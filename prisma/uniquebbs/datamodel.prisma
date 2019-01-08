@@ -1,0 +1,55 @@
+type Group {
+  gid: Int! @unique
+  name: String!
+  master: [User!]!
+}
+type User {
+  uid: Int! @unique
+  openid: Int!
+  isAdmin: Boolean! @default(value:false)
+  group: Group!
+  posts: Int! @default(value: 0)
+  time: DateTime!
+  lastLogin: Int!
+  signature: String! @default(value: "Hello World!")
+}
+type Forum{
+  fid: Int! @unique
+  name: String!
+  master: [User!]!
+  threads: Int! @default(value: 0)
+  lastPost: Post
+}
+type Post{
+  pid: Int! @unique
+  forum: Forum!
+  user: User!
+  thread: Thread!
+  time: DateTime!
+  isFirst: Int! @default(value:0)
+  quote: Int! @default(value:-1)
+  message: String!
+}
+type Thread{
+  tid: Int! @unique
+  user: User! 
+  forum: Forum!
+  time: DateTime!
+  subject: String!
+  post: [Post!]!
+  top: Boolean! @default(value:false)
+  closed: Boolean! @default(value:false)
+  diamond: Boolean! @default(value:false)
+  attach: [Attach!]!
+}
+type Attach{
+  aid: Int! @unique
+  user: User!
+  post: Post!
+  thread: Thread!
+  forum: Forum!
+  filesize: Int!
+  time: DateTime!
+  downloads: Int! @default(value:0)
+  fileName: String!
+}

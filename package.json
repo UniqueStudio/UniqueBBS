@@ -1,0 +1,11 @@
+{
+  "name": "UniqueBBS",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/ttzztztz/UniqueBBS.git",
+  "author": "ttzztztz <935319340@qq.com>",
+  "license": "MIT",
+  "dependencies": {
+    
+  }
+}
