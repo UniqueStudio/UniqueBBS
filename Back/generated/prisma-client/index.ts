@@ -17,6 +17,7 @@ export interface Exists {
   attach: (where?: AttachWhereInput) => Promise<boolean>;
   forum: (where?: ForumWhereInput) => Promise<boolean>;
   group: (where?: GroupWhereInput) => Promise<boolean>;
+  message: (where?: MessageWhereInput) => Promise<boolean>;
   post: (where?: PostWhereInput) => Promise<boolean>;
   thread: (where?: ThreadWhereInput) => Promise<boolean>;
   user: (where?: UserWhereInput) => Promise<boolean>;
@@ -110,6 +111,29 @@ export interface Prisma {
       last?: Int;
     }
   ) => GroupConnectionPromise;
+  message: (where: MessageWhereUniqueInput) => MessagePromise;
+  messages: (
+    args?: {
+      where?: MessageWhereInput;
+      orderBy?: MessageOrderByInput;
+      skip?: Int;
+      after?: String;
+      before?: String;
+      first?: Int;
+      last?: Int;
+    }
+  ) => FragmentableArray<Message>;
+  messagesConnection: (
+    args?: {
+      where?: MessageWhereInput;
+      orderBy?: MessageOrderByInput;
+      skip?: Int;
+      after?: String;
+      before?: String;
+      first?: Int;
+      last?: Int;
+    }
+  ) => MessageConnectionPromise;
   post: (where: PostWhereUniqueInput) => PostPromise;
   posts: (
     args?: {
@@ -233,6 +257,22 @@ export interface Prisma {
   ) => GroupPromise;
   deleteGroup: (where: GroupWhereUniqueInput) => GroupPromise;
   deleteManyGroups: (where?: GroupWhereInput) => BatchPayloadPromise;
+  createMessage: (data: MessageCreateInput) => MessagePromise;
+  updateMessage: (
+    args: { data: MessageUpdateInput; where: MessageWhereUniqueInput }
+  ) => MessagePromise;
+  updateManyMessages: (
+    args: { data: MessageUpdateManyMutationInput; where?: MessageWhereInput }
+  ) => BatchPayloadPromise;
+  upsertMessage: (
+    args: {
+      where: MessageWhereUniqueInput;
+      create: MessageCreateInput;
+      update: MessageUpdateInput;
+    }
+  ) => MessagePromise;
+  deleteMessage: (where: MessageWhereUniqueInput) => MessagePromise;
+  deleteManyMessages: (where?: MessageWhereInput) => BatchPayloadPromise;
   createPost: (data: PostCreateInput) => PostPromise;
   updatePost: (
     args: { data: PostUpdateInput; where: PostWhereUniqueInput }
@@ -299,6 +339,9 @@ export interface Subscription {
   group: (
     where?: GroupSubscriptionWhereInput
   ) => GroupSubscriptionPayloadSubscription;
+  message: (
+    where?: MessageSubscriptionWhereInput
+  ) => MessageSubscriptionPayloadSubscription;
   post: (
     where?: PostSubscriptionWhereInput
   ) => PostSubscriptionPayloadSubscription;
@@ -318,95 +361,69 @@ export interface ClientConstructor<T> {
  * Types
  */
 
-export type UserOrderByInput =
-  | "uid_ASC"
-  | "uid_DESC"
-  | "openid_ASC"
-  | "openid_DESC"
-  | "isAdmin_ASC"
-  | "isAdmin_DESC"
-  | "posts_ASC"
-  | "posts_DESC"
-  | "time_ASC"
-  | "time_DESC"
-  | "lastLogin_ASC"
-  | "lastLogin_DESC"
-  | "signature_ASC"
-  | "signature_DESC"
+export type GroupOrderByInput =
   | "id_ASC"
   | "id_DESC"
+  | "name_ASC"
+  | "name_DESC"
   | "createdAt_ASC"
   | "createdAt_DESC"
   | "updatedAt_ASC"
   | "updatedAt_DESC";
 
 export type PostOrderByInput =
-  | "pid_ASC"
-  | "pid_DESC"
-  | "time_ASC"
-  | "time_DESC"
+  | "id_ASC"
+  | "id_DESC"
   | "isFirst_ASC"
   | "isFirst_DESC"
   | "quote_ASC"
   | "quote_DESC"
   | "message_ASC"
   | "message_DESC"
-  | "id_ASC"
-  | "id_DESC"
   | "createdAt_ASC"
   | "createdAt_DESC"
   | "updatedAt_ASC"
   | "updatedAt_DESC";
 
 export type AttachOrderByInput =
-  | "aid_ASC"
-  | "aid_DESC"
+  | "id_ASC"
+  | "id_DESC"
   | "filesize_ASC"
   | "filesize_DESC"
-  | "time_ASC"
-  | "time_DESC"
   | "downloads_ASC"
   | "downloads_DESC"
   | "fileName_ASC"
   | "fileName_DESC"
-  | "id_ASC"
-  | "id_DESC"
   | "createdAt_ASC"
   | "createdAt_DESC"
   | "updatedAt_ASC"
   | "updatedAt_DESC";
 
 export type ForumOrderByInput =
-  | "fid_ASC"
-  | "fid_DESC"
+  | "id_ASC"
+  | "id_DESC"
   | "name_ASC"
   | "name_DESC"
   | "threads_ASC"
   | "threads_DESC"
-  | "id_ASC"
-  | "id_DESC"
   | "createdAt_ASC"
   | "createdAt_DESC"
   | "updatedAt_ASC"
   | "updatedAt_DESC";
 
-export type GroupOrderByInput =
-  | "gid_ASC"
-  | "gid_DESC"
-  | "name_ASC"
-  | "name_DESC"
+export type MessageOrderByInput =
   | "id_ASC"
   | "id_DESC"
+  | "message_ASC"
+  | "message_DESC"
   | "createdAt_ASC"
   | "createdAt_DESC"
   | "updatedAt_ASC"
   | "updatedAt_DESC";
 
 export type ThreadOrderByInput =
-  | "tid_ASC"
-  | "tid_DESC"
-  | "time_ASC"
-  | "time_DESC"
+  | "id_ASC"
+  | "id_DESC"
   | "subject_ASC"
   | "subject_DESC"
   | "top_ASC"
@@ -415,8 +432,26 @@ export type ThreadOrderByInput =
   | "closed_DESC"
   | "diamond_ASC"
   | "diamond_DESC"
+  | "createdAt_ASC"
+  | "createdAt_DESC"
+  | "updatedAt_ASC"
+  | "updatedAt_DESC";
+
+export type UserOrderByInput =
   | "id_ASC"
   | "id_DESC"
+  | "username_ASC"
+  | "username_DESC"
+  | "openid_ASC"
+  | "openid_DESC"
+  | "isAdmin_ASC"
+  | "isAdmin_DESC"
+  | "posts_ASC"
+  | "posts_DESC"
+  | "lastLogin_ASC"
+  | "lastLogin_DESC"
+  | "signature_ASC"
+  | "signature_DESC"
   | "createdAt_ASC"
   | "createdAt_DESC"
   | "updatedAt_ASC"
@@ -425,81 +460,24 @@ export type ThreadOrderByInput =
 export type MutationType = "CREATED" | "UPDATED" | "DELETED";
 
 export type AttachWhereUniqueInput = AtLeastOne<{
-  aid: Int;
+  id: ID_Input;
 }>;
 
-export interface UserWhereInput {
-  uid?: Int;
-  uid_not?: Int;
-  uid_in?: Int[] | Int;
-  uid_not_in?: Int[] | Int;
-  uid_lt?: Int;
-  uid_lte?: Int;
-  uid_gt?: Int;
-  uid_gte?: Int;
-  openid?: Int;
-  openid_not?: Int;
-  openid_in?: Int[] | Int;
-  openid_not_in?: Int[] | Int;
-  openid_lt?: Int;
-  openid_lte?: Int;
-  openid_gt?: Int;
-  openid_gte?: Int;
-  isAdmin?: Boolean;
-  isAdmin_not?: Boolean;
-  group?: GroupWhereInput;
-  posts?: Int;
-  posts_not?: Int;
-  posts_in?: Int[] | Int;
-  posts_not_in?: Int[] | Int;
-  posts_lt?: Int;
-  posts_lte?: Int;
-  posts_gt?: Int;
-  posts_gte?: Int;
-  time?: DateTimeInput;
-  time_not?: DateTimeInput;
-  time_in?: DateTimeInput[] | DateTimeInput;
-  time_not_in?: DateTimeInput[] | DateTimeInput;
-  time_lt?: DateTimeInput;
-  time_lte?: DateTimeInput;
-  time_gt?: DateTimeInput;
-  time_gte?: DateTimeInput;
-  lastLogin?: Int;
-  lastLogin_not?: Int;
-  lastLogin_in?: Int[] | Int;
-  lastLogin_not_in?: Int[] | Int;
-  lastLogin_lt?: Int;
-  lastLogin_lte?: Int;
-  lastLogin_gt?: Int;
-  lastLogin_gte?: Int;
-  signature?: String;
-  signature_not?: String;
-  signature_in?: String[] | String;
-  signature_not_in?: String[] | String;
-  signature_lt?: String;
-  signature_lte?: String;
-  signature_gt?: String;
-  signature_gte?: String;
-  signature_contains?: String;
-  signature_not_contains?: String;
-  signature_starts_with?: String;
-  signature_not_starts_with?: String;
-  signature_ends_with?: String;
-  signature_not_ends_with?: String;
-  AND?: UserWhereInput[] | UserWhereInput;
-  OR?: UserWhereInput[] | UserWhereInput;
-  NOT?: UserWhereInput[] | UserWhereInput;
-}
-
 export interface GroupWhereInput {
-  gid?: Int;
-  gid_not?: Int;
-  gid_in?: Int[] | Int;
-  gid_not_in?: Int[] | Int;
-  gid_lt?: Int;
-  gid_lte?: Int;
-  gid_gt?: Int;
-  gid_gte?: Int;
+  id?: ID_Input;
+  id_not?: ID_Input;
+  id_in?: ID_Input[] | ID_Input;
+  id_not_in?: ID_Input[] | ID_Input;
+  id_lt?: ID_Input;
+  id_lte?: ID_Input;
+  id_gt?: ID_Input;
+  id_gte?: ID_Input;
+  id_contains?: ID_Input;
+  id_not_contains?: ID_Input;
+  id_starts_with?: ID_Input;
+  id_not_starts_with?: ID_Input;
+  id_ends_with?: ID_Input;
+  id_not_ends_with?: ID_Input;
   name?: String;
   name_not?: String;
   name_in?: String[] | String;
@@ -514,42 +492,110 @@ export interface GroupWhereInput {
   name_not_starts_with?: String;
   name_ends_with?: String;
   name_not_ends_with?: String;
-  master_every?: UserWhereInput;
-  master_some?: UserWhereInput;
-  master_none?: UserWhereInput;
+  master?: UserWhereInput;
   AND?: GroupWhereInput[] | GroupWhereInput;
   OR?: GroupWhereInput[] | GroupWhereInput;
   NOT?: GroupWhereInput[] | GroupWhereInput;
 }
 
+export interface UserWhereInput {
+  id?: ID_Input;
+  id_not?: ID_Input;
+  id_in?: ID_Input[] | ID_Input;
+  id_not_in?: ID_Input[] | ID_Input;
+  id_lt?: ID_Input;
+  id_lte?: ID_Input;
+  id_gt?: ID_Input;
+  id_gte?: ID_Input;
+  id_contains?: ID_Input;
+  id_not_contains?: ID_Input;
+  id_starts_with?: ID_Input;
+  id_not_starts_with?: ID_Input;
+  id_ends_with?: ID_Input;
+  id_not_ends_with?: ID_Input;
+  username?: String;
+  username_not?: String;
+  username_in?: String[] | String;
+  username_not_in?: String[] | String;
+  username_lt?: String;
+  username_lte?: String;
+  username_gt?: String;
+  username_gte?: String;
+  username_contains?: String;
+  username_not_contains?: String;
+  username_starts_with?: String;
+  username_not_starts_with?: String;
+  username_ends_with?: String;
+  username_not_ends_with?: String;
+  openid?: Int;
+  openid_not?: Int;
+  openid_in?: Int[] | Int;
+  openid_not_in?: Int[] | Int;
+  openid_lt?: Int;
+  openid_lte?: Int;
+  openid_gt?: Int;
+  openid_gte?: Int;
+  isAdmin?: Boolean;
+  isAdmin_not?: Boolean;
+  group_every?: GroupWhereInput;
+  group_some?: GroupWhereInput;
+  group_none?: GroupWhereInput;
+  posts?: Int;
+  posts_not?: Int;
+  posts_in?: Int[] | Int;
+  posts_not_in?: Int[] | Int;
+  posts_lt?: Int;
+  posts_lte?: Int;
+  posts_gt?: Int;
+  posts_gte?: Int;
+  lastLogin?: DateTimeInput;
+  lastLogin_not?: DateTimeInput;
+  lastLogin_in?: DateTimeInput[] | DateTimeInput;
+  lastLogin_not_in?: DateTimeInput[] | DateTimeInput;
+  lastLogin_lt?: DateTimeInput;
+  lastLogin_lte?: DateTimeInput;
+  lastLogin_gt?: DateTimeInput;
+  lastLogin_gte?: DateTimeInput;
+  signature?: String;
+  signature_not?: String;
+  signature_in?: String[] | String;
+  signature_not_in?: String[] | String;
+  signature_lt?: String;
+  signature_lte?: String;
+  signature_gt?: String;
+  signature_gte?: String;
+  signature_contains?: String;
+  signature_not_contains?: String;
+  signature_starts_with?: String;
+  signature_not_starts_with?: String;
+  signature_ends_with?: String;
+  signature_not_ends_with?: String;
+  mentor?: UserWhereInput;
+  AND?: UserWhereInput[] | UserWhereInput;
+  OR?: UserWhereInput[] | UserWhereInput;
+  NOT?: UserWhereInput[] | UserWhereInput;
+}
+
 export interface PostWhereInput {
-  pid?: Int;
-  pid_not?: Int;
-  pid_in?: Int[] | Int;
-  pid_not_in?: Int[] | Int;
-  pid_lt?: Int;
-  pid_lte?: Int;
-  pid_gt?: Int;
-  pid_gte?: Int;
+  id?: ID_Input;
+  id_not?: ID_Input;
+  id_in?: ID_Input[] | ID_Input;
+  id_not_in?: ID_Input[] | ID_Input;
+  id_lt?: ID_Input;
+  id_lte?: ID_Input;
+  id_gt?: ID_Input;
+  id_gte?: ID_Input;
+  id_contains?: ID_Input;
+  id_not_contains?: ID_Input;
+  id_starts_with?: ID_Input;
+  id_not_starts_with?: ID_Input;
+  id_ends_with?: ID_Input;
+  id_not_ends_with?: ID_Input;
   forum?: ForumWhereInput;
   user?: UserWhereInput;
   thread?: ThreadWhereInput;
-  time?: DateTimeInput;
-  time_not?: DateTimeInput;
-  time_in?: DateTimeInput[] | DateTimeInput;
-  time_not_in?: DateTimeInput[] | DateTimeInput;
-  time_lt?: DateTimeInput;
-  time_lte?: DateTimeInput;
-  time_gt?: DateTimeInput;
-  time_gte?: DateTimeInput;
-  isFirst?: Int;
-  isFirst_not?: Int;
-  isFirst_in?: Int[] | Int;
-  isFirst_not_in?: Int[] | Int;
-  isFirst_lt?: Int;
-  isFirst_lte?: Int;
-  isFirst_gt?: Int;
-  isFirst_gte?: Int;
+  isFirst?: Boolean;
+  isFirst_not?: Boolean;
   quote?: Int;
   quote_not?: Int;
   quote_in?: Int[] | Int;
@@ -578,14 +624,20 @@ export interface PostWhereInput {
 }
 
 export interface ForumWhereInput {
-  fid?: Int;
-  fid_not?: Int;
-  fid_in?: Int[] | Int;
-  fid_not_in?: Int[] | Int;
-  fid_lt?: Int;
-  fid_lte?: Int;
-  fid_gt?: Int;
-  fid_gte?: Int;
+  id?: ID_Input;
+  id_not?: ID_Input;
+  id_in?: ID_Input[] | ID_Input;
+  id_not_in?: ID_Input[] | ID_Input;
+  id_lt?: ID_Input;
+  id_lte?: ID_Input;
+  id_gt?: ID_Input;
+  id_gte?: ID_Input;
+  id_contains?: ID_Input;
+  id_not_contains?: ID_Input;
+  id_starts_with?: ID_Input;
+  id_not_starts_with?: ID_Input;
+  id_ends_with?: ID_Input;
+  id_not_ends_with?: ID_Input;
   name?: String;
   name_not?: String;
   name_in?: String[] | String;
@@ -600,9 +652,6 @@ export interface ForumWhereInput {
   name_not_starts_with?: String;
   name_ends_with?: String;
   name_not_ends_with?: String;
-  master_every?: UserWhereInput;
-  master_some?: UserWhereInput;
-  master_none?: UserWhereInput;
   threads?: Int;
   threads_not?: Int;
   threads_in?: Int[] | Int;
@@ -618,24 +667,22 @@ export interface ForumWhereInput {
 }
 
 export interface ThreadWhereInput {
-  tid?: Int;
-  tid_not?: Int;
-  tid_in?: Int[] | Int;
-  tid_not_in?: Int[] | Int;
-  tid_lt?: Int;
-  tid_lte?: Int;
-  tid_gt?: Int;
-  tid_gte?: Int;
+  id?: ID_Input;
+  id_not?: ID_Input;
+  id_in?: ID_Input[] | ID_Input;
+  id_not_in?: ID_Input[] | ID_Input;
+  id_lt?: ID_Input;
+  id_lte?: ID_Input;
+  id_gt?: ID_Input;
+  id_gte?: ID_Input;
+  id_contains?: ID_Input;
+  id_not_contains?: ID_Input;
+  id_starts_with?: ID_Input;
+  id_not_starts_with?: ID_Input;
+  id_ends_with?: ID_Input;
+  id_not_ends_with?: ID_Input;
   user?: UserWhereInput;
   forum?: ForumWhereInput;
-  time?: DateTimeInput;
-  time_not?: DateTimeInput;
-  time_in?: DateTimeInput[] | DateTimeInput;
-  time_not_in?: DateTimeInput[] | DateTimeInput;
-  time_lt?: DateTimeInput;
-  time_lte?: DateTimeInput;
-  time_gt?: DateTimeInput;
-  time_gte?: DateTimeInput;
   subject?: String;
   subject_not?: String;
   subject_in?: String[] | String;
@@ -668,14 +715,20 @@ export interface ThreadWhereInput {
 }
 
 export interface AttachWhereInput {
-  aid?: Int;
-  aid_not?: Int;
-  aid_in?: Int[] | Int;
-  aid_not_in?: Int[] | Int;
-  aid_lt?: Int;
-  aid_lte?: Int;
-  aid_gt?: Int;
-  aid_gte?: Int;
+  id?: ID_Input;
+  id_not?: ID_Input;
+  id_in?: ID_Input[] | ID_Input;
+  id_not_in?: ID_Input[] | ID_Input;
+  id_lt?: ID_Input;
+  id_lte?: ID_Input;
+  id_gt?: ID_Input;
+  id_gte?: ID_Input;
+  id_contains?: ID_Input;
+  id_not_contains?: ID_Input;
+  id_starts_with?: ID_Input;
+  id_not_starts_with?: ID_Input;
+  id_ends_with?: ID_Input;
+  id_not_ends_with?: ID_Input;
   user?: UserWhereInput;
   post?: PostWhereInput;
   thread?: ThreadWhereInput;
@@ -688,14 +741,6 @@ export interface AttachWhereInput {
   filesize_lte?: Int;
   filesize_gt?: Int;
   filesize_gte?: Int;
-  time?: DateTimeInput;
-  time_not?: DateTimeInput;
-  time_in?: DateTimeInput[] | DateTimeInput;
-  time_not_in?: DateTimeInput[] | DateTimeInput;
-  time_lt?: DateTimeInput;
-  time_lte?: DateTimeInput;
-  time_gt?: DateTimeInput;
-  time_gte?: DateTimeInput;
   downloads?: Int;
   downloads_not?: Int;
   downloads_in?: Int[] | Int;
@@ -724,33 +769,71 @@ export interface AttachWhereInput {
 }
 
 export type ForumWhereUniqueInput = AtLeastOne<{
-  fid: Int;
+  id: ID_Input;
 }>;
 
 export type GroupWhereUniqueInput = AtLeastOne<{
-  gid: Int;
+  id: ID_Input;
 }>;
 
+export type MessageWhereUniqueInput = AtLeastOne<{
+  id: ID_Input;
+}>;
+
+export interface MessageWhereInput {
+  id?: ID_Input;
+  id_not?: ID_Input;
+  id_in?: ID_Input[] | ID_Input;
+  id_not_in?: ID_Input[] | ID_Input;
+  id_lt?: ID_Input;
+  id_lte?: ID_Input;
+  id_gt?: ID_Input;
+  id_gte?: ID_Input;
+  id_contains?: ID_Input;
+  id_not_contains?: ID_Input;
+  id_starts_with?: ID_Input;
+  id_not_starts_with?: ID_Input;
+  id_ends_with?: ID_Input;
+  id_not_ends_with?: ID_Input;
+  fromUser?: UserWhereInput;
+  toUser?: UserWhereInput;
+  message?: String;
+  message_not?: String;
+  message_in?: String[] | String;
+  message_not_in?: String[] | String;
+  message_lt?: String;
+  message_lte?: String;
+  message_gt?: String;
+  message_gte?: String;
+  message_contains?: String;
+  message_not_contains?: String;
+  message_starts_with?: String;
+  message_not_starts_with?: String;
+  message_ends_with?: String;
+  message_not_ends_with?: String;
+  AND?: MessageWhereInput[] | MessageWhereInput;
+  OR?: MessageWhereInput[] | MessageWhereInput;
+  NOT?: MessageWhereInput[] | MessageWhereInput;
+}
+
 export type PostWhereUniqueInput = AtLeastOne<{
-  pid: Int;
+  id: ID_Input;
 }>;
 
 export type ThreadWhereUniqueInput = AtLeastOne<{
-  tid: Int;
+  id: ID_Input;
 }>;
 
 export type UserWhereUniqueInput = AtLeastOne<{
-  uid: Int;
+  id: ID_Input;
 }>;
 
 export interface AttachCreateInput {
-  aid: Int;
   user: UserCreateOneInput;
   post: PostCreateOneInput;
   thread: ThreadCreateOneWithoutAttachInput;
   forum: ForumCreateOneInput;
   filesize: Int;
-  time: DateTimeInput;
   downloads?: Int;
   fileName: String;
 }
@@ -761,23 +844,22 @@ export interface UserCreateOneInput {
 }
 
 export interface UserCreateInput {
-  uid: Int;
+  username: String;
   openid: Int;
   isAdmin?: Boolean;
-  group: GroupCreateOneWithoutMasterInput;
+  group?: GroupCreateManyWithoutMasterInput;
   posts?: Int;
-  time: DateTimeInput;
-  lastLogin: Int;
+  lastLogin: DateTimeInput;
   signature?: String;
+  mentor?: UserCreateOneInput;
 }
 
-export interface GroupCreateOneWithoutMasterInput {
-  create?: GroupCreateWithoutMasterInput;
-  connect?: GroupWhereUniqueInput;
+export interface GroupCreateManyWithoutMasterInput {
+  create?: GroupCreateWithoutMasterInput[] | GroupCreateWithoutMasterInput;
+  connect?: GroupWhereUniqueInput[] | GroupWhereUniqueInput;
 }
 
 export interface GroupCreateWithoutMasterInput {
-  gid: Int;
   name: String;
 }
 
@@ -787,12 +869,10 @@ export interface PostCreateOneInput {
 }
 
 export interface PostCreateInput {
-  pid: Int;
   forum: ForumCreateOneWithoutLastPostInput;
   user: UserCreateOneInput;
   thread: ThreadCreateOneWithoutPostInput;
-  time: DateTimeInput;
-  isFirst?: Int;
+  isFirst?: Boolean;
   quote?: Int;
   message: String;
 }
@@ -803,15 +883,8 @@ export interface ForumCreateOneWithoutLastPostInput {
 }
 
 export interface ForumCreateWithoutLastPostInput {
-  fid: Int;
   name: String;
-  master?: UserCreateManyInput;
   threads?: Int;
-}
-
-export interface UserCreateManyInput {
-  create?: UserCreateInput[] | UserCreateInput;
-  connect?: UserWhereUniqueInput[] | UserWhereUniqueInput;
 }
 
 export interface ThreadCreateOneWithoutPostInput {
@@ -820,10 +893,8 @@ export interface ThreadCreateOneWithoutPostInput {
 }
 
 export interface ThreadCreateWithoutPostInput {
-  tid: Int;
   user: UserCreateOneInput;
   forum: ForumCreateOneInput;
-  time: DateTimeInput;
   subject: String;
   top?: Boolean;
   closed?: Boolean;
@@ -837,9 +908,7 @@ export interface ForumCreateOneInput {
 }
 
 export interface ForumCreateInput {
-  fid: Int;
   name: String;
-  master?: UserCreateManyInput;
   threads?: Int;
   lastPost?: PostCreateOneWithoutForumInput;
 }
@@ -850,11 +919,9 @@ export interface PostCreateOneWithoutForumInput {
 }
 
 export interface PostCreateWithoutForumInput {
-  pid: Int;
   user: UserCreateOneInput;
   thread: ThreadCreateOneWithoutPostInput;
-  time: DateTimeInput;
-  isFirst?: Int;
+  isFirst?: Boolean;
   quote?: Int;
   message: String;
 }
@@ -865,12 +932,10 @@ export interface AttachCreateManyWithoutThreadInput {
 }
 
 export interface AttachCreateWithoutThreadInput {
-  aid: Int;
   user: UserCreateOneInput;
   post: PostCreateOneInput;
   forum: ForumCreateOneInput;
   filesize: Int;
-  time: DateTimeInput;
   downloads?: Int;
   fileName: String;
 }
@@ -881,10 +946,8 @@ export interface ThreadCreateOneWithoutAttachInput {
 }
 
 export interface ThreadCreateWithoutAttachInput {
-  tid: Int;
   user: UserCreateOneInput;
   forum: ForumCreateOneInput;
-  time: DateTimeInput;
   subject: String;
   post?: PostCreateManyWithoutThreadInput;
   top?: Boolean;
@@ -898,23 +961,19 @@ export interface PostCreateManyWithoutThreadInput {
 }
 
 export interface PostCreateWithoutThreadInput {
-  pid: Int;
   forum: ForumCreateOneWithoutLastPostInput;
   user: UserCreateOneInput;
-  time: DateTimeInput;
-  isFirst?: Int;
+  isFirst?: Boolean;
   quote?: Int;
   message: String;
 }
 
 export interface AttachUpdateInput {
-  aid?: Int;
   user?: UserUpdateOneRequiredInput;
   post?: PostUpdateOneRequiredInput;
   thread?: ThreadUpdateOneRequiredWithoutAttachInput;
   forum?: ForumUpdateOneRequiredInput;
   filesize?: Int;
-  time?: DateTimeInput;
   downloads?: Int;
   fileName?: String;
 }
@@ -927,31 +986,98 @@ export interface UserUpdateOneRequiredInput {
 }
 
 export interface UserUpdateDataInput {
-  uid?: Int;
+  username?: String;
   openid?: Int;
   isAdmin?: Boolean;
-  group?: GroupUpdateOneRequiredWithoutMasterInput;
+  group?: GroupUpdateManyWithoutMasterInput;
   posts?: Int;
-  time?: DateTimeInput;
-  lastLogin?: Int;
+  lastLogin?: DateTimeInput;
   signature?: String;
+  mentor?: UserUpdateOneInput;
 }
 
-export interface GroupUpdateOneRequiredWithoutMasterInput {
-  create?: GroupCreateWithoutMasterInput;
-  update?: GroupUpdateWithoutMasterDataInput;
-  upsert?: GroupUpsertWithoutMasterInput;
-  connect?: GroupWhereUniqueInput;
+export interface GroupUpdateManyWithoutMasterInput {
+  create?: GroupCreateWithoutMasterInput[] | GroupCreateWithoutMasterInput;
+  delete?: GroupWhereUniqueInput[] | GroupWhereUniqueInput;
+  connect?: GroupWhereUniqueInput[] | GroupWhereUniqueInput;
+  disconnect?: GroupWhereUniqueInput[] | GroupWhereUniqueInput;
+  update?:
+    | GroupUpdateWithWhereUniqueWithoutMasterInput[]
+    | GroupUpdateWithWhereUniqueWithoutMasterInput;
+  upsert?:
+    | GroupUpsertWithWhereUniqueWithoutMasterInput[]
+    | GroupUpsertWithWhereUniqueWithoutMasterInput;
+  deleteMany?: GroupScalarWhereInput[] | GroupScalarWhereInput;
+  updateMany?:
+    | GroupUpdateManyWithWhereNestedInput[]
+    | GroupUpdateManyWithWhereNestedInput;
+}
+
+export interface GroupUpdateWithWhereUniqueWithoutMasterInput {
+  where: GroupWhereUniqueInput;
+  data: GroupUpdateWithoutMasterDataInput;
 }
 
 export interface GroupUpdateWithoutMasterDataInput {
-  gid?: Int;
   name?: String;
 }
 
-export interface GroupUpsertWithoutMasterInput {
+export interface GroupUpsertWithWhereUniqueWithoutMasterInput {
+  where: GroupWhereUniqueInput;
   update: GroupUpdateWithoutMasterDataInput;
   create: GroupCreateWithoutMasterInput;
+}
+
+export interface GroupScalarWhereInput {
+  id?: ID_Input;
+  id_not?: ID_Input;
+  id_in?: ID_Input[] | ID_Input;
+  id_not_in?: ID_Input[] | ID_Input;
+  id_lt?: ID_Input;
+  id_lte?: ID_Input;
+  id_gt?: ID_Input;
+  id_gte?: ID_Input;
+  id_contains?: ID_Input;
+  id_not_contains?: ID_Input;
+  id_starts_with?: ID_Input;
+  id_not_starts_with?: ID_Input;
+  id_ends_with?: ID_Input;
+  id_not_ends_with?: ID_Input;
+  name?: String;
+  name_not?: String;
+  name_in?: String[] | String;
+  name_not_in?: String[] | String;
+  name_lt?: String;
+  name_lte?: String;
+  name_gt?: String;
+  name_gte?: String;
+  name_contains?: String;
+  name_not_contains?: String;
+  name_starts_with?: String;
+  name_not_starts_with?: String;
+  name_ends_with?: String;
+  name_not_ends_with?: String;
+  AND?: GroupScalarWhereInput[] | GroupScalarWhereInput;
+  OR?: GroupScalarWhereInput[] | GroupScalarWhereInput;
+  NOT?: GroupScalarWhereInput[] | GroupScalarWhereInput;
+}
+
+export interface GroupUpdateManyWithWhereNestedInput {
+  where: GroupScalarWhereInput;
+  data: GroupUpdateManyDataInput;
+}
+
+export interface GroupUpdateManyDataInput {
+  name?: String;
+}
+
+export interface UserUpdateOneInput {
+  create?: UserCreateInput;
+  update?: UserUpdateDataInput;
+  upsert?: UserUpsertNestedInput;
+  delete?: Boolean;
+  disconnect?: Boolean;
+  connect?: UserWhereUniqueInput;
 }
 
 export interface UserUpsertNestedInput {
@@ -967,12 +1093,10 @@ export interface PostUpdateOneRequiredInput {
 }
 
 export interface PostUpdateDataInput {
-  pid?: Int;
   forum?: ForumUpdateOneRequiredWithoutLastPostInput;
   user?: UserUpdateOneRequiredInput;
   thread?: ThreadUpdateOneRequiredWithoutPostInput;
-  time?: DateTimeInput;
-  isFirst?: Int;
+  isFirst?: Boolean;
   quote?: Int;
   message?: String;
 }
@@ -985,115 +1109,8 @@ export interface ForumUpdateOneRequiredWithoutLastPostInput {
 }
 
 export interface ForumUpdateWithoutLastPostDataInput {
-  fid?: Int;
   name?: String;
-  master?: UserUpdateManyInput;
   threads?: Int;
-}
-
-export interface UserUpdateManyInput {
-  create?: UserCreateInput[] | UserCreateInput;
-  update?:
-    | UserUpdateWithWhereUniqueNestedInput[]
-    | UserUpdateWithWhereUniqueNestedInput;
-  upsert?:
-    | UserUpsertWithWhereUniqueNestedInput[]
-    | UserUpsertWithWhereUniqueNestedInput;
-  delete?: UserWhereUniqueInput[] | UserWhereUniqueInput;
-  connect?: UserWhereUniqueInput[] | UserWhereUniqueInput;
-  disconnect?: UserWhereUniqueInput[] | UserWhereUniqueInput;
-  deleteMany?: UserScalarWhereInput[] | UserScalarWhereInput;
-  updateMany?:
-    | UserUpdateManyWithWhereNestedInput[]
-    | UserUpdateManyWithWhereNestedInput;
-}
-
-export interface UserUpdateWithWhereUniqueNestedInput {
-  where: UserWhereUniqueInput;
-  data: UserUpdateDataInput;
-}
-
-export interface UserUpsertWithWhereUniqueNestedInput {
-  where: UserWhereUniqueInput;
-  update: UserUpdateDataInput;
-  create: UserCreateInput;
-}
-
-export interface UserScalarWhereInput {
-  uid?: Int;
-  uid_not?: Int;
-  uid_in?: Int[] | Int;
-  uid_not_in?: Int[] | Int;
-  uid_lt?: Int;
-  uid_lte?: Int;
-  uid_gt?: Int;
-  uid_gte?: Int;
-  openid?: Int;
-  openid_not?: Int;
-  openid_in?: Int[] | Int;
-  openid_not_in?: Int[] | Int;
-  openid_lt?: Int;
-  openid_lte?: Int;
-  openid_gt?: Int;
-  openid_gte?: Int;
-  isAdmin?: Boolean;
-  isAdmin_not?: Boolean;
-  posts?: Int;
-  posts_not?: Int;
-  posts_in?: Int[] | Int;
-  posts_not_in?: Int[] | Int;
-  posts_lt?: Int;
-  posts_lte?: Int;
-  posts_gt?: Int;
-  posts_gte?: Int;
-  time?: DateTimeInput;
-  time_not?: DateTimeInput;
-  time_in?: DateTimeInput[] | DateTimeInput;
-  time_not_in?: DateTimeInput[] | DateTimeInput;
-  time_lt?: DateTimeInput;
-  time_lte?: DateTimeInput;
-  time_gt?: DateTimeInput;
-  time_gte?: DateTimeInput;
-  lastLogin?: Int;
-  lastLogin_not?: Int;
-  lastLogin_in?: Int[] | Int;
-  lastLogin_not_in?: Int[] | Int;
-  lastLogin_lt?: Int;
-  lastLogin_lte?: Int;
-  lastLogin_gt?: Int;
-  lastLogin_gte?: Int;
-  signature?: String;
-  signature_not?: String;
-  signature_in?: String[] | String;
-  signature_not_in?: String[] | String;
-  signature_lt?: String;
-  signature_lte?: String;
-  signature_gt?: String;
-  signature_gte?: String;
-  signature_contains?: String;
-  signature_not_contains?: String;
-  signature_starts_with?: String;
-  signature_not_starts_with?: String;
-  signature_ends_with?: String;
-  signature_not_ends_with?: String;
-  AND?: UserScalarWhereInput[] | UserScalarWhereInput;
-  OR?: UserScalarWhereInput[] | UserScalarWhereInput;
-  NOT?: UserScalarWhereInput[] | UserScalarWhereInput;
-}
-
-export interface UserUpdateManyWithWhereNestedInput {
-  where: UserScalarWhereInput;
-  data: UserUpdateManyDataInput;
-}
-
-export interface UserUpdateManyDataInput {
-  uid?: Int;
-  openid?: Int;
-  isAdmin?: Boolean;
-  posts?: Int;
-  time?: DateTimeInput;
-  lastLogin?: Int;
-  signature?: String;
 }
 
 export interface ForumUpsertWithoutLastPostInput {
@@ -1109,10 +1126,8 @@ export interface ThreadUpdateOneRequiredWithoutPostInput {
 }
 
 export interface ThreadUpdateWithoutPostDataInput {
-  tid?: Int;
   user?: UserUpdateOneRequiredInput;
   forum?: ForumUpdateOneRequiredInput;
-  time?: DateTimeInput;
   subject?: String;
   top?: Boolean;
   closed?: Boolean;
@@ -1128,9 +1143,7 @@ export interface ForumUpdateOneRequiredInput {
 }
 
 export interface ForumUpdateDataInput {
-  fid?: Int;
   name?: String;
-  master?: UserUpdateManyInput;
   threads?: Int;
   lastPost?: PostUpdateOneWithoutForumInput;
 }
@@ -1145,11 +1158,9 @@ export interface PostUpdateOneWithoutForumInput {
 }
 
 export interface PostUpdateWithoutForumDataInput {
-  pid?: Int;
   user?: UserUpdateOneRequiredInput;
   thread?: ThreadUpdateOneRequiredWithoutPostInput;
-  time?: DateTimeInput;
-  isFirst?: Int;
+  isFirst?: Boolean;
   quote?: Int;
   message?: String;
 }
@@ -1187,12 +1198,10 @@ export interface AttachUpdateWithWhereUniqueWithoutThreadInput {
 }
 
 export interface AttachUpdateWithoutThreadDataInput {
-  aid?: Int;
   user?: UserUpdateOneRequiredInput;
   post?: PostUpdateOneRequiredInput;
   forum?: ForumUpdateOneRequiredInput;
   filesize?: Int;
-  time?: DateTimeInput;
   downloads?: Int;
   fileName?: String;
 }
@@ -1204,14 +1213,20 @@ export interface AttachUpsertWithWhereUniqueWithoutThreadInput {
 }
 
 export interface AttachScalarWhereInput {
-  aid?: Int;
-  aid_not?: Int;
-  aid_in?: Int[] | Int;
-  aid_not_in?: Int[] | Int;
-  aid_lt?: Int;
-  aid_lte?: Int;
-  aid_gt?: Int;
-  aid_gte?: Int;
+  id?: ID_Input;
+  id_not?: ID_Input;
+  id_in?: ID_Input[] | ID_Input;
+  id_not_in?: ID_Input[] | ID_Input;
+  id_lt?: ID_Input;
+  id_lte?: ID_Input;
+  id_gt?: ID_Input;
+  id_gte?: ID_Input;
+  id_contains?: ID_Input;
+  id_not_contains?: ID_Input;
+  id_starts_with?: ID_Input;
+  id_not_starts_with?: ID_Input;
+  id_ends_with?: ID_Input;
+  id_not_ends_with?: ID_Input;
   filesize?: Int;
   filesize_not?: Int;
   filesize_in?: Int[] | Int;
@@ -1220,14 +1235,6 @@ export interface AttachScalarWhereInput {
   filesize_lte?: Int;
   filesize_gt?: Int;
   filesize_gte?: Int;
-  time?: DateTimeInput;
-  time_not?: DateTimeInput;
-  time_in?: DateTimeInput[] | DateTimeInput;
-  time_not_in?: DateTimeInput[] | DateTimeInput;
-  time_lt?: DateTimeInput;
-  time_lte?: DateTimeInput;
-  time_gt?: DateTimeInput;
-  time_gte?: DateTimeInput;
   downloads?: Int;
   downloads_not?: Int;
   downloads_in?: Int[] | Int;
@@ -1261,9 +1268,7 @@ export interface AttachUpdateManyWithWhereNestedInput {
 }
 
 export interface AttachUpdateManyDataInput {
-  aid?: Int;
   filesize?: Int;
-  time?: DateTimeInput;
   downloads?: Int;
   fileName?: String;
 }
@@ -1286,10 +1291,8 @@ export interface ThreadUpdateOneRequiredWithoutAttachInput {
 }
 
 export interface ThreadUpdateWithoutAttachDataInput {
-  tid?: Int;
   user?: UserUpdateOneRequiredInput;
   forum?: ForumUpdateOneRequiredInput;
-  time?: DateTimeInput;
   subject?: String;
   post?: PostUpdateManyWithoutThreadInput;
   top?: Boolean;
@@ -1320,11 +1323,9 @@ export interface PostUpdateWithWhereUniqueWithoutThreadInput {
 }
 
 export interface PostUpdateWithoutThreadDataInput {
-  pid?: Int;
   forum?: ForumUpdateOneRequiredWithoutLastPostInput;
   user?: UserUpdateOneRequiredInput;
-  time?: DateTimeInput;
-  isFirst?: Int;
+  isFirst?: Boolean;
   quote?: Int;
   message?: String;
 }
@@ -1336,30 +1337,22 @@ export interface PostUpsertWithWhereUniqueWithoutThreadInput {
 }
 
 export interface PostScalarWhereInput {
-  pid?: Int;
-  pid_not?: Int;
-  pid_in?: Int[] | Int;
-  pid_not_in?: Int[] | Int;
-  pid_lt?: Int;
-  pid_lte?: Int;
-  pid_gt?: Int;
-  pid_gte?: Int;
-  time?: DateTimeInput;
-  time_not?: DateTimeInput;
-  time_in?: DateTimeInput[] | DateTimeInput;
-  time_not_in?: DateTimeInput[] | DateTimeInput;
-  time_lt?: DateTimeInput;
-  time_lte?: DateTimeInput;
-  time_gt?: DateTimeInput;
-  time_gte?: DateTimeInput;
-  isFirst?: Int;
-  isFirst_not?: Int;
-  isFirst_in?: Int[] | Int;
-  isFirst_not_in?: Int[] | Int;
-  isFirst_lt?: Int;
-  isFirst_lte?: Int;
-  isFirst_gt?: Int;
-  isFirst_gte?: Int;
+  id?: ID_Input;
+  id_not?: ID_Input;
+  id_in?: ID_Input[] | ID_Input;
+  id_not_in?: ID_Input[] | ID_Input;
+  id_lt?: ID_Input;
+  id_lte?: ID_Input;
+  id_gt?: ID_Input;
+  id_gte?: ID_Input;
+  id_contains?: ID_Input;
+  id_not_contains?: ID_Input;
+  id_starts_with?: ID_Input;
+  id_not_starts_with?: ID_Input;
+  id_ends_with?: ID_Input;
+  id_not_ends_with?: ID_Input;
+  isFirst?: Boolean;
+  isFirst_not?: Boolean;
   quote?: Int;
   quote_not?: Int;
   quote_in?: Int[] | Int;
@@ -1393,9 +1386,7 @@ export interface PostUpdateManyWithWhereNestedInput {
 }
 
 export interface PostUpdateManyDataInput {
-  pid?: Int;
-  time?: DateTimeInput;
-  isFirst?: Int;
+  isFirst?: Boolean;
   quote?: Int;
   message?: String;
 }
@@ -1406,121 +1397,109 @@ export interface ThreadUpsertWithoutAttachInput {
 }
 
 export interface AttachUpdateManyMutationInput {
-  aid?: Int;
   filesize?: Int;
-  time?: DateTimeInput;
   downloads?: Int;
   fileName?: String;
 }
 
 export interface ForumUpdateInput {
-  fid?: Int;
   name?: String;
-  master?: UserUpdateManyInput;
   threads?: Int;
   lastPost?: PostUpdateOneWithoutForumInput;
 }
 
 export interface ForumUpdateManyMutationInput {
-  fid?: Int;
   name?: String;
   threads?: Int;
 }
 
 export interface GroupCreateInput {
-  gid: Int;
   name: String;
-  master?: UserCreateManyWithoutGroupInput;
+  master?: UserCreateOneWithoutGroupInput;
 }
 
-export interface UserCreateManyWithoutGroupInput {
-  create?: UserCreateWithoutGroupInput[] | UserCreateWithoutGroupInput;
-  connect?: UserWhereUniqueInput[] | UserWhereUniqueInput;
+export interface UserCreateOneWithoutGroupInput {
+  create?: UserCreateWithoutGroupInput;
+  connect?: UserWhereUniqueInput;
 }
 
 export interface UserCreateWithoutGroupInput {
-  uid: Int;
+  username: String;
   openid: Int;
   isAdmin?: Boolean;
   posts?: Int;
-  time: DateTimeInput;
-  lastLogin: Int;
+  lastLogin: DateTimeInput;
   signature?: String;
+  mentor?: UserCreateOneInput;
 }
 
 export interface GroupUpdateInput {
-  gid?: Int;
   name?: String;
-  master?: UserUpdateManyWithoutGroupInput;
+  master?: UserUpdateOneWithoutGroupInput;
 }
 
-export interface UserUpdateManyWithoutGroupInput {
-  create?: UserCreateWithoutGroupInput[] | UserCreateWithoutGroupInput;
-  delete?: UserWhereUniqueInput[] | UserWhereUniqueInput;
-  connect?: UserWhereUniqueInput[] | UserWhereUniqueInput;
-  disconnect?: UserWhereUniqueInput[] | UserWhereUniqueInput;
-  update?:
-    | UserUpdateWithWhereUniqueWithoutGroupInput[]
-    | UserUpdateWithWhereUniqueWithoutGroupInput;
-  upsert?:
-    | UserUpsertWithWhereUniqueWithoutGroupInput[]
-    | UserUpsertWithWhereUniqueWithoutGroupInput;
-  deleteMany?: UserScalarWhereInput[] | UserScalarWhereInput;
-  updateMany?:
-    | UserUpdateManyWithWhereNestedInput[]
-    | UserUpdateManyWithWhereNestedInput;
-}
-
-export interface UserUpdateWithWhereUniqueWithoutGroupInput {
-  where: UserWhereUniqueInput;
-  data: UserUpdateWithoutGroupDataInput;
+export interface UserUpdateOneWithoutGroupInput {
+  create?: UserCreateWithoutGroupInput;
+  update?: UserUpdateWithoutGroupDataInput;
+  upsert?: UserUpsertWithoutGroupInput;
+  delete?: Boolean;
+  disconnect?: Boolean;
+  connect?: UserWhereUniqueInput;
 }
 
 export interface UserUpdateWithoutGroupDataInput {
-  uid?: Int;
+  username?: String;
   openid?: Int;
   isAdmin?: Boolean;
   posts?: Int;
-  time?: DateTimeInput;
-  lastLogin?: Int;
+  lastLogin?: DateTimeInput;
   signature?: String;
+  mentor?: UserUpdateOneInput;
 }
 
-export interface UserUpsertWithWhereUniqueWithoutGroupInput {
-  where: UserWhereUniqueInput;
+export interface UserUpsertWithoutGroupInput {
   update: UserUpdateWithoutGroupDataInput;
   create: UserCreateWithoutGroupInput;
 }
 
 export interface GroupUpdateManyMutationInput {
-  gid?: Int;
   name?: String;
 }
 
+export interface MessageCreateInput {
+  fromUser: UserCreateOneInput;
+  toUser: UserCreateOneInput;
+  message: String;
+}
+
+export interface MessageUpdateInput {
+  fromUser?: UserUpdateOneRequiredInput;
+  toUser?: UserUpdateOneRequiredInput;
+  message?: String;
+}
+
+export interface MessageUpdateManyMutationInput {
+  message?: String;
+}
+
 export interface PostUpdateInput {
-  pid?: Int;
   forum?: ForumUpdateOneRequiredWithoutLastPostInput;
   user?: UserUpdateOneRequiredInput;
   thread?: ThreadUpdateOneRequiredWithoutPostInput;
-  time?: DateTimeInput;
-  isFirst?: Int;
+  isFirst?: Boolean;
   quote?: Int;
   message?: String;
 }
 
 export interface PostUpdateManyMutationInput {
-  pid?: Int;
-  time?: DateTimeInput;
-  isFirst?: Int;
+  isFirst?: Boolean;
   quote?: Int;
   message?: String;
 }
 
 export interface ThreadCreateInput {
-  tid: Int;
   user: UserCreateOneInput;
   forum: ForumCreateOneInput;
-  time: DateTimeInput;
   subject: String;
   post?: PostCreateManyWithoutThreadInput;
   top?: Boolean;
@@ -1530,10 +1509,8 @@ export interface ThreadCreateInput {
 }
 
 export interface ThreadUpdateInput {
-  tid?: Int;
   user?: UserUpdateOneRequiredInput;
   forum?: ForumUpdateOneRequiredInput;
-  time?: DateTimeInput;
   subject?: String;
   post?: PostUpdateManyWithoutThreadInput;
   top?: Boolean;
@@ -1543,8 +1520,6 @@ export interface ThreadUpdateInput {
 }
 
 export interface ThreadUpdateManyMutationInput {
-  tid?: Int;
-  time?: DateTimeInput;
   subject?: String;
   top?: Boolean;
   closed?: Boolean;
@@ -1552,23 +1527,22 @@ export interface ThreadUpdateManyMutationInput {
 }
 
 export interface UserUpdateInput {
-  uid?: Int;
+  username?: String;
   openid?: Int;
   isAdmin?: Boolean;
-  group?: GroupUpdateOneRequiredWithoutMasterInput;
+  group?: GroupUpdateManyWithoutMasterInput;
   posts?: Int;
-  time?: DateTimeInput;
-  lastLogin?: Int;
+  lastLogin?: DateTimeInput;
   signature?: String;
+  mentor?: UserUpdateOneInput;
 }
 
 export interface UserUpdateManyMutationInput {
-  uid?: Int;
+  username?: String;
   openid?: Int;
   isAdmin?: Boolean;
   posts?: Int;
-  time?: DateTimeInput;
-  lastLogin?: Int;
+  lastLogin?: DateTimeInput;
   signature?: String;
 }
 
@@ -1603,6 +1577,17 @@ export interface GroupSubscriptionWhereInput {
   AND?: GroupSubscriptionWhereInput[] | GroupSubscriptionWhereInput;
   OR?: GroupSubscriptionWhereInput[] | GroupSubscriptionWhereInput;
   NOT?: GroupSubscriptionWhereInput[] | GroupSubscriptionWhereInput;
+}
+
+export interface MessageSubscriptionWhereInput {
+  mutation_in?: MutationType[] | MutationType;
+  updatedFields_contains?: String;
+  updatedFields_contains_every?: String[] | String;
+  updatedFields_contains_some?: String[] | String;
+  node?: MessageWhereInput;
+  AND?: MessageSubscriptionWhereInput[] | MessageSubscriptionWhereInput;
+  OR?: MessageSubscriptionWhereInput[] | MessageSubscriptionWhereInput;
+  NOT?: MessageSubscriptionWhereInput[] | MessageSubscriptionWhereInput;
 }
 
 export interface PostSubscriptionWhereInput {
@@ -1643,21 +1628,19 @@ export interface NodeNode {
 }
 
 export interface Attach {
-  aid: Int;
+  id: ID_Output;
   filesize: Int;
-  time: DateTimeOutput;
   downloads: Int;
   fileName: String;
 }
 
 export interface AttachPromise extends Promise<Attach>, Fragmentable {
-  aid: () => Promise<Int>;
+  id: () => Promise<ID_Output>;
   user: <T = UserPromise>() => T;
   post: <T = PostPromise>() => T;
   thread: <T = ThreadPromise>() => T;
   forum: <T = ForumPromise>() => T;
   filesize: () => Promise<Int>;
-  time: () => Promise<DateTimeOutput>;
   downloads: () => Promise<Int>;
   fileName: () => Promise<String>;
 }
@@ -1665,63 +1648,59 @@ export interface AttachPromise extends Promise<Attach>, Fragmentable {
 export interface AttachSubscription
   extends Promise<AsyncIterator<Attach>>,
     Fragmentable {
-  aid: () => Promise<AsyncIterator<Int>>;
+  id: () => Promise<AsyncIterator<ID_Output>>;
   user: <T = UserSubscription>() => T;
   post: <T = PostSubscription>() => T;
   thread: <T = ThreadSubscription>() => T;
   forum: <T = ForumSubscription>() => T;
   filesize: () => Promise<AsyncIterator<Int>>;
-  time: () => Promise<AsyncIterator<DateTimeOutput>>;
   downloads: () => Promise<AsyncIterator<Int>>;
   fileName: () => Promise<AsyncIterator<String>>;
 }
 
 export interface User {
-  uid: Int;
+  id: ID_Output;
+  username: String;
   openid: Int;
   isAdmin: Boolean;
   posts: Int;
-  time: DateTimeOutput;
-  lastLogin: Int;
+  lastLogin: DateTimeOutput;
   signature: String;
 }
 
 export interface UserPromise extends Promise<User>, Fragmentable {
-  uid: () => Promise<Int>;
+  id: () => Promise<ID_Output>;
+  username: () => Promise<String>;
   openid: () => Promise<Int>;
   isAdmin: () => Promise<Boolean>;
-  group: <T = GroupPromise>() => T;
+  group: <T = FragmentableArray<Group>>(
+    args?: {
+      where?: GroupWhereInput;
+      orderBy?: GroupOrderByInput;
+      skip?: Int;
+      after?: String;
+      before?: String;
+      first?: Int;
+      last?: Int;
+    }
+  ) => T;
   posts: () => Promise<Int>;
-  time: () => Promise<DateTimeOutput>;
-  lastLogin: () => Promise<Int>;
+  lastLogin: () => Promise<DateTimeOutput>;
   signature: () => Promise<String>;
+  mentor: <T = UserPromise>() => T;
 }
 
 export interface UserSubscription
   extends Promise<AsyncIterator<User>>,
     Fragmentable {
-  uid: () => Promise<AsyncIterator<Int>>;
+  id: () => Promise<AsyncIterator<ID_Output>>;
+  username: () => Promise<AsyncIterator<String>>;
   openid: () => Promise<AsyncIterator<Int>>;
   isAdmin: () => Promise<AsyncIterator<Boolean>>;
-  group: <T = GroupSubscription>() => T;
-  posts: () => Promise<AsyncIterator<Int>>;
-  time: () => Promise<AsyncIterator<DateTimeOutput>>;
-  lastLogin: () => Promise<AsyncIterator<Int>>;
-  signature: () => Promise<AsyncIterator<String>>;
-}
-
-export interface Group {
-  gid: Int;
-  name: String;
-}
-
-export interface GroupPromise extends Promise<Group>, Fragmentable {
-  gid: () => Promise<Int>;
-  name: () => Promise<String>;
-  master: <T = FragmentableArray<User>>(
+  group: <T = Promise<AsyncIterator<GroupSubscription>>>(
     args?: {
-      where?: UserWhereInput;
-      orderBy?: UserOrderByInput;
+      where?: GroupWhereInput;
+      orderBy?: GroupOrderByInput;
       skip?: Int;
       after?: String;
       before?: String;
@@ -1729,41 +1708,44 @@ export interface GroupPromise extends Promise<Group>, Fragmentable {
       last?: Int;
     }
   ) => T;
+  posts: () => Promise<AsyncIterator<Int>>;
+  lastLogin: () => Promise<AsyncIterator<DateTimeOutput>>;
+  signature: () => Promise<AsyncIterator<String>>;
+  mentor: <T = UserSubscription>() => T;
+}
+
+export interface Group {
+  id: ID_Output;
+  name: String;
+}
+
+export interface GroupPromise extends Promise<Group>, Fragmentable {
+  id: () => Promise<ID_Output>;
+  name: () => Promise<String>;
+  master: <T = UserPromise>() => T;
 }
 
 export interface GroupSubscription
   extends Promise<AsyncIterator<Group>>,
     Fragmentable {
-  gid: () => Promise<AsyncIterator<Int>>;
+  id: () => Promise<AsyncIterator<ID_Output>>;
   name: () => Promise<AsyncIterator<String>>;
-  master: <T = Promise<AsyncIterator<UserSubscription>>>(
-    args?: {
-      where?: UserWhereInput;
-      orderBy?: UserOrderByInput;
-      skip?: Int;
-      after?: String;
-      before?: String;
-      first?: Int;
-      last?: Int;
-    }
-  ) => T;
+  master: <T = UserSubscription>() => T;
 }
 
 export interface Post {
-  pid: Int;
-  time: DateTimeOutput;
-  isFirst: Int;
+  id: ID_Output;
+  isFirst: Boolean;
   quote: Int;
   message: String;
 }
 
 export interface PostPromise extends Promise<Post>, Fragmentable {
-  pid: () => Promise<Int>;
+  id: () => Promise<ID_Output>;
   forum: <T = ForumPromise>() => T;
   user: <T = UserPromise>() => T;
   thread: <T = ThreadPromise>() => T;
-  time: () => Promise<DateTimeOutput>;
-  isFirst: () => Promise<Int>;
+  isFirst: () => Promise<Boolean>;
   quote: () => Promise<Int>;
   message: () => Promise<String>;
 }
@@ -1771,36 +1753,24 @@ export interface PostPromise extends Promise<Post>, Fragmentable {
 export interface PostSubscription
   extends Promise<AsyncIterator<Post>>,
     Fragmentable {
-  pid: () => Promise<AsyncIterator<Int>>;
+  id: () => Promise<AsyncIterator<ID_Output>>;
   forum: <T = ForumSubscription>() => T;
   user: <T = UserSubscription>() => T;
   thread: <T = ThreadSubscription>() => T;
-  time: () => Promise<AsyncIterator<DateTimeOutput>>;
-  isFirst: () => Promise<AsyncIterator<Int>>;
+  isFirst: () => Promise<AsyncIterator<Boolean>>;
   quote: () => Promise<AsyncIterator<Int>>;
   message: () => Promise<AsyncIterator<String>>;
 }
 
 export interface Forum {
-  fid: Int;
+  id: ID_Output;
   name: String;
   threads: Int;
 }
 
 export interface ForumPromise extends Promise<Forum>, Fragmentable {
-  fid: () => Promise<Int>;
+  id: () => Promise<ID_Output>;
   name: () => Promise<String>;
-  master: <T = FragmentableArray<User>>(
-    args?: {
-      where?: UserWhereInput;
-      orderBy?: UserOrderByInput;
-      skip?: Int;
-      after?: String;
-      before?: String;
-      first?: Int;
-      last?: Int;
-    }
-  ) => T;
   threads: () => Promise<Int>;
   lastPost: <T = PostPromise>() => T;
 }
@@ -1808,26 +1778,14 @@ export interface ForumPromise extends Promise<Forum>, Fragmentable {
 export interface ForumSubscription
   extends Promise<AsyncIterator<Forum>>,
     Fragmentable {
-  fid: () => Promise<AsyncIterator<Int>>;
+  id: () => Promise<AsyncIterator<ID_Output>>;
   name: () => Promise<AsyncIterator<String>>;
-  master: <T = Promise<AsyncIterator<UserSubscription>>>(
-    args?: {
-      where?: UserWhereInput;
-      orderBy?: UserOrderByInput;
-      skip?: Int;
-      after?: String;
-      before?: String;
-      first?: Int;
-      last?: Int;
-    }
-  ) => T;
   threads: () => Promise<AsyncIterator<Int>>;
   lastPost: <T = PostSubscription>() => T;
 }
 
 export interface Thread {
-  tid: Int;
-  time: DateTimeOutput;
+  id: ID_Output;
   subject: String;
   top: Boolean;
   closed: Boolean;
@@ -1835,10 +1793,9 @@ export interface Thread {
 }
 
 export interface ThreadPromise extends Promise<Thread>, Fragmentable {
-  tid: () => Promise<Int>;
+  id: () => Promise<ID_Output>;
   user: <T = UserPromise>() => T;
   forum: <T = ForumPromise>() => T;
-  time: () => Promise<DateTimeOutput>;
   subject: () => Promise<String>;
   post: <T = FragmentableArray<Post>>(
     args?: {
@@ -1870,10 +1827,9 @@ export interface ThreadPromise extends Promise<Thread>, Fragmentable {
 export interface ThreadSubscription
   extends Promise<AsyncIterator<Thread>>,
     Fragmentable {
-  tid: () => Promise<AsyncIterator<Int>>;
+  id: () => Promise<AsyncIterator<ID_Output>>;
   user: <T = UserSubscription>() => T;
   forum: <T = ForumSubscription>() => T;
-  time: () => Promise<AsyncIterator<DateTimeOutput>>;
   subject: () => Promise<AsyncIterator<String>>;
   post: <T = Promise<AsyncIterator<PostSubscription>>>(
     args?: {
@@ -2087,6 +2043,81 @@ export interface AggregateGroupSubscription
   count: () => Promise<AsyncIterator<Int>>;
 }
 
+export interface Message {
+  id: ID_Output;
+  message: String;
+}
+
+export interface MessagePromise extends Promise<Message>, Fragmentable {
+  id: () => Promise<ID_Output>;
+  fromUser: <T = UserPromise>() => T;
+  toUser: <T = UserPromise>() => T;
+  message: () => Promise<String>;
+}
+
+export interface MessageSubscription
+  extends Promise<AsyncIterator<Message>>,
+    Fragmentable {
+  id: () => Promise<AsyncIterator<ID_Output>>;
+  fromUser: <T = UserSubscription>() => T;
+  toUser: <T = UserSubscription>() => T;
+  message: () => Promise<AsyncIterator<String>>;
+}
+
+export interface MessageConnection {
+  pageInfo: PageInfo;
+  edges: MessageEdge[];
+}
+
+export interface MessageConnectionPromise
+  extends Promise<MessageConnection>,
+    Fragmentable {
+  pageInfo: <T = PageInfoPromise>() => T;
+  edges: <T = FragmentableArray<MessageEdge>>() => T;
+  aggregate: <T = AggregateMessagePromise>() => T;
+}
+
+export interface MessageConnectionSubscription
+  extends Promise<AsyncIterator<MessageConnection>>,
+    Fragmentable {
+  pageInfo: <T = PageInfoSubscription>() => T;
+  edges: <T = Promise<AsyncIterator<MessageEdgeSubscription>>>() => T;
+  aggregate: <T = AggregateMessageSubscription>() => T;
+}
+
+export interface MessageEdge {
+  node: Message;
+  cursor: String;
+}
+
+export interface MessageEdgePromise extends Promise<MessageEdge>, Fragmentable {
+  node: <T = MessagePromise>() => T;
+  cursor: () => Promise<String>;
+}
+
+export interface MessageEdgeSubscription
+  extends Promise<AsyncIterator<MessageEdge>>,
+    Fragmentable {
+  node: <T = MessageSubscription>() => T;
+  cursor: () => Promise<AsyncIterator<String>>;
+}
+
+export interface AggregateMessage {
+  count: Int;
+}
+
+export interface AggregateMessagePromise
+  extends Promise<AggregateMessage>,
+    Fragmentable {
+  count: () => Promise<Int>;
+}
+
+export interface AggregateMessageSubscription
+  extends Promise<AsyncIterator<AggregateMessage>>,
+    Fragmentable {
+  count: () => Promise<AsyncIterator<Int>>;
+}
+
 export interface PostConnection {
   pageInfo: PageInfo;
   edges: PostEdge[];
@@ -2291,9 +2322,8 @@ export interface AttachSubscriptionPayloadSubscription
 }
 
 export interface AttachPreviousValues {
-  aid: Int;
+  id: ID_Output;
   filesize: Int;
-  time: DateTimeOutput;
   downloads: Int;
   fileName: String;
 }
@@ -2301,9 +2331,8 @@ export interface AttachPreviousValues {
 export interface AttachPreviousValuesPromise
   extends Promise<AttachPreviousValues>,
     Fragmentable {
-  aid: () => Promise<Int>;
+  id: () => Promise<ID_Output>;
   filesize: () => Promise<Int>;
-  time: () => Promise<DateTimeOutput>;
   downloads: () => Promise<Int>;
   fileName: () => Promise<String>;
 }
@@ -2311,9 +2340,8 @@ export interface AttachPreviousValuesPromise
 export interface AttachPreviousValuesSubscription
   extends Promise<AsyncIterator<AttachPreviousValues>>,
     Fragmentable {
-  aid: () => Promise<AsyncIterator<Int>>;
+  id: () => Promise<AsyncIterator<ID_Output>>;
   filesize: () => Promise<AsyncIterator<Int>>;
-  time: () => Promise<AsyncIterator<DateTimeOutput>>;
   downloads: () => Promise<AsyncIterator<Int>>;
   fileName: () => Promise<AsyncIterator<String>>;
 }
@@ -2344,7 +2372,7 @@ export interface ForumSubscriptionPayloadSubscription
 }
 
 export interface ForumPreviousValues {
-  fid: Int;
+  id: ID_Output;
   name: String;
   threads: Int;
 }
@@ -2352,7 +2380,7 @@ export interface ForumPreviousValues {
 export interface ForumPreviousValuesPromise
   extends Promise<ForumPreviousValues>,
     Fragmentable {
-  fid: () => Promise<Int>;
+  id: () => Promise<ID_Output>;
   name: () => Promise<String>;
   threads: () => Promise<Int>;
 }
@@ -2360,7 +2388,7 @@ export interface ForumPreviousValuesPromise
 export interface ForumPreviousValuesSubscription
   extends Promise<AsyncIterator<ForumPreviousValues>>,
     Fragmentable {
-  fid: () => Promise<AsyncIterator<Int>>;
+  id: () => Promise<AsyncIterator<ID_Output>>;
   name: () => Promise<AsyncIterator<String>>;
   threads: () => Promise<AsyncIterator<Int>>;
 }
@@ -2391,22 +2419,66 @@ export interface GroupSubscriptionPayloadSubscription
 }
 
 export interface GroupPreviousValues {
-  gid: Int;
+  id: ID_Output;
   name: String;
 }
 
 export interface GroupPreviousValuesPromise
   extends Promise<GroupPreviousValues>,
     Fragmentable {
-  gid: () => Promise<Int>;
+  id: () => Promise<ID_Output>;
   name: () => Promise<String>;
 }
 
 export interface GroupPreviousValuesSubscription
   extends Promise<AsyncIterator<GroupPreviousValues>>,
     Fragmentable {
-  gid: () => Promise<AsyncIterator<Int>>;
+  id: () => Promise<AsyncIterator<ID_Output>>;
   name: () => Promise<AsyncIterator<String>>;
+}
+
+export interface MessageSubscriptionPayload {
+  mutation: MutationType;
+  node: Message;
+  updatedFields: String[];
+  previousValues: MessagePreviousValues;
+}
+
+export interface MessageSubscriptionPayloadPromise
+  extends Promise<MessageSubscriptionPayload>,
+    Fragmentable {
+  mutation: () => Promise<MutationType>;
+  node: <T = MessagePromise>() => T;
+  updatedFields: () => Promise<String[]>;
+  previousValues: <T = MessagePreviousValuesPromise>() => T;
+}
+
+export interface MessageSubscriptionPayloadSubscription
+  extends Promise<AsyncIterator<MessageSubscriptionPayload>>,
+    Fragmentable {
+  mutation: () => Promise<AsyncIterator<MutationType>>;
+  node: <T = MessageSubscription>() => T;
+  updatedFields: () => Promise<AsyncIterator<String[]>>;
+  previousValues: <T = MessagePreviousValuesSubscription>() => T;
+}
+
+export interface MessagePreviousValues {
+  id: ID_Output;
+  message: String;
+}
+
+export interface MessagePreviousValuesPromise
+  extends Promise<MessagePreviousValues>,
+    Fragmentable {
+  id: () => Promise<ID_Output>;
+  message: () => Promise<String>;
+}
+
+export interface MessagePreviousValuesSubscription
+  extends Promise<AsyncIterator<MessagePreviousValues>>,
+    Fragmentable {
+  id: () => Promise<AsyncIterator<ID_Output>>;
+  message: () => Promise<AsyncIterator<String>>;
 }
 
 export interface PostSubscriptionPayload {
@@ -2435,9 +2507,8 @@ export interface PostSubscriptionPayloadSubscription
 }
 
 export interface PostPreviousValues {
-  pid: Int;
-  time: DateTimeOutput;
-  isFirst: Int;
+  id: ID_Output;
+  isFirst: Boolean;
   quote: Int;
   message: String;
 }
@@ -2445,9 +2516,8 @@ export interface PostPreviousValues {
 export interface PostPreviousValuesPromise
   extends Promise<PostPreviousValues>,
     Fragmentable {
-  pid: () => Promise<Int>;
-  time: () => Promise<DateTimeOutput>;
-  isFirst: () => Promise<Int>;
+  id: () => Promise<ID_Output>;
+  isFirst: () => Promise<Boolean>;
   quote: () => Promise<Int>;
   message: () => Promise<String>;
 }
@@ -2455,9 +2525,8 @@ export interface PostPreviousValuesPromise
 export interface PostPreviousValuesSubscription
   extends Promise<AsyncIterator<PostPreviousValues>>,
     Fragmentable {
-  pid: () => Promise<AsyncIterator<Int>>;
-  time: () => Promise<AsyncIterator<DateTimeOutput>>;
-  isFirst: () => Promise<AsyncIterator<Int>>;
+  id: () => Promise<AsyncIterator<ID_Output>>;
+  isFirst: () => Promise<AsyncIterator<Boolean>>;
   quote: () => Promise<AsyncIterator<Int>>;
   message: () => Promise<AsyncIterator<String>>;
 }
@@ -2488,8 +2557,7 @@ export interface ThreadSubscriptionPayloadSubscription
 }
 
 export interface ThreadPreviousValues {
-  tid: Int;
-  time: DateTimeOutput;
+  id: ID_Output;
   subject: String;
   top: Boolean;
   closed: Boolean;
@@ -2499,8 +2567,7 @@ export interface ThreadPreviousValues {
 export interface ThreadPreviousValuesPromise
   extends Promise<ThreadPreviousValues>,
     Fragmentable {
-  tid: () => Promise<Int>;
-  time: () => Promise<DateTimeOutput>;
+  id: () => Promise<ID_Output>;
   subject: () => Promise<String>;
   top: () => Promise<Boolean>;
   closed: () => Promise<Boolean>;
@@ -2510,8 +2577,7 @@ export interface ThreadPreviousValuesPromise
 export interface ThreadPreviousValuesSubscription
   extends Promise<AsyncIterator<ThreadPreviousValues>>,
     Fragmentable {
-  tid: () => Promise<AsyncIterator<Int>>;
-  time: () => Promise<AsyncIterator<DateTimeOutput>>;
+  id: () => Promise<AsyncIterator<ID_Output>>;
   subject: () => Promise<AsyncIterator<String>>;
   top: () => Promise<AsyncIterator<Boolean>>;
   closed: () => Promise<AsyncIterator<Boolean>>;
@@ -2544,38 +2610,49 @@ export interface UserSubscriptionPayloadSubscription
 }
 
 export interface UserPreviousValues {
-  uid: Int;
+  id: ID_Output;
+  username: String;
   openid: Int;
   isAdmin: Boolean;
   posts: Int;
-  time: DateTimeOutput;
-  lastLogin: Int;
+  lastLogin: DateTimeOutput;
   signature: String;
 }
 
 export interface UserPreviousValuesPromise
   extends Promise<UserPreviousValues>,
     Fragmentable {
-  uid: () => Promise<Int>;
+  id: () => Promise<ID_Output>;
+  username: () => Promise<String>;
   openid: () => Promise<Int>;
   isAdmin: () => Promise<Boolean>;
   posts: () => Promise<Int>;
-  time: () => Promise<DateTimeOutput>;
-  lastLogin: () => Promise<Int>;
+  lastLogin: () => Promise<DateTimeOutput>;
   signature: () => Promise<String>;
 }
 
 export interface UserPreviousValuesSubscription
   extends Promise<AsyncIterator<UserPreviousValues>>,
     Fragmentable {
-  uid: () => Promise<AsyncIterator<Int>>;
+  id: () => Promise<AsyncIterator<ID_Output>>;
+  username: () => Promise<AsyncIterator<String>>;
   openid: () => Promise<AsyncIterator<Int>>;
   isAdmin: () => Promise<AsyncIterator<Boolean>>;
   posts: () => Promise<AsyncIterator<Int>>;
-  time: () => Promise<AsyncIterator<DateTimeOutput>>;
-  lastLogin: () => Promise<AsyncIterator<Int>>;
+  lastLogin: () => Promise<AsyncIterator<DateTimeOutput>>;
   signature: () => Promise<AsyncIterator<String>>;
 }
+
+/*
+The `ID` scalar type represents a unique identifier, often used to refetch an object or as key for a cache. The ID type appears in a JSON response as a String; however, it is not intended to be human-readable. When expected as an input type, any string (such as `"4"`) or integer (such as `4`) input value will be accepted as an ID.
+*/
+export type ID_Input = string | number;
+export type ID_Output = string;
+
+/*
+The `String` scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
+*/
+export type String = string;
 
 /*
 The `Int` scalar type represents non-fractional signed whole numeric values. Int can represent values between -(2^31) and 2^31 - 1. 
@@ -2588,11 +2665,6 @@ The `Boolean` scalar type represents `true` or `false`.
 export type Boolean = boolean;
 
 /*
-The `String` scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
-*/
-export type String = string;
-
-/*
 DateTime scalar input type, allowing Date
 */
 export type DateTimeInput = Date | string;
@@ -2601,12 +2673,6 @@ export type DateTimeInput = Date | string;
 DateTime scalar output type, which is always a string
 */
 export type DateTimeOutput = string;
-
-/*
-The `ID` scalar type represents a unique identifier, often used to refetch an object or as key for a cache. The ID type appears in a JSON response as a String; however, it is not intended to be human-readable. When expected as an input type, any string (such as `"4"`) or integer (such as `4`) input value will be accepted as an ID.
-*/
-export type ID_Input = string | number;
-export type ID_Output = string;
 
 export type Long = string;
 
@@ -2625,6 +2691,10 @@ export const models: Model[] = [
   },
   {
     name: "Group",
+    embedded: false
+  },
+  {
+    name: "Message",
     embedded: false
   },
   {

@@ -1,40 +1,38 @@
 type Group {
-  gid: Int! @unique
+  id: ID! @unique
   name: String!
-  master: [User!]!
+  master: User
 }
 type User {
-  uid: Int! @unique
+  id: ID! @unique
+  username: String!
   openid: Int!
   isAdmin: Boolean! @default(value:false)
-  group: Group!
+  group: [Group!]!
   posts: Int! @default(value: 0)
-  time: DateTime!
-  lastLogin: Int!
-  signature: String! @default(value: "Hello World!")
+  lastLogin: DateTime!
+  signature: String! @default(value: "")
+  mentor: User
 }
 type Forum{
-  fid: Int! @unique
+  id: ID! @unique
   name: String!
-  master: [User!]!
   threads: Int! @default(value: 0)
   lastPost: Post
 }
 type Post{
-  pid: Int! @unique
+  id: ID! @unique
   forum: Forum!
   user: User!
   thread: Thread!
-  time: DateTime!
-  isFirst: Int! @default(value:0)
+  isFirst: Boolean! @default(value:false)
   quote: Int! @default(value:-1)
   message: String!
 }
 type Thread{
-  tid: Int! @unique
+  id: ID! @unique
   user: User! 
   forum: Forum!
-  time: DateTime!
   subject: String!
   post: [Post!]!
   top: Boolean! @default(value:false)
@@ -43,13 +41,18 @@ type Thread{
   attach: [Attach!]!
 }
 type Attach{
-  aid: Int! @unique
+  id: ID! @unique
   user: User!
   post: Post!
   thread: Thread!
   forum: Forum!
   filesize: Int!
-  time: DateTime!
   downloads: Int! @default(value:0)
   fileName: String!
+}
+type Message{
+  id: ID! @unique
+  fromUser: User! @relation(name:"MsgFromUser")
+  toUser: User! @relation(name:"MsgToUser")
+  message: String!
 }

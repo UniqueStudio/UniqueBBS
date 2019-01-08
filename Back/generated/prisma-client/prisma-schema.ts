@@ -10,6 +10,10 @@ type AggregateGroup {
   count: Int!
 }
 
+type AggregateMessage {
+  count: Int!
+}
+
 type AggregatePost {
   count: Int!
 }
@@ -23,13 +27,12 @@ type AggregateUser {
 }
 
 type Attach {
-  aid: Int!
+  id: ID!
   user: User!
   post: Post!
   thread: Thread!
   forum: Forum!
   filesize: Int!
-  time: DateTime!
   downloads: Int!
   fileName: String!
 }
@@ -41,13 +44,11 @@ type AttachConnection {
 }
 
 input AttachCreateInput {
-  aid: Int!
   user: UserCreateOneInput!
   post: PostCreateOneInput!
   thread: ThreadCreateOneWithoutAttachInput!
   forum: ForumCreateOneInput!
   filesize: Int!
-  time: DateTime!
   downloads: Int
   fileName: String!
 }
@@ -58,12 +59,10 @@ input AttachCreateManyWithoutThreadInput {
 }
 
 input AttachCreateWithoutThreadInput {
-  aid: Int!
   user: UserCreateOneInput!
   post: PostCreateOneInput!
   forum: ForumCreateOneInput!
   filesize: Int!
-  time: DateTime!
   downloads: Int
   fileName: String!
 }
@@ -74,18 +73,14 @@ type AttachEdge {
 }
 
 enum AttachOrderByInput {
-  aid_ASC
-  aid_DESC
+  id_ASC
+  id_DESC
   filesize_ASC
   filesize_DESC
-  time_ASC
-  time_DESC
   downloads_ASC
   downloads_DESC
   fileName_ASC
   fileName_DESC
-  id_ASC
-  id_DESC
   createdAt_ASC
   createdAt_DESC
   updatedAt_ASC
@@ -93,22 +88,27 @@ enum AttachOrderByInput {
 }
 
 type AttachPreviousValues {
-  aid: Int!
+  id: ID!
   filesize: Int!
-  time: DateTime!
   downloads: Int!
   fileName: String!
 }
 
 input AttachScalarWhereInput {
-  aid: Int
-  aid_not: Int
-  aid_in: [Int!]
-  aid_not_in: [Int!]
-  aid_lt: Int
-  aid_lte: Int
-  aid_gt: Int
-  aid_gte: Int
+  id: ID
+  id_not: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
+  id_lt: ID
+  id_lte: ID
+  id_gt: ID
+  id_gte: ID
+  id_contains: ID
+  id_not_contains: ID
+  id_starts_with: ID
+  id_not_starts_with: ID
+  id_ends_with: ID
+  id_not_ends_with: ID
   filesize: Int
   filesize_not: Int
   filesize_in: [Int!]
@@ -117,14 +117,6 @@ input AttachScalarWhereInput {
   filesize_lte: Int
   filesize_gt: Int
   filesize_gte: Int
-  time: DateTime
-  time_not: DateTime
-  time_in: [DateTime!]
-  time_not_in: [DateTime!]
-  time_lt: DateTime
-  time_lte: DateTime
-  time_gt: DateTime
-  time_gte: DateTime
   downloads: Int
   downloads_not: Int
   downloads_in: [Int!]
@@ -171,29 +163,23 @@ input AttachSubscriptionWhereInput {
 }
 
 input AttachUpdateInput {
-  aid: Int
   user: UserUpdateOneRequiredInput
   post: PostUpdateOneRequiredInput
   thread: ThreadUpdateOneRequiredWithoutAttachInput
   forum: ForumUpdateOneRequiredInput
   filesize: Int
-  time: DateTime
   downloads: Int
   fileName: String
 }
 
 input AttachUpdateManyDataInput {
-  aid: Int
   filesize: Int
-  time: DateTime
   downloads: Int
   fileName: String
 }
 
 input AttachUpdateManyMutationInput {
-  aid: Int
   filesize: Int
-  time: DateTime
   downloads: Int
   fileName: String
 }
@@ -215,12 +201,10 @@ input AttachUpdateManyWithWhereNestedInput {
 }
 
 input AttachUpdateWithoutThreadDataInput {
-  aid: Int
   user: UserUpdateOneRequiredInput
   post: PostUpdateOneRequiredInput
   forum: ForumUpdateOneRequiredInput
   filesize: Int
-  time: DateTime
   downloads: Int
   fileName: String
 }
@@ -237,14 +221,20 @@ input AttachUpsertWithWhereUniqueWithoutThreadInput {
 }
 
 input AttachWhereInput {
-  aid: Int
-  aid_not: Int
-  aid_in: [Int!]
-  aid_not_in: [Int!]
-  aid_lt: Int
-  aid_lte: Int
-  aid_gt: Int
-  aid_gte: Int
+  id: ID
+  id_not: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
+  id_lt: ID
+  id_lte: ID
+  id_gt: ID
+  id_gte: ID
+  id_contains: ID
+  id_not_contains: ID
+  id_starts_with: ID
+  id_not_starts_with: ID
+  id_ends_with: ID
+  id_not_ends_with: ID
   user: UserWhereInput
   post: PostWhereInput
   thread: ThreadWhereInput
@@ -257,14 +247,6 @@ input AttachWhereInput {
   filesize_lte: Int
   filesize_gt: Int
   filesize_gte: Int
-  time: DateTime
-  time_not: DateTime
-  time_in: [DateTime!]
-  time_not_in: [DateTime!]
-  time_lt: DateTime
-  time_lte: DateTime
-  time_gt: DateTime
-  time_gte: DateTime
   downloads: Int
   downloads_not: Int
   downloads_in: [Int!]
@@ -293,7 +275,7 @@ input AttachWhereInput {
 }
 
 input AttachWhereUniqueInput {
-  aid: Int
+  id: ID
 }
 
 type BatchPayload {
@@ -303,9 +285,8 @@ type BatchPayload {
 scalar DateTime
 
 type Forum {
-  fid: Int!
+  id: ID!
   name: String!
-  master(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [User!]
   threads: Int!
   lastPost: Post
 }
@@ -317,9 +298,7 @@ type ForumConnection {
 }
 
 input ForumCreateInput {
-  fid: Int!
   name: String!
-  master: UserCreateManyInput
   threads: Int
   lastPost: PostCreateOneWithoutForumInput
 }
@@ -335,9 +314,7 @@ input ForumCreateOneWithoutLastPostInput {
 }
 
 input ForumCreateWithoutLastPostInput {
-  fid: Int!
   name: String!
-  master: UserCreateManyInput
   threads: Int
 }
 
@@ -347,14 +324,12 @@ type ForumEdge {
 }
 
 enum ForumOrderByInput {
-  fid_ASC
-  fid_DESC
+  id_ASC
+  id_DESC
   name_ASC
   name_DESC
   threads_ASC
   threads_DESC
-  id_ASC
-  id_DESC
   createdAt_ASC
   createdAt_DESC
   updatedAt_ASC
@@ -362,7 +337,7 @@ enum ForumOrderByInput {
 }
 
 type ForumPreviousValues {
-  fid: Int!
+  id: ID!
   name: String!
   threads: Int!
 }
@@ -386,23 +361,18 @@ input ForumSubscriptionWhereInput {
 }
 
 input ForumUpdateDataInput {
-  fid: Int
   name: String
-  master: UserUpdateManyInput
   threads: Int
   lastPost: PostUpdateOneWithoutForumInput
 }
 
 input ForumUpdateInput {
-  fid: Int
   name: String
-  master: UserUpdateManyInput
   threads: Int
   lastPost: PostUpdateOneWithoutForumInput
 }
 
 input ForumUpdateManyMutationInput {
-  fid: Int
   name: String
   threads: Int
 }
@@ -422,9 +392,7 @@ input ForumUpdateOneRequiredWithoutLastPostInput {
 }
 
 input ForumUpdateWithoutLastPostDataInput {
-  fid: Int
   name: String
-  master: UserUpdateManyInput
   threads: Int
 }
 
@@ -439,14 +407,20 @@ input ForumUpsertWithoutLastPostInput {
 }
 
 input ForumWhereInput {
-  fid: Int
-  fid_not: Int
-  fid_in: [Int!]
-  fid_not_in: [Int!]
-  fid_lt: Int
-  fid_lte: Int
-  fid_gt: Int
-  fid_gte: Int
+  id: ID
+  id_not: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
+  id_lt: ID
+  id_lte: ID
+  id_gt: ID
+  id_gte: ID
+  id_contains: ID
+  id_not_contains: ID
+  id_starts_with: ID
+  id_not_starts_with: ID
+  id_ends_with: ID
+  id_not_ends_with: ID
   name: String
   name_not: String
   name_in: [String!]
@@ -461,9 +435,6 @@ input ForumWhereInput {
   name_not_starts_with: String
   name_ends_with: String
   name_not_ends_with: String
-  master_every: UserWhereInput
-  master_some: UserWhereInput
-  master_none: UserWhereInput
   threads: Int
   threads_not: Int
   threads_in: [Int!]
@@ -479,13 +450,13 @@ input ForumWhereInput {
 }
 
 input ForumWhereUniqueInput {
-  fid: Int
+  id: ID
 }
 
 type Group {
-  gid: Int!
+  id: ID!
   name: String!
-  master(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [User!]
+  master: User
 }
 
 type GroupConnection {
@@ -495,18 +466,16 @@ type GroupConnection {
 }
 
 input GroupCreateInput {
-  gid: Int!
   name: String!
-  master: UserCreateManyWithoutGroupInput
+  master: UserCreateOneWithoutGroupInput
 }
 
-input GroupCreateOneWithoutMasterInput {
-  create: GroupCreateWithoutMasterInput
-  connect: GroupWhereUniqueInput
+input GroupCreateManyWithoutMasterInput {
+  create: [GroupCreateWithoutMasterInput!]
+  connect: [GroupWhereUniqueInput!]
 }
 
 input GroupCreateWithoutMasterInput {
-  gid: Int!
   name: String!
 }
 
@@ -516,12 +485,10 @@ type GroupEdge {
 }
 
 enum GroupOrderByInput {
-  gid_ASC
-  gid_DESC
-  name_ASC
-  name_DESC
   id_ASC
   id_DESC
+  name_ASC
+  name_DESC
   createdAt_ASC
   createdAt_DESC
   updatedAt_ASC
@@ -529,8 +496,42 @@ enum GroupOrderByInput {
 }
 
 type GroupPreviousValues {
-  gid: Int!
+  id: ID!
   name: String!
+}
+
+input GroupScalarWhereInput {
+  id: ID
+  id_not: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
+  id_lt: ID
+  id_lte: ID
+  id_gt: ID
+  id_gte: ID
+  id_contains: ID
+  id_not_contains: ID
+  id_starts_with: ID
+  id_not_starts_with: ID
+  id_ends_with: ID
+  id_not_ends_with: ID
+  name: String
+  name_not: String
+  name_in: [String!]
+  name_not_in: [String!]
+  name_lt: String
+  name_lte: String
+  name_gt: String
+  name_gte: String
+  name_contains: String
+  name_not_contains: String
+  name_starts_with: String
+  name_not_starts_with: String
+  name_ends_with: String
+  name_not_ends_with: String
+  AND: [GroupScalarWhereInput!]
+  OR: [GroupScalarWhereInput!]
+  NOT: [GroupScalarWhereInput!]
 }
 
 type GroupSubscriptionPayload {
@@ -552,42 +553,64 @@ input GroupSubscriptionWhereInput {
 }
 
 input GroupUpdateInput {
-  gid: Int
   name: String
-  master: UserUpdateManyWithoutGroupInput
+  master: UserUpdateOneWithoutGroupInput
+}
+
+input GroupUpdateManyDataInput {
+  name: String
 }
 
 input GroupUpdateManyMutationInput {
-  gid: Int
   name: String
 }
 
-input GroupUpdateOneRequiredWithoutMasterInput {
-  create: GroupCreateWithoutMasterInput
-  update: GroupUpdateWithoutMasterDataInput
-  upsert: GroupUpsertWithoutMasterInput
-  connect: GroupWhereUniqueInput
+input GroupUpdateManyWithoutMasterInput {
+  create: [GroupCreateWithoutMasterInput!]
+  delete: [GroupWhereUniqueInput!]
+  connect: [GroupWhereUniqueInput!]
+  disconnect: [GroupWhereUniqueInput!]
+  update: [GroupUpdateWithWhereUniqueWithoutMasterInput!]
+  upsert: [GroupUpsertWithWhereUniqueWithoutMasterInput!]
+  deleteMany: [GroupScalarWhereInput!]
+  updateMany: [GroupUpdateManyWithWhereNestedInput!]
+}
+
+input GroupUpdateManyWithWhereNestedInput {
+  where: GroupScalarWhereInput!
+  data: GroupUpdateManyDataInput!
 }
 
 input GroupUpdateWithoutMasterDataInput {
-  gid: Int
   name: String
 }
 
-input GroupUpsertWithoutMasterInput {
+input GroupUpdateWithWhereUniqueWithoutMasterInput {
+  where: GroupWhereUniqueInput!
+  data: GroupUpdateWithoutMasterDataInput!
+}
+
+input GroupUpsertWithWhereUniqueWithoutMasterInput {
+  where: GroupWhereUniqueInput!
   update: GroupUpdateWithoutMasterDataInput!
   create: GroupCreateWithoutMasterInput!
 }
 
 input GroupWhereInput {
-  gid: Int
-  gid_not: Int
-  gid_in: [Int!]
-  gid_not_in: [Int!]
-  gid_lt: Int
-  gid_lte: Int
-  gid_gt: Int
-  gid_gte: Int
+  id: ID
+  id_not: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
+  id_lt: ID
+  id_lte: ID
+  id_gt: ID
+  id_gte: ID
+  id_contains: ID
+  id_not_contains: ID
+  id_starts_with: ID
+  id_not_starts_with: ID
+  id_ends_with: ID
+  id_not_ends_with: ID
   name: String
   name_not: String
   name_in: [String!]
@@ -602,19 +625,125 @@ input GroupWhereInput {
   name_not_starts_with: String
   name_ends_with: String
   name_not_ends_with: String
-  master_every: UserWhereInput
-  master_some: UserWhereInput
-  master_none: UserWhereInput
+  master: UserWhereInput
   AND: [GroupWhereInput!]
   OR: [GroupWhereInput!]
   NOT: [GroupWhereInput!]
 }
 
 input GroupWhereUniqueInput {
-  gid: Int
+  id: ID
 }
 
 scalar Long
+
+type Message {
+  id: ID!
+  fromUser: User!
+  toUser: User!
+  message: String!
+}
+
+type MessageConnection {
+  pageInfo: PageInfo!
+  edges: [MessageEdge]!
+  aggregate: AggregateMessage!
+}
+
+input MessageCreateInput {
+  fromUser: UserCreateOneInput!
+  toUser: UserCreateOneInput!
+  message: String!
+}
+
+type MessageEdge {
+  node: Message!
+  cursor: String!
+}
+
+enum MessageOrderByInput {
+  id_ASC
+  id_DESC
+  message_ASC
+  message_DESC
+  createdAt_ASC
+  createdAt_DESC
+  updatedAt_ASC
+  updatedAt_DESC
+}
+
+type MessagePreviousValues {
+  id: ID!
+  message: String!
+}
+
+type MessageSubscriptionPayload {
+  mutation: MutationType!
+  node: Message
+  updatedFields: [String!]
+  previousValues: MessagePreviousValues
+}
+
+input MessageSubscriptionWhereInput {
+  mutation_in: [MutationType!]
+  updatedFields_contains: String
+  updatedFields_contains_every: [String!]
+  updatedFields_contains_some: [String!]
+  node: MessageWhereInput
+  AND: [MessageSubscriptionWhereInput!]
+  OR: [MessageSubscriptionWhereInput!]
+  NOT: [MessageSubscriptionWhereInput!]
+}
+
+input MessageUpdateInput {
+  fromUser: UserUpdateOneRequiredInput
+  toUser: UserUpdateOneRequiredInput
+  message: String
+}
+
+input MessageUpdateManyMutationInput {
+  message: String
+}
+
+input MessageWhereInput {
+  id: ID
+  id_not: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
+  id_lt: ID
+  id_lte: ID
+  id_gt: ID
+  id_gte: ID
+  id_contains: ID
+  id_not_contains: ID
+  id_starts_with: ID
+  id_not_starts_with: ID
+  id_ends_with: ID
+  id_not_ends_with: ID
+  fromUser: UserWhereInput
+  toUser: UserWhereInput
+  message: String
+  message_not: String
+  message_in: [String!]
+  message_not_in: [String!]
+  message_lt: String
+  message_lte: String
+  message_gt: String
+  message_gte: String
+  message_contains: String
+  message_not_contains: String
+  message_starts_with: String
+  message_not_starts_with: String
+  message_ends_with: String
+  message_not_ends_with: String
+  AND: [MessageWhereInput!]
+  OR: [MessageWhereInput!]
+  NOT: [MessageWhereInput!]
+}
+
+input MessageWhereUniqueInput {
+  id: ID
+}
 
 type Mutation {
   createAttach(data: AttachCreateInput!): Attach!
@@ -635,6 +764,12 @@ type Mutation {
   upsertGroup(where: GroupWhereUniqueInput!, create: GroupCreateInput!, update: GroupUpdateInput!): Group!
   deleteGroup(where: GroupWhereUniqueInput!): Group
   deleteManyGroups(where: GroupWhereInput): BatchPayload!
+  createMessage(data: MessageCreateInput!): Message!
+  updateMessage(data: MessageUpdateInput!, where: MessageWhereUniqueInput!): Message
+  updateManyMessages(data: MessageUpdateManyMutationInput!, where: MessageWhereInput): BatchPayload!
+  upsertMessage(where: MessageWhereUniqueInput!, create: MessageCreateInput!, update: MessageUpdateInput!): Message!
+  deleteMessage(where: MessageWhereUniqueInput!): Message
+  deleteManyMessages(where: MessageWhereInput): BatchPayload!
   createPost(data: PostCreateInput!): Post!
   updatePost(data: PostUpdateInput!, where: PostWhereUniqueInput!): Post
   updateManyPosts(data: PostUpdateManyMutationInput!, where: PostWhereInput): BatchPayload!
@@ -673,12 +808,11 @@ type PageInfo {
 }
 
 type Post {
-  pid: Int!
+  id: ID!
   forum: Forum!
   user: User!
   thread: Thread!
-  time: DateTime!
-  isFirst: Int!
+  isFirst: Boolean!
   quote: Int!
   message: String!
 }
@@ -690,12 +824,10 @@ type PostConnection {
 }
 
 input PostCreateInput {
-  pid: Int!
   forum: ForumCreateOneWithoutLastPostInput!
   user: UserCreateOneInput!
   thread: ThreadCreateOneWithoutPostInput!
-  time: DateTime!
-  isFirst: Int
+  isFirst: Boolean
   quote: Int
   message: String!
 }
@@ -716,21 +848,17 @@ input PostCreateOneWithoutForumInput {
 }
 
 input PostCreateWithoutForumInput {
-  pid: Int!
   user: UserCreateOneInput!
   thread: ThreadCreateOneWithoutPostInput!
-  time: DateTime!
-  isFirst: Int
+  isFirst: Boolean
   quote: Int
   message: String!
 }
 
 input PostCreateWithoutThreadInput {
-  pid: Int!
   forum: ForumCreateOneWithoutLastPostInput!
   user: UserCreateOneInput!
-  time: DateTime!
-  isFirst: Int
+  isFirst: Boolean
   quote: Int
   message: String!
 }
@@ -741,18 +869,14 @@ type PostEdge {
 }
 
 enum PostOrderByInput {
-  pid_ASC
-  pid_DESC
-  time_ASC
-  time_DESC
+  id_ASC
+  id_DESC
   isFirst_ASC
   isFirst_DESC
   quote_ASC
   quote_DESC
   message_ASC
   message_DESC
-  id_ASC
-  id_DESC
   createdAt_ASC
   createdAt_DESC
   updatedAt_ASC
@@ -760,38 +884,29 @@ enum PostOrderByInput {
 }
 
 type PostPreviousValues {
-  pid: Int!
-  time: DateTime!
-  isFirst: Int!
+  id: ID!
+  isFirst: Boolean!
   quote: Int!
   message: String!
 }
 
 input PostScalarWhereInput {
-  pid: Int
-  pid_not: Int
-  pid_in: [Int!]
-  pid_not_in: [Int!]
-  pid_lt: Int
-  pid_lte: Int
-  pid_gt: Int
-  pid_gte: Int
-  time: DateTime
-  time_not: DateTime
-  time_in: [DateTime!]
-  time_not_in: [DateTime!]
-  time_lt: DateTime
-  time_lte: DateTime
-  time_gt: DateTime
-  time_gte: DateTime
-  isFirst: Int
-  isFirst_not: Int
-  isFirst_in: [Int!]
-  isFirst_not_in: [Int!]
-  isFirst_lt: Int
-  isFirst_lte: Int
-  isFirst_gt: Int
-  isFirst_gte: Int
+  id: ID
+  id_not: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
+  id_lt: ID
+  id_lte: ID
+  id_gt: ID
+  id_gte: ID
+  id_contains: ID
+  id_not_contains: ID
+  id_starts_with: ID
+  id_not_starts_with: ID
+  id_ends_with: ID
+  id_not_ends_with: ID
+  isFirst: Boolean
+  isFirst_not: Boolean
   quote: Int
   quote_not: Int
   quote_in: [Int!]
@@ -838,39 +953,31 @@ input PostSubscriptionWhereInput {
 }
 
 input PostUpdateDataInput {
-  pid: Int
   forum: ForumUpdateOneRequiredWithoutLastPostInput
   user: UserUpdateOneRequiredInput
   thread: ThreadUpdateOneRequiredWithoutPostInput
-  time: DateTime
-  isFirst: Int
+  isFirst: Boolean
   quote: Int
   message: String
 }
 
 input PostUpdateInput {
-  pid: Int
   forum: ForumUpdateOneRequiredWithoutLastPostInput
   user: UserUpdateOneRequiredInput
   thread: ThreadUpdateOneRequiredWithoutPostInput
-  time: DateTime
-  isFirst: Int
+  isFirst: Boolean
   quote: Int
   message: String
 }
 
 input PostUpdateManyDataInput {
-  pid: Int
-  time: DateTime
-  isFirst: Int
+  isFirst: Boolean
   quote: Int
   message: String
 }
 
 input PostUpdateManyMutationInput {
-  pid: Int
-  time: DateTime
-  isFirst: Int
+  isFirst: Boolean
   quote: Int
   message: String
 }
@@ -908,21 +1015,17 @@ input PostUpdateOneWithoutForumInput {
 }
 
 input PostUpdateWithoutForumDataInput {
-  pid: Int
   user: UserUpdateOneRequiredInput
   thread: ThreadUpdateOneRequiredWithoutPostInput
-  time: DateTime
-  isFirst: Int
+  isFirst: Boolean
   quote: Int
   message: String
 }
 
 input PostUpdateWithoutThreadDataInput {
-  pid: Int
   forum: ForumUpdateOneRequiredWithoutLastPostInput
   user: UserUpdateOneRequiredInput
-  time: DateTime
-  isFirst: Int
+  isFirst: Boolean
   quote: Int
   message: String
 }
@@ -949,33 +1052,25 @@ input PostUpsertWithWhereUniqueWithoutThreadInput {
 }
 
 input PostWhereInput {
-  pid: Int
-  pid_not: Int
-  pid_in: [Int!]
-  pid_not_in: [Int!]
-  pid_lt: Int
-  pid_lte: Int
-  pid_gt: Int
-  pid_gte: Int
+  id: ID
+  id_not: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
+  id_lt: ID
+  id_lte: ID
+  id_gt: ID
+  id_gte: ID
+  id_contains: ID
+  id_not_contains: ID
+  id_starts_with: ID
+  id_not_starts_with: ID
+  id_ends_with: ID
+  id_not_ends_with: ID
   forum: ForumWhereInput
   user: UserWhereInput
   thread: ThreadWhereInput
-  time: DateTime
-  time_not: DateTime
-  time_in: [DateTime!]
-  time_not_in: [DateTime!]
-  time_lt: DateTime
-  time_lte: DateTime
-  time_gt: DateTime
-  time_gte: DateTime
-  isFirst: Int
-  isFirst_not: Int
-  isFirst_in: [Int!]
-  isFirst_not_in: [Int!]
-  isFirst_lt: Int
-  isFirst_lte: Int
-  isFirst_gt: Int
-  isFirst_gte: Int
+  isFirst: Boolean
+  isFirst_not: Boolean
   quote: Int
   quote_not: Int
   quote_in: [Int!]
@@ -1004,7 +1099,7 @@ input PostWhereInput {
 }
 
 input PostWhereUniqueInput {
-  pid: Int
+  id: ID
 }
 
 type Query {
@@ -1017,6 +1112,9 @@ type Query {
   group(where: GroupWhereUniqueInput!): Group
   groups(where: GroupWhereInput, orderBy: GroupOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Group]!
   groupsConnection(where: GroupWhereInput, orderBy: GroupOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): GroupConnection!
+  message(where: MessageWhereUniqueInput!): Message
+  messages(where: MessageWhereInput, orderBy: MessageOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Message]!
+  messagesConnection(where: MessageWhereInput, orderBy: MessageOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): MessageConnection!
   post(where: PostWhereUniqueInput!): Post
   posts(where: PostWhereInput, orderBy: PostOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Post]!
   postsConnection(where: PostWhereInput, orderBy: PostOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): PostConnection!
@@ -1033,16 +1131,16 @@ type Subscription {
   attach(where: AttachSubscriptionWhereInput): AttachSubscriptionPayload
   forum(where: ForumSubscriptionWhereInput): ForumSubscriptionPayload
   group(where: GroupSubscriptionWhereInput): GroupSubscriptionPayload
+  message(where: MessageSubscriptionWhereInput): MessageSubscriptionPayload
   post(where: PostSubscriptionWhereInput): PostSubscriptionPayload
   thread(where: ThreadSubscriptionWhereInput): ThreadSubscriptionPayload
   user(where: UserSubscriptionWhereInput): UserSubscriptionPayload
 }
 
 type Thread {
-  tid: Int!
+  id: ID!
   user: User!
   forum: Forum!
-  time: DateTime!
   subject: String!
   post(where: PostWhereInput, orderBy: PostOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Post!]
   top: Boolean!
@@ -1058,10 +1156,8 @@ type ThreadConnection {
 }
 
 input ThreadCreateInput {
-  tid: Int!
   user: UserCreateOneInput!
   forum: ForumCreateOneInput!
-  time: DateTime!
   subject: String!
   post: PostCreateManyWithoutThreadInput
   top: Boolean
@@ -1081,10 +1177,8 @@ input ThreadCreateOneWithoutPostInput {
 }
 
 input ThreadCreateWithoutAttachInput {
-  tid: Int!
   user: UserCreateOneInput!
   forum: ForumCreateOneInput!
-  time: DateTime!
   subject: String!
   post: PostCreateManyWithoutThreadInput
   top: Boolean
@@ -1093,10 +1187,8 @@ input ThreadCreateWithoutAttachInput {
 }
 
 input ThreadCreateWithoutPostInput {
-  tid: Int!
   user: UserCreateOneInput!
   forum: ForumCreateOneInput!
-  time: DateTime!
   subject: String!
   top: Boolean
   closed: Boolean
@@ -1110,10 +1202,8 @@ type ThreadEdge {
 }
 
 enum ThreadOrderByInput {
-  tid_ASC
-  tid_DESC
-  time_ASC
-  time_DESC
+  id_ASC
+  id_DESC
   subject_ASC
   subject_DESC
   top_ASC
@@ -1122,8 +1212,6 @@ enum ThreadOrderByInput {
   closed_DESC
   diamond_ASC
   diamond_DESC
-  id_ASC
-  id_DESC
   createdAt_ASC
   createdAt_DESC
   updatedAt_ASC
@@ -1131,8 +1219,7 @@ enum ThreadOrderByInput {
 }
 
 type ThreadPreviousValues {
-  tid: Int!
-  time: DateTime!
+  id: ID!
   subject: String!
   top: Boolean!
   closed: Boolean!
@@ -1158,10 +1245,8 @@ input ThreadSubscriptionWhereInput {
 }
 
 input ThreadUpdateInput {
-  tid: Int
   user: UserUpdateOneRequiredInput
   forum: ForumUpdateOneRequiredInput
-  time: DateTime
   subject: String
   post: PostUpdateManyWithoutThreadInput
   top: Boolean
@@ -1171,8 +1256,6 @@ input ThreadUpdateInput {
 }
 
 input ThreadUpdateManyMutationInput {
-  tid: Int
-  time: DateTime
   subject: String
   top: Boolean
   closed: Boolean
@@ -1194,10 +1277,8 @@ input ThreadUpdateOneRequiredWithoutPostInput {
 }
 
 input ThreadUpdateWithoutAttachDataInput {
-  tid: Int
   user: UserUpdateOneRequiredInput
   forum: ForumUpdateOneRequiredInput
-  time: DateTime
   subject: String
   post: PostUpdateManyWithoutThreadInput
   top: Boolean
@@ -1206,10 +1287,8 @@ input ThreadUpdateWithoutAttachDataInput {
 }
 
 input ThreadUpdateWithoutPostDataInput {
-  tid: Int
   user: UserUpdateOneRequiredInput
   forum: ForumUpdateOneRequiredInput
-  time: DateTime
   subject: String
   top: Boolean
   closed: Boolean
@@ -1228,24 +1307,22 @@ input ThreadUpsertWithoutPostInput {
 }
 
 input ThreadWhereInput {
-  tid: Int
-  tid_not: Int
-  tid_in: [Int!]
-  tid_not_in: [Int!]
-  tid_lt: Int
-  tid_lte: Int
-  tid_gt: Int
-  tid_gte: Int
+  id: ID
+  id_not: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
+  id_lt: ID
+  id_lte: ID
+  id_gt: ID
+  id_gte: ID
+  id_contains: ID
+  id_not_contains: ID
+  id_starts_with: ID
+  id_not_starts_with: ID
+  id_ends_with: ID
+  id_not_ends_with: ID
   user: UserWhereInput
   forum: ForumWhereInput
-  time: DateTime
-  time_not: DateTime
-  time_in: [DateTime!]
-  time_not_in: [DateTime!]
-  time_lt: DateTime
-  time_lte: DateTime
-  time_gt: DateTime
-  time_gte: DateTime
   subject: String
   subject_not: String
   subject_in: [String!]
@@ -1278,18 +1355,19 @@ input ThreadWhereInput {
 }
 
 input ThreadWhereUniqueInput {
-  tid: Int
+  id: ID
 }
 
 type User {
-  uid: Int!
+  id: ID!
+  username: String!
   openid: Int!
   isAdmin: Boolean!
-  group: Group!
+  group(where: GroupWhereInput, orderBy: GroupOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Group!]
   posts: Int!
-  time: DateTime!
-  lastLogin: Int!
+  lastLogin: DateTime!
   signature: String!
+  mentor: User
 }
 
 type UserConnection {
@@ -1299,24 +1377,14 @@ type UserConnection {
 }
 
 input UserCreateInput {
-  uid: Int!
+  username: String!
   openid: Int!
   isAdmin: Boolean
-  group: GroupCreateOneWithoutMasterInput!
+  group: GroupCreateManyWithoutMasterInput
   posts: Int
-  time: DateTime!
-  lastLogin: Int!
+  lastLogin: DateTime!
   signature: String
-}
-
-input UserCreateManyInput {
-  create: [UserCreateInput!]
-  connect: [UserWhereUniqueInput!]
-}
-
-input UserCreateManyWithoutGroupInput {
-  create: [UserCreateWithoutGroupInput!]
-  connect: [UserWhereUniqueInput!]
+  mentor: UserCreateOneInput
 }
 
 input UserCreateOneInput {
@@ -1324,14 +1392,19 @@ input UserCreateOneInput {
   connect: UserWhereUniqueInput
 }
 
+input UserCreateOneWithoutGroupInput {
+  create: UserCreateWithoutGroupInput
+  connect: UserWhereUniqueInput
+}
+
 input UserCreateWithoutGroupInput {
-  uid: Int!
+  username: String!
   openid: Int!
   isAdmin: Boolean
   posts: Int
-  time: DateTime!
-  lastLogin: Int!
+  lastLogin: DateTime!
   signature: String
+  mentor: UserCreateOneInput
 }
 
 type UserEdge {
@@ -1340,22 +1413,20 @@ type UserEdge {
 }
 
 enum UserOrderByInput {
-  uid_ASC
-  uid_DESC
+  id_ASC
+  id_DESC
+  username_ASC
+  username_DESC
   openid_ASC
   openid_DESC
   isAdmin_ASC
   isAdmin_DESC
   posts_ASC
   posts_DESC
-  time_ASC
-  time_DESC
   lastLogin_ASC
   lastLogin_DESC
   signature_ASC
   signature_DESC
-  id_ASC
-  id_DESC
   createdAt_ASC
   createdAt_DESC
   updatedAt_ASC
@@ -1363,75 +1434,13 @@ enum UserOrderByInput {
 }
 
 type UserPreviousValues {
-  uid: Int!
+  id: ID!
+  username: String!
   openid: Int!
   isAdmin: Boolean!
   posts: Int!
-  time: DateTime!
-  lastLogin: Int!
+  lastLogin: DateTime!
   signature: String!
-}
-
-input UserScalarWhereInput {
-  uid: Int
-  uid_not: Int
-  uid_in: [Int!]
-  uid_not_in: [Int!]
-  uid_lt: Int
-  uid_lte: Int
-  uid_gt: Int
-  uid_gte: Int
-  openid: Int
-  openid_not: Int
-  openid_in: [Int!]
-  openid_not_in: [Int!]
-  openid_lt: Int
-  openid_lte: Int
-  openid_gt: Int
-  openid_gte: Int
-  isAdmin: Boolean
-  isAdmin_not: Boolean
-  posts: Int
-  posts_not: Int
-  posts_in: [Int!]
-  posts_not_in: [Int!]
-  posts_lt: Int
-  posts_lte: Int
-  posts_gt: Int
-  posts_gte: Int
-  time: DateTime
-  time_not: DateTime
-  time_in: [DateTime!]
-  time_not_in: [DateTime!]
-  time_lt: DateTime
-  time_lte: DateTime
-  time_gt: DateTime
-  time_gte: DateTime
-  lastLogin: Int
-  lastLogin_not: Int
-  lastLogin_in: [Int!]
-  lastLogin_not_in: [Int!]
-  lastLogin_lt: Int
-  lastLogin_lte: Int
-  lastLogin_gt: Int
-  lastLogin_gte: Int
-  signature: String
-  signature_not: String
-  signature_in: [String!]
-  signature_not_in: [String!]
-  signature_lt: String
-  signature_lte: String
-  signature_gt: String
-  signature_gte: String
-  signature_contains: String
-  signature_not_contains: String
-  signature_starts_with: String
-  signature_not_starts_with: String
-  signature_ends_with: String
-  signature_not_ends_with: String
-  AND: [UserScalarWhereInput!]
-  OR: [UserScalarWhereInput!]
-  NOT: [UserScalarWhereInput!]
 }
 
 type UserSubscriptionPayload {
@@ -1453,72 +1462,43 @@ input UserSubscriptionWhereInput {
 }
 
 input UserUpdateDataInput {
-  uid: Int
+  username: String
   openid: Int
   isAdmin: Boolean
-  group: GroupUpdateOneRequiredWithoutMasterInput
+  group: GroupUpdateManyWithoutMasterInput
   posts: Int
-  time: DateTime
-  lastLogin: Int
+  lastLogin: DateTime
   signature: String
+  mentor: UserUpdateOneInput
 }
 
 input UserUpdateInput {
-  uid: Int
+  username: String
   openid: Int
   isAdmin: Boolean
-  group: GroupUpdateOneRequiredWithoutMasterInput
+  group: GroupUpdateManyWithoutMasterInput
   posts: Int
-  time: DateTime
-  lastLogin: Int
+  lastLogin: DateTime
   signature: String
-}
-
-input UserUpdateManyDataInput {
-  uid: Int
-  openid: Int
-  isAdmin: Boolean
-  posts: Int
-  time: DateTime
-  lastLogin: Int
-  signature: String
-}
-
-input UserUpdateManyInput {
-  create: [UserCreateInput!]
-  update: [UserUpdateWithWhereUniqueNestedInput!]
-  upsert: [UserUpsertWithWhereUniqueNestedInput!]
-  delete: [UserWhereUniqueInput!]
-  connect: [UserWhereUniqueInput!]
-  disconnect: [UserWhereUniqueInput!]
-  deleteMany: [UserScalarWhereInput!]
-  updateMany: [UserUpdateManyWithWhereNestedInput!]
+  mentor: UserUpdateOneInput
 }
 
 input UserUpdateManyMutationInput {
-  uid: Int
+  username: String
   openid: Int
   isAdmin: Boolean
   posts: Int
-  time: DateTime
-  lastLogin: Int
+  lastLogin: DateTime
   signature: String
 }
 
-input UserUpdateManyWithoutGroupInput {
-  create: [UserCreateWithoutGroupInput!]
-  delete: [UserWhereUniqueInput!]
-  connect: [UserWhereUniqueInput!]
-  disconnect: [UserWhereUniqueInput!]
-  update: [UserUpdateWithWhereUniqueWithoutGroupInput!]
-  upsert: [UserUpsertWithWhereUniqueWithoutGroupInput!]
-  deleteMany: [UserScalarWhereInput!]
-  updateMany: [UserUpdateManyWithWhereNestedInput!]
-}
-
-input UserUpdateManyWithWhereNestedInput {
-  where: UserScalarWhereInput!
-  data: UserUpdateManyDataInput!
+input UserUpdateOneInput {
+  create: UserCreateInput
+  update: UserUpdateDataInput
+  upsert: UserUpsertNestedInput
+  delete: Boolean
+  disconnect: Boolean
+  connect: UserWhereUniqueInput
 }
 
 input UserUpdateOneRequiredInput {
@@ -1528,24 +1508,23 @@ input UserUpdateOneRequiredInput {
   connect: UserWhereUniqueInput
 }
 
+input UserUpdateOneWithoutGroupInput {
+  create: UserCreateWithoutGroupInput
+  update: UserUpdateWithoutGroupDataInput
+  upsert: UserUpsertWithoutGroupInput
+  delete: Boolean
+  disconnect: Boolean
+  connect: UserWhereUniqueInput
+}
+
 input UserUpdateWithoutGroupDataInput {
-  uid: Int
+  username: String
   openid: Int
   isAdmin: Boolean
   posts: Int
-  time: DateTime
-  lastLogin: Int
+  lastLogin: DateTime
   signature: String
-}
-
-input UserUpdateWithWhereUniqueNestedInput {
-  where: UserWhereUniqueInput!
-  data: UserUpdateDataInput!
-}
-
-input UserUpdateWithWhereUniqueWithoutGroupInput {
-  where: UserWhereUniqueInput!
-  data: UserUpdateWithoutGroupDataInput!
+  mentor: UserUpdateOneInput
 }
 
 input UserUpsertNestedInput {
@@ -1553,27 +1532,40 @@ input UserUpsertNestedInput {
   create: UserCreateInput!
 }
 
-input UserUpsertWithWhereUniqueNestedInput {
-  where: UserWhereUniqueInput!
-  update: UserUpdateDataInput!
-  create: UserCreateInput!
-}
-
-input UserUpsertWithWhereUniqueWithoutGroupInput {
-  where: UserWhereUniqueInput!
+input UserUpsertWithoutGroupInput {
   update: UserUpdateWithoutGroupDataInput!
   create: UserCreateWithoutGroupInput!
 }
 
 input UserWhereInput {
-  uid: Int
-  uid_not: Int
-  uid_in: [Int!]
-  uid_not_in: [Int!]
-  uid_lt: Int
-  uid_lte: Int
-  uid_gt: Int
-  uid_gte: Int
+  id: ID
+  id_not: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
+  id_lt: ID
+  id_lte: ID
+  id_gt: ID
+  id_gte: ID
+  id_contains: ID
+  id_not_contains: ID
+  id_starts_with: ID
+  id_not_starts_with: ID
+  id_ends_with: ID
+  id_not_ends_with: ID
+  username: String
+  username_not: String
+  username_in: [String!]
+  username_not_in: [String!]
+  username_lt: String
+  username_lte: String
+  username_gt: String
+  username_gte: String
+  username_contains: String
+  username_not_contains: String
+  username_starts_with: String
+  username_not_starts_with: String
+  username_ends_with: String
+  username_not_ends_with: String
   openid: Int
   openid_not: Int
   openid_in: [Int!]
@@ -1584,7 +1576,9 @@ input UserWhereInput {
   openid_gte: Int
   isAdmin: Boolean
   isAdmin_not: Boolean
-  group: GroupWhereInput
+  group_every: GroupWhereInput
+  group_some: GroupWhereInput
+  group_none: GroupWhereInput
   posts: Int
   posts_not: Int
   posts_in: [Int!]
@@ -1593,22 +1587,14 @@ input UserWhereInput {
   posts_lte: Int
   posts_gt: Int
   posts_gte: Int
-  time: DateTime
-  time_not: DateTime
-  time_in: [DateTime!]
-  time_not_in: [DateTime!]
-  time_lt: DateTime
-  time_lte: DateTime
-  time_gt: DateTime
-  time_gte: DateTime
-  lastLogin: Int
-  lastLogin_not: Int
-  lastLogin_in: [Int!]
-  lastLogin_not_in: [Int!]
-  lastLogin_lt: Int
-  lastLogin_lte: Int
-  lastLogin_gt: Int
-  lastLogin_gte: Int
+  lastLogin: DateTime
+  lastLogin_not: DateTime
+  lastLogin_in: [DateTime!]
+  lastLogin_not_in: [DateTime!]
+  lastLogin_lt: DateTime
+  lastLogin_lte: DateTime
+  lastLogin_gt: DateTime
+  lastLogin_gte: DateTime
   signature: String
   signature_not: String
   signature_in: [String!]
@@ -1623,12 +1609,13 @@ input UserWhereInput {
   signature_not_starts_with: String
   signature_ends_with: String
   signature_not_ends_with: String
+  mentor: UserWhereInput
   AND: [UserWhereInput!]
   OR: [UserWhereInput!]
   NOT: [UserWhereInput!]
 }
 
 input UserWhereUniqueInput {
-  uid: Int
+  id: ID
 }
 `
