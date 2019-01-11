@@ -457,6 +457,7 @@ type Group {
   id: ID!
   name: String!
   master: User
+  key: Int!
 }
 
 type GroupConnection {
@@ -468,6 +469,7 @@ type GroupConnection {
 input GroupCreateInput {
   name: String!
   master: UserCreateOneWithoutGroupInput
+  key: Int!
 }
 
 input GroupCreateManyWithoutMasterInput {
@@ -477,6 +479,7 @@ input GroupCreateManyWithoutMasterInput {
 
 input GroupCreateWithoutMasterInput {
   name: String!
+  key: Int!
 }
 
 type GroupEdge {
@@ -489,6 +492,8 @@ enum GroupOrderByInput {
   id_DESC
   name_ASC
   name_DESC
+  key_ASC
+  key_DESC
   createdAt_ASC
   createdAt_DESC
   updatedAt_ASC
@@ -498,6 +503,7 @@ enum GroupOrderByInput {
 type GroupPreviousValues {
   id: ID!
   name: String!
+  key: Int!
 }
 
 input GroupScalarWhereInput {
@@ -529,6 +535,14 @@ input GroupScalarWhereInput {
   name_not_starts_with: String
   name_ends_with: String
   name_not_ends_with: String
+  key: Int
+  key_not: Int
+  key_in: [Int!]
+  key_not_in: [Int!]
+  key_lt: Int
+  key_lte: Int
+  key_gt: Int
+  key_gte: Int
   AND: [GroupScalarWhereInput!]
   OR: [GroupScalarWhereInput!]
   NOT: [GroupScalarWhereInput!]
@@ -555,14 +569,17 @@ input GroupSubscriptionWhereInput {
 input GroupUpdateInput {
   name: String
   master: UserUpdateOneWithoutGroupInput
+  key: Int
 }
 
 input GroupUpdateManyDataInput {
   name: String
+  key: Int
 }
 
 input GroupUpdateManyMutationInput {
   name: String
+  key: Int
 }
 
 input GroupUpdateManyWithoutMasterInput {
@@ -583,6 +600,7 @@ input GroupUpdateManyWithWhereNestedInput {
 
 input GroupUpdateWithoutMasterDataInput {
   name: String
+  key: Int
 }
 
 input GroupUpdateWithWhereUniqueWithoutMasterInput {
@@ -626,6 +644,14 @@ input GroupWhereInput {
   name_ends_with: String
   name_not_ends_with: String
   master: UserWhereInput
+  key: Int
+  key_not: Int
+  key_in: [Int!]
+  key_not_in: [Int!]
+  key_lt: Int
+  key_lte: Int
+  key_gt: Int
+  key_gte: Int
   AND: [GroupWhereInput!]
   OR: [GroupWhereInput!]
   NOT: [GroupWhereInput!]
@@ -633,6 +659,7 @@ input GroupWhereInput {
 
 input GroupWhereUniqueInput {
   id: ID
+  key: Int
 }
 
 scalar Long
@@ -642,6 +669,7 @@ type Message {
   fromUser: User!
   toUser: User!
   message: String!
+  isRead: Boolean!
 }
 
 type MessageConnection {
@@ -654,6 +682,7 @@ input MessageCreateInput {
   fromUser: UserCreateOneInput!
   toUser: UserCreateOneInput!
   message: String!
+  isRead: Boolean
 }
 
 type MessageEdge {
@@ -666,6 +695,8 @@ enum MessageOrderByInput {
   id_DESC
   message_ASC
   message_DESC
+  isRead_ASC
+  isRead_DESC
   createdAt_ASC
   createdAt_DESC
   updatedAt_ASC
@@ -675,6 +706,7 @@ enum MessageOrderByInput {
 type MessagePreviousValues {
   id: ID!
   message: String!
+  isRead: Boolean!
 }
 
 type MessageSubscriptionPayload {
@@ -699,10 +731,12 @@ input MessageUpdateInput {
   fromUser: UserUpdateOneRequiredInput
   toUser: UserUpdateOneRequiredInput
   message: String
+  isRead: Boolean
 }
 
 input MessageUpdateManyMutationInput {
   message: String
+  isRead: Boolean
 }
 
 input MessageWhereInput {
@@ -736,6 +770,8 @@ input MessageWhereInput {
   message_not_starts_with: String
   message_ends_with: String
   message_not_ends_with: String
+  isRead: Boolean
+  isRead_not: Boolean
   AND: [MessageWhereInput!]
   OR: [MessageWhereInput!]
   NOT: [MessageWhereInput!]
@@ -1142,6 +1178,8 @@ type Thread {
   user: User!
   forum: Forum!
   subject: String!
+  active: Boolean!
+  postCount: Int!
   post(where: PostWhereInput, orderBy: PostOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Post!]
   top: Boolean!
   closed: Boolean!
@@ -1159,6 +1197,8 @@ input ThreadCreateInput {
   user: UserCreateOneInput!
   forum: ForumCreateOneInput!
   subject: String!
+  active: Boolean
+  postCount: Int
   post: PostCreateManyWithoutThreadInput
   top: Boolean
   closed: Boolean
@@ -1180,6 +1220,8 @@ input ThreadCreateWithoutAttachInput {
   user: UserCreateOneInput!
   forum: ForumCreateOneInput!
   subject: String!
+  active: Boolean
+  postCount: Int
   post: PostCreateManyWithoutThreadInput
   top: Boolean
   closed: Boolean
@@ -1190,6 +1232,8 @@ input ThreadCreateWithoutPostInput {
   user: UserCreateOneInput!
   forum: ForumCreateOneInput!
   subject: String!
+  active: Boolean
+  postCount: Int
   top: Boolean
   closed: Boolean
   diamond: Boolean
@@ -1206,6 +1250,10 @@ enum ThreadOrderByInput {
   id_DESC
   subject_ASC
   subject_DESC
+  active_ASC
+  active_DESC
+  postCount_ASC
+  postCount_DESC
   top_ASC
   top_DESC
   closed_ASC
@@ -1221,6 +1269,8 @@ enum ThreadOrderByInput {
 type ThreadPreviousValues {
   id: ID!
   subject: String!
+  active: Boolean!
+  postCount: Int!
   top: Boolean!
   closed: Boolean!
   diamond: Boolean!
@@ -1248,6 +1298,8 @@ input ThreadUpdateInput {
   user: UserUpdateOneRequiredInput
   forum: ForumUpdateOneRequiredInput
   subject: String
+  active: Boolean
+  postCount: Int
   post: PostUpdateManyWithoutThreadInput
   top: Boolean
   closed: Boolean
@@ -1257,6 +1309,8 @@ input ThreadUpdateInput {
 
 input ThreadUpdateManyMutationInput {
   subject: String
+  active: Boolean
+  postCount: Int
   top: Boolean
   closed: Boolean
   diamond: Boolean
@@ -1280,6 +1334,8 @@ input ThreadUpdateWithoutAttachDataInput {
   user: UserUpdateOneRequiredInput
   forum: ForumUpdateOneRequiredInput
   subject: String
+  active: Boolean
+  postCount: Int
   post: PostUpdateManyWithoutThreadInput
   top: Boolean
   closed: Boolean
@@ -1290,6 +1346,8 @@ input ThreadUpdateWithoutPostDataInput {
   user: UserUpdateOneRequiredInput
   forum: ForumUpdateOneRequiredInput
   subject: String
+  active: Boolean
+  postCount: Int
   top: Boolean
   closed: Boolean
   diamond: Boolean
@@ -1337,6 +1395,16 @@ input ThreadWhereInput {
   subject_not_starts_with: String
   subject_ends_with: String
   subject_not_ends_with: String
+  active: Boolean
+  active_not: Boolean
+  postCount: Int
+  postCount_not: Int
+  postCount_in: [Int!]
+  postCount_not_in: [Int!]
+  postCount_lt: Int
+  postCount_lte: Int
+  postCount_gt: Int
+  postCount_gte: Int
   post_every: PostWhereInput
   post_some: PostWhereInput
   post_none: PostWhereInput
@@ -1361,7 +1429,10 @@ input ThreadWhereUniqueInput {
 type User {
   id: ID!
   username: String!
-  openid: Int!
+  active: Boolean!
+  mobile: String!
+  avatar: String!
+  userid: String!
   isAdmin: Boolean!
   group(where: GroupWhereInput, orderBy: GroupOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Group!]
   posts: Int!
@@ -1378,7 +1449,10 @@ type UserConnection {
 
 input UserCreateInput {
   username: String!
-  openid: Int!
+  active: Boolean
+  mobile: String
+  avatar: String
+  userid: String!
   isAdmin: Boolean
   group: GroupCreateManyWithoutMasterInput
   posts: Int
@@ -1399,7 +1473,10 @@ input UserCreateOneWithoutGroupInput {
 
 input UserCreateWithoutGroupInput {
   username: String!
-  openid: Int!
+  active: Boolean
+  mobile: String
+  avatar: String
+  userid: String!
   isAdmin: Boolean
   posts: Int
   lastLogin: DateTime!
@@ -1417,8 +1494,14 @@ enum UserOrderByInput {
   id_DESC
   username_ASC
   username_DESC
-  openid_ASC
-  openid_DESC
+  active_ASC
+  active_DESC
+  mobile_ASC
+  mobile_DESC
+  avatar_ASC
+  avatar_DESC
+  userid_ASC
+  userid_DESC
   isAdmin_ASC
   isAdmin_DESC
   posts_ASC
@@ -1436,7 +1519,10 @@ enum UserOrderByInput {
 type UserPreviousValues {
   id: ID!
   username: String!
-  openid: Int!
+  active: Boolean!
+  mobile: String!
+  avatar: String!
+  userid: String!
   isAdmin: Boolean!
   posts: Int!
   lastLogin: DateTime!
@@ -1463,7 +1549,10 @@ input UserSubscriptionWhereInput {
 
 input UserUpdateDataInput {
   username: String
-  openid: Int
+  active: Boolean
+  mobile: String
+  avatar: String
+  userid: String
   isAdmin: Boolean
   group: GroupUpdateManyWithoutMasterInput
   posts: Int
@@ -1474,7 +1563,10 @@ input UserUpdateDataInput {
 
 input UserUpdateInput {
   username: String
-  openid: Int
+  active: Boolean
+  mobile: String
+  avatar: String
+  userid: String
   isAdmin: Boolean
   group: GroupUpdateManyWithoutMasterInput
   posts: Int
@@ -1485,7 +1577,10 @@ input UserUpdateInput {
 
 input UserUpdateManyMutationInput {
   username: String
-  openid: Int
+  active: Boolean
+  mobile: String
+  avatar: String
+  userid: String
   isAdmin: Boolean
   posts: Int
   lastLogin: DateTime
@@ -1519,7 +1614,10 @@ input UserUpdateOneWithoutGroupInput {
 
 input UserUpdateWithoutGroupDataInput {
   username: String
-  openid: Int
+  active: Boolean
+  mobile: String
+  avatar: String
+  userid: String
   isAdmin: Boolean
   posts: Int
   lastLogin: DateTime
@@ -1566,14 +1664,50 @@ input UserWhereInput {
   username_not_starts_with: String
   username_ends_with: String
   username_not_ends_with: String
-  openid: Int
-  openid_not: Int
-  openid_in: [Int!]
-  openid_not_in: [Int!]
-  openid_lt: Int
-  openid_lte: Int
-  openid_gt: Int
-  openid_gte: Int
+  active: Boolean
+  active_not: Boolean
+  mobile: String
+  mobile_not: String
+  mobile_in: [String!]
+  mobile_not_in: [String!]
+  mobile_lt: String
+  mobile_lte: String
+  mobile_gt: String
+  mobile_gte: String
+  mobile_contains: String
+  mobile_not_contains: String
+  mobile_starts_with: String
+  mobile_not_starts_with: String
+  mobile_ends_with: String
+  mobile_not_ends_with: String
+  avatar: String
+  avatar_not: String
+  avatar_in: [String!]
+  avatar_not_in: [String!]
+  avatar_lt: String
+  avatar_lte: String
+  avatar_gt: String
+  avatar_gte: String
+  avatar_contains: String
+  avatar_not_contains: String
+  avatar_starts_with: String
+  avatar_not_starts_with: String
+  avatar_ends_with: String
+  avatar_not_ends_with: String
+  userid: String
+  userid_not: String
+  userid_in: [String!]
+  userid_not_in: [String!]
+  userid_lt: String
+  userid_lte: String
+  userid_gt: String
+  userid_gte: String
+  userid_contains: String
+  userid_not_contains: String
+  userid_starts_with: String
+  userid_not_starts_with: String
+  userid_ends_with: String
+  userid_not_ends_with: String
   isAdmin: Boolean
   isAdmin_not: Boolean
   group_every: GroupWhereInput
@@ -1617,5 +1751,6 @@ input UserWhereInput {
 
 input UserWhereUniqueInput {
   id: ID
+  userid: String
 }
 `

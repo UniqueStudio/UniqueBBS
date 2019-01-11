@@ -1,14 +1,18 @@
 type Group {
   id: ID! @unique
+  key: Int! @unique
   name: String!
-  master: User
+  master: User@relation(name:"GroupMaster")
 }
 type User {
   id: ID! @unique
   username: String!
-  openid: Int!
+  active: Boolean! @default(value: true)
+  mobile: String! @default(value:0)
+  avatar: String! @default(value:"__default__")
+  userid: String! @unique
   isAdmin: Boolean! @default(value:false)
-  group: [Group!]!
+  group: [Group!]! @relation(name:"GroupList")
   posts: Int! @default(value: 0)
   lastLogin: DateTime!
   signature: String! @default(value: "")
@@ -34,6 +38,8 @@ type Thread{
   user: User! 
   forum: Forum!
   subject: String!
+  active: Boolean! @default(value: true)
+  postCount: Int! @default(value:0)
   post: [Post!]!
   top: Boolean! @default(value:false)
   closed: Boolean! @default(value:false)
@@ -55,4 +61,5 @@ type Message{
   fromUser: User! @relation(name:"MsgFromUser")
   toUser: User! @relation(name:"MsgToUser")
   message: String!
+  isRead: Boolean! @default(value:false)
 }
