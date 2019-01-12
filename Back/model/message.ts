@@ -2,6 +2,9 @@ import { prisma, Message } from "../generated/prisma-client"
 import { Request, Response } from 'express';
 import { verifyJWT } from "./check";
 
+export const MESSAGE_REPLY = (username, subject) => `${username}回复了您的帖子${subject}！`;
+export const MESSAGE_QUOTE = (username, subject) => `${username}引用了您在帖子${subject}中的回复！`;
+
 export const pushMessage = async function (fromUid, toUid, msg) {
     await sendMessage(fromUid, toUid, msg);
     // todo: -> mobile email ...

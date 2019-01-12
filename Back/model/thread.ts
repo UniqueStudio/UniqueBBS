@@ -1,9 +1,10 @@
-import { prisma } from "../generated/prisma-client"
+import { prisma, Forum } from "../generated/prisma-client"
 import { Request, Response } from 'express';
 import { redLock } from "../server"
 import { pagesize } from "./consts"
-import { verifyJWT } from "./check"
+import { verifyJWT, filterUserInfo } from "./check"
 import { userThreadsAdd, forumThreadsAdd, forumLastPostUpdate } from "./runtime"
+import { pushMessage, MESSAGE_REPLY , MESSAGE_QUOTE } from "./message"
 
 export const threadList = async function (req: Request, res: Response) {
     try {
@@ -13,9 +14,22 @@ export const threadList = async function (req: Request, res: Response) {
         page = Number.parseInt(page);
 
         const whereArr = {
-            id: fid === "*" ? undefined : fid,
+            forum: {
+                id: fid === "*" ? undefined : fid,
+            },
             active: authObj.isAdmin ? undefined : true
         };
+
+        let resultForum: Forum;
+        if (fid !== "*") {
+            resultForum = await prisma.forum({
+                id: fid
+            });
+
+            if (!resultForum) {
+                return res.json({ code: -1, msg: "板块不存在！" });
+            }
+        }
 
         const resultArrRaw = await prisma.threads({
             where: whereArr,
@@ -29,7 +43,7 @@ export const threadList = async function (req: Request, res: Response) {
                 async (item) => {
                     return {
                         thread: item,
-                        user: await prisma.thread({ id: item.id }).user(),
+                        user: filterUserInfo(await prisma.thread({ id: item.id }).user()),
                         lastReply: await prisma.posts({
                             where: {
                                 thread: {
@@ -43,7 +57,11 @@ export const threadList = async function (req: Request, res: Response) {
                 })
         );
 
-        res.json({ code: 1, msg: resultArr });
+        if (fid === "*") {
+            res.json({ code: 1, msg: { forum: resultForum, list: resultArr } });
+        } else {
+            res.json({ code: 1, msg: { list: resultArr } });
+        }
 
     } catch (e) {
         res.json({ code: -1 });
@@ -57,18 +75,19 @@ export const threadInfo = async function (req: Request, res: Response) {
         let { tid, page } = req.params;
         page = Number.parseInt(page);
 
-        const threadInfoObj = { id: tid, isFirst: false, active: authObj.isAdmin ? undefined : true };
+        const threadInfoObj = { id: tid, active: authObj.isAdmin ? undefined : true };
 
         const threadInfo = await prisma.thread({
             id: tid
         });
-        const threadAuthor = await prisma.thread({
+        const threadAuthor = filterUserInfo(await prisma.thread({
             id: tid
-        }).user();
+        }).user());
 
         const postArrRaw = await prisma.posts({
             where: {
-                thread: threadInfoObj
+                thread: threadInfoObj,
+                isFirst: false
             },
             skip: (page - 1) * pagesize,
             first: pagesize
@@ -87,9 +106,9 @@ export const threadInfo = async function (req: Request, res: Response) {
             postArrRaw.map(
                 async (item) => ({
                     thread: item,
-                    user: await prisma.thread({
+                    user: filterUserInfo(await prisma.post({
                         id: item.id
-                    }).user()
+                    }).user())
                 })
             )
         );
@@ -168,6 +187,9 @@ export const threadReply = async function (req: Request, res: Response) {
             const threadInfo = await prisma.thread({
                 id: tid
             });
+            const authorInfo = await prisma.thread({
+                id: tid
+            }).user();
             const forumInfo = await prisma.thread({
                 id: tid
             }).forum();
@@ -193,7 +215,7 @@ export const threadReply = async function (req: Request, res: Response) {
                                     id: uid,
                                 }
                             },
-                            quote: quote,
+                            quote: Number.parseInt(quote),
                             createDate: new Date(),
                             active: true
                         }
@@ -204,6 +226,20 @@ export const threadReply = async function (req: Request, res: Response) {
             });
 
             await forumLastPostUpdate(forumInfo.id, resultThread[0].id);
+            if (uid !== authorInfo.id) {
+                await pushMessage(uid, authorInfo.id, MESSAGE_REPLY(authorInfo.username, threadInfo.subject));
+                if (quote !== -1) {
+                    const quotePost = await prisma.post({
+                        id: quote
+                    });
+                    const quotePostAuthor = await prisma.post({
+                        id:quote
+                    }).user();
+                    if(quotePost && quotePostAuthor.id !== uid){
+                        await pushMessage(uid, quotePostAuthor.id, MESSAGE_QUOTE(authorInfo.username, threadInfo.subject));
+                    }
+                }
+            }
 
             res.json({ code: 1 });
         } catch (e) {

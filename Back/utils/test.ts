@@ -1,13 +1,24 @@
 import { prisma } from "../generated/prisma-client"
+import { addSaltPassword } from "../model/check"
 
 async function func() {
-    const result = await prisma.groups();
-    for(let group of result){
-        const val = await prisma.group({
-            id:group.id
-        }).master();
-        console.log(val);
+    const newForum = ["hzytql", "zcytql"];
+    for (let forum of newForum) {
+        await prisma.createForum({
+            name: forum
+        });
     }
-    
+
+    const result = await prisma.updateUser({
+        where: {
+            userid: "YangZiYue"
+        },
+        data: {
+            nickname:"ttzztztz",
+            password: addSaltPassword("20000301")
+        }
+    });
+    console.log(result);
+
 }
 func();

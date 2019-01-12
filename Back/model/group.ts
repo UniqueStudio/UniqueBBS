@@ -1,7 +1,6 @@
 import { prisma, User, Group } from "../generated/prisma-client"
-import { verifyJWT } from "./check"
+import { verifyJWT , filterUsersInfo } from "./check"
 import { Request, Response } from 'express'
-import { filterUsersInfo } from "./user"
 
 export const getGroupUserList = async function (req: Request, res: Response) {
     try {

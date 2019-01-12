@@ -1,7 +1,7 @@
 import * as express from "express"
 import * as bodyParser from "body-parser"
-import { userInfo, userLoginByPwd, userInfoUpdate, userInfoUpdateFromWx, userQRLogin, userScan } from "./model/user"
-import { threadDeleteHard , postDeleteHard , postDelete , threadList, threadInfo , threadCreate , threadReply , threadDelete } from "./model/thread"
+import { userMyInfo, userInfo, userLoginByPwd, userInfoUpdate, userInfoUpdateFromWx, userQRLogin, userScan, userPwdReset } from "./model/user"
+import { threadDeleteHard, postDeleteHard, postDelete, threadList, threadInfo, threadCreate, threadReply, threadDelete } from "./model/thread"
 import { forumList, forumListSimple } from "./model/forum"
 import * as Redis from "redis"
 import * as Redlock from "redlock"
@@ -27,11 +27,23 @@ const app = express();
 app.use(bodyParser.json({
     limit: '1mb'
 }));
+app.use((req, res, next) => {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Methods", "POST, GET");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
+    res.header("X-Powered-By", "Rabbit/1.0");
+    next();
+});
 
+app.use(bodyParser.urlencoded({
+    extended: true
+}));
 //User
 app.get("/user/info/:uid", userInfo);
+app.get("/user/my/info", userMyInfo);
 app.post("/user/login/pwd", userLoginByPwd);
 app.post("/user/update/normal", userInfoUpdate);
+app.post("/user/update/pwd", userPwdReset);
 app.post("/user/update/wx", userInfoUpdateFromWx);
 app.get('/user/login/qr', userQRLogin);
 app.get('/user/login/scan/:key/status', userScan);

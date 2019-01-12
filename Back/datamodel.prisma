@@ -31,13 +31,13 @@ type Forum{
   id: ID! @unique
   name: String!
   threads: Int! @default(value: 0)
-  lastPost: Post
+  lastPost: Post @relation(name:"ForumLastPost")
 }
 type Post{
   id: ID! @unique
-  forum: Forum!
+  forum: Forum! @relation(name:"PostBelongForum")
   user: User!
-  thread: Thread! @relation(name:"PostParentThread")
+  thread: Thread!
   isFirst: Boolean! @default(value:false)
   quote: Int! @default(value:-1)
   message: String!
@@ -51,7 +51,7 @@ type Thread{
   subject: String!
   active: Boolean! @default(value: true)
   postCount: Int! @default(value:0)
-  post: [Post!]! @relation(name:"PostList")
+  post: [Post!]!
   top: Boolean! @default(value:false)
   closed: Boolean! @default(value:false)
   diamond: Boolean! @default(value:false)

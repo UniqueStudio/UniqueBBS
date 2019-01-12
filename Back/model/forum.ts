@@ -26,7 +26,7 @@ export const forumListSimple = async function (req: Request, res: Response) {
     try {
         verifyJWT(req.header('Authorization'));
         const result = await prisma.forums();
-        res.json();
+        res.json({ code: 1, msg: result });
     } catch (e) {
         res.json({ code: -1, msg: e.message });
     }
