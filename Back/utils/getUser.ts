@@ -1,7 +1,7 @@
 import { prisma } from "../generated/prisma-client"
 import fetch from 'node-fetch';
-import { accessTokenURL, getUserListURL } from '../model/consts';
-import { updateExpression } from "babel-types";
+import { getUserListURL } from '../model/consts';
+import { getAccessToken } from "../model/check"
 
 export const getUser = async function () {
     const groups = await prisma.groups();
@@ -14,9 +14,7 @@ export const getUser = async function () {
         groupKeyList.push([group.key, group.name]);
     }
 
-    const accessTokenResponse = await fetch(accessTokenURL);
-    const accessTokenResult = await accessTokenResponse.json();
-    const accessToken = accessTokenResult.access_token;
+    const accessToken = await getAccessToken();
 
     for (let [groupKey, groupName] of groupKeyList) {
         // const groupID = groupKeyList["group_k" + groupKey];
@@ -52,6 +50,7 @@ export const getUser = async function () {
                 mobile: user.mobile,
                 avatar: user.avatar,
                 userid: user.userid,
+                email: user.email,
                 lastLogin: new Date(),
                 group: {
                     connect: userGroup
@@ -78,11 +77,11 @@ export const getUser = async function () {
             if (user.isleader === 1) {
                 console.log(`Set Group ${groupName} Master to ${user.name}`);
                 const groupUpdate = await prisma.updateGroup({
-                    where:{
+                    where: {
                         key: groupKey
                     },
-                    data:{
-                        master:{
+                    data: {
+                        master: {
                             connect: {
                                 id: userID
                             }
@@ -90,7 +89,7 @@ export const getUser = async function () {
                     }
                 });
             }
-            
+
         }
     }
 

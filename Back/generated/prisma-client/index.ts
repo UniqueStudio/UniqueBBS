@@ -364,10 +364,10 @@ export interface ClientConstructor<T> {
 export type GroupOrderByInput =
   | "id_ASC"
   | "id_DESC"
-  | "name_ASC"
-  | "name_DESC"
   | "key_ASC"
   | "key_DESC"
+  | "name_ASC"
+  | "name_DESC"
   | "createdAt_ASC"
   | "createdAt_DESC"
   | "updatedAt_ASC"
@@ -450,6 +450,24 @@ export type UserOrderByInput =
   | "id_DESC"
   | "username_ASC"
   | "username_DESC"
+  | "nickname_ASC"
+  | "nickname_DESC"
+  | "password_ASC"
+  | "password_DESC"
+  | "email_ASC"
+  | "email_DESC"
+  | "studentID_ASC"
+  | "studentID_DESC"
+  | "dormitory_ASC"
+  | "dormitory_DESC"
+  | "qq_ASC"
+  | "qq_DESC"
+  | "wechat_ASC"
+  | "wechat_DESC"
+  | "major_ASC"
+  | "major_DESC"
+  | "className_ASC"
+  | "className_DESC"
   | "active_ASC"
   | "active_DESC"
   | "mobile_ASC"
@@ -492,6 +510,14 @@ export interface GroupWhereInput {
   id_not_starts_with?: ID_Input;
   id_ends_with?: ID_Input;
   id_not_ends_with?: ID_Input;
+  key?: Int;
+  key_not?: Int;
+  key_in?: Int[] | Int;
+  key_not_in?: Int[] | Int;
+  key_lt?: Int;
+  key_lte?: Int;
+  key_gt?: Int;
+  key_gte?: Int;
   name?: String;
   name_not?: String;
   name_in?: String[] | String;
@@ -507,14 +533,6 @@ export interface GroupWhereInput {
   name_ends_with?: String;
   name_not_ends_with?: String;
   master?: UserWhereInput;
-  key?: Int;
-  key_not?: Int;
-  key_in?: Int[] | Int;
-  key_not_in?: Int[] | Int;
-  key_lt?: Int;
-  key_lte?: Int;
-  key_gt?: Int;
-  key_gte?: Int;
   AND?: GroupWhereInput[] | GroupWhereInput;
   OR?: GroupWhereInput[] | GroupWhereInput;
   NOT?: GroupWhereInput[] | GroupWhereInput;
@@ -549,6 +567,132 @@ export interface UserWhereInput {
   username_not_starts_with?: String;
   username_ends_with?: String;
   username_not_ends_with?: String;
+  nickname?: String;
+  nickname_not?: String;
+  nickname_in?: String[] | String;
+  nickname_not_in?: String[] | String;
+  nickname_lt?: String;
+  nickname_lte?: String;
+  nickname_gt?: String;
+  nickname_gte?: String;
+  nickname_contains?: String;
+  nickname_not_contains?: String;
+  nickname_starts_with?: String;
+  nickname_not_starts_with?: String;
+  nickname_ends_with?: String;
+  nickname_not_ends_with?: String;
+  password?: String;
+  password_not?: String;
+  password_in?: String[] | String;
+  password_not_in?: String[] | String;
+  password_lt?: String;
+  password_lte?: String;
+  password_gt?: String;
+  password_gte?: String;
+  password_contains?: String;
+  password_not_contains?: String;
+  password_starts_with?: String;
+  password_not_starts_with?: String;
+  password_ends_with?: String;
+  password_not_ends_with?: String;
+  email?: String;
+  email_not?: String;
+  email_in?: String[] | String;
+  email_not_in?: String[] | String;
+  email_lt?: String;
+  email_lte?: String;
+  email_gt?: String;
+  email_gte?: String;
+  email_contains?: String;
+  email_not_contains?: String;
+  email_starts_with?: String;
+  email_not_starts_with?: String;
+  email_ends_with?: String;
+  email_not_ends_with?: String;
+  studentID?: String;
+  studentID_not?: String;
+  studentID_in?: String[] | String;
+  studentID_not_in?: String[] | String;
+  studentID_lt?: String;
+  studentID_lte?: String;
+  studentID_gt?: String;
+  studentID_gte?: String;
+  studentID_contains?: String;
+  studentID_not_contains?: String;
+  studentID_starts_with?: String;
+  studentID_not_starts_with?: String;
+  studentID_ends_with?: String;
+  studentID_not_ends_with?: String;
+  dormitory?: String;
+  dormitory_not?: String;
+  dormitory_in?: String[] | String;
+  dormitory_not_in?: String[] | String;
+  dormitory_lt?: String;
+  dormitory_lte?: String;
+  dormitory_gt?: String;
+  dormitory_gte?: String;
+  dormitory_contains?: String;
+  dormitory_not_contains?: String;
+  dormitory_starts_with?: String;
+  dormitory_not_starts_with?: String;
+  dormitory_ends_with?: String;
+  dormitory_not_ends_with?: String;
+  qq?: String;
+  qq_not?: String;
+  qq_in?: String[] | String;
+  qq_not_in?: String[] | String;
+  qq_lt?: String;
+  qq_lte?: String;
+  qq_gt?: String;
+  qq_gte?: String;
+  qq_contains?: String;
+  qq_not_contains?: String;
+  qq_starts_with?: String;
+  qq_not_starts_with?: String;
+  qq_ends_with?: String;
+  qq_not_ends_with?: String;
+  wechat?: String;
+  wechat_not?: String;
+  wechat_in?: String[] | String;
+  wechat_not_in?: String[] | String;
+  wechat_lt?: String;
+  wechat_lte?: String;
+  wechat_gt?: String;
+  wechat_gte?: String;
+  wechat_contains?: String;
+  wechat_not_contains?: String;
+  wechat_starts_with?: String;
+  wechat_not_starts_with?: String;
+  wechat_ends_with?: String;
+  wechat_not_ends_with?: String;
+  major?: String;
+  major_not?: String;
+  major_in?: String[] | String;
+  major_not_in?: String[] | String;
+  major_lt?: String;
+  major_lte?: String;
+  major_gt?: String;
+  major_gte?: String;
+  major_contains?: String;
+  major_not_contains?: String;
+  major_starts_with?: String;
+  major_not_starts_with?: String;
+  major_ends_with?: String;
+  major_not_ends_with?: String;
+  className?: String;
+  className_not?: String;
+  className_in?: String[] | String;
+  className_not_in?: String[] | String;
+  className_lt?: String;
+  className_lte?: String;
+  className_gt?: String;
+  className_gte?: String;
+  className_contains?: String;
+  className_not_contains?: String;
+  className_starts_with?: String;
+  className_not_starts_with?: String;
+  className_ends_with?: String;
+  className_not_ends_with?: String;
   active?: Boolean;
   active_not?: Boolean;
   mobile?: String;
@@ -917,6 +1061,15 @@ export interface UserCreateOneInput {
 
 export interface UserCreateInput {
   username: String;
+  nickname?: String;
+  password?: String;
+  email?: String;
+  studentID?: String;
+  dormitory?: String;
+  qq?: String;
+  wechat?: String;
+  major?: String;
+  className?: String;
   active?: Boolean;
   mobile?: String;
   avatar?: String;
@@ -935,8 +1088,8 @@ export interface GroupCreateManyWithoutMasterInput {
 }
 
 export interface GroupCreateWithoutMasterInput {
-  name: String;
   key: Int;
+  name: String;
 }
 
 export interface PostCreateOneInput {
@@ -1067,6 +1220,15 @@ export interface UserUpdateOneRequiredInput {
 
 export interface UserUpdateDataInput {
   username?: String;
+  nickname?: String;
+  password?: String;
+  email?: String;
+  studentID?: String;
+  dormitory?: String;
+  qq?: String;
+  wechat?: String;
+  major?: String;
+  className?: String;
   active?: Boolean;
   mobile?: String;
   avatar?: String;
@@ -1102,8 +1264,8 @@ export interface GroupUpdateWithWhereUniqueWithoutMasterInput {
 }
 
 export interface GroupUpdateWithoutMasterDataInput {
-  name?: String;
   key?: Int;
+  name?: String;
 }
 
 export interface GroupUpsertWithWhereUniqueWithoutMasterInput {
@@ -1127,6 +1289,14 @@ export interface GroupScalarWhereInput {
   id_not_starts_with?: ID_Input;
   id_ends_with?: ID_Input;
   id_not_ends_with?: ID_Input;
+  key?: Int;
+  key_not?: Int;
+  key_in?: Int[] | Int;
+  key_not_in?: Int[] | Int;
+  key_lt?: Int;
+  key_lte?: Int;
+  key_gt?: Int;
+  key_gte?: Int;
   name?: String;
   name_not?: String;
   name_in?: String[] | String;
@@ -1141,14 +1311,6 @@ export interface GroupScalarWhereInput {
   name_not_starts_with?: String;
   name_ends_with?: String;
   name_not_ends_with?: String;
-  key?: Int;
-  key_not?: Int;
-  key_in?: Int[] | Int;
-  key_not_in?: Int[] | Int;
-  key_lt?: Int;
-  key_lte?: Int;
-  key_gt?: Int;
-  key_gte?: Int;
   AND?: GroupScalarWhereInput[] | GroupScalarWhereInput;
   OR?: GroupScalarWhereInput[] | GroupScalarWhereInput;
   NOT?: GroupScalarWhereInput[] | GroupScalarWhereInput;
@@ -1160,8 +1322,8 @@ export interface GroupUpdateManyWithWhereNestedInput {
 }
 
 export interface GroupUpdateManyDataInput {
-  name?: String;
   key?: Int;
+  name?: String;
 }
 
 export interface UserUpdateOneInput {
@@ -1511,9 +1673,9 @@ export interface ForumUpdateManyMutationInput {
 }
 
 export interface GroupCreateInput {
+  key: Int;
   name: String;
   master?: UserCreateOneWithoutGroupInput;
-  key: Int;
 }
 
 export interface UserCreateOneWithoutGroupInput {
@@ -1523,6 +1685,15 @@ export interface UserCreateOneWithoutGroupInput {
 
 export interface UserCreateWithoutGroupInput {
   username: String;
+  nickname?: String;
+  password?: String;
+  email?: String;
+  studentID?: String;
+  dormitory?: String;
+  qq?: String;
+  wechat?: String;
+  major?: String;
+  className?: String;
   active?: Boolean;
   mobile?: String;
   avatar?: String;
@@ -1535,9 +1706,9 @@ export interface UserCreateWithoutGroupInput {
 }
 
 export interface GroupUpdateInput {
+  key?: Int;
   name?: String;
   master?: UserUpdateOneWithoutGroupInput;
-  key?: Int;
 }
 
 export interface UserUpdateOneWithoutGroupInput {
@@ -1551,6 +1722,15 @@ export interface UserUpdateOneWithoutGroupInput {
 
 export interface UserUpdateWithoutGroupDataInput {
   username?: String;
+  nickname?: String;
+  password?: String;
+  email?: String;
+  studentID?: String;
+  dormitory?: String;
+  qq?: String;
+  wechat?: String;
+  major?: String;
+  className?: String;
   active?: Boolean;
   mobile?: String;
   avatar?: String;
@@ -1568,8 +1748,8 @@ export interface UserUpsertWithoutGroupInput {
 }
 
 export interface GroupUpdateManyMutationInput {
-  name?: String;
   key?: Int;
+  name?: String;
 }
 
 export interface MessageCreateInput {
@@ -1643,6 +1823,15 @@ export interface ThreadUpdateManyMutationInput {
 
 export interface UserUpdateInput {
   username?: String;
+  nickname?: String;
+  password?: String;
+  email?: String;
+  studentID?: String;
+  dormitory?: String;
+  qq?: String;
+  wechat?: String;
+  major?: String;
+  className?: String;
   active?: Boolean;
   mobile?: String;
   avatar?: String;
@@ -1657,6 +1846,15 @@ export interface UserUpdateInput {
 
 export interface UserUpdateManyMutationInput {
   username?: String;
+  nickname?: String;
+  password?: String;
+  email?: String;
+  studentID?: String;
+  dormitory?: String;
+  qq?: String;
+  wechat?: String;
+  major?: String;
+  className?: String;
   active?: Boolean;
   mobile?: String;
   avatar?: String;
@@ -1782,6 +1980,15 @@ export interface AttachSubscription
 export interface User {
   id: ID_Output;
   username: String;
+  nickname?: String;
+  password?: String;
+  email: String;
+  studentID: String;
+  dormitory: String;
+  qq: String;
+  wechat: String;
+  major: String;
+  className: String;
   active: Boolean;
   mobile: String;
   avatar: String;
@@ -1795,6 +2002,15 @@ export interface User {
 export interface UserPromise extends Promise<User>, Fragmentable {
   id: () => Promise<ID_Output>;
   username: () => Promise<String>;
+  nickname: () => Promise<String>;
+  password: () => Promise<String>;
+  email: () => Promise<String>;
+  studentID: () => Promise<String>;
+  dormitory: () => Promise<String>;
+  qq: () => Promise<String>;
+  wechat: () => Promise<String>;
+  major: () => Promise<String>;
+  className: () => Promise<String>;
   active: () => Promise<Boolean>;
   mobile: () => Promise<String>;
   avatar: () => Promise<String>;
@@ -1822,6 +2038,15 @@ export interface UserSubscription
     Fragmentable {
   id: () => Promise<AsyncIterator<ID_Output>>;
   username: () => Promise<AsyncIterator<String>>;
+  nickname: () => Promise<AsyncIterator<String>>;
+  password: () => Promise<AsyncIterator<String>>;
+  email: () => Promise<AsyncIterator<String>>;
+  studentID: () => Promise<AsyncIterator<String>>;
+  dormitory: () => Promise<AsyncIterator<String>>;
+  qq: () => Promise<AsyncIterator<String>>;
+  wechat: () => Promise<AsyncIterator<String>>;
+  major: () => Promise<AsyncIterator<String>>;
+  className: () => Promise<AsyncIterator<String>>;
   active: () => Promise<AsyncIterator<Boolean>>;
   mobile: () => Promise<AsyncIterator<String>>;
   avatar: () => Promise<AsyncIterator<String>>;
@@ -1846,24 +2071,24 @@ export interface UserSubscription
 
 export interface Group {
   id: ID_Output;
-  name: String;
   key: Int;
+  name: String;
 }
 
 export interface GroupPromise extends Promise<Group>, Fragmentable {
   id: () => Promise<ID_Output>;
+  key: () => Promise<Int>;
   name: () => Promise<String>;
   master: <T = UserPromise>() => T;
-  key: () => Promise<Int>;
 }
 
 export interface GroupSubscription
   extends Promise<AsyncIterator<Group>>,
     Fragmentable {
   id: () => Promise<AsyncIterator<ID_Output>>;
+  key: () => Promise<AsyncIterator<Int>>;
   name: () => Promise<AsyncIterator<String>>;
   master: <T = UserSubscription>() => T;
-  key: () => Promise<AsyncIterator<Int>>;
 }
 
 export interface Post {
@@ -2562,24 +2787,24 @@ export interface GroupSubscriptionPayloadSubscription
 
 export interface GroupPreviousValues {
   id: ID_Output;
-  name: String;
   key: Int;
+  name: String;
 }
 
 export interface GroupPreviousValuesPromise
   extends Promise<GroupPreviousValues>,
     Fragmentable {
   id: () => Promise<ID_Output>;
-  name: () => Promise<String>;
   key: () => Promise<Int>;
+  name: () => Promise<String>;
 }
 
 export interface GroupPreviousValuesSubscription
   extends Promise<AsyncIterator<GroupPreviousValues>>,
     Fragmentable {
   id: () => Promise<AsyncIterator<ID_Output>>;
-  name: () => Promise<AsyncIterator<String>>;
   key: () => Promise<AsyncIterator<Int>>;
+  name: () => Promise<AsyncIterator<String>>;
 }
 
 export interface MessageSubscriptionPayload {
@@ -2766,6 +2991,15 @@ export interface UserSubscriptionPayloadSubscription
 export interface UserPreviousValues {
   id: ID_Output;
   username: String;
+  nickname?: String;
+  password?: String;
+  email: String;
+  studentID: String;
+  dormitory: String;
+  qq: String;
+  wechat: String;
+  major: String;
+  className: String;
   active: Boolean;
   mobile: String;
   avatar: String;
@@ -2781,6 +3015,15 @@ export interface UserPreviousValuesPromise
     Fragmentable {
   id: () => Promise<ID_Output>;
   username: () => Promise<String>;
+  nickname: () => Promise<String>;
+  password: () => Promise<String>;
+  email: () => Promise<String>;
+  studentID: () => Promise<String>;
+  dormitory: () => Promise<String>;
+  qq: () => Promise<String>;
+  wechat: () => Promise<String>;
+  major: () => Promise<String>;
+  className: () => Promise<String>;
   active: () => Promise<Boolean>;
   mobile: () => Promise<String>;
   avatar: () => Promise<String>;
@@ -2796,6 +3039,15 @@ export interface UserPreviousValuesSubscription
     Fragmentable {
   id: () => Promise<AsyncIterator<ID_Output>>;
   username: () => Promise<AsyncIterator<String>>;
+  nickname: () => Promise<AsyncIterator<String>>;
+  password: () => Promise<AsyncIterator<String>>;
+  email: () => Promise<AsyncIterator<String>>;
+  studentID: () => Promise<AsyncIterator<String>>;
+  dormitory: () => Promise<AsyncIterator<String>>;
+  qq: () => Promise<AsyncIterator<String>>;
+  wechat: () => Promise<AsyncIterator<String>>;
+  major: () => Promise<AsyncIterator<String>>;
+  className: () => Promise<AsyncIterator<String>>;
   active: () => Promise<AsyncIterator<Boolean>>;
   mobile: () => Promise<AsyncIterator<String>>;
   avatar: () => Promise<AsyncIterator<String>>;

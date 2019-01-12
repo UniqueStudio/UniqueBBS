@@ -7,6 +7,15 @@ type Group {
 type User {
   id: ID! @unique
   username: String!
+  nickname: String
+  password: String
+  email: String! @default(value:"")
+  studentID: String! @default(value:"")
+  dormitory: String! @default(value:"")
+  qq: String! @default(value:"")
+  wechat: String! @default(value:"")
+  major: String! @default(value:"")
+  className: String! @default(value:"")
   active: Boolean! @default(value: true)
   mobile: String! @default(value:0)
   avatar: String! @default(value:"__default__")
@@ -28,7 +37,7 @@ type Post{
   id: ID! @unique
   forum: Forum!
   user: User!
-  thread: Thread!
+  thread: Thread! @relation(name:"PostParentThread")
   isFirst: Boolean! @default(value:false)
   quote: Int! @default(value:-1)
   message: String!
@@ -40,17 +49,17 @@ type Thread{
   subject: String!
   active: Boolean! @default(value: true)
   postCount: Int! @default(value:0)
-  post: [Post!]!
+  post: [Post!]! @relation(name:"PostList")
   top: Boolean! @default(value:false)
   closed: Boolean! @default(value:false)
   diamond: Boolean! @default(value:false)
-  attach: [Attach!]!
+  attach: [Attach!]! @relation(name:"AttachList")
 }
 type Attach{
   id: ID! @unique
   user: User!
   post: Post!
-  thread: Thread!
+  thread: Thread! @relation(name:"AttachInThread")
   forum: Forum!
   filesize: Int!
   downloads: Int! @default(value:0)

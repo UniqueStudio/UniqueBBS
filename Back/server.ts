@@ -10,13 +10,16 @@ export const redisServer = Redis.createClient({
     host: 'redis'
 });
 
+redisServer.on("error", err => {
+    console.log("Redis Error: " + err);
+});
+
 export const redLock = new Redlock([redisServer],{
     driftFactor: 0.01,
     retryCount: 10,
     retryDelay: 200,
     retryJitter: 200    
 });
-
 
 const app = express();
 app.use(bodyParser.json({

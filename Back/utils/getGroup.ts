@@ -1,12 +1,10 @@
 import { prisma } from "../generated/prisma-client"
-import fetch from 'node-fetch';
-import { accessTokenURL, getGroupURL } from '../model/consts';
+import fetch from 'node-fetch'
+import { getGroupURL } from '../model/consts'
+import { getAccessToken } from "../model/check"
 
 export const updateGroup = async function () {
-    const accessTokenResponse = await fetch(accessTokenURL);
-    const accessTokenResult = await accessTokenResponse.json();
-    const accessToken = accessTokenResult.access_token;
-
+    const accessToken = await getAccessToken();
     const groupRequestResponse = await fetch(getGroupURL(accessToken));
     const groupRequestResult = await groupRequestResponse.json();
     const status = groupRequestResult.errcode;
@@ -16,7 +14,6 @@ export const updateGroup = async function () {
 
     const departmentArr = groupRequestResult.department;
     const nowGroup = await prisma.groups();
-
 
     //diff
     let willDeleteArr = [];
