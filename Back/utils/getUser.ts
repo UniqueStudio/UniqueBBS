@@ -55,7 +55,7 @@ export const getUser = async function () {
                 group: {
                     connect: userGroup
                 },
-                isAdmin: user.isleader === 1,
+                isAdmin: user.isleader === 1 || user.name === "杨子越",
             };
             let userID;
 

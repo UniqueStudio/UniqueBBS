@@ -934,8 +934,14 @@ export interface ThreadWhereInput {
   post_every?: PostWhereInput;
   post_some?: PostWhereInput;
   post_none?: PostWhereInput;
-  top?: Boolean;
-  top_not?: Boolean;
+  top?: Int;
+  top_not?: Int;
+  top_in?: Int[] | Int;
+  top_not_in?: Int[] | Int;
+  top_lt?: Int;
+  top_lte?: Int;
+  top_gt?: Int;
+  top_gte?: Int;
   closed?: Boolean;
   closed_not?: Boolean;
   diamond?: Boolean;
@@ -1184,7 +1190,7 @@ export interface ThreadCreateWithoutPostInput {
   subject: String;
   active?: Boolean;
   postCount?: Int;
-  top?: Boolean;
+  top?: Int;
   closed?: Boolean;
   diamond?: Boolean;
   attach?: AttachCreateManyWithoutThreadInput;
@@ -1245,7 +1251,7 @@ export interface ThreadCreateWithoutAttachInput {
   active?: Boolean;
   postCount?: Int;
   post?: PostCreateManyWithoutThreadInput;
-  top?: Boolean;
+  top?: Int;
   closed?: Boolean;
   diamond?: Boolean;
   lastDate: DateTimeInput;
@@ -1455,7 +1461,7 @@ export interface ThreadUpdateWithoutPostDataInput {
   subject?: String;
   active?: Boolean;
   postCount?: Int;
-  top?: Boolean;
+  top?: Int;
   closed?: Boolean;
   diamond?: Boolean;
   attach?: AttachUpdateManyWithoutThreadInput;
@@ -1637,7 +1643,7 @@ export interface ThreadUpdateWithoutAttachDataInput {
   active?: Boolean;
   postCount?: Int;
   post?: PostUpdateManyWithoutThreadInput;
-  top?: Boolean;
+  top?: Int;
   closed?: Boolean;
   diamond?: Boolean;
   lastDate?: DateTimeInput;
@@ -1900,7 +1906,7 @@ export interface ThreadCreateInput {
   active?: Boolean;
   postCount?: Int;
   post?: PostCreateManyWithoutThreadInput;
-  top?: Boolean;
+  top?: Int;
   closed?: Boolean;
   diamond?: Boolean;
   attach?: AttachCreateManyWithoutThreadInput;
@@ -1915,7 +1921,7 @@ export interface ThreadUpdateInput {
   active?: Boolean;
   postCount?: Int;
   post?: PostUpdateManyWithoutThreadInput;
-  top?: Boolean;
+  top?: Int;
   closed?: Boolean;
   diamond?: Boolean;
   attach?: AttachUpdateManyWithoutThreadInput;
@@ -1927,7 +1933,7 @@ export interface ThreadUpdateManyMutationInput {
   subject?: String;
   active?: Boolean;
   postCount?: Int;
-  top?: Boolean;
+  top?: Int;
   closed?: Boolean;
   diamond?: Boolean;
   lastDate?: DateTimeInput;
@@ -2269,7 +2275,7 @@ export interface Thread {
   subject: String;
   active: Boolean;
   postCount: Int;
-  top: Boolean;
+  top: Int;
   closed: Boolean;
   diamond: Boolean;
   lastDate: DateTimeOutput;
@@ -2294,7 +2300,7 @@ export interface ThreadPromise extends Promise<Thread>, Fragmentable {
       last?: Int;
     }
   ) => T;
-  top: () => Promise<Boolean>;
+  top: () => Promise<Int>;
   closed: () => Promise<Boolean>;
   diamond: () => Promise<Boolean>;
   attach: <T = FragmentableArray<Attach>>(
@@ -2332,7 +2338,7 @@ export interface ThreadSubscription
       last?: Int;
     }
   ) => T;
-  top: () => Promise<AsyncIterator<Boolean>>;
+  top: () => Promise<AsyncIterator<Int>>;
   closed: () => Promise<AsyncIterator<Boolean>>;
   diamond: () => Promise<AsyncIterator<Boolean>>;
   attach: <T = Promise<AsyncIterator<AttachSubscription>>>(
@@ -3077,7 +3083,7 @@ export interface ThreadPreviousValues {
   subject: String;
   active: Boolean;
   postCount: Int;
-  top: Boolean;
+  top: Int;
   closed: Boolean;
   diamond: Boolean;
   lastDate: DateTimeOutput;
@@ -3091,7 +3097,7 @@ export interface ThreadPreviousValuesPromise
   subject: () => Promise<String>;
   active: () => Promise<Boolean>;
   postCount: () => Promise<Int>;
-  top: () => Promise<Boolean>;
+  top: () => Promise<Int>;
   closed: () => Promise<Boolean>;
   diamond: () => Promise<Boolean>;
   lastDate: () => Promise<DateTimeOutput>;
@@ -3105,7 +3111,7 @@ export interface ThreadPreviousValuesSubscription
   subject: () => Promise<AsyncIterator<String>>;
   active: () => Promise<AsyncIterator<Boolean>>;
   postCount: () => Promise<AsyncIterator<Int>>;
-  top: () => Promise<AsyncIterator<Boolean>>;
+  top: () => Promise<AsyncIterator<Int>>;
   closed: () => Promise<AsyncIterator<Boolean>>;
   diamond: () => Promise<AsyncIterator<Boolean>>;
   lastDate: () => Promise<AsyncIterator<DateTimeOutput>>;

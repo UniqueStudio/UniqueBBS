@@ -1,23 +1,33 @@
-import { prisma, Forum } from "../generated/prisma-client"
-import { Request, Response } from 'express';
-import { redLock } from "../server"
-import { pagesize } from "./consts"
-import { verifyJWT, filterUserInfo } from "./check"
-import { userThreadsAdd, forumThreadsAdd, forumLastPostUpdate } from "./runtime"
-import { pushMessage, MESSAGE_REPLY , MESSAGE_QUOTE } from "./message"
+import { prisma, Forum, Thread } from "../generated/prisma-client";
+import { Request, Response } from "express";
+import { redLock } from "../server";
+import { pagesize } from "./consts";
+import { verifyJWT, filterUserInfo } from "./check";
+import {
+    userThreadsAdd,
+    forumThreadsAdd,
+    forumLastPostUpdate
+} from "./runtime";
+import {
+    pushMessage,
+    MESSAGE_REPLY,
+    MESSAGE_QUOTE,
+    MESSAGE_DIAMOND
+} from "./message";
 
-export const threadList = async function (req: Request, res: Response) {
+export const threadList = async function(req: Request, res: Response) {
     try {
-        const authObj = verifyJWT(req.header('Authorization'));
+        const authObj = verifyJWT(req.header("Authorization"));
 
         let { fid, page } = req.params;
         page = Number.parseInt(page);
 
         const whereArr = {
             forum: {
-                id: fid === "*" ? undefined : fid,
+                id: fid === "*" ? undefined : fid
             },
-            active: authObj.isAdmin ? undefined : true
+            active: authObj.isAdmin ? undefined : true,
+            top: 0
         };
 
         let resultForum: Forum;
@@ -31,6 +41,29 @@ export const threadList = async function (req: Request, res: Response) {
             }
         }
 
+        let topArr: Array<Thread> = [];
+        if (page === 1) {
+            topArr = await prisma.threads({
+                where: {
+                    top: 2
+                },
+                orderBy: "lastDate_DESC"
+            });
+            if (fid !== "*") {
+                topArr.push(
+                    ...(await prisma.threads({
+                        where: {
+                            top: 1,
+                            forum: {
+                                id: fid
+                            }
+                        },
+                        orderBy: "lastDate_DESC"
+                    }))
+                );
+            }
+        }
+
         const resultArrRaw = await prisma.threads({
             where: whereArr,
             skip: (page - 1) * pagesize,
@@ -39,50 +72,59 @@ export const threadList = async function (req: Request, res: Response) {
         });
 
         const resultArr = await Promise.all(
-            resultArrRaw.map(
-                async (item) => {
-                    return {
-                        thread: item,
-                        user: filterUserInfo(await prisma.thread({ id: item.id }).user()),
-                        lastReply: await prisma.posts({
-                            where: {
-                                thread: {
-                                    id: item.id
-                                }
-                            },
-                            orderBy: "createDate_DESC",
-                            first: 1
-                        })[0]
-                    };
-                })
+            resultArrRaw.map(async item => {
+                return {
+                    thread: item,
+                    user: filterUserInfo(
+                        await prisma.thread({ id: item.id }).user()
+                    ),
+                    lastReply: await prisma.posts({
+                        where: {
+                            thread: {
+                                id: item.id
+                            }
+                        },
+                        orderBy: "createDate_DESC",
+                        first: 1
+                    })[0]
+                };
+            })
         );
 
         if (fid === "*") {
-            res.json({ code: 1, msg: { forum: resultForum, list: resultArr } });
+            res.json({
+                code: 1,
+                msg: { forum: resultForum, list: resultArr, top: topArr }
+            });
         } else {
-            res.json({ code: 1, msg: { list: resultArr } });
+            res.json({ code: 1, msg: { list: resultArr, top: topArr } });
         }
-
     } catch (e) {
         res.json({ code: -1 });
     }
-
 };
 
-export const threadInfo = async function (req: Request, res: Response) {
+export const threadInfo = async function(req: Request, res: Response) {
     try {
-        const authObj = verifyJWT(req.header('Authorization'));
+        const authObj = verifyJWT(req.header("Authorization"));
         let { tid, page } = req.params;
         page = Number.parseInt(page);
 
-        const threadInfoObj = { id: tid, active: authObj.isAdmin ? undefined : true };
+        const threadInfoObj = {
+            id: tid,
+            active: authObj.isAdmin ? undefined : true
+        };
 
         const threadInfo = await prisma.thread({
             id: tid
         });
-        const threadAuthor = filterUserInfo(await prisma.thread({
-            id: tid
-        }).user());
+        const threadAuthor = filterUserInfo(
+            await prisma
+                .thread({
+                    id: tid
+                })
+                .user()
+        );
 
         const postArrRaw = await prisma.posts({
             where: {
@@ -103,19 +145,25 @@ export const threadInfo = async function (req: Request, res: Response) {
         });
 
         const postArr = await Promise.all(
-            postArrRaw.map(
-                async (item) => ({
-                    thread: item,
-                    user: filterUserInfo(await prisma.post({
-                        id: item.id
-                    }).user())
-                })
-            )
+            postArrRaw.map(async item => ({
+                thread: item,
+                user: filterUserInfo(
+                    await prisma
+                        .post({
+                            id: item.id
+                        })
+                        .user()
+                )
+            }))
         );
 
         res.json({
-            code: 1, msg: {
-                threadInfo, threadAuthor, firstPost, postArr
+            code: 1,
+            msg: {
+                threadInfo,
+                threadAuthor,
+                firstPost,
+                postArr
             }
         });
     } catch (e) {
@@ -123,63 +171,63 @@ export const threadInfo = async function (req: Request, res: Response) {
     }
 };
 
-export const threadCreate = async function (req: Request, res: Response) {
+export const threadCreate = async function(req: Request, res: Response) {
     try {
         const { fid, subject, message } = req.body;
-        const authObj = verifyJWT(req.header('Authorization'));
+        const authObj = verifyJWT(req.header("Authorization"));
         const uid = authObj.uid;
 
-        const resultThread = await prisma.createThread({
-            subject: subject,
-            forum: {
-                connect: {
-                    id: fid
+        const resultThread = await prisma
+            .createThread({
+                subject: subject,
+                forum: {
+                    connect: {
+                        id: fid
+                    }
+                },
+                user: {
+                    connect: {
+                        id: uid
+                    }
+                },
+                createDate: new Date(),
+                lastDate: new Date(),
+                post: {
+                    create: {
+                        isFirst: true,
+                        message: message,
+                        forum: {
+                            connect: {
+                                id: fid
+                            }
+                        },
+                        user: {
+                            connect: {
+                                id: uid
+                            }
+                        },
+                        createDate: new Date()
+                    }
                 }
-            },
-            user: {
-                connect: {
-                    id: uid
-                }
-            },
-            createDate: new Date(),
-            lastDate: new Date(),
-            post: {
-                create: {
-                    isFirst: true,
-                    message: message,
-                    forum: {
-                        connect: {
-                            id: fid
-                        }
-                    },
-                    user: {
-                        connect: {
-                            id: uid,
-                        }
-                    },
-                    createDate: new Date(),
-                }
-            }
-        }).post({
-            first: 1
-        });
+            })
+            .post({
+                first: 1
+            });
 
         const [{ id: newPostPid }] = resultThread;
         await forumThreadsAdd(fid, 1, newPostPid);
         await userThreadsAdd(uid, 1);
 
         res.json({ code: 1 });
-
     } catch (e) {
         res.json({ code: -1, msg: e.message });
     }
-
 };
 
-export const threadReply = async function (req: Request, res: Response) {
+export const threadReply = async function(req: Request, res: Response) {
     try {
         const { tid, message, quote } = req.body;
-        const authObj = verifyJWT(req.header('Authorization'));
+        const authObj = verifyJWT(req.header("Authorization"));
         const uid = authObj.uid;
         const lock = await redLock.lock(`thread:${tid}`, 200);
 
@@ -187,56 +235,83 @@ export const threadReply = async function (req: Request, res: Response) {
             const threadInfo = await prisma.thread({
                 id: tid
             });
-            const authorInfo = await prisma.thread({
-                id: tid
-            }).user();
-            const forumInfo = await prisma.thread({
-                id: tid
-            }).forum();
 
-            const resultThread = await prisma.updateThread({
-                where: {
-                    id: tid,
-                },
-                data: {
-                    postCount: threadInfo.postCount + 1,
-                    lastDate: new Date(),
-                    post: {
-                        create: {
-                            isFirst: false,
-                            message: message,
-                            forum: {
-                                connect: {
-                                    id: forumInfo.id
-                                }
-                            },
-                            user: {
-                                connect: {
-                                    id: uid,
-                                }
-                            },
-                            quote: Number.parseInt(quote),
-                            createDate: new Date(),
-                            active: true
+            if (threadInfo.closed && !authObj.isAdmin) {
+                return res.json({
+                    code: -1,
+                    msg: "该帖子已被关闭，您无权回复！"
+                });
+            }
+
+            const authorInfo = await prisma
+                .thread({
+                    id: tid
+                })
+                .user();
+            const forumInfo = await prisma
+                .thread({
+                    id: tid
+                })
+                .forum();
+
+            const resultThread = await prisma
+                .updateThread({
+                    where: {
+                        id: tid
+                    },
+                    data: {
+                        postCount: threadInfo.postCount + 1,
+                        lastDate: new Date(),
+                        post: {
+                            create: {
+                                isFirst: false,
+                                message: message,
+                                forum: {
+                                    connect: {
+                                        id: forumInfo.id
+                                    }
+                                },
+                                user: {
+                                    connect: {
+                                        id: uid
+                                    }
+                                },
+                                quote: Number.parseInt(quote),
+                                createDate: new Date(),
+                                active: true
+                            }
                         }
                     }
-                }
-            }).post({
-                last: 1
-            });
+                })
+                .post({
+                    last: 1
+                });
 
             await forumLastPostUpdate(forumInfo.id, resultThread[0].id);
             if (uid !== authorInfo.id) {
-                await pushMessage(uid, authorInfo.id, MESSAGE_REPLY(authorInfo.username, threadInfo.subject));
+                await pushMessage(
+                    uid,
+                    authorInfo.id,
+                    MESSAGE_REPLY(authorInfo.username, threadInfo.subject)
+                );
                 if (quote !== -1) {
                     const quotePost = await prisma.post({
                         id: quote
                     });
-                    const quotePostAuthor = await prisma.post({
-                        id:quote
-                    }).user();
-                    if(quotePost && quotePostAuthor.id !== uid){
-                        await pushMessage(uid, quotePostAuthor.id, MESSAGE_QUOTE(authorInfo.username, threadInfo.subject));
+                    const quotePostAuthor = await prisma
+                        .post({
+                            id: quote
+                        })
+                        .user();
+                    if (quotePost && quotePostAuthor.id !== uid) {
+                        await pushMessage(
+                            uid,
+                            quotePostAuthor.id,
+                            MESSAGE_QUOTE(
+                                authorInfo.username,
+                                threadInfo.subject
+                            )
+                        );
                     }
                 }
             }
@@ -247,22 +322,23 @@ export const threadReply = async function (req: Request, res: Response) {
         } finally {
             lock.unlock();
         }
-
     } catch (e) {
         res.json({ code: -1, msg: e.message });
     }
 };
 
-export const threadDelete = async function (req: Request, res: Response) {
+export const threadDelete = async function(req: Request, res: Response) {
     try {
-        const authObj = verifyJWT(req.header('Authorization'));
+        const authObj = verifyJWT(req.header("Authorization"));
         const { tid } = req.params;
         const uid = authObj.uid;
-        const threadAuthInfo = await prisma.thread({
-            id: tid
-        }).user();
+        const threadAuthInfo = await prisma
+            .thread({
+                id: tid
+            })
+            .user();
 
-        if (threadAuthInfo.id !== uid && !(authObj.isAdmin)) {
+        if (threadAuthInfo.id !== uid && !authObj.isAdmin) {
             return res.json({ code: -1, msg: "您无权操作此帖子！" });
         } else {
             await prisma.updateThread({
@@ -291,16 +367,18 @@ export const threadDelete = async function (req: Request, res: Response) {
     }
 };
 
-export const postDelete = async function (req: Request, res: Response) {
+export const postDelete = async function(req: Request, res: Response) {
     try {
-        const authObj = verifyJWT(req.header('Authorization'));
+        const authObj = verifyJWT(req.header("Authorization"));
         const { pid } = req.params;
         const uid = authObj.uid;
-        const postAuthInfo = await prisma.post({
-            id: pid
-        }).user();
+        const postAuthInfo = await prisma
+            .post({
+                id: pid
+            })
+            .user();
 
-        if (postAuthInfo.id !== uid && !(authObj.isAdmin)) {
+        if (postAuthInfo.id !== uid && !authObj.isAdmin) {
             return res.json({ code: -1, msg: "您无权操作此帖子！" });
         } else {
             await prisma.updatePost({
@@ -318,10 +396,10 @@ export const postDelete = async function (req: Request, res: Response) {
     }
 };
 
-export const postDeleteHard = async function (req: Request, res: Response) {
+export const postDeleteHard = async function(req: Request, res: Response) {
     try {
-        const authObj = verifyJWT(req.header('Authorization'));
-        if (!(authObj.isAdmin)) {
+        const authObj = verifyJWT(req.header("Authorization"));
+        if (!authObj.isAdmin) {
             return res.json({ code: -1, msg: "您无权操作此帖子！" });
         } else {
             const { pid } = req.params;
@@ -335,16 +413,18 @@ export const postDeleteHard = async function (req: Request, res: Response) {
     }
 };
 
-export const threadDeleteHard = async function (req: Request, res: Response) {
+export const threadDeleteHard = async function(req: Request, res: Response) {
     try {
-        const authObj = verifyJWT(req.header('Authorization'));
-        if (!(authObj.isAdmin)) {
+        const authObj = verifyJWT(req.header("Authorization"));
+        if (!authObj.isAdmin) {
             return res.json({ code: -1, msg: "您无权操作此帖子！" });
         } else {
             const { tid } = req.params;
-            const author = await prisma.thread({
-                id: tid
-            }).user();
+            const author = await prisma
+                .thread({
+                    id: tid
+                })
+                .user();
             const thread = await prisma.thread({
                 id: tid
             });
@@ -358,6 +438,89 @@ export const threadDeleteHard = async function (req: Request, res: Response) {
             });
             await userThreadsAdd(author.id, -1);
             await forumThreadsAdd(thread.id, -1);
+            res.json({ code: 1 });
+        }
+    } catch (e) {
+        res.json({ code: -1, msg: e.message });
+    }
+};
+
+export const threadDiamond = async function(req: Request, res: Response) {
+    try {
+        const authObj = verifyJWT(req.header("Authorization"));
+        if (!authObj.isAdmin) {
+            return res.json({ code: -1, msg: "您无权操作此帖子！" });
+        } else {
+            const { tid, setDiamond } = req.body;
+            const threadInfo = await prisma.updateThread({
+                where: {
+                    id: tid
+                },
+                data: {
+                    diamond: setDiamond === "1"
+                }
+            });
+
+            const threadAuthor = await prisma
+                .thread({
+                    id: tid
+                })
+                .user();
+
+            if (setDiamond === "1") {
+                const [firstUser] = await prisma.users({
+                    first: 1
+                });
+                pushMessage(
+                    firstUser.id,
+                    threadAuthor.id,
+                    MESSAGE_DIAMOND(threadInfo.subject)
+                );
+            }
+            res.json({ code: 1 });
+        }
+    } catch (e) {
+        res.json({ code: -1, msg: e.message });
+    }
+};
+
+export const threadTop = async function(req: Request, res: Response) {
+    try {
+        const authObj = verifyJWT(req.header("Authorization"));
+        if (!authObj.isAdmin) {
+            return res.json({ code: -1, msg: "您无权操作此帖子！" });
+        } else {
+            const { tid, setTop } = req.body;
+            const threadInfo = await prisma.updateThread({
+                where: {
+                    id: tid
+                },
+                data: {
+                    top: Number.parseInt(setTop)
+                }
+            });
+            res.json({ code: 1 });
+        }
+    } catch (e) {
+        res.json({ code: -1, msg: e.message });
+    }
+};
+
+export const threadClose = async function(req: Request, res: Response) {
+    try {
+        const authObj = verifyJWT(req.header("Authorization"));
+        if (!authObj.isAdmin) {
+            return res.json({ code: -1, msg: "您无权操作此帖子！" });
+        } else {
+            const { tid, setClose } = req.body;
+            const threadInfo = await prisma.updateThread({
+                where: {
+                    id: tid
+                },
+                data: {
+                    closed: setClose === "1"
+                }
+            });
             res.json({ code: 1 });
         }
     } catch (e) {

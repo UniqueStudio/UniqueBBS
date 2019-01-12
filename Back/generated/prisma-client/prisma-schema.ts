@@ -1268,7 +1268,7 @@ type Thread {
   active: Boolean!
   postCount: Int!
   post(where: PostWhereInput, orderBy: PostOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Post!]
-  top: Boolean!
+  top: Int!
   closed: Boolean!
   diamond: Boolean!
   attach(where: AttachWhereInput, orderBy: AttachOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Attach!]
@@ -1289,7 +1289,7 @@ input ThreadCreateInput {
   active: Boolean
   postCount: Int
   post: PostCreateManyWithoutThreadInput
-  top: Boolean
+  top: Int
   closed: Boolean
   diamond: Boolean
   attach: AttachCreateManyWithoutThreadInput
@@ -1314,7 +1314,7 @@ input ThreadCreateWithoutAttachInput {
   active: Boolean
   postCount: Int
   post: PostCreateManyWithoutThreadInput
-  top: Boolean
+  top: Int
   closed: Boolean
   diamond: Boolean
   lastDate: DateTime!
@@ -1327,7 +1327,7 @@ input ThreadCreateWithoutPostInput {
   subject: String!
   active: Boolean
   postCount: Int
-  top: Boolean
+  top: Int
   closed: Boolean
   diamond: Boolean
   attach: AttachCreateManyWithoutThreadInput
@@ -1370,7 +1370,7 @@ type ThreadPreviousValues {
   subject: String!
   active: Boolean!
   postCount: Int!
-  top: Boolean!
+  top: Int!
   closed: Boolean!
   diamond: Boolean!
   lastDate: DateTime!
@@ -1402,7 +1402,7 @@ input ThreadUpdateInput {
   active: Boolean
   postCount: Int
   post: PostUpdateManyWithoutThreadInput
-  top: Boolean
+  top: Int
   closed: Boolean
   diamond: Boolean
   attach: AttachUpdateManyWithoutThreadInput
@@ -1414,7 +1414,7 @@ input ThreadUpdateManyMutationInput {
   subject: String
   active: Boolean
   postCount: Int
-  top: Boolean
+  top: Int
   closed: Boolean
   diamond: Boolean
   lastDate: DateTime
@@ -1442,7 +1442,7 @@ input ThreadUpdateWithoutAttachDataInput {
   active: Boolean
   postCount: Int
   post: PostUpdateManyWithoutThreadInput
-  top: Boolean
+  top: Int
   closed: Boolean
   diamond: Boolean
   lastDate: DateTime
@@ -1455,7 +1455,7 @@ input ThreadUpdateWithoutPostDataInput {
   subject: String
   active: Boolean
   postCount: Int
-  top: Boolean
+  top: Int
   closed: Boolean
   diamond: Boolean
   attach: AttachUpdateManyWithoutThreadInput
@@ -1517,8 +1517,14 @@ input ThreadWhereInput {
   post_every: PostWhereInput
   post_some: PostWhereInput
   post_none: PostWhereInput
-  top: Boolean
-  top_not: Boolean
+  top: Int
+  top_not: Int
+  top_in: [Int!]
+  top_not_in: [Int!]
+  top_lt: Int
+  top_lte: Int
+  top_gt: Int
+  top_gte: Int
   closed: Boolean
   closed_not: Boolean
   diamond: Boolean

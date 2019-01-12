@@ -1,11 +1,12 @@
 import * as express from "express"
 import * as bodyParser from "body-parser"
 import { userMyInfo, userInfo, userLoginByPwd, userInfoUpdate, userInfoUpdateFromWx, userQRLogin, userScan, userPwdReset } from "./model/user"
-import { threadDeleteHard, postDeleteHard, postDelete, threadList, threadInfo, threadCreate, threadReply, threadDelete } from "./model/thread"
+import { threadDeleteHard, postDeleteHard, postDelete, threadList, threadInfo, threadCreate, threadReply, threadDelete, threadDiamond, threadTop, threadClose } from "./model/thread"
 import { forumList, forumListSimple } from "./model/forum"
 import * as Redis from "redis"
 import * as Redlock from "redlock"
 
+const VERSION = "1.00";
 
 export const redisServer = Redis.createClient({
     host: 'localhost',
@@ -41,12 +42,12 @@ app.use(bodyParser.urlencoded({
 //User
 app.get("/user/info/:uid", userInfo);
 app.get("/user/my/info", userMyInfo);
+app.get('/user/login/qr', userQRLogin);
+app.get('/user/login/scan/:key/status', userScan);
 app.post("/user/login/pwd", userLoginByPwd);
 app.post("/user/update/normal", userInfoUpdate);
 app.post("/user/update/pwd", userPwdReset);
 app.post("/user/update/wx", userInfoUpdateFromWx);
-app.get('/user/login/qr', userQRLogin);
-app.get('/user/login/scan/:key/status', userScan);
 
 //Forum
 app.get('/forum/list', forumList);
@@ -57,11 +58,14 @@ app.get('/thread/list/:fid/:page', threadList);
 app.get('/thread/info/:tid/:page', threadInfo);
 app.post('/thread/create', threadCreate);
 app.post('/thread/reply', threadReply);
+app.post('/thread/diamond', threadDiamond);
+app.post('/thread/top', threadTop);
+app.post('/thread/close', threadClose);
 app.post('/thread/delete/:tid', threadDelete);
 app.post('/post/delete/:pid', postDelete);
 app.post('/thread/deleteHard/:tid', threadDeleteHard);
 app.post('/post/deleteHard/:pid', postDeleteHard);
 
 app.listen(7010, () => {
-    console.log("uniqueBBS server is running on port 7010.\nRedis:6379 , MySQL:3306 , graphQL:4466");
+    console.log(`Rabbit WebServer / ${VERSION} is running on port 7010.\nRedis:6379 , MySQL:3306 , graphQL:4466`);
 });

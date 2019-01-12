@@ -1,7 +1,7 @@
-import { prisma } from "../generated/prisma-client"
-import { redLock } from "../server"
+import { prisma } from "../generated/prisma-client";
+import { redLock } from "../server";
 
-export const userThreadsAdd = async function (uid, addNum: number = 1) {
+export const userThreadsAdd = async function(uid, addNum: number = 1) {
     const redLockResourceNameUser = `user:${uid}`;
     const lock = await redLock.lock(redLockResourceNameUser, 200);
     try {
@@ -23,7 +23,7 @@ export const userThreadsAdd = async function (uid, addNum: number = 1) {
     return true;
 };
 
-export const forumLastPostUpdate = async function (fid, lastPostID) {
+export const forumLastPostUpdate = async function(fid, lastPostID) {
     const redLockResourceNameUser = `forum:${fid}`;
     const lock = await redLock.lock(redLockResourceNameUser, 200);
 
@@ -46,7 +46,11 @@ export const forumLastPostUpdate = async function (fid, lastPostID) {
     return true;
 };
 
-export const forumThreadsAdd = async function (fid, addNum: number = 1, lastPostID?) {
+export const forumThreadsAdd = async function(
+    fid,
+    addNum: number = 1,
+    lastPostID?
+) {
     const redLockResourceNameUser = `forum:${fid}`;
     const lock = await redLock.lock(redLockResourceNameUser, 200);
 
@@ -68,7 +72,7 @@ export const forumThreadsAdd = async function (fid, addNum: number = 1, lastPost
             };
         } else {
             dataObj = {
-                threads: forumInfo.threads + addNum,
+                threads: forumInfo.threads + addNum
             };
         }
 
@@ -84,7 +88,7 @@ export const forumThreadsAdd = async function (fid, addNum: number = 1, lastPost
     return true;
 };
 
-export const threadPostCountAdd = async function (tid, addNum: number = 1) {
+export const threadPostCountAdd = async function(tid, addNum: number = 1) {
     const redLockResourceNameUser = `thread:${tid}`;
     const lock = await redLock.lock(redLockResourceNameUser, 200);
     try {

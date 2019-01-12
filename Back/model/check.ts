@@ -1,23 +1,27 @@
-import * as jwt from 'jsonwebtoken';
-import { secret, accessTokenURL, filterUserKeys, filterMyKeys } from './consts';
-import * as crypto from "crypto"
-import { User } from "../generated/prisma-client"
+import * as jwt from "jsonwebtoken";
+import { secret, accessTokenURL, filterUserKeys, filterMyKeys } from "./consts";
+import * as crypto from "crypto";
+import { User } from "../generated/prisma-client";
 
 export const signJWT = (uid: string, isAdmin: boolean) => {
-    return jwt.sign({
-        uid: uid,
-        isAdmin: isAdmin
-    }, secret, {
+    return jwt.sign(
+        {
+            uid: uid,
+            isAdmin: isAdmin
+        },
+        secret,
+        {
             expiresIn: 86400
-        });
+        }
+    );
 };
 
 export const verifyJWT = (token?: string) => {
     if (!token) {
-        throw new Error('No token provided');
+        throw new Error("No token provided");
     }
-    if (token.indexOf('Bearer ') === 0) {
-        token = token.replace('Bearer ', '');
+    if (token.indexOf("Bearer ") === 0) {
+        token = token.replace("Bearer ", "");
     }
     return jwt.verify(token, secret);
 };
@@ -41,21 +45,21 @@ export const getAccessToken = async () => {
     return accessToken;
 };
 
-export const filterUserInfo = function (user: User) {
+export const filterUserInfo = function(user: User) {
     for (let key of filterUserKeys) {
         delete user[key];
     }
     return user;
 };
 
-export const filterMyInfo = function (user: User) {
+export const filterMyInfo = function(user: User) {
     for (let key of filterMyKeys) {
         delete user[key];
     }
     return user;
 };
 
-export const filterUsersInfo = function (users: Array<User>) {
+export const filterUsersInfo = function(users: Array<User>) {
     for (let user of users) {
         user = filterUserInfo(user);
     }

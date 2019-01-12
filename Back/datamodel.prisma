@@ -52,7 +52,7 @@ type Thread{
   active: Boolean! @default(value: true)
   postCount: Int! @default(value:0)
   post: [Post!]!
-  top: Boolean! @default(value:false)
+  top: Int! @default(value:0)
   closed: Boolean! @default(value:false)
   diamond: Boolean! @default(value:false)
   attach: [Attach!]! @relation(name:"AttachList")
