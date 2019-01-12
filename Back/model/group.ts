@@ -5,7 +5,7 @@ import { filterUsersInfo } from "./user"
 
 export const getGroupUserList = async function (req: Request, res: Response) {
     try {
-        verifyJWT(req.get('Authorization'));
+        verifyJWT(req.header('Authorization'));
         const { gid } = req.body;
         const userList: Array<User> = await prisma.users({
             where: {
@@ -22,7 +22,7 @@ export const getGroupUserList = async function (req: Request, res: Response) {
 
 export const getGroupList = async function (req: Request, res: Response) {
     try {
-        verifyJWT(req.get('Authorization'));
+        verifyJWT(req.header('Authorization'));
         const groupList: Array<Group> = await prisma.groups();
         res.json({ code: 1, msg: groupList });
     } catch (err) {

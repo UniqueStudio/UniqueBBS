@@ -2,18 +2,24 @@ import { prisma, User } from "../generated/prisma-client"
 import fetch from 'node-fetch';
 import { scanningURL, userIDURL, userInfoURL, getQRCodeURL, filterUserKeys } from './consts';
 import { Request, Response } from 'express';
-import { addSaltPasswordOnce, getAccessToken, signJWT } from "./check";
+import { addSaltPasswordOnce, getAccessToken, signJWT, verifyJWT } from "./check";
 
 export const userInfo = async function (req: Request, res: Response) {
-    const { id } = req.params;
-    const result = await prisma.user({
-        id: id
-    });
-    res.json({ code: 1, msg: filterUserInfo(result) });
+    try {
+        verifyJWT(req.header('Authorization'));
+        const { uid } = req.params;
+        const result = await prisma.user({
+            id: uid
+        });
+        res.json({ code: 1, msg: filterUserInfo(result) });
+    } catch (e) {
+        res.json({ code: -1, msg: e.message });
+    }
+
 };
 
 export const userLoginByPwd = async function (req: Request, res: Response) {
-    const { nickname, pwd } = req.params;
+    const { nickname, pwd } = req.body;
 
     const userInfoArr = await prisma.users({
         where: {
@@ -22,7 +28,7 @@ export const userLoginByPwd = async function (req: Request, res: Response) {
     });
 
     if (userInfoArr.length !== 1) {
-        return res.json({ code: -1, msg: "昵称不存在或未设置！" });
+        return res.json({ code: -1, msg: "昵称不存在！请设置昵称后再登录！" });
     }
 
     const userInfo = userInfoArr[0];
@@ -32,23 +38,42 @@ export const userLoginByPwd = async function (req: Request, res: Response) {
 
     const pwd_salt = addSaltPasswordOnce(pwd);
     if (pwd_salt === userInfo.password) {
-        const token = signJWT(userInfo.id , userInfo.isAdmin);
+        const token = signJWT(userInfo.id, userInfo.isAdmin);
         prisma.updateUser({
-            where:{
+            where: {
                 id: userInfo.id
             },
-            data:{
+            data: {
                 lastLogin: new Date()
             }
         });
-        res.send({ code: 1, msg: { uid : userInfo.id , token } });
+        res.send({ code: 1, msg: { uid: userInfo.id, token } });
     } else {
         return res.json({ code: -1, msg: "密码错误！" });
     }
 
 };
 
-export const updateUserInfoFromWx = async (userid: string) => {
+export const userInfoUpdate = async function (req: Request, res: Response) {
+    try {
+        const authObj = verifyJWT(req.header('Authorization'));
+        const uid = authObj.uid;
+        const { studentID, dormitory, qq, wechat, major, className } = req.body;
+        const result = await prisma.updateUser({
+            where: {
+                id: uid
+            },
+            data: {
+                studentID, dormitory, qq, wechat, major, className
+            }
+        });
+        res.json({ code: 1 });
+    } catch (e) {
+        res.json({ code: -1, msg: e.message });
+    }
+};
+
+export const userInfoUpdateFromWx = async function (userid: string) {
     const accessToken = await getAccessToken();
     const userInfoResponse = await fetch(userInfoURL(accessToken, userid));
     const user = await userInfoResponse.json();
@@ -92,10 +117,10 @@ export const updateUserInfoFromWx = async (userid: string) => {
         data: dataObj
     });
 
-    return true;
+    return userUpdate;
 };
 
-export const handleScan = async function (req: Request, res: Response) {
+export const userScan = async function (req: Request, res: Response) {
     try {
         const scanResponse = await fetch(`${scanningURL}${req.params.key}`);
         const scanResult = await scanResponse.text();
@@ -120,18 +145,18 @@ export const handleScan = async function (req: Request, res: Response) {
                     res.send({ code: -1, msg: '用户不存在！' });
                 } else {
                     let _user = user[0];
-                    const token = signJWT(_user.id , _user.isAdmin);
+                    const token = signJWT(_user.id, _user.isAdmin);
                     prisma.updateUser({
-                        where:{
+                        where: {
                             id: _user.id
                         },
-                        data:{
+                        data: {
                             lastLogin: new Date()
                         }
                     });
-                    res.send({ code: 1, msg: { uid : _user.id , token } });
+                    res.send({ code: 1, msg: { uid: _user.id, token } });
                 }
-                
+
             } else {
                 res.send({ code: -1, msg: '登录失败' });
                 return;
@@ -145,14 +170,14 @@ export const handleScan = async function (req: Request, res: Response) {
     }
 };
 
-export const handleLogin = async function (req: Request, res: Response) {
+export const userQRLogin = async function (req: Request, res: Response) {
     try {
         const response = await fetch(getQRCodeURL);
         const html = await response.text();
         const key = html.match(/key ?: ?"\w+/)![0].replace(/key ?: ?"/, '');
-        res.send({ key, type: 'success' });
+        res.send({ code: 1, msg: key });
     } catch (err) {
-        res.send({ message: err.message, type: 'warning' });
+        res.send({ code: -1, msg: err.message });
     }
 };
 

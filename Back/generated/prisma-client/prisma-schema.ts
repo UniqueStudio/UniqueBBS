@@ -35,6 +35,7 @@ type Attach {
   filesize: Int!
   downloads: Int!
   fileName: String!
+  createDate: DateTime!
 }
 
 type AttachConnection {
@@ -51,6 +52,7 @@ input AttachCreateInput {
   filesize: Int!
   downloads: Int
   fileName: String!
+  createDate: DateTime!
 }
 
 input AttachCreateManyWithoutThreadInput {
@@ -65,6 +67,7 @@ input AttachCreateWithoutThreadInput {
   filesize: Int!
   downloads: Int
   fileName: String!
+  createDate: DateTime!
 }
 
 type AttachEdge {
@@ -81,6 +84,8 @@ enum AttachOrderByInput {
   downloads_DESC
   fileName_ASC
   fileName_DESC
+  createDate_ASC
+  createDate_DESC
   createdAt_ASC
   createdAt_DESC
   updatedAt_ASC
@@ -92,6 +97,7 @@ type AttachPreviousValues {
   filesize: Int!
   downloads: Int!
   fileName: String!
+  createDate: DateTime!
 }
 
 input AttachScalarWhereInput {
@@ -139,6 +145,14 @@ input AttachScalarWhereInput {
   fileName_not_starts_with: String
   fileName_ends_with: String
   fileName_not_ends_with: String
+  createDate: DateTime
+  createDate_not: DateTime
+  createDate_in: [DateTime!]
+  createDate_not_in: [DateTime!]
+  createDate_lt: DateTime
+  createDate_lte: DateTime
+  createDate_gt: DateTime
+  createDate_gte: DateTime
   AND: [AttachScalarWhereInput!]
   OR: [AttachScalarWhereInput!]
   NOT: [AttachScalarWhereInput!]
@@ -170,18 +184,21 @@ input AttachUpdateInput {
   filesize: Int
   downloads: Int
   fileName: String
+  createDate: DateTime
 }
 
 input AttachUpdateManyDataInput {
   filesize: Int
   downloads: Int
   fileName: String
+  createDate: DateTime
 }
 
 input AttachUpdateManyMutationInput {
   filesize: Int
   downloads: Int
   fileName: String
+  createDate: DateTime
 }
 
 input AttachUpdateManyWithoutThreadInput {
@@ -207,6 +224,7 @@ input AttachUpdateWithoutThreadDataInput {
   filesize: Int
   downloads: Int
   fileName: String
+  createDate: DateTime
 }
 
 input AttachUpdateWithWhereUniqueWithoutThreadInput {
@@ -269,6 +287,14 @@ input AttachWhereInput {
   fileName_not_starts_with: String
   fileName_ends_with: String
   fileName_not_ends_with: String
+  createDate: DateTime
+  createDate_not: DateTime
+  createDate_in: [DateTime!]
+  createDate_not_in: [DateTime!]
+  createDate_lt: DateTime
+  createDate_lte: DateTime
+  createDate_gt: DateTime
+  createDate_gte: DateTime
   AND: [AttachWhereInput!]
   OR: [AttachWhereInput!]
   NOT: [AttachWhereInput!]
@@ -670,6 +696,7 @@ type Message {
   toUser: User!
   message: String!
   isRead: Boolean!
+  createDate: DateTime!
 }
 
 type MessageConnection {
@@ -683,6 +710,7 @@ input MessageCreateInput {
   toUser: UserCreateOneInput!
   message: String!
   isRead: Boolean
+  createDate: DateTime!
 }
 
 type MessageEdge {
@@ -697,6 +725,8 @@ enum MessageOrderByInput {
   message_DESC
   isRead_ASC
   isRead_DESC
+  createDate_ASC
+  createDate_DESC
   createdAt_ASC
   createdAt_DESC
   updatedAt_ASC
@@ -707,6 +737,7 @@ type MessagePreviousValues {
   id: ID!
   message: String!
   isRead: Boolean!
+  createDate: DateTime!
 }
 
 type MessageSubscriptionPayload {
@@ -732,11 +763,13 @@ input MessageUpdateInput {
   toUser: UserUpdateOneRequiredInput
   message: String
   isRead: Boolean
+  createDate: DateTime
 }
 
 input MessageUpdateManyMutationInput {
   message: String
   isRead: Boolean
+  createDate: DateTime
 }
 
 input MessageWhereInput {
@@ -772,6 +805,14 @@ input MessageWhereInput {
   message_not_ends_with: String
   isRead: Boolean
   isRead_not: Boolean
+  createDate: DateTime
+  createDate_not: DateTime
+  createDate_in: [DateTime!]
+  createDate_not_in: [DateTime!]
+  createDate_lt: DateTime
+  createDate_lte: DateTime
+  createDate_gt: DateTime
+  createDate_gte: DateTime
   AND: [MessageWhereInput!]
   OR: [MessageWhereInput!]
   NOT: [MessageWhereInput!]
@@ -851,6 +892,8 @@ type Post {
   isFirst: Boolean!
   quote: Int!
   message: String!
+  createDate: DateTime!
+  active: Boolean!
 }
 
 type PostConnection {
@@ -866,6 +909,8 @@ input PostCreateInput {
   isFirst: Boolean
   quote: Int
   message: String!
+  createDate: DateTime!
+  active: Boolean
 }
 
 input PostCreateManyWithoutThreadInput {
@@ -889,6 +934,8 @@ input PostCreateWithoutForumInput {
   isFirst: Boolean
   quote: Int
   message: String!
+  createDate: DateTime!
+  active: Boolean
 }
 
 input PostCreateWithoutThreadInput {
@@ -897,6 +944,8 @@ input PostCreateWithoutThreadInput {
   isFirst: Boolean
   quote: Int
   message: String!
+  createDate: DateTime!
+  active: Boolean
 }
 
 type PostEdge {
@@ -913,6 +962,10 @@ enum PostOrderByInput {
   quote_DESC
   message_ASC
   message_DESC
+  createDate_ASC
+  createDate_DESC
+  active_ASC
+  active_DESC
   createdAt_ASC
   createdAt_DESC
   updatedAt_ASC
@@ -924,6 +977,8 @@ type PostPreviousValues {
   isFirst: Boolean!
   quote: Int!
   message: String!
+  createDate: DateTime!
+  active: Boolean!
 }
 
 input PostScalarWhereInput {
@@ -965,6 +1020,16 @@ input PostScalarWhereInput {
   message_not_starts_with: String
   message_ends_with: String
   message_not_ends_with: String
+  createDate: DateTime
+  createDate_not: DateTime
+  createDate_in: [DateTime!]
+  createDate_not_in: [DateTime!]
+  createDate_lt: DateTime
+  createDate_lte: DateTime
+  createDate_gt: DateTime
+  createDate_gte: DateTime
+  active: Boolean
+  active_not: Boolean
   AND: [PostScalarWhereInput!]
   OR: [PostScalarWhereInput!]
   NOT: [PostScalarWhereInput!]
@@ -995,6 +1060,8 @@ input PostUpdateDataInput {
   isFirst: Boolean
   quote: Int
   message: String
+  createDate: DateTime
+  active: Boolean
 }
 
 input PostUpdateInput {
@@ -1004,18 +1071,24 @@ input PostUpdateInput {
   isFirst: Boolean
   quote: Int
   message: String
+  createDate: DateTime
+  active: Boolean
 }
 
 input PostUpdateManyDataInput {
   isFirst: Boolean
   quote: Int
   message: String
+  createDate: DateTime
+  active: Boolean
 }
 
 input PostUpdateManyMutationInput {
   isFirst: Boolean
   quote: Int
   message: String
+  createDate: DateTime
+  active: Boolean
 }
 
 input PostUpdateManyWithoutThreadInput {
@@ -1056,6 +1129,8 @@ input PostUpdateWithoutForumDataInput {
   isFirst: Boolean
   quote: Int
   message: String
+  createDate: DateTime
+  active: Boolean
 }
 
 input PostUpdateWithoutThreadDataInput {
@@ -1064,6 +1139,8 @@ input PostUpdateWithoutThreadDataInput {
   isFirst: Boolean
   quote: Int
   message: String
+  createDate: DateTime
+  active: Boolean
 }
 
 input PostUpdateWithWhereUniqueWithoutThreadInput {
@@ -1129,6 +1206,16 @@ input PostWhereInput {
   message_not_starts_with: String
   message_ends_with: String
   message_not_ends_with: String
+  createDate: DateTime
+  createDate_not: DateTime
+  createDate_in: [DateTime!]
+  createDate_not_in: [DateTime!]
+  createDate_lt: DateTime
+  createDate_lte: DateTime
+  createDate_gt: DateTime
+  createDate_gte: DateTime
+  active: Boolean
+  active_not: Boolean
   AND: [PostWhereInput!]
   OR: [PostWhereInput!]
   NOT: [PostWhereInput!]
@@ -1185,6 +1272,8 @@ type Thread {
   closed: Boolean!
   diamond: Boolean!
   attach(where: AttachWhereInput, orderBy: AttachOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Attach!]
+  lastDate: DateTime!
+  createDate: DateTime!
 }
 
 type ThreadConnection {
@@ -1204,6 +1293,8 @@ input ThreadCreateInput {
   closed: Boolean
   diamond: Boolean
   attach: AttachCreateManyWithoutThreadInput
+  lastDate: DateTime!
+  createDate: DateTime!
 }
 
 input ThreadCreateOneWithoutAttachInput {
@@ -1226,6 +1317,8 @@ input ThreadCreateWithoutAttachInput {
   top: Boolean
   closed: Boolean
   diamond: Boolean
+  lastDate: DateTime!
+  createDate: DateTime!
 }
 
 input ThreadCreateWithoutPostInput {
@@ -1238,6 +1331,8 @@ input ThreadCreateWithoutPostInput {
   closed: Boolean
   diamond: Boolean
   attach: AttachCreateManyWithoutThreadInput
+  lastDate: DateTime!
+  createDate: DateTime!
 }
 
 type ThreadEdge {
@@ -1260,6 +1355,10 @@ enum ThreadOrderByInput {
   closed_DESC
   diamond_ASC
   diamond_DESC
+  lastDate_ASC
+  lastDate_DESC
+  createDate_ASC
+  createDate_DESC
   createdAt_ASC
   createdAt_DESC
   updatedAt_ASC
@@ -1274,6 +1373,8 @@ type ThreadPreviousValues {
   top: Boolean!
   closed: Boolean!
   diamond: Boolean!
+  lastDate: DateTime!
+  createDate: DateTime!
 }
 
 type ThreadSubscriptionPayload {
@@ -1305,6 +1406,8 @@ input ThreadUpdateInput {
   closed: Boolean
   diamond: Boolean
   attach: AttachUpdateManyWithoutThreadInput
+  lastDate: DateTime
+  createDate: DateTime
 }
 
 input ThreadUpdateManyMutationInput {
@@ -1314,6 +1417,8 @@ input ThreadUpdateManyMutationInput {
   top: Boolean
   closed: Boolean
   diamond: Boolean
+  lastDate: DateTime
+  createDate: DateTime
 }
 
 input ThreadUpdateOneRequiredWithoutAttachInput {
@@ -1340,6 +1445,8 @@ input ThreadUpdateWithoutAttachDataInput {
   top: Boolean
   closed: Boolean
   diamond: Boolean
+  lastDate: DateTime
+  createDate: DateTime
 }
 
 input ThreadUpdateWithoutPostDataInput {
@@ -1352,6 +1459,8 @@ input ThreadUpdateWithoutPostDataInput {
   closed: Boolean
   diamond: Boolean
   attach: AttachUpdateManyWithoutThreadInput
+  lastDate: DateTime
+  createDate: DateTime
 }
 
 input ThreadUpsertWithoutAttachInput {
@@ -1417,6 +1526,22 @@ input ThreadWhereInput {
   attach_every: AttachWhereInput
   attach_some: AttachWhereInput
   attach_none: AttachWhereInput
+  lastDate: DateTime
+  lastDate_not: DateTime
+  lastDate_in: [DateTime!]
+  lastDate_not_in: [DateTime!]
+  lastDate_lt: DateTime
+  lastDate_lte: DateTime
+  lastDate_gt: DateTime
+  lastDate_gte: DateTime
+  createDate: DateTime
+  createDate_not: DateTime
+  createDate_in: [DateTime!]
+  createDate_not_in: [DateTime!]
+  createDate_lt: DateTime
+  createDate_lte: DateTime
+  createDate_gt: DateTime
+  createDate_gte: DateTime
   AND: [ThreadWhereInput!]
   OR: [ThreadWhereInput!]
   NOT: [ThreadWhereInput!]
@@ -1444,7 +1569,7 @@ type User {
   userid: String!
   isAdmin: Boolean!
   group(where: GroupWhereInput, orderBy: GroupOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Group!]
-  posts: Int!
+  threads: Int!
   lastLogin: DateTime!
   signature: String!
   mentor: User
@@ -1473,7 +1598,7 @@ input UserCreateInput {
   userid: String!
   isAdmin: Boolean
   group: GroupCreateManyWithoutMasterInput
-  posts: Int
+  threads: Int
   lastLogin: DateTime!
   signature: String
   mentor: UserCreateOneInput
@@ -1505,7 +1630,7 @@ input UserCreateWithoutGroupInput {
   avatar: String
   userid: String!
   isAdmin: Boolean
-  posts: Int
+  threads: Int
   lastLogin: DateTime!
   signature: String
   mentor: UserCreateOneInput
@@ -1549,8 +1674,8 @@ enum UserOrderByInput {
   userid_DESC
   isAdmin_ASC
   isAdmin_DESC
-  posts_ASC
-  posts_DESC
+  threads_ASC
+  threads_DESC
   lastLogin_ASC
   lastLogin_DESC
   signature_ASC
@@ -1578,7 +1703,7 @@ type UserPreviousValues {
   avatar: String!
   userid: String!
   isAdmin: Boolean!
-  posts: Int!
+  threads: Int!
   lastLogin: DateTime!
   signature: String!
 }
@@ -1618,7 +1743,7 @@ input UserUpdateDataInput {
   userid: String
   isAdmin: Boolean
   group: GroupUpdateManyWithoutMasterInput
-  posts: Int
+  threads: Int
   lastLogin: DateTime
   signature: String
   mentor: UserUpdateOneInput
@@ -1641,7 +1766,7 @@ input UserUpdateInput {
   userid: String
   isAdmin: Boolean
   group: GroupUpdateManyWithoutMasterInput
-  posts: Int
+  threads: Int
   lastLogin: DateTime
   signature: String
   mentor: UserUpdateOneInput
@@ -1663,7 +1788,7 @@ input UserUpdateManyMutationInput {
   avatar: String
   userid: String
   isAdmin: Boolean
-  posts: Int
+  threads: Int
   lastLogin: DateTime
   signature: String
 }
@@ -1709,7 +1834,7 @@ input UserUpdateWithoutGroupDataInput {
   avatar: String
   userid: String
   isAdmin: Boolean
-  posts: Int
+  threads: Int
   lastLogin: DateTime
   signature: String
   mentor: UserUpdateOneInput
@@ -1929,14 +2054,14 @@ input UserWhereInput {
   group_every: GroupWhereInput
   group_some: GroupWhereInput
   group_none: GroupWhereInput
-  posts: Int
-  posts_not: Int
-  posts_in: [Int!]
-  posts_not_in: [Int!]
-  posts_lt: Int
-  posts_lte: Int
-  posts_gt: Int
-  posts_gte: Int
+  threads: Int
+  threads_not: Int
+  threads_in: [Int!]
+  threads_not_in: [Int!]
+  threads_lt: Int
+  threads_lte: Int
+  threads_gt: Int
+  threads_gte: Int
   lastLogin: DateTime
   lastLogin_not: DateTime
   lastLogin_in: [DateTime!]

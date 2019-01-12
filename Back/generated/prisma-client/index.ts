@@ -382,6 +382,10 @@ export type PostOrderByInput =
   | "quote_DESC"
   | "message_ASC"
   | "message_DESC"
+  | "createDate_ASC"
+  | "createDate_DESC"
+  | "active_ASC"
+  | "active_DESC"
   | "createdAt_ASC"
   | "createdAt_DESC"
   | "updatedAt_ASC"
@@ -396,6 +400,8 @@ export type AttachOrderByInput =
   | "downloads_DESC"
   | "fileName_ASC"
   | "fileName_DESC"
+  | "createDate_ASC"
+  | "createDate_DESC"
   | "createdAt_ASC"
   | "createdAt_DESC"
   | "updatedAt_ASC"
@@ -420,6 +426,8 @@ export type MessageOrderByInput =
   | "message_DESC"
   | "isRead_ASC"
   | "isRead_DESC"
+  | "createDate_ASC"
+  | "createDate_DESC"
   | "createdAt_ASC"
   | "createdAt_DESC"
   | "updatedAt_ASC"
@@ -440,6 +448,10 @@ export type ThreadOrderByInput =
   | "closed_DESC"
   | "diamond_ASC"
   | "diamond_DESC"
+  | "lastDate_ASC"
+  | "lastDate_DESC"
+  | "createDate_ASC"
+  | "createDate_DESC"
   | "createdAt_ASC"
   | "createdAt_DESC"
   | "updatedAt_ASC"
@@ -478,8 +490,8 @@ export type UserOrderByInput =
   | "userid_DESC"
   | "isAdmin_ASC"
   | "isAdmin_DESC"
-  | "posts_ASC"
-  | "posts_DESC"
+  | "threads_ASC"
+  | "threads_DESC"
   | "lastLogin_ASC"
   | "lastLogin_DESC"
   | "signature_ASC"
@@ -742,14 +754,14 @@ export interface UserWhereInput {
   group_every?: GroupWhereInput;
   group_some?: GroupWhereInput;
   group_none?: GroupWhereInput;
-  posts?: Int;
-  posts_not?: Int;
-  posts_in?: Int[] | Int;
-  posts_not_in?: Int[] | Int;
-  posts_lt?: Int;
-  posts_lte?: Int;
-  posts_gt?: Int;
-  posts_gte?: Int;
+  threads?: Int;
+  threads_not?: Int;
+  threads_in?: Int[] | Int;
+  threads_not_in?: Int[] | Int;
+  threads_lt?: Int;
+  threads_lte?: Int;
+  threads_gt?: Int;
+  threads_gte?: Int;
   lastLogin?: DateTimeInput;
   lastLogin_not?: DateTimeInput;
   lastLogin_in?: DateTimeInput[] | DateTimeInput;
@@ -820,6 +832,16 @@ export interface PostWhereInput {
   message_not_starts_with?: String;
   message_ends_with?: String;
   message_not_ends_with?: String;
+  createDate?: DateTimeInput;
+  createDate_not?: DateTimeInput;
+  createDate_in?: DateTimeInput[] | DateTimeInput;
+  createDate_not_in?: DateTimeInput[] | DateTimeInput;
+  createDate_lt?: DateTimeInput;
+  createDate_lte?: DateTimeInput;
+  createDate_gt?: DateTimeInput;
+  createDate_gte?: DateTimeInput;
+  active?: Boolean;
+  active_not?: Boolean;
   AND?: PostWhereInput[] | PostWhereInput;
   OR?: PostWhereInput[] | PostWhereInput;
   NOT?: PostWhereInput[] | PostWhereInput;
@@ -921,6 +943,22 @@ export interface ThreadWhereInput {
   attach_every?: AttachWhereInput;
   attach_some?: AttachWhereInput;
   attach_none?: AttachWhereInput;
+  lastDate?: DateTimeInput;
+  lastDate_not?: DateTimeInput;
+  lastDate_in?: DateTimeInput[] | DateTimeInput;
+  lastDate_not_in?: DateTimeInput[] | DateTimeInput;
+  lastDate_lt?: DateTimeInput;
+  lastDate_lte?: DateTimeInput;
+  lastDate_gt?: DateTimeInput;
+  lastDate_gte?: DateTimeInput;
+  createDate?: DateTimeInput;
+  createDate_not?: DateTimeInput;
+  createDate_in?: DateTimeInput[] | DateTimeInput;
+  createDate_not_in?: DateTimeInput[] | DateTimeInput;
+  createDate_lt?: DateTimeInput;
+  createDate_lte?: DateTimeInput;
+  createDate_gt?: DateTimeInput;
+  createDate_gte?: DateTimeInput;
   AND?: ThreadWhereInput[] | ThreadWhereInput;
   OR?: ThreadWhereInput[] | ThreadWhereInput;
   NOT?: ThreadWhereInput[] | ThreadWhereInput;
@@ -975,6 +1013,14 @@ export interface AttachWhereInput {
   fileName_not_starts_with?: String;
   fileName_ends_with?: String;
   fileName_not_ends_with?: String;
+  createDate?: DateTimeInput;
+  createDate_not?: DateTimeInput;
+  createDate_in?: DateTimeInput[] | DateTimeInput;
+  createDate_not_in?: DateTimeInput[] | DateTimeInput;
+  createDate_lt?: DateTimeInput;
+  createDate_lte?: DateTimeInput;
+  createDate_gt?: DateTimeInput;
+  createDate_gte?: DateTimeInput;
   AND?: AttachWhereInput[] | AttachWhereInput;
   OR?: AttachWhereInput[] | AttachWhereInput;
   NOT?: AttachWhereInput[] | AttachWhereInput;
@@ -1026,6 +1072,14 @@ export interface MessageWhereInput {
   message_not_ends_with?: String;
   isRead?: Boolean;
   isRead_not?: Boolean;
+  createDate?: DateTimeInput;
+  createDate_not?: DateTimeInput;
+  createDate_in?: DateTimeInput[] | DateTimeInput;
+  createDate_not_in?: DateTimeInput[] | DateTimeInput;
+  createDate_lt?: DateTimeInput;
+  createDate_lte?: DateTimeInput;
+  createDate_gt?: DateTimeInput;
+  createDate_gte?: DateTimeInput;
   AND?: MessageWhereInput[] | MessageWhereInput;
   OR?: MessageWhereInput[] | MessageWhereInput;
   NOT?: MessageWhereInput[] | MessageWhereInput;
@@ -1052,6 +1106,7 @@ export interface AttachCreateInput {
   filesize: Int;
   downloads?: Int;
   fileName: String;
+  createDate: DateTimeInput;
 }
 
 export interface UserCreateOneInput {
@@ -1076,7 +1131,7 @@ export interface UserCreateInput {
   userid: String;
   isAdmin?: Boolean;
   group?: GroupCreateManyWithoutMasterInput;
-  posts?: Int;
+  threads?: Int;
   lastLogin: DateTimeInput;
   signature?: String;
   mentor?: UserCreateOneInput;
@@ -1104,6 +1159,8 @@ export interface PostCreateInput {
   isFirst?: Boolean;
   quote?: Int;
   message: String;
+  createDate: DateTimeInput;
+  active?: Boolean;
 }
 
 export interface ForumCreateOneWithoutLastPostInput {
@@ -1131,6 +1188,8 @@ export interface ThreadCreateWithoutPostInput {
   closed?: Boolean;
   diamond?: Boolean;
   attach?: AttachCreateManyWithoutThreadInput;
+  lastDate: DateTimeInput;
+  createDate: DateTimeInput;
 }
 
 export interface ForumCreateOneInput {
@@ -1155,6 +1214,8 @@ export interface PostCreateWithoutForumInput {
   isFirst?: Boolean;
   quote?: Int;
   message: String;
+  createDate: DateTimeInput;
+  active?: Boolean;
 }
 
 export interface AttachCreateManyWithoutThreadInput {
@@ -1169,6 +1230,7 @@ export interface AttachCreateWithoutThreadInput {
   filesize: Int;
   downloads?: Int;
   fileName: String;
+  createDate: DateTimeInput;
 }
 
 export interface ThreadCreateOneWithoutAttachInput {
@@ -1186,6 +1248,8 @@ export interface ThreadCreateWithoutAttachInput {
   top?: Boolean;
   closed?: Boolean;
   diamond?: Boolean;
+  lastDate: DateTimeInput;
+  createDate: DateTimeInput;
 }
 
 export interface PostCreateManyWithoutThreadInput {
@@ -1199,6 +1263,8 @@ export interface PostCreateWithoutThreadInput {
   isFirst?: Boolean;
   quote?: Int;
   message: String;
+  createDate: DateTimeInput;
+  active?: Boolean;
 }
 
 export interface AttachUpdateInput {
@@ -1209,6 +1275,7 @@ export interface AttachUpdateInput {
   filesize?: Int;
   downloads?: Int;
   fileName?: String;
+  createDate?: DateTimeInput;
 }
 
 export interface UserUpdateOneRequiredInput {
@@ -1235,7 +1302,7 @@ export interface UserUpdateDataInput {
   userid?: String;
   isAdmin?: Boolean;
   group?: GroupUpdateManyWithoutMasterInput;
-  posts?: Int;
+  threads?: Int;
   lastLogin?: DateTimeInput;
   signature?: String;
   mentor?: UserUpdateOneInput;
@@ -1354,6 +1421,8 @@ export interface PostUpdateDataInput {
   isFirst?: Boolean;
   quote?: Int;
   message?: String;
+  createDate?: DateTimeInput;
+  active?: Boolean;
 }
 
 export interface ForumUpdateOneRequiredWithoutLastPostInput {
@@ -1390,6 +1459,8 @@ export interface ThreadUpdateWithoutPostDataInput {
   closed?: Boolean;
   diamond?: Boolean;
   attach?: AttachUpdateManyWithoutThreadInput;
+  lastDate?: DateTimeInput;
+  createDate?: DateTimeInput;
 }
 
 export interface ForumUpdateOneRequiredInput {
@@ -1420,6 +1491,8 @@ export interface PostUpdateWithoutForumDataInput {
   isFirst?: Boolean;
   quote?: Int;
   message?: String;
+  createDate?: DateTimeInput;
+  active?: Boolean;
 }
 
 export interface PostUpsertWithoutForumInput {
@@ -1461,6 +1534,7 @@ export interface AttachUpdateWithoutThreadDataInput {
   filesize?: Int;
   downloads?: Int;
   fileName?: String;
+  createDate?: DateTimeInput;
 }
 
 export interface AttachUpsertWithWhereUniqueWithoutThreadInput {
@@ -1514,6 +1588,14 @@ export interface AttachScalarWhereInput {
   fileName_not_starts_with?: String;
   fileName_ends_with?: String;
   fileName_not_ends_with?: String;
+  createDate?: DateTimeInput;
+  createDate_not?: DateTimeInput;
+  createDate_in?: DateTimeInput[] | DateTimeInput;
+  createDate_not_in?: DateTimeInput[] | DateTimeInput;
+  createDate_lt?: DateTimeInput;
+  createDate_lte?: DateTimeInput;
+  createDate_gt?: DateTimeInput;
+  createDate_gte?: DateTimeInput;
   AND?: AttachScalarWhereInput[] | AttachScalarWhereInput;
   OR?: AttachScalarWhereInput[] | AttachScalarWhereInput;
   NOT?: AttachScalarWhereInput[] | AttachScalarWhereInput;
@@ -1528,6 +1610,7 @@ export interface AttachUpdateManyDataInput {
   filesize?: Int;
   downloads?: Int;
   fileName?: String;
+  createDate?: DateTimeInput;
 }
 
 export interface ThreadUpsertWithoutPostInput {
@@ -1557,6 +1640,8 @@ export interface ThreadUpdateWithoutAttachDataInput {
   top?: Boolean;
   closed?: Boolean;
   diamond?: Boolean;
+  lastDate?: DateTimeInput;
+  createDate?: DateTimeInput;
 }
 
 export interface PostUpdateManyWithoutThreadInput {
@@ -1587,6 +1672,8 @@ export interface PostUpdateWithoutThreadDataInput {
   isFirst?: Boolean;
   quote?: Int;
   message?: String;
+  createDate?: DateTimeInput;
+  active?: Boolean;
 }
 
 export interface PostUpsertWithWhereUniqueWithoutThreadInput {
@@ -1634,6 +1721,16 @@ export interface PostScalarWhereInput {
   message_not_starts_with?: String;
   message_ends_with?: String;
   message_not_ends_with?: String;
+  createDate?: DateTimeInput;
+  createDate_not?: DateTimeInput;
+  createDate_in?: DateTimeInput[] | DateTimeInput;
+  createDate_not_in?: DateTimeInput[] | DateTimeInput;
+  createDate_lt?: DateTimeInput;
+  createDate_lte?: DateTimeInput;
+  createDate_gt?: DateTimeInput;
+  createDate_gte?: DateTimeInput;
+  active?: Boolean;
+  active_not?: Boolean;
   AND?: PostScalarWhereInput[] | PostScalarWhereInput;
   OR?: PostScalarWhereInput[] | PostScalarWhereInput;
   NOT?: PostScalarWhereInput[] | PostScalarWhereInput;
@@ -1648,6 +1745,8 @@ export interface PostUpdateManyDataInput {
   isFirst?: Boolean;
   quote?: Int;
   message?: String;
+  createDate?: DateTimeInput;
+  active?: Boolean;
 }
 
 export interface ThreadUpsertWithoutAttachInput {
@@ -1659,6 +1758,7 @@ export interface AttachUpdateManyMutationInput {
   filesize?: Int;
   downloads?: Int;
   fileName?: String;
+  createDate?: DateTimeInput;
 }
 
 export interface ForumUpdateInput {
@@ -1699,7 +1799,7 @@ export interface UserCreateWithoutGroupInput {
   avatar?: String;
   userid: String;
   isAdmin?: Boolean;
-  posts?: Int;
+  threads?: Int;
   lastLogin: DateTimeInput;
   signature?: String;
   mentor?: UserCreateOneInput;
@@ -1736,7 +1836,7 @@ export interface UserUpdateWithoutGroupDataInput {
   avatar?: String;
   userid?: String;
   isAdmin?: Boolean;
-  posts?: Int;
+  threads?: Int;
   lastLogin?: DateTimeInput;
   signature?: String;
   mentor?: UserUpdateOneInput;
@@ -1757,6 +1857,7 @@ export interface MessageCreateInput {
   toUser: UserCreateOneInput;
   message: String;
   isRead?: Boolean;
+  createDate: DateTimeInput;
 }
 
 export interface MessageUpdateInput {
@@ -1764,11 +1865,13 @@ export interface MessageUpdateInput {
   toUser?: UserUpdateOneRequiredInput;
   message?: String;
   isRead?: Boolean;
+  createDate?: DateTimeInput;
 }
 
 export interface MessageUpdateManyMutationInput {
   message?: String;
   isRead?: Boolean;
+  createDate?: DateTimeInput;
 }
 
 export interface PostUpdateInput {
@@ -1778,12 +1881,16 @@ export interface PostUpdateInput {
   isFirst?: Boolean;
   quote?: Int;
   message?: String;
+  createDate?: DateTimeInput;
+  active?: Boolean;
 }
 
 export interface PostUpdateManyMutationInput {
   isFirst?: Boolean;
   quote?: Int;
   message?: String;
+  createDate?: DateTimeInput;
+  active?: Boolean;
 }
 
 export interface ThreadCreateInput {
@@ -1797,6 +1904,8 @@ export interface ThreadCreateInput {
   closed?: Boolean;
   diamond?: Boolean;
   attach?: AttachCreateManyWithoutThreadInput;
+  lastDate: DateTimeInput;
+  createDate: DateTimeInput;
 }
 
 export interface ThreadUpdateInput {
@@ -1810,6 +1919,8 @@ export interface ThreadUpdateInput {
   closed?: Boolean;
   diamond?: Boolean;
   attach?: AttachUpdateManyWithoutThreadInput;
+  lastDate?: DateTimeInput;
+  createDate?: DateTimeInput;
 }
 
 export interface ThreadUpdateManyMutationInput {
@@ -1819,6 +1930,8 @@ export interface ThreadUpdateManyMutationInput {
   top?: Boolean;
   closed?: Boolean;
   diamond?: Boolean;
+  lastDate?: DateTimeInput;
+  createDate?: DateTimeInput;
 }
 
 export interface UserUpdateInput {
@@ -1838,7 +1951,7 @@ export interface UserUpdateInput {
   userid?: String;
   isAdmin?: Boolean;
   group?: GroupUpdateManyWithoutMasterInput;
-  posts?: Int;
+  threads?: Int;
   lastLogin?: DateTimeInput;
   signature?: String;
   mentor?: UserUpdateOneInput;
@@ -1860,7 +1973,7 @@ export interface UserUpdateManyMutationInput {
   avatar?: String;
   userid?: String;
   isAdmin?: Boolean;
-  posts?: Int;
+  threads?: Int;
   lastLogin?: DateTimeInput;
   signature?: String;
 }
@@ -1951,6 +2064,7 @@ export interface Attach {
   filesize: Int;
   downloads: Int;
   fileName: String;
+  createDate: DateTimeOutput;
 }
 
 export interface AttachPromise extends Promise<Attach>, Fragmentable {
@@ -1962,6 +2076,7 @@ export interface AttachPromise extends Promise<Attach>, Fragmentable {
   filesize: () => Promise<Int>;
   downloads: () => Promise<Int>;
   fileName: () => Promise<String>;
+  createDate: () => Promise<DateTimeOutput>;
 }
 
 export interface AttachSubscription
@@ -1975,6 +2090,7 @@ export interface AttachSubscription
   filesize: () => Promise<AsyncIterator<Int>>;
   downloads: () => Promise<AsyncIterator<Int>>;
   fileName: () => Promise<AsyncIterator<String>>;
+  createDate: () => Promise<AsyncIterator<DateTimeOutput>>;
 }
 
 export interface User {
@@ -1994,7 +2110,7 @@ export interface User {
   avatar: String;
   userid: String;
   isAdmin: Boolean;
-  posts: Int;
+  threads: Int;
   lastLogin: DateTimeOutput;
   signature: String;
 }
@@ -2027,7 +2143,7 @@ export interface UserPromise extends Promise<User>, Fragmentable {
       last?: Int;
     }
   ) => T;
-  posts: () => Promise<Int>;
+  threads: () => Promise<Int>;
   lastLogin: () => Promise<DateTimeOutput>;
   signature: () => Promise<String>;
   mentor: <T = UserPromise>() => T;
@@ -2063,7 +2179,7 @@ export interface UserSubscription
       last?: Int;
     }
   ) => T;
-  posts: () => Promise<AsyncIterator<Int>>;
+  threads: () => Promise<AsyncIterator<Int>>;
   lastLogin: () => Promise<AsyncIterator<DateTimeOutput>>;
   signature: () => Promise<AsyncIterator<String>>;
   mentor: <T = UserSubscription>() => T;
@@ -2096,6 +2212,8 @@ export interface Post {
   isFirst: Boolean;
   quote: Int;
   message: String;
+  createDate: DateTimeOutput;
+  active: Boolean;
 }
 
 export interface PostPromise extends Promise<Post>, Fragmentable {
@@ -2106,6 +2224,8 @@ export interface PostPromise extends Promise<Post>, Fragmentable {
   isFirst: () => Promise<Boolean>;
   quote: () => Promise<Int>;
   message: () => Promise<String>;
+  createDate: () => Promise<DateTimeOutput>;
+  active: () => Promise<Boolean>;
 }
 
 export interface PostSubscription
@@ -2118,6 +2238,8 @@ export interface PostSubscription
   isFirst: () => Promise<AsyncIterator<Boolean>>;
   quote: () => Promise<AsyncIterator<Int>>;
   message: () => Promise<AsyncIterator<String>>;
+  createDate: () => Promise<AsyncIterator<DateTimeOutput>>;
+  active: () => Promise<AsyncIterator<Boolean>>;
 }
 
 export interface Forum {
@@ -2150,6 +2272,8 @@ export interface Thread {
   top: Boolean;
   closed: Boolean;
   diamond: Boolean;
+  lastDate: DateTimeOutput;
+  createDate: DateTimeOutput;
 }
 
 export interface ThreadPromise extends Promise<Thread>, Fragmentable {
@@ -2184,6 +2308,8 @@ export interface ThreadPromise extends Promise<Thread>, Fragmentable {
       last?: Int;
     }
   ) => T;
+  lastDate: () => Promise<DateTimeOutput>;
+  createDate: () => Promise<DateTimeOutput>;
 }
 
 export interface ThreadSubscription
@@ -2220,6 +2346,8 @@ export interface ThreadSubscription
       last?: Int;
     }
   ) => T;
+  lastDate: () => Promise<AsyncIterator<DateTimeOutput>>;
+  createDate: () => Promise<AsyncIterator<DateTimeOutput>>;
 }
 
 export interface AttachConnection {
@@ -2411,6 +2539,7 @@ export interface Message {
   id: ID_Output;
   message: String;
   isRead: Boolean;
+  createDate: DateTimeOutput;
 }
 
 export interface MessagePromise extends Promise<Message>, Fragmentable {
@@ -2419,6 +2548,7 @@ export interface MessagePromise extends Promise<Message>, Fragmentable {
   toUser: <T = UserPromise>() => T;
   message: () => Promise<String>;
   isRead: () => Promise<Boolean>;
+  createDate: () => Promise<DateTimeOutput>;
 }
 
 export interface MessageSubscription
@@ -2429,6 +2559,7 @@ export interface MessageSubscription
   toUser: <T = UserSubscription>() => T;
   message: () => Promise<AsyncIterator<String>>;
   isRead: () => Promise<AsyncIterator<Boolean>>;
+  createDate: () => Promise<AsyncIterator<DateTimeOutput>>;
 }
 
 export interface MessageConnection {
@@ -2693,6 +2824,7 @@ export interface AttachPreviousValues {
   filesize: Int;
   downloads: Int;
   fileName: String;
+  createDate: DateTimeOutput;
 }
 
 export interface AttachPreviousValuesPromise
@@ -2702,6 +2834,7 @@ export interface AttachPreviousValuesPromise
   filesize: () => Promise<Int>;
   downloads: () => Promise<Int>;
   fileName: () => Promise<String>;
+  createDate: () => Promise<DateTimeOutput>;
 }
 
 export interface AttachPreviousValuesSubscription
@@ -2711,6 +2844,7 @@ export interface AttachPreviousValuesSubscription
   filesize: () => Promise<AsyncIterator<Int>>;
   downloads: () => Promise<AsyncIterator<Int>>;
   fileName: () => Promise<AsyncIterator<String>>;
+  createDate: () => Promise<AsyncIterator<DateTimeOutput>>;
 }
 
 export interface ForumSubscriptionPayload {
@@ -2836,6 +2970,7 @@ export interface MessagePreviousValues {
   id: ID_Output;
   message: String;
   isRead: Boolean;
+  createDate: DateTimeOutput;
 }
 
 export interface MessagePreviousValuesPromise
@@ -2844,6 +2979,7 @@ export interface MessagePreviousValuesPromise
   id: () => Promise<ID_Output>;
   message: () => Promise<String>;
   isRead: () => Promise<Boolean>;
+  createDate: () => Promise<DateTimeOutput>;
 }
 
 export interface MessagePreviousValuesSubscription
@@ -2852,6 +2988,7 @@ export interface MessagePreviousValuesSubscription
   id: () => Promise<AsyncIterator<ID_Output>>;
   message: () => Promise<AsyncIterator<String>>;
   isRead: () => Promise<AsyncIterator<Boolean>>;
+  createDate: () => Promise<AsyncIterator<DateTimeOutput>>;
 }
 
 export interface PostSubscriptionPayload {
@@ -2884,6 +3021,8 @@ export interface PostPreviousValues {
   isFirst: Boolean;
   quote: Int;
   message: String;
+  createDate: DateTimeOutput;
+  active: Boolean;
 }
 
 export interface PostPreviousValuesPromise
@@ -2893,6 +3032,8 @@ export interface PostPreviousValuesPromise
   isFirst: () => Promise<Boolean>;
   quote: () => Promise<Int>;
   message: () => Promise<String>;
+  createDate: () => Promise<DateTimeOutput>;
+  active: () => Promise<Boolean>;
 }
 
 export interface PostPreviousValuesSubscription
@@ -2902,6 +3043,8 @@ export interface PostPreviousValuesSubscription
   isFirst: () => Promise<AsyncIterator<Boolean>>;
   quote: () => Promise<AsyncIterator<Int>>;
   message: () => Promise<AsyncIterator<String>>;
+  createDate: () => Promise<AsyncIterator<DateTimeOutput>>;
+  active: () => Promise<AsyncIterator<Boolean>>;
 }
 
 export interface ThreadSubscriptionPayload {
@@ -2937,6 +3080,8 @@ export interface ThreadPreviousValues {
   top: Boolean;
   closed: Boolean;
   diamond: Boolean;
+  lastDate: DateTimeOutput;
+  createDate: DateTimeOutput;
 }
 
 export interface ThreadPreviousValuesPromise
@@ -2949,6 +3094,8 @@ export interface ThreadPreviousValuesPromise
   top: () => Promise<Boolean>;
   closed: () => Promise<Boolean>;
   diamond: () => Promise<Boolean>;
+  lastDate: () => Promise<DateTimeOutput>;
+  createDate: () => Promise<DateTimeOutput>;
 }
 
 export interface ThreadPreviousValuesSubscription
@@ -2961,6 +3108,8 @@ export interface ThreadPreviousValuesSubscription
   top: () => Promise<AsyncIterator<Boolean>>;
   closed: () => Promise<AsyncIterator<Boolean>>;
   diamond: () => Promise<AsyncIterator<Boolean>>;
+  lastDate: () => Promise<AsyncIterator<DateTimeOutput>>;
+  createDate: () => Promise<AsyncIterator<DateTimeOutput>>;
 }
 
 export interface UserSubscriptionPayload {
@@ -3005,7 +3154,7 @@ export interface UserPreviousValues {
   avatar: String;
   userid: String;
   isAdmin: Boolean;
-  posts: Int;
+  threads: Int;
   lastLogin: DateTimeOutput;
   signature: String;
 }
@@ -3029,7 +3178,7 @@ export interface UserPreviousValuesPromise
   avatar: () => Promise<String>;
   userid: () => Promise<String>;
   isAdmin: () => Promise<Boolean>;
-  posts: () => Promise<Int>;
+  threads: () => Promise<Int>;
   lastLogin: () => Promise<DateTimeOutput>;
   signature: () => Promise<String>;
 }
@@ -3053,7 +3202,7 @@ export interface UserPreviousValuesSubscription
   avatar: () => Promise<AsyncIterator<String>>;
   userid: () => Promise<AsyncIterator<String>>;
   isAdmin: () => Promise<AsyncIterator<Boolean>>;
-  posts: () => Promise<AsyncIterator<Int>>;
+  threads: () => Promise<AsyncIterator<Int>>;
   lastLogin: () => Promise<AsyncIterator<DateTimeOutput>>;
   signature: () => Promise<AsyncIterator<String>>;
 }

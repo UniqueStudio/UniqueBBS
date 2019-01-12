@@ -18,14 +18,15 @@ export const sendMessage = async function (fromUid, toUid, msg) {
                 id: toUid
             }
         },
-        message: msg
+        message: msg,
+        createDate: new Date()
     });
     return result;
 };
 
 export const messageIsRead = async function (req: Request, res: Response) {
     try {
-        verifyJWT(req.get('Authorization'));
+        verifyJWT(req.header('Authorization'));
         const { mid } = req.params;
         const result: Message = await prisma.updateMessage({
             where: {

@@ -22,7 +22,7 @@ type User {
   userid: String! @unique
   isAdmin: Boolean! @default(value:false)
   group: [Group!]! @relation(name:"GroupList")
-  posts: Int! @default(value: 0)
+  threads: Int! @default(value: 0)
   lastLogin: DateTime!
   signature: String! @default(value: "")
   mentor: User
@@ -41,6 +41,8 @@ type Post{
   isFirst: Boolean! @default(value:false)
   quote: Int! @default(value:-1)
   message: String!
+  createDate: DateTime!
+  active: Boolean! @default(value:true)
 }
 type Thread{
   id: ID! @unique
@@ -54,6 +56,8 @@ type Thread{
   closed: Boolean! @default(value:false)
   diamond: Boolean! @default(value:false)
   attach: [Attach!]! @relation(name:"AttachList")
+  lastDate: DateTime!
+  createDate: DateTime!
 }
 type Attach{
   id: ID! @unique
@@ -64,6 +68,7 @@ type Attach{
   filesize: Int!
   downloads: Int! @default(value:0)
   fileName: String!
+  createDate: DateTime!
 }
 type Message{
   id: ID! @unique
@@ -71,4 +76,5 @@ type Message{
   toUser: User! @relation(name:"MsgToUser")
   message: String!
   isRead: Boolean! @default(value:false)
+  createDate: DateTime!
 }
