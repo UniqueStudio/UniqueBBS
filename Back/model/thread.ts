@@ -118,6 +118,11 @@ export const threadInfo = async function(req: Request, res: Response) {
         const threadInfo = await prisma.thread({
             id: tid
         });
+
+        if (!threadInfo || (!threadInfo.active && !authObj.isAdmin)) {
+            return res.json({ code: -1, msg: "主题不存在！" });
+        }
+
         const threadAuthor = filterUserInfo(
             await prisma
                 .thread({
@@ -129,7 +134,8 @@ export const threadInfo = async function(req: Request, res: Response) {
         const postArrRaw = await prisma.posts({
             where: {
                 thread: threadInfoObj,
-                isFirst: false
+                isFirst: false,
+                active: authObj.isAdmin ? undefined : true
             },
             skip: (page - 1) * pagesize,
             first: pagesize
@@ -146,7 +152,7 @@ export const threadInfo = async function(req: Request, res: Response) {
 
         const postArr = await Promise.all(
             postArrRaw.map(async item => ({
-                thread: item,
+                post: item,
                 user: filterUserInfo(
                     await prisma
                         .post({
@@ -253,6 +259,13 @@ export const threadReply = async function(req: Request, res: Response) {
                     id: tid
                 })
                 .forum();
+
+            if (!authorInfo || !forumInfo) {
+                return res.json({
+                    code: -1,
+                    msg: "主题不存在！"
+                });
+            }
 
             const resultThread = await prisma
                 .updateThread({
@@ -523,6 +536,104 @@ export const threadClose = async function(req: Request, res: Response) {
             });
             res.json({ code: 1 });
         }
+    } catch (e) {
+        res.json({ code: -1, msg: e.message });
+    }
+};
+
+export const threadRecovery = async function(req: Request, res: Response) {
+    try {
+        const authObj = verifyJWT(req.header("Authorization"));
+        if (!authObj.isAdmin) {
+            return res.json({ code: -1, msg: "您无权操作此帖子！" });
+        } else {
+            const { tid, postsBool } = req.params;
+            const threadInfo = await prisma.updateThread({
+                where: {
+                    id: tid
+                },
+                data: {
+                    active: true
+                }
+            });
+
+            await prisma.updateManyPosts({
+                where: {
+                    thread: {
+                        id: tid
+                    },
+                    isFirst: true,
+                    active: false
+                },
+                data: {
+                    active: true
+                }
+            });
+            if (postsBool === "1") {
+                await prisma.updateManyPosts({
+                    where: {
+                        id: tid,
+                        active: false
+                    },
+                    data: {
+                        active: true
+                    }
+                });
+            }
+
+            res.json({ code: 1 });
+        }
+    } catch (e) {
+        res.json({ code: -1, msg: e.message });
+    }
+};
+
+export const postRecovery = async function(req: Request, res: Response) {
+    try {
+        const authObj = verifyJWT(req.header("Authorization"));
+        if (!authObj.isAdmin) {
+            return res.json({ code: -1, msg: "您无权操作此帖子！" });
+        } else {
+            const { pid } = req.params;
+            const postInfo = await prisma.updatePost({
+                where: {
+                    id: pid
+                },
+                data: {
+                    active: true
+                }
+            });
+            res.json({ code: 1 });
+        }
+    } catch (e) {
+        res.json({ code: -1, msg: e.message });
+    }
+};
+
+export const threadGraph = async function(req: Request, res: Response) {
+    try {
+        const authObj = verifyJWT(req.header("Authorization"));
+        const { tid } = req.params;
+
+        const fragment = `fragment PostsWithDate on Post{
+            createDate
+        }`;
+        const PostsWithDate = await prisma
+            .posts({
+                where: {
+                    thread: {
+                        id: tid,
+                        // active: true
+                    },
+                    user: {
+                        id: authObj.uid
+                    },
+                    // active: true
+                },
+                orderBy: "createDate_ASC"
+            })
+            .$fragment(fragment);
+        res.json({ code: 1, msg: PostsWithDate });
     } catch (e) {
         res.json({ code: -1, msg: e.message });
     }
