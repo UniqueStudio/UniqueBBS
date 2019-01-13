@@ -18,6 +18,10 @@ type AggregatePost {
   count: Int!
 }
 
+type AggregateReport {
+  count: Int!
+}
+
 type AggregateThread {
   count: Int!
 }
@@ -853,6 +857,12 @@ type Mutation {
   upsertPost(where: PostWhereUniqueInput!, create: PostCreateInput!, update: PostUpdateInput!): Post!
   deletePost(where: PostWhereUniqueInput!): Post
   deleteManyPosts(where: PostWhereInput): BatchPayload!
+  createReport(data: ReportCreateInput!): Report!
+  updateReport(data: ReportUpdateInput!, where: ReportWhereUniqueInput!): Report
+  updateManyReports(data: ReportUpdateManyMutationInput!, where: ReportWhereInput): BatchPayload!
+  upsertReport(where: ReportWhereUniqueInput!, create: ReportCreateInput!, update: ReportUpdateInput!): Report!
+  deleteReport(where: ReportWhereUniqueInput!): Report
+  deleteManyReports(where: ReportWhereInput): BatchPayload!
   createThread(data: ThreadCreateInput!): Thread!
   updateThread(data: ThreadUpdateInput!, where: ThreadWhereUniqueInput!): Thread
   updateManyThreads(data: ThreadUpdateManyMutationInput!, where: ThreadWhereInput): BatchPayload!
@@ -1241,6 +1251,9 @@ type Query {
   post(where: PostWhereUniqueInput!): Post
   posts(where: PostWhereInput, orderBy: PostOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Post]!
   postsConnection(where: PostWhereInput, orderBy: PostOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): PostConnection!
+  report(where: ReportWhereUniqueInput!): Report
+  reports(where: ReportWhereInput, orderBy: ReportOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Report]!
+  reportsConnection(where: ReportWhereInput, orderBy: ReportOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): ReportConnection!
   thread(where: ThreadWhereUniqueInput!): Thread
   threads(where: ThreadWhereInput, orderBy: ThreadOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Thread]!
   threadsConnection(where: ThreadWhereInput, orderBy: ThreadOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): ThreadConnection!
@@ -1250,12 +1263,387 @@ type Query {
   node(id: ID!): Node
 }
 
+type Report {
+  id: ID!
+  length: String!
+  content: String!
+  plan: String!
+  solution: String!
+  conclusion: String!
+  createDate: DateTime!
+  isWeek: Boolean!
+  user: User!
+}
+
+type ReportConnection {
+  pageInfo: PageInfo!
+  edges: [ReportEdge]!
+  aggregate: AggregateReport!
+}
+
+input ReportCreateInput {
+  length: String!
+  content: String!
+  plan: String!
+  solution: String!
+  conclusion: String!
+  createDate: DateTime!
+  isWeek: Boolean
+  user: UserCreateOneWithoutReportInput!
+}
+
+input ReportCreateManyWithoutUserInput {
+  create: [ReportCreateWithoutUserInput!]
+  connect: [ReportWhereUniqueInput!]
+}
+
+input ReportCreateWithoutUserInput {
+  length: String!
+  content: String!
+  plan: String!
+  solution: String!
+  conclusion: String!
+  createDate: DateTime!
+  isWeek: Boolean
+}
+
+type ReportEdge {
+  node: Report!
+  cursor: String!
+}
+
+enum ReportOrderByInput {
+  id_ASC
+  id_DESC
+  length_ASC
+  length_DESC
+  content_ASC
+  content_DESC
+  plan_ASC
+  plan_DESC
+  solution_ASC
+  solution_DESC
+  conclusion_ASC
+  conclusion_DESC
+  createDate_ASC
+  createDate_DESC
+  isWeek_ASC
+  isWeek_DESC
+  createdAt_ASC
+  createdAt_DESC
+  updatedAt_ASC
+  updatedAt_DESC
+}
+
+type ReportPreviousValues {
+  id: ID!
+  length: String!
+  content: String!
+  plan: String!
+  solution: String!
+  conclusion: String!
+  createDate: DateTime!
+  isWeek: Boolean!
+}
+
+input ReportScalarWhereInput {
+  id: ID
+  id_not: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
+  id_lt: ID
+  id_lte: ID
+  id_gt: ID
+  id_gte: ID
+  id_contains: ID
+  id_not_contains: ID
+  id_starts_with: ID
+  id_not_starts_with: ID
+  id_ends_with: ID
+  id_not_ends_with: ID
+  length: String
+  length_not: String
+  length_in: [String!]
+  length_not_in: [String!]
+  length_lt: String
+  length_lte: String
+  length_gt: String
+  length_gte: String
+  length_contains: String
+  length_not_contains: String
+  length_starts_with: String
+  length_not_starts_with: String
+  length_ends_with: String
+  length_not_ends_with: String
+  content: String
+  content_not: String
+  content_in: [String!]
+  content_not_in: [String!]
+  content_lt: String
+  content_lte: String
+  content_gt: String
+  content_gte: String
+  content_contains: String
+  content_not_contains: String
+  content_starts_with: String
+  content_not_starts_with: String
+  content_ends_with: String
+  content_not_ends_with: String
+  plan: String
+  plan_not: String
+  plan_in: [String!]
+  plan_not_in: [String!]
+  plan_lt: String
+  plan_lte: String
+  plan_gt: String
+  plan_gte: String
+  plan_contains: String
+  plan_not_contains: String
+  plan_starts_with: String
+  plan_not_starts_with: String
+  plan_ends_with: String
+  plan_not_ends_with: String
+  solution: String
+  solution_not: String
+  solution_in: [String!]
+  solution_not_in: [String!]
+  solution_lt: String
+  solution_lte: String
+  solution_gt: String
+  solution_gte: String
+  solution_contains: String
+  solution_not_contains: String
+  solution_starts_with: String
+  solution_not_starts_with: String
+  solution_ends_with: String
+  solution_not_ends_with: String
+  conclusion: String
+  conclusion_not: String
+  conclusion_in: [String!]
+  conclusion_not_in: [String!]
+  conclusion_lt: String
+  conclusion_lte: String
+  conclusion_gt: String
+  conclusion_gte: String
+  conclusion_contains: String
+  conclusion_not_contains: String
+  conclusion_starts_with: String
+  conclusion_not_starts_with: String
+  conclusion_ends_with: String
+  conclusion_not_ends_with: String
+  createDate: DateTime
+  createDate_not: DateTime
+  createDate_in: [DateTime!]
+  createDate_not_in: [DateTime!]
+  createDate_lt: DateTime
+  createDate_lte: DateTime
+  createDate_gt: DateTime
+  createDate_gte: DateTime
+  isWeek: Boolean
+  isWeek_not: Boolean
+  AND: [ReportScalarWhereInput!]
+  OR: [ReportScalarWhereInput!]
+  NOT: [ReportScalarWhereInput!]
+}
+
+type ReportSubscriptionPayload {
+  mutation: MutationType!
+  node: Report
+  updatedFields: [String!]
+  previousValues: ReportPreviousValues
+}
+
+input ReportSubscriptionWhereInput {
+  mutation_in: [MutationType!]
+  updatedFields_contains: String
+  updatedFields_contains_every: [String!]
+  updatedFields_contains_some: [String!]
+  node: ReportWhereInput
+  AND: [ReportSubscriptionWhereInput!]
+  OR: [ReportSubscriptionWhereInput!]
+  NOT: [ReportSubscriptionWhereInput!]
+}
+
+input ReportUpdateInput {
+  length: String
+  content: String
+  plan: String
+  solution: String
+  conclusion: String
+  createDate: DateTime
+  isWeek: Boolean
+  user: UserUpdateOneRequiredWithoutReportInput
+}
+
+input ReportUpdateManyDataInput {
+  length: String
+  content: String
+  plan: String
+  solution: String
+  conclusion: String
+  createDate: DateTime
+  isWeek: Boolean
+}
+
+input ReportUpdateManyMutationInput {
+  length: String
+  content: String
+  plan: String
+  solution: String
+  conclusion: String
+  createDate: DateTime
+  isWeek: Boolean
+}
+
+input ReportUpdateManyWithoutUserInput {
+  create: [ReportCreateWithoutUserInput!]
+  delete: [ReportWhereUniqueInput!]
+  connect: [ReportWhereUniqueInput!]
+  disconnect: [ReportWhereUniqueInput!]
+  update: [ReportUpdateWithWhereUniqueWithoutUserInput!]
+  upsert: [ReportUpsertWithWhereUniqueWithoutUserInput!]
+  deleteMany: [ReportScalarWhereInput!]
+  updateMany: [ReportUpdateManyWithWhereNestedInput!]
+}
+
+input ReportUpdateManyWithWhereNestedInput {
+  where: ReportScalarWhereInput!
+  data: ReportUpdateManyDataInput!
+}
+
+input ReportUpdateWithoutUserDataInput {
+  length: String
+  content: String
+  plan: String
+  solution: String
+  conclusion: String
+  createDate: DateTime
+  isWeek: Boolean
+}
+
+input ReportUpdateWithWhereUniqueWithoutUserInput {
+  where: ReportWhereUniqueInput!
+  data: ReportUpdateWithoutUserDataInput!
+}
+
+input ReportUpsertWithWhereUniqueWithoutUserInput {
+  where: ReportWhereUniqueInput!
+  update: ReportUpdateWithoutUserDataInput!
+  create: ReportCreateWithoutUserInput!
+}
+
+input ReportWhereInput {
+  id: ID
+  id_not: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
+  id_lt: ID
+  id_lte: ID
+  id_gt: ID
+  id_gte: ID
+  id_contains: ID
+  id_not_contains: ID
+  id_starts_with: ID
+  id_not_starts_with: ID
+  id_ends_with: ID
+  id_not_ends_with: ID
+  length: String
+  length_not: String
+  length_in: [String!]
+  length_not_in: [String!]
+  length_lt: String
+  length_lte: String
+  length_gt: String
+  length_gte: String
+  length_contains: String
+  length_not_contains: String
+  length_starts_with: String
+  length_not_starts_with: String
+  length_ends_with: String
+  length_not_ends_with: String
+  content: String
+  content_not: String
+  content_in: [String!]
+  content_not_in: [String!]
+  content_lt: String
+  content_lte: String
+  content_gt: String
+  content_gte: String
+  content_contains: String
+  content_not_contains: String
+  content_starts_with: String
+  content_not_starts_with: String
+  content_ends_with: String
+  content_not_ends_with: String
+  plan: String
+  plan_not: String
+  plan_in: [String!]
+  plan_not_in: [String!]
+  plan_lt: String
+  plan_lte: String
+  plan_gt: String
+  plan_gte: String
+  plan_contains: String
+  plan_not_contains: String
+  plan_starts_with: String
+  plan_not_starts_with: String
+  plan_ends_with: String
+  plan_not_ends_with: String
+  solution: String
+  solution_not: String
+  solution_in: [String!]
+  solution_not_in: [String!]
+  solution_lt: String
+  solution_lte: String
+  solution_gt: String
+  solution_gte: String
+  solution_contains: String
+  solution_not_contains: String
+  solution_starts_with: String
+  solution_not_starts_with: String
+  solution_ends_with: String
+  solution_not_ends_with: String
+  conclusion: String
+  conclusion_not: String
+  conclusion_in: [String!]
+  conclusion_not_in: [String!]
+  conclusion_lt: String
+  conclusion_lte: String
+  conclusion_gt: String
+  conclusion_gte: String
+  conclusion_contains: String
+  conclusion_not_contains: String
+  conclusion_starts_with: String
+  conclusion_not_starts_with: String
+  conclusion_ends_with: String
+  conclusion_not_ends_with: String
+  createDate: DateTime
+  createDate_not: DateTime
+  createDate_in: [DateTime!]
+  createDate_not_in: [DateTime!]
+  createDate_lt: DateTime
+  createDate_lte: DateTime
+  createDate_gt: DateTime
+  createDate_gte: DateTime
+  isWeek: Boolean
+  isWeek_not: Boolean
+  user: UserWhereInput
+  AND: [ReportWhereInput!]
+  OR: [ReportWhereInput!]
+  NOT: [ReportWhereInput!]
+}
+
+input ReportWhereUniqueInput {
+  id: ID
+}
+
 type Subscription {
   attach(where: AttachSubscriptionWhereInput): AttachSubscriptionPayload
   forum(where: ForumSubscriptionWhereInput): ForumSubscriptionPayload
   group(where: GroupSubscriptionWhereInput): GroupSubscriptionPayload
   message(where: MessageSubscriptionWhereInput): MessageSubscriptionPayload
   post(where: PostSubscriptionWhereInput): PostSubscriptionPayload
+  report(where: ReportSubscriptionWhereInput): ReportSubscriptionPayload
   thread(where: ThreadSubscriptionWhereInput): ThreadSubscriptionPayload
   user(where: UserSubscriptionWhereInput): UserSubscriptionPayload
 }
@@ -1579,6 +1967,7 @@ type User {
   lastLogin: DateTime!
   signature: String!
   mentor: User
+  report(where: ReportWhereInput, orderBy: ReportOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Report!]
 }
 
 type UserConnection {
@@ -1608,6 +1997,7 @@ input UserCreateInput {
   lastLogin: DateTime!
   signature: String
   mentor: UserCreateOneInput
+  report: ReportCreateManyWithoutUserInput
 }
 
 input UserCreateOneInput {
@@ -1617,6 +2007,11 @@ input UserCreateOneInput {
 
 input UserCreateOneWithoutGroupInput {
   create: UserCreateWithoutGroupInput
+  connect: UserWhereUniqueInput
+}
+
+input UserCreateOneWithoutReportInput {
+  create: UserCreateWithoutReportInput
   connect: UserWhereUniqueInput
 }
 
@@ -1636,6 +2031,30 @@ input UserCreateWithoutGroupInput {
   avatar: String
   userid: String!
   isAdmin: Boolean
+  threads: Int
+  lastLogin: DateTime!
+  signature: String
+  mentor: UserCreateOneInput
+  report: ReportCreateManyWithoutUserInput
+}
+
+input UserCreateWithoutReportInput {
+  username: String!
+  nickname: String
+  password: String
+  email: String
+  studentID: String
+  dormitory: String
+  qq: String
+  wechat: String
+  major: String
+  className: String
+  active: Boolean
+  mobile: String
+  avatar: String
+  userid: String!
+  isAdmin: Boolean
+  group: GroupCreateManyWithoutMasterInput
   threads: Int
   lastLogin: DateTime!
   signature: String
@@ -1753,6 +2172,7 @@ input UserUpdateDataInput {
   lastLogin: DateTime
   signature: String
   mentor: UserUpdateOneInput
+  report: ReportUpdateManyWithoutUserInput
 }
 
 input UserUpdateInput {
@@ -1776,6 +2196,7 @@ input UserUpdateInput {
   lastLogin: DateTime
   signature: String
   mentor: UserUpdateOneInput
+  report: ReportUpdateManyWithoutUserInput
 }
 
 input UserUpdateManyMutationInput {
@@ -1815,6 +2236,13 @@ input UserUpdateOneRequiredInput {
   connect: UserWhereUniqueInput
 }
 
+input UserUpdateOneRequiredWithoutReportInput {
+  create: UserCreateWithoutReportInput
+  update: UserUpdateWithoutReportDataInput
+  upsert: UserUpsertWithoutReportInput
+  connect: UserWhereUniqueInput
+}
+
 input UserUpdateOneWithoutGroupInput {
   create: UserCreateWithoutGroupInput
   update: UserUpdateWithoutGroupDataInput
@@ -1844,6 +2272,30 @@ input UserUpdateWithoutGroupDataInput {
   lastLogin: DateTime
   signature: String
   mentor: UserUpdateOneInput
+  report: ReportUpdateManyWithoutUserInput
+}
+
+input UserUpdateWithoutReportDataInput {
+  username: String
+  nickname: String
+  password: String
+  email: String
+  studentID: String
+  dormitory: String
+  qq: String
+  wechat: String
+  major: String
+  className: String
+  active: Boolean
+  mobile: String
+  avatar: String
+  userid: String
+  isAdmin: Boolean
+  group: GroupUpdateManyWithoutMasterInput
+  threads: Int
+  lastLogin: DateTime
+  signature: String
+  mentor: UserUpdateOneInput
 }
 
 input UserUpsertNestedInput {
@@ -1854,6 +2306,11 @@ input UserUpsertNestedInput {
 input UserUpsertWithoutGroupInput {
   update: UserUpdateWithoutGroupDataInput!
   create: UserCreateWithoutGroupInput!
+}
+
+input UserUpsertWithoutReportInput {
+  update: UserUpdateWithoutReportDataInput!
+  create: UserCreateWithoutReportInput!
 }
 
 input UserWhereInput {
@@ -2091,6 +2548,9 @@ input UserWhereInput {
   signature_ends_with: String
   signature_not_ends_with: String
   mentor: UserWhereInput
+  report_every: ReportWhereInput
+  report_some: ReportWhereInput
+  report_none: ReportWhereInput
   AND: [UserWhereInput!]
   OR: [UserWhereInput!]
   NOT: [UserWhereInput!]

@@ -27,22 +27,40 @@ import {
     threadGraph
 } from "./model/thread";
 import { forumList, forumListSimple } from "./model/forum";
+import { mentorGet, mentorSet } from "./model/mentor";
+import {
+    reportCreate,
+    reportInfo,
+    reportGraph,
+    reportList
+} from "./model/report";
+
 import * as Redis from "redis";
 import * as Redlock from "redlock";
 import { messageIsRead, messageList } from "./model/message";
+import { promisify } from "util";
 
 const VERSION = "1.00";
 
-export const redisServer = Redis.createClient({
+export const redisClient = Redis.createClient({
     host: "localhost",
     port: 6379
 });
 
-redisServer.on("error", err => {
+export const redisClientGetAsync = promisify(redisClient.get).bind(redisClient);
+export const redisClientSetAsync = promisify(redisClient.set).bind(redisClient);
+export const redisClientIncrAsync = promisify(redisClient.incr).bind(
+    redisClient
+);
+export const redisClientExpireAsync = promisify(redisClient.expire).bind(
+    redisClient
+);
+
+redisClient.on("error", err => {
     console.log("Redis Error: " + err);
 });
 
-export const redLock = new Redlock([redisServer], {
+export const redLock = new Redlock([redisClient], {
     driftFactor: 0.01,
     retryCount: 10,
     retryDelay: 200,
@@ -62,7 +80,7 @@ app.use((req, res, next) => {
         "Access-Control-Allow-Headers",
         "Origin, X-Requested-With, Content-Type, Accept, Authorization"
     );
-    res.header("X-Powered-By", "Rabbit/1.0");
+    res.header("X-Powered-By", `Rabbit/${VERSION}`);
     next();
 });
 
@@ -74,7 +92,7 @@ app.use(
 //User
 app.get("/user/info/:uid", userInfo);
 app.get("/user/my/info", userMyInfo);
-app.get("/user/login/qr", userQRLogin);
+app.get("/user/login/qrcode", userQRLogin);
 app.get("/user/login/scan/:key/status", userScan);
 app.post("/user/login/pwd", userLoginByPwd);
 app.post("/user/update/normal", userInfoUpdate);
@@ -106,6 +124,16 @@ app.post("/post/recovery/:pid", postRecovery);
 //Message
 app.post("/message/read/:id", messageIsRead);
 app.get("/message/list/:page", messageList);
+
+//Mentor
+app.get("/mentor/info", mentorGet);
+app.post("/mentor/set", mentorSet);
+
+//Report
+app.get("/report/info/:rid", reportInfo);
+app.get("/report/graph/:uid", reportGraph);
+app.get("/report/list/:page", reportList);
+app.post("/report/create", reportCreate);
 
 app.listen(7010, () => {
     console.log(

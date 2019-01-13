@@ -19,6 +19,7 @@ export interface Exists {
   group: (where?: GroupWhereInput) => Promise<boolean>;
   message: (where?: MessageWhereInput) => Promise<boolean>;
   post: (where?: PostWhereInput) => Promise<boolean>;
+  report: (where?: ReportWhereInput) => Promise<boolean>;
   thread: (where?: ThreadWhereInput) => Promise<boolean>;
   user: (where?: UserWhereInput) => Promise<boolean>;
 }
@@ -157,6 +158,29 @@ export interface Prisma {
       last?: Int;
     }
   ) => PostConnectionPromise;
+  report: (where: ReportWhereUniqueInput) => ReportPromise;
+  reports: (
+    args?: {
+      where?: ReportWhereInput;
+      orderBy?: ReportOrderByInput;
+      skip?: Int;
+      after?: String;
+      before?: String;
+      first?: Int;
+      last?: Int;
+    }
+  ) => FragmentableArray<Report>;
+  reportsConnection: (
+    args?: {
+      where?: ReportWhereInput;
+      orderBy?: ReportOrderByInput;
+      skip?: Int;
+      after?: String;
+      before?: String;
+      first?: Int;
+      last?: Int;
+    }
+  ) => ReportConnectionPromise;
   thread: (where: ThreadWhereUniqueInput) => ThreadPromise;
   threads: (
     args?: {
@@ -289,6 +313,22 @@ export interface Prisma {
   ) => PostPromise;
   deletePost: (where: PostWhereUniqueInput) => PostPromise;
   deleteManyPosts: (where?: PostWhereInput) => BatchPayloadPromise;
+  createReport: (data: ReportCreateInput) => ReportPromise;
+  updateReport: (
+    args: { data: ReportUpdateInput; where: ReportWhereUniqueInput }
+  ) => ReportPromise;
+  updateManyReports: (
+    args: { data: ReportUpdateManyMutationInput; where?: ReportWhereInput }
+  ) => BatchPayloadPromise;
+  upsertReport: (
+    args: {
+      where: ReportWhereUniqueInput;
+      create: ReportCreateInput;
+      update: ReportUpdateInput;
+    }
+  ) => ReportPromise;
+  deleteReport: (where: ReportWhereUniqueInput) => ReportPromise;
+  deleteManyReports: (where?: ReportWhereInput) => BatchPayloadPromise;
   createThread: (data: ThreadCreateInput) => ThreadPromise;
   updateThread: (
     args: { data: ThreadUpdateInput; where: ThreadWhereUniqueInput }
@@ -345,6 +385,9 @@ export interface Subscription {
   post: (
     where?: PostSubscriptionWhereInput
   ) => PostSubscriptionPayloadSubscription;
+  report: (
+    where?: ReportSubscriptionWhereInput
+  ) => ReportSubscriptionPayloadSubscription;
   thread: (
     where?: ThreadSubscriptionWhereInput
   ) => ThreadSubscriptionPayloadSubscription;
@@ -368,6 +411,28 @@ export type GroupOrderByInput =
   | "key_DESC"
   | "name_ASC"
   | "name_DESC"
+  | "createdAt_ASC"
+  | "createdAt_DESC"
+  | "updatedAt_ASC"
+  | "updatedAt_DESC";
+
+export type ReportOrderByInput =
+  | "id_ASC"
+  | "id_DESC"
+  | "length_ASC"
+  | "length_DESC"
+  | "content_ASC"
+  | "content_DESC"
+  | "plan_ASC"
+  | "plan_DESC"
+  | "solution_ASC"
+  | "solution_DESC"
+  | "conclusion_ASC"
+  | "conclusion_DESC"
+  | "createDate_ASC"
+  | "createDate_DESC"
+  | "isWeek_ASC"
+  | "isWeek_DESC"
   | "createdAt_ASC"
   | "createdAt_DESC"
   | "updatedAt_ASC"
@@ -785,9 +850,113 @@ export interface UserWhereInput {
   signature_ends_with?: String;
   signature_not_ends_with?: String;
   mentor?: UserWhereInput;
+  report_every?: ReportWhereInput;
+  report_some?: ReportWhereInput;
+  report_none?: ReportWhereInput;
   AND?: UserWhereInput[] | UserWhereInput;
   OR?: UserWhereInput[] | UserWhereInput;
   NOT?: UserWhereInput[] | UserWhereInput;
+}
+
+export interface ReportWhereInput {
+  id?: ID_Input;
+  id_not?: ID_Input;
+  id_in?: ID_Input[] | ID_Input;
+  id_not_in?: ID_Input[] | ID_Input;
+  id_lt?: ID_Input;
+  id_lte?: ID_Input;
+  id_gt?: ID_Input;
+  id_gte?: ID_Input;
+  id_contains?: ID_Input;
+  id_not_contains?: ID_Input;
+  id_starts_with?: ID_Input;
+  id_not_starts_with?: ID_Input;
+  id_ends_with?: ID_Input;
+  id_not_ends_with?: ID_Input;
+  length?: String;
+  length_not?: String;
+  length_in?: String[] | String;
+  length_not_in?: String[] | String;
+  length_lt?: String;
+  length_lte?: String;
+  length_gt?: String;
+  length_gte?: String;
+  length_contains?: String;
+  length_not_contains?: String;
+  length_starts_with?: String;
+  length_not_starts_with?: String;
+  length_ends_with?: String;
+  length_not_ends_with?: String;
+  content?: String;
+  content_not?: String;
+  content_in?: String[] | String;
+  content_not_in?: String[] | String;
+  content_lt?: String;
+  content_lte?: String;
+  content_gt?: String;
+  content_gte?: String;
+  content_contains?: String;
+  content_not_contains?: String;
+  content_starts_with?: String;
+  content_not_starts_with?: String;
+  content_ends_with?: String;
+  content_not_ends_with?: String;
+  plan?: String;
+  plan_not?: String;
+  plan_in?: String[] | String;
+  plan_not_in?: String[] | String;
+  plan_lt?: String;
+  plan_lte?: String;
+  plan_gt?: String;
+  plan_gte?: String;
+  plan_contains?: String;
+  plan_not_contains?: String;
+  plan_starts_with?: String;
+  plan_not_starts_with?: String;
+  plan_ends_with?: String;
+  plan_not_ends_with?: String;
+  solution?: String;
+  solution_not?: String;
+  solution_in?: String[] | String;
+  solution_not_in?: String[] | String;
+  solution_lt?: String;
+  solution_lte?: String;
+  solution_gt?: String;
+  solution_gte?: String;
+  solution_contains?: String;
+  solution_not_contains?: String;
+  solution_starts_with?: String;
+  solution_not_starts_with?: String;
+  solution_ends_with?: String;
+  solution_not_ends_with?: String;
+  conclusion?: String;
+  conclusion_not?: String;
+  conclusion_in?: String[] | String;
+  conclusion_not_in?: String[] | String;
+  conclusion_lt?: String;
+  conclusion_lte?: String;
+  conclusion_gt?: String;
+  conclusion_gte?: String;
+  conclusion_contains?: String;
+  conclusion_not_contains?: String;
+  conclusion_starts_with?: String;
+  conclusion_not_starts_with?: String;
+  conclusion_ends_with?: String;
+  conclusion_not_ends_with?: String;
+  createDate?: DateTimeInput;
+  createDate_not?: DateTimeInput;
+  createDate_in?: DateTimeInput[] | DateTimeInput;
+  createDate_not_in?: DateTimeInput[] | DateTimeInput;
+  createDate_lt?: DateTimeInput;
+  createDate_lte?: DateTimeInput;
+  createDate_gt?: DateTimeInput;
+  createDate_gte?: DateTimeInput;
+  isWeek?: Boolean;
+  isWeek_not?: Boolean;
+  user?: UserWhereInput;
+  AND?: ReportWhereInput[] | ReportWhereInput;
+  OR?: ReportWhereInput[] | ReportWhereInput;
+  NOT?: ReportWhereInput[] | ReportWhereInput;
 }
 
 export interface PostWhereInput {
@@ -1095,6 +1264,10 @@ export type PostWhereUniqueInput = AtLeastOne<{
   id: ID_Input;
 }>;
 
+export type ReportWhereUniqueInput = AtLeastOne<{
+  id: ID_Input;
+}>;
+
 export type ThreadWhereUniqueInput = AtLeastOne<{
   id: ID_Input;
 }>;
@@ -1141,6 +1314,7 @@ export interface UserCreateInput {
   lastLogin: DateTimeInput;
   signature?: String;
   mentor?: UserCreateOneInput;
+  report?: ReportCreateManyWithoutUserInput;
 }
 
 export interface GroupCreateManyWithoutMasterInput {
@@ -1151,6 +1325,21 @@ export interface GroupCreateManyWithoutMasterInput {
 export interface GroupCreateWithoutMasterInput {
   key: Int;
   name: String;
+}
+
+export interface ReportCreateManyWithoutUserInput {
+  create?: ReportCreateWithoutUserInput[] | ReportCreateWithoutUserInput;
+  connect?: ReportWhereUniqueInput[] | ReportWhereUniqueInput;
+}
+
+export interface ReportCreateWithoutUserInput {
+  length: String;
+  content: String;
+  plan: String;
+  solution: String;
+  conclusion: String;
+  createDate: DateTimeInput;
+  isWeek?: Boolean;
 }
 
 export interface PostCreateOneInput {
@@ -1312,6 +1501,7 @@ export interface UserUpdateDataInput {
   lastLogin?: DateTimeInput;
   signature?: String;
   mentor?: UserUpdateOneInput;
+  report?: ReportUpdateManyWithoutUserInput;
 }
 
 export interface GroupUpdateManyWithoutMasterInput {
@@ -1411,6 +1601,159 @@ export interface UserUpdateOneInput {
 export interface UserUpsertNestedInput {
   update: UserUpdateDataInput;
   create: UserCreateInput;
+}
+
+export interface ReportUpdateManyWithoutUserInput {
+  create?: ReportCreateWithoutUserInput[] | ReportCreateWithoutUserInput;
+  delete?: ReportWhereUniqueInput[] | ReportWhereUniqueInput;
+  connect?: ReportWhereUniqueInput[] | ReportWhereUniqueInput;
+  disconnect?: ReportWhereUniqueInput[] | ReportWhereUniqueInput;
+  update?:
+    | ReportUpdateWithWhereUniqueWithoutUserInput[]
+    | ReportUpdateWithWhereUniqueWithoutUserInput;
+  upsert?:
+    | ReportUpsertWithWhereUniqueWithoutUserInput[]
+    | ReportUpsertWithWhereUniqueWithoutUserInput;
+  deleteMany?: ReportScalarWhereInput[] | ReportScalarWhereInput;
+  updateMany?:
+    | ReportUpdateManyWithWhereNestedInput[]
+    | ReportUpdateManyWithWhereNestedInput;
+}
+
+export interface ReportUpdateWithWhereUniqueWithoutUserInput {
+  where: ReportWhereUniqueInput;
+  data: ReportUpdateWithoutUserDataInput;
+}
+
+export interface ReportUpdateWithoutUserDataInput {
+  length?: String;
+  content?: String;
+  plan?: String;
+  solution?: String;
+  conclusion?: String;
+  createDate?: DateTimeInput;
+  isWeek?: Boolean;
+}
+
+export interface ReportUpsertWithWhereUniqueWithoutUserInput {
+  where: ReportWhereUniqueInput;
+  update: ReportUpdateWithoutUserDataInput;
+  create: ReportCreateWithoutUserInput;
+}
+
+export interface ReportScalarWhereInput {
+  id?: ID_Input;
+  id_not?: ID_Input;
+  id_in?: ID_Input[] | ID_Input;
+  id_not_in?: ID_Input[] | ID_Input;
+  id_lt?: ID_Input;
+  id_lte?: ID_Input;
+  id_gt?: ID_Input;
+  id_gte?: ID_Input;
+  id_contains?: ID_Input;
+  id_not_contains?: ID_Input;
+  id_starts_with?: ID_Input;
+  id_not_starts_with?: ID_Input;
+  id_ends_with?: ID_Input;
+  id_not_ends_with?: ID_Input;
+  length?: String;
+  length_not?: String;
+  length_in?: String[] | String;
+  length_not_in?: String[] | String;
+  length_lt?: String;
+  length_lte?: String;
+  length_gt?: String;
+  length_gte?: String;
+  length_contains?: String;
+  length_not_contains?: String;
+  length_starts_with?: String;
+  length_not_starts_with?: String;
+  length_ends_with?: String;
+  length_not_ends_with?: String;
+  content?: String;
+  content_not?: String;
+  content_in?: String[] | String;
+  content_not_in?: String[] | String;
+  content_lt?: String;
+  content_lte?: String;
+  content_gt?: String;
+  content_gte?: String;
+  content_contains?: String;
+  content_not_contains?: String;
+  content_starts_with?: String;
+  content_not_starts_with?: String;
+  content_ends_with?: String;
+  content_not_ends_with?: String;
+  plan?: String;
+  plan_not?: String;
+  plan_in?: String[] | String;
+  plan_not_in?: String[] | String;
+  plan_lt?: String;
+  plan_lte?: String;
+  plan_gt?: String;
+  plan_gte?: String;
+  plan_contains?: String;
+  plan_not_contains?: String;
+  plan_starts_with?: String;
+  plan_not_starts_with?: String;
+  plan_ends_with?: String;
+  plan_not_ends_with?: String;
+  solution?: String;
+  solution_not?: String;
+  solution_in?: String[] | String;
+  solution_not_in?: String[] | String;
+  solution_lt?: String;
+  solution_lte?: String;
+  solution_gt?: String;
+  solution_gte?: String;
+  solution_contains?: String;
+  solution_not_contains?: String;
+  solution_starts_with?: String;
+  solution_not_starts_with?: String;
+  solution_ends_with?: String;
+  solution_not_ends_with?: String;
+  conclusion?: String;
+  conclusion_not?: String;
+  conclusion_in?: String[] | String;
+  conclusion_not_in?: String[] | String;
+  conclusion_lt?: String;
+  conclusion_lte?: String;
+  conclusion_gt?: String;
+  conclusion_gte?: String;
+  conclusion_contains?: String;
+  conclusion_not_contains?: String;
+  conclusion_starts_with?: String;
+  conclusion_not_starts_with?: String;
+  conclusion_ends_with?: String;
+  conclusion_not_ends_with?: String;
+  createDate?: DateTimeInput;
+  createDate_not?: DateTimeInput;
+  createDate_in?: DateTimeInput[] | DateTimeInput;
+  createDate_not_in?: DateTimeInput[] | DateTimeInput;
+  createDate_lt?: DateTimeInput;
+  createDate_lte?: DateTimeInput;
+  createDate_gt?: DateTimeInput;
+  createDate_gte?: DateTimeInput;
+  isWeek?: Boolean;
+  isWeek_not?: Boolean;
+  AND?: ReportScalarWhereInput[] | ReportScalarWhereInput;
+  OR?: ReportScalarWhereInput[] | ReportScalarWhereInput;
+  NOT?: ReportScalarWhereInput[] | ReportScalarWhereInput;
+}
+
+export interface ReportUpdateManyWithWhereNestedInput {
+  where: ReportScalarWhereInput;
+  data: ReportUpdateManyDataInput;
+}
+
+export interface ReportUpdateManyDataInput {
+  length?: String;
+  content?: String;
+  plan?: String;
+  solution?: String;
+  conclusion?: String;
+  createDate?: DateTimeInput;
+  isWeek?: Boolean;
 }
 
 export interface PostUpdateOneRequiredInput {
@@ -1809,6 +2152,7 @@ export interface UserCreateWithoutGroupInput {
   lastLogin: DateTimeInput;
   signature?: String;
   mentor?: UserCreateOneInput;
+  report?: ReportCreateManyWithoutUserInput;
 }
 
 export interface GroupUpdateInput {
@@ -1846,6 +2190,7 @@ export interface UserUpdateWithoutGroupDataInput {
   lastLogin?: DateTimeInput;
   signature?: String;
   mentor?: UserUpdateOneInput;
+  report?: ReportUpdateManyWithoutUserInput;
 }
 
 export interface UserUpsertWithoutGroupInput {
@@ -1897,6 +2242,101 @@ export interface PostUpdateManyMutationInput {
   message?: String;
   createDate?: DateTimeInput;
   active?: Boolean;
+}
+
+export interface ReportCreateInput {
+  length: String;
+  content: String;
+  plan: String;
+  solution: String;
+  conclusion: String;
+  createDate: DateTimeInput;
+  isWeek?: Boolean;
+  user: UserCreateOneWithoutReportInput;
+}
+
+export interface UserCreateOneWithoutReportInput {
+  create?: UserCreateWithoutReportInput;
+  connect?: UserWhereUniqueInput;
+}
+
+export interface UserCreateWithoutReportInput {
+  username: String;
+  nickname?: String;
+  password?: String;
+  email?: String;
+  studentID?: String;
+  dormitory?: String;
+  qq?: String;
+  wechat?: String;
+  major?: String;
+  className?: String;
+  active?: Boolean;
+  mobile?: String;
+  avatar?: String;
+  userid: String;
+  isAdmin?: Boolean;
+  group?: GroupCreateManyWithoutMasterInput;
+  threads?: Int;
+  lastLogin: DateTimeInput;
+  signature?: String;
+  mentor?: UserCreateOneInput;
+}
+
+export interface ReportUpdateInput {
+  length?: String;
+  content?: String;
+  plan?: String;
+  solution?: String;
+  conclusion?: String;
+  createDate?: DateTimeInput;
+  isWeek?: Boolean;
+  user?: UserUpdateOneRequiredWithoutReportInput;
+}
+
+export interface UserUpdateOneRequiredWithoutReportInput {
+  create?: UserCreateWithoutReportInput;
+  update?: UserUpdateWithoutReportDataInput;
+  upsert?: UserUpsertWithoutReportInput;
+  connect?: UserWhereUniqueInput;
+}
+
+export interface UserUpdateWithoutReportDataInput {
+  username?: String;
+  nickname?: String;
+  password?: String;
+  email?: String;
+  studentID?: String;
+  dormitory?: String;
+  qq?: String;
+  wechat?: String;
+  major?: String;
+  className?: String;
+  active?: Boolean;
+  mobile?: String;
+  avatar?: String;
+  userid?: String;
+  isAdmin?: Boolean;
+  group?: GroupUpdateManyWithoutMasterInput;
+  threads?: Int;
+  lastLogin?: DateTimeInput;
+  signature?: String;
+  mentor?: UserUpdateOneInput;
+}
+
+export interface UserUpsertWithoutReportInput {
+  update: UserUpdateWithoutReportDataInput;
+  create: UserCreateWithoutReportInput;
+}
+
+export interface ReportUpdateManyMutationInput {
+  length?: String;
+  content?: String;
+  plan?: String;
+  solution?: String;
+  conclusion?: String;
+  createDate?: DateTimeInput;
+  isWeek?: Boolean;
 }
 
 export interface ThreadCreateInput {
@@ -1961,6 +2401,7 @@ export interface UserUpdateInput {
   lastLogin?: DateTimeInput;
   signature?: String;
   mentor?: UserUpdateOneInput;
+  report?: ReportUpdateManyWithoutUserInput;
 }
 
 export interface UserUpdateManyMutationInput {
@@ -2037,6 +2478,17 @@ export interface PostSubscriptionWhereInput {
   AND?: PostSubscriptionWhereInput[] | PostSubscriptionWhereInput;
   OR?: PostSubscriptionWhereInput[] | PostSubscriptionWhereInput;
   NOT?: PostSubscriptionWhereInput[] | PostSubscriptionWhereInput;
+}
+
+export interface ReportSubscriptionWhereInput {
+  mutation_in?: MutationType[] | MutationType;
+  updatedFields_contains?: String;
+  updatedFields_contains_every?: String[] | String;
+  updatedFields_contains_some?: String[] | String;
+  node?: ReportWhereInput;
+  AND?: ReportSubscriptionWhereInput[] | ReportSubscriptionWhereInput;
+  OR?: ReportSubscriptionWhereInput[] | ReportSubscriptionWhereInput;
+  NOT?: ReportSubscriptionWhereInput[] | ReportSubscriptionWhereInput;
 }
 
 export interface ThreadSubscriptionWhereInput {
@@ -2153,6 +2605,17 @@ export interface UserPromise extends Promise<User>, Fragmentable {
   lastLogin: () => Promise<DateTimeOutput>;
   signature: () => Promise<String>;
   mentor: <T = UserPromise>() => T;
+  report: <T = FragmentableArray<Report>>(
+    args?: {
+      where?: ReportWhereInput;
+      orderBy?: ReportOrderByInput;
+      skip?: Int;
+      after?: String;
+      before?: String;
+      first?: Int;
+      last?: Int;
+    }
+  ) => T;
 }
 
 export interface UserSubscription
@@ -2189,6 +2652,17 @@ export interface UserSubscription
   lastLogin: () => Promise<AsyncIterator<DateTimeOutput>>;
   signature: () => Promise<AsyncIterator<String>>;
   mentor: <T = UserSubscription>() => T;
+  report: <T = Promise<AsyncIterator<ReportSubscription>>>(
+    args?: {
+      where?: ReportWhereInput;
+      orderBy?: ReportOrderByInput;
+      skip?: Int;
+      after?: String;
+      before?: String;
+      first?: Int;
+      last?: Int;
+    }
+  ) => T;
 }
 
 export interface Group {
@@ -2211,6 +2685,43 @@ export interface GroupSubscription
   key: () => Promise<AsyncIterator<Int>>;
   name: () => Promise<AsyncIterator<String>>;
   master: <T = UserSubscription>() => T;
+}
+
+export interface Report {
+  id: ID_Output;
+  length: String;
+  content: String;
+  plan: String;
+  solution: String;
+  conclusion: String;
+  createDate: DateTimeOutput;
+  isWeek: Boolean;
+}
+
+export interface ReportPromise extends Promise<Report>, Fragmentable {
+  id: () => Promise<ID_Output>;
+  length: () => Promise<String>;
+  content: () => Promise<String>;
+  plan: () => Promise<String>;
+  solution: () => Promise<String>;
+  conclusion: () => Promise<String>;
+  createDate: () => Promise<DateTimeOutput>;
+  isWeek: () => Promise<Boolean>;
+  user: <T = UserPromise>() => T;
+}
+
+export interface ReportSubscription
+  extends Promise<AsyncIterator<Report>>,
+    Fragmentable {
+  id: () => Promise<AsyncIterator<ID_Output>>;
+  length: () => Promise<AsyncIterator<String>>;
+  content: () => Promise<AsyncIterator<String>>;
+  plan: () => Promise<AsyncIterator<String>>;
+  solution: () => Promise<AsyncIterator<String>>;
+  conclusion: () => Promise<AsyncIterator<String>>;
+  createDate: () => Promise<AsyncIterator<DateTimeOutput>>;
+  isWeek: () => Promise<AsyncIterator<Boolean>>;
+  user: <T = UserSubscription>() => T;
 }
 
 export interface Post {
@@ -2676,6 +3187,60 @@ export interface AggregatePostSubscription
   count: () => Promise<AsyncIterator<Int>>;
 }
 
+export interface ReportConnection {
+  pageInfo: PageInfo;
+  edges: ReportEdge[];
+}
+
+export interface ReportConnectionPromise
+  extends Promise<ReportConnection>,
+    Fragmentable {
+  pageInfo: <T = PageInfoPromise>() => T;
+  edges: <T = FragmentableArray<ReportEdge>>() => T;
+  aggregate: <T = AggregateReportPromise>() => T;
+}
+
+export interface ReportConnectionSubscription
+  extends Promise<AsyncIterator<ReportConnection>>,
+    Fragmentable {
+  pageInfo: <T = PageInfoSubscription>() => T;
+  edges: <T = Promise<AsyncIterator<ReportEdgeSubscription>>>() => T;
+  aggregate: <T = AggregateReportSubscription>() => T;
+}
+
+export interface ReportEdge {
+  node: Report;
+  cursor: String;
+}
+
+export interface ReportEdgePromise extends Promise<ReportEdge>, Fragmentable {
+  node: <T = ReportPromise>() => T;
+  cursor: () => Promise<String>;
+}
+
+export interface ReportEdgeSubscription
+  extends Promise<AsyncIterator<ReportEdge>>,
+    Fragmentable {
+  node: <T = ReportSubscription>() => T;
+  cursor: () => Promise<AsyncIterator<String>>;
+}
+
+export interface AggregateReport {
+  count: Int;
+}
+
+export interface AggregateReportPromise
+  extends Promise<AggregateReport>,
+    Fragmentable {
+  count: () => Promise<Int>;
+}
+
+export interface AggregateReportSubscription
+  extends Promise<AsyncIterator<AggregateReport>>,
+    Fragmentable {
+  count: () => Promise<AsyncIterator<Int>>;
+}
+
 export interface ThreadConnection {
   pageInfo: PageInfo;
   edges: ThreadEdge[];
@@ -3053,6 +3618,68 @@ export interface PostPreviousValuesSubscription
   active: () => Promise<AsyncIterator<Boolean>>;
 }
 
+export interface ReportSubscriptionPayload {
+  mutation: MutationType;
+  node: Report;
+  updatedFields: String[];
+  previousValues: ReportPreviousValues;
+}
+
+export interface ReportSubscriptionPayloadPromise
+  extends Promise<ReportSubscriptionPayload>,
+    Fragmentable {
+  mutation: () => Promise<MutationType>;
+  node: <T = ReportPromise>() => T;
+  updatedFields: () => Promise<String[]>;
+  previousValues: <T = ReportPreviousValuesPromise>() => T;
+}
+
+export interface ReportSubscriptionPayloadSubscription
+  extends Promise<AsyncIterator<ReportSubscriptionPayload>>,
+    Fragmentable {
+  mutation: () => Promise<AsyncIterator<MutationType>>;
+  node: <T = ReportSubscription>() => T;
+  updatedFields: () => Promise<AsyncIterator<String[]>>;
+  previousValues: <T = ReportPreviousValuesSubscription>() => T;
+}
+
+export interface ReportPreviousValues {
+  id: ID_Output;
+  length: String;
+  content: String;
+  plan: String;
+  solution: String;
+  conclusion: String;
+  createDate: DateTimeOutput;
+  isWeek: Boolean;
+}
+
+export interface ReportPreviousValuesPromise
+  extends Promise<ReportPreviousValues>,
+    Fragmentable {
+  id: () => Promise<ID_Output>;
+  length: () => Promise<String>;
+  content: () => Promise<String>;
+  plan: () => Promise<String>;
+  solution: () => Promise<String>;
+  conclusion: () => Promise<String>;
+  createDate: () => Promise<DateTimeOutput>;
+  isWeek: () => Promise<Boolean>;
+}
+
+export interface ReportPreviousValuesSubscription
+  extends Promise<AsyncIterator<ReportPreviousValues>>,
+    Fragmentable {
+  id: () => Promise<AsyncIterator<ID_Output>>;
+  length: () => Promise<AsyncIterator<String>>;
+  content: () => Promise<AsyncIterator<String>>;
+  plan: () => Promise<AsyncIterator<String>>;
+  solution: () => Promise<AsyncIterator<String>>;
+  conclusion: () => Promise<AsyncIterator<String>>;
+  createDate: () => Promise<AsyncIterator<DateTimeOutput>>;
+  isWeek: () => Promise<AsyncIterator<Boolean>>;
+}
+
 export interface ThreadSubscriptionPayload {
   mutation: MutationType;
   node: Thread;
@@ -3269,6 +3896,10 @@ export const models: Model[] = [
   },
   {
     name: "Post",
+    embedded: false
+  },
+  {
+    name: "Report",
     embedded: false
   },
   {

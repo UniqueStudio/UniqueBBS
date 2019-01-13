@@ -1,7 +1,13 @@
 import { prisma, Forum, Thread } from "../generated/prisma-client";
 import { Request, Response } from "express";
-import { redLock } from "../server";
-import { pagesize } from "./consts";
+import {
+    redLock,
+    redisClientExpireAsync,
+    redisClientGetAsync,
+    redisClientSetAsync,
+    redisClientIncrAsync
+} from "../server";
+import { pagesize, redisPostKey, RedisLockInterval } from "./consts";
 import { verifyJWT, filterUserInfo } from "./check";
 import {
     userThreadsAdd,
@@ -180,8 +186,21 @@ export const threadInfo = async function(req: Request, res: Response) {
 export const threadCreate = async function(req: Request, res: Response) {
     try {
         const { fid, subject, message } = req.body;
-        const authObj = verifyJWT(req.header("Authorization"));
-        const uid = authObj.uid;
+        const { uid } = verifyJWT(req.header("Authorization"));
+
+        const redisKey = redisPostKey(uid);
+        const redisValue = await redisClientGetAsync(redisKey);
+        if (redisValue) {
+            const redisValueNum: number = Number.parseInt(redisValue);
+            if (redisValueNum > 3) {
+                return res.json({ code: -1, msg: "您的请求过于频繁！" });
+            } else {
+                await redisClientIncrAsync(redisKey);
+                await redisClientExpireAsync(redisKey, RedisLockInterval);
+            }
+        } else {
+            await redisClientSetAsync(redisKey, "1", RedisLockInterval);
+        }
 
         const resultThread = await prisma
             .createThread({
@@ -235,6 +254,22 @@ export const threadReply = async function(req: Request, res: Response) {
         const { tid, message, quote } = req.body;
         const authObj = verifyJWT(req.header("Authorization"));
         const uid = authObj.uid;
+
+        const redisKey = redisPostKey(uid);
+        const redisValue = await redisClientGetAsync(redisKey);
+        if (redisValue) {
+            const redisValueNum: number = Number.parseInt(redisValue);
+            if (redisValueNum > 3) {
+                return res.json({ code: -1, msg: "您的请求过于频繁！" });
+            } else {
+                await redisClientIncrAsync(redisKey);
+                await redisClientExpireAsync(redisKey, RedisLockInterval);
+            }
+        } else {
+            await redisClientSetAsync(redisKey, "1");
+            await redisClientExpireAsync(redisKey, RedisLockInterval);
+        }
+
         const lock = await redLock.lock(`thread:${tid}`, 200);
 
         try {
@@ -612,7 +647,7 @@ export const postRecovery = async function(req: Request, res: Response) {
 
 export const threadGraph = async function(req: Request, res: Response) {
     try {
-        const authObj = verifyJWT(req.header("Authorization"));
+        const { uid } = verifyJWT(req.header("Authorization"));
         const { tid } = req.params;
 
         const fragment = `fragment PostsWithDate on Post{
@@ -622,12 +657,12 @@ export const threadGraph = async function(req: Request, res: Response) {
             .posts({
                 where: {
                     thread: {
-                        id: tid,
+                        id: tid
                         // active: true
                     },
                     user: {
-                        id: authObj.uid
-                    },
+                        id: uid
+                    }
                     // active: true
                 },
                 orderBy: "createDate_ASC"

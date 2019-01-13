@@ -1,80 +1,92 @@
 type Group {
-  id: ID! @unique
-  key: Int! @unique
-  name: String!
-  master: User@relation(name:"GroupMaster")
+    id: ID! @unique
+    key: Int! @unique
+    name: String!
+    master: User @relation(name: "GroupMaster")
 }
 type User {
-  id: ID! @unique
-  username: String!
-  nickname: String
-  password: String
-  email: String! @default(value:"")
-  studentID: String! @default(value:"")
-  dormitory: String! @default(value:"")
-  qq: String! @default(value:"")
-  wechat: String! @default(value:"")
-  major: String! @default(value:"")
-  className: String! @default(value:"")
-  active: Boolean! @default(value: true)
-  mobile: String! @default(value:0)
-  avatar: String! @default(value:"__default__")
-  userid: String! @unique
-  isAdmin: Boolean! @default(value:false)
-  group: [Group!]! @relation(name:"GroupList")
-  threads: Int! @default(value: 0)
-  lastLogin: DateTime!
-  signature: String! @default(value: "")
-  mentor: User
+    id: ID! @unique
+    username: String!
+    nickname: String
+    password: String
+    email: String! @default(value: "")
+    studentID: String! @default(value: "")
+    dormitory: String! @default(value: "")
+    qq: String! @default(value: "")
+    wechat: String! @default(value: "")
+    major: String! @default(value: "")
+    className: String! @default(value: "")
+    active: Boolean! @default(value: true)
+    mobile: String! @default(value: 0)
+    avatar: String! @default(value: "__default__")
+    userid: String! @unique
+    isAdmin: Boolean! @default(value: false)
+    group: [Group!]! @relation(name: "GroupList")
+    threads: Int! @default(value: 0)
+    lastLogin: DateTime!
+    signature: String! @default(value: "")
+    mentor: User
+    report: [Report!]! @relation(name:"ReportList")
 }
-type Forum{
-  id: ID! @unique
-  name: String!
-  threads: Int! @default(value: 0)
-  lastPost: Post @relation(name:"ForumLastPost")
+type Report {
+    id: ID! @unique
+    length: String!
+    content: String!
+    plan: String!
+    solution: String!
+    conclusion: String!
+    createDate: DateTime!
+    isWeek: Boolean! @default(value: false)
+    user: User! @relation(name:"ReportList")
 }
-type Post{
-  id: ID! @unique
-  forum: Forum! @relation(name:"PostBelongForum")
-  user: User!
-  thread: Thread!
-  isFirst: Boolean! @default(value:false)
-  quote: Int! @default(value:-1)
-  message: String!
-  createDate: DateTime!
-  active: Boolean! @default(value:true)
+type Forum {
+    id: ID! @unique
+    name: String!
+    threads: Int! @default(value: 0)
+    lastPost: Post @relation(name: "ForumLastPost")
 }
-type Thread{
-  id: ID! @unique
-  user: User! 
-  forum: Forum!
-  subject: String!
-  active: Boolean! @default(value: true)
-  postCount: Int! @default(value:0)
-  post: [Post!]!
-  top: Int! @default(value:0)
-  closed: Boolean! @default(value:false)
-  diamond: Boolean! @default(value:false)
-  attach: [Attach!]! @relation(name:"AttachList")
-  lastDate: DateTime!
-  createDate: DateTime!
+type Post {
+    id: ID! @unique
+    forum: Forum! @relation(name: "PostBelongForum")
+    user: User!
+    thread: Thread!
+    isFirst: Boolean! @default(value: false)
+    quote: Int! @default(value: -1)
+    message: String!
+    createDate: DateTime!
+    active: Boolean! @default(value: true)
 }
-type Attach{
-  id: ID! @unique
-  user: User!
-  post: Post!
-  thread: Thread! @relation(name:"AttachInThread")
-  forum: Forum!
-  filesize: Int!
-  downloads: Int! @default(value:0)
-  fileName: String!
-  createDate: DateTime!
+type Thread {
+    id: ID! @unique
+    user: User!
+    forum: Forum!
+    subject: String!
+    active: Boolean! @default(value: true)
+    postCount: Int! @default(value: 0)
+    post: [Post!]!
+    top: Int! @default(value: 0)
+    closed: Boolean! @default(value: false)
+    diamond: Boolean! @default(value: false)
+    attach: [Attach!]! @relation(name: "AttachList")
+    lastDate: DateTime!
+    createDate: DateTime!
 }
-type Message{
-  id: ID! @unique
-  fromUser: User! @relation(name:"MsgFromUser")
-  toUser: User! @relation(name:"MsgToUser")
-  message: String!
-  isRead: Boolean! @default(value:false)
-  createDate: DateTime!
+type Attach {
+    id: ID! @unique
+    user: User!
+    post: Post!
+    thread: Thread! @relation(name: "AttachInThread")
+    forum: Forum!
+    filesize: Int!
+    downloads: Int! @default(value: 0)
+    fileName: String!
+    createDate: DateTime!
+}
+type Message {
+    id: ID! @unique
+    fromUser: User! @relation(name: "MsgFromUser")
+    toUser: User! @relation(name: "MsgToUser")
+    message: String!
+    isRead: Boolean! @default(value: false)
+    createDate: DateTime!
 }
