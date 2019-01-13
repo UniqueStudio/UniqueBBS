@@ -3,6 +3,8 @@ import * as bodyParser from "body-parser";
 import {
     userMyInfo,
     userInfo,
+    userThreads,
+    userPosts,
     userLoginByPwd,
     userInfoUpdate,
     userInfoUpdateFromWx,
@@ -44,6 +46,8 @@ import * as Redis from "redis";
 import * as Redlock from "redlock";
 import { messageIsRead, messageList } from "./model/message";
 import { promisify } from "util";
+import * as multer from "multer";
+import { fileDownload, fileUpload, fileDestination } from "./model/attach";
 
 const VERSION = "1.00";
 
@@ -94,15 +98,26 @@ app.use(
         extended: true
     })
 );
-//User
+
+const storage = multer.diskStorage({
+    destination: fileDestination,
+    filename: fileUpload
+});
+const upload = multer({ storage: storage, limits: { fileSize: 20971520 } }); //20MB
+
+//User & Mentor
 app.get("/user/info/:uid", userInfo);
+app.get("/user/threads/:uid/:page", userThreads);
+app.get("/user/posts/:uid/:page", userPosts);
 app.get("/user/my/info", userMyInfo);
 app.get("/user/login/qrcode", userQRLogin);
 app.get("/user/login/scan/:key/status", userScan);
+app.get("/user/mentor/info", mentorGet);
 app.post("/user/login/pwd", userLoginByPwd);
 app.post("/user/update/normal", userInfoUpdate);
 app.post("/user/update/pwd", userPwdReset);
 app.post("/user/update/wx", userInfoUpdateFromWx);
+app.post("/user/mentor/set", mentorSet);
 
 //Forum
 app.get("/forum/list", forumList);
@@ -111,7 +126,7 @@ app.get("/forum/listSimple", forumListSimple);
 //Thread
 app.get("/thread/list/:fid/:page", threadList);
 app.get("/thread/info/:tid/:page", threadInfo);
-app.post("/thread/create", threadCreate);
+app.post("/thread/create", upload.array("attaches", 10), threadCreate);
 app.post("/thread/update/:tid", threadUpdate);
 app.post("/thread/move/:tid", threadMove);
 app.post("/thread/reply", threadReply);
@@ -132,16 +147,15 @@ app.post("/post/recovery/:pid", postRecovery);
 app.post("/message/read/:id", messageIsRead);
 app.get("/message/list/:page", messageList);
 
-//Mentor
-app.get("/mentor/info", mentorGet);
-app.post("/mentor/set", mentorSet);
-
 //Report
 app.get("/report/info/:rid", reportInfo);
 app.get("/report/graph/:uid", reportGraph);
 app.get("/report/list/:page", reportList);
 app.post("/report/create", reportCreate);
 app.post("/report/update/:rid", reportUpdate);
+
+//Attach & Upload
+app.get("/attach/download/:aid", fileDownload);
 
 app.listen(7010, () => {
     console.log(

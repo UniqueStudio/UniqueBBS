@@ -465,6 +465,8 @@ export type AttachOrderByInput =
   | "downloads_DESC"
   | "fileName_ASC"
   | "fileName_DESC"
+  | "originalName_ASC"
+  | "originalName_DESC"
   | "createDate_ASC"
   | "createDate_DESC"
   | "createdAt_ASC"
@@ -1153,10 +1155,7 @@ export interface AttachWhereInput {
   id_not_starts_with?: ID_Input;
   id_ends_with?: ID_Input;
   id_not_ends_with?: ID_Input;
-  user?: UserWhereInput;
-  post?: PostWhereInput;
   thread?: ThreadWhereInput;
-  forum?: ForumWhereInput;
   filesize?: Int;
   filesize_not?: Int;
   filesize_in?: Int[] | Int;
@@ -1187,6 +1186,20 @@ export interface AttachWhereInput {
   fileName_not_starts_with?: String;
   fileName_ends_with?: String;
   fileName_not_ends_with?: String;
+  originalName?: String;
+  originalName_not?: String;
+  originalName_in?: String[] | String;
+  originalName_not_in?: String[] | String;
+  originalName_lt?: String;
+  originalName_lte?: String;
+  originalName_gt?: String;
+  originalName_gte?: String;
+  originalName_contains?: String;
+  originalName_not_contains?: String;
+  originalName_starts_with?: String;
+  originalName_not_starts_with?: String;
+  originalName_ends_with?: String;
+  originalName_not_ends_with?: String;
   createDate?: DateTimeInput;
   createDate_not?: DateTimeInput;
   createDate_in?: DateTimeInput[] | DateTimeInput;
@@ -1277,13 +1290,30 @@ export type UserWhereUniqueInput = AtLeastOne<{
 }>;
 
 export interface AttachCreateInput {
-  user: UserCreateOneInput;
-  post: PostCreateOneInput;
   thread: ThreadCreateOneWithoutAttachInput;
-  forum: ForumCreateOneInput;
   filesize: Int;
   downloads?: Int;
   fileName: String;
+  originalName: String;
+  createDate: DateTimeInput;
+}
+
+export interface ThreadCreateOneWithoutAttachInput {
+  create?: ThreadCreateWithoutAttachInput;
+  connect?: ThreadWhereUniqueInput;
+}
+
+export interface ThreadCreateWithoutAttachInput {
+  user: UserCreateOneInput;
+  forum: ForumCreateOneInput;
+  subject: String;
+  active?: Boolean;
+  postCount?: Int;
+  post?: PostCreateManyWithoutThreadInput;
+  top?: Int;
+  closed?: Boolean;
+  diamond?: Boolean;
+  lastDate: DateTimeInput;
   createDate: DateTimeInput;
 }
 
@@ -1341,6 +1371,17 @@ export interface ReportCreateWithoutUserInput {
   isWeek?: Boolean;
 }
 
+export interface ForumCreateOneInput {
+  create?: ForumCreateInput;
+  connect?: ForumWhereUniqueInput;
+}
+
+export interface ForumCreateInput {
+  name: String;
+  threads?: Int;
+  lastPost?: PostCreateOneInput;
+}
+
 export interface PostCreateOneInput {
   create?: PostCreateInput;
   connect?: PostWhereUniqueInput;
@@ -1375,48 +1416,16 @@ export interface ThreadCreateWithoutPostInput {
   createDate: DateTimeInput;
 }
 
-export interface ForumCreateOneInput {
-  create?: ForumCreateInput;
-  connect?: ForumWhereUniqueInput;
-}
-
-export interface ForumCreateInput {
-  name: String;
-  threads?: Int;
-  lastPost?: PostCreateOneInput;
-}
-
 export interface AttachCreateManyWithoutThreadInput {
   create?: AttachCreateWithoutThreadInput[] | AttachCreateWithoutThreadInput;
   connect?: AttachWhereUniqueInput[] | AttachWhereUniqueInput;
 }
 
 export interface AttachCreateWithoutThreadInput {
-  user: UserCreateOneInput;
-  post: PostCreateOneInput;
-  forum: ForumCreateOneInput;
   filesize: Int;
   downloads?: Int;
   fileName: String;
-  createDate: DateTimeInput;
-}
-
-export interface ThreadCreateOneWithoutAttachInput {
-  create?: ThreadCreateWithoutAttachInput;
-  connect?: ThreadWhereUniqueInput;
-}
-
-export interface ThreadCreateWithoutAttachInput {
-  user: UserCreateOneInput;
-  forum: ForumCreateOneInput;
-  subject: String;
-  active?: Boolean;
-  postCount?: Int;
-  post?: PostCreateManyWithoutThreadInput;
-  top?: Int;
-  closed?: Boolean;
-  diamond?: Boolean;
-  lastDate: DateTimeInput;
+  originalName: String;
   createDate: DateTimeInput;
 }
 
@@ -1435,13 +1444,32 @@ export interface PostCreateWithoutThreadInput {
 }
 
 export interface AttachUpdateInput {
-  user?: UserUpdateOneRequiredInput;
-  post?: PostUpdateOneRequiredInput;
   thread?: ThreadUpdateOneRequiredWithoutAttachInput;
-  forum?: ForumUpdateOneRequiredInput;
   filesize?: Int;
   downloads?: Int;
   fileName?: String;
+  originalName?: String;
+  createDate?: DateTimeInput;
+}
+
+export interface ThreadUpdateOneRequiredWithoutAttachInput {
+  create?: ThreadCreateWithoutAttachInput;
+  update?: ThreadUpdateWithoutAttachDataInput;
+  upsert?: ThreadUpsertWithoutAttachInput;
+  connect?: ThreadWhereUniqueInput;
+}
+
+export interface ThreadUpdateWithoutAttachDataInput {
+  user?: UserUpdateOneRequiredInput;
+  forum?: ForumUpdateOneRequiredInput;
+  subject?: String;
+  active?: Boolean;
+  postCount?: Int;
+  post?: PostUpdateManyWithoutThreadInput;
+  top?: Int;
+  closed?: Boolean;
+  diamond?: Boolean;
+  lastDate?: DateTimeInput;
   createDate?: DateTimeInput;
 }
 
@@ -1728,10 +1756,25 @@ export interface ReportUpdateManyDataInput {
   isWeek?: Boolean;
 }
 
-export interface PostUpdateOneRequiredInput {
+export interface ForumUpdateOneRequiredInput {
+  create?: ForumCreateInput;
+  update?: ForumUpdateDataInput;
+  upsert?: ForumUpsertNestedInput;
+  connect?: ForumWhereUniqueInput;
+}
+
+export interface ForumUpdateDataInput {
+  name?: String;
+  threads?: Int;
+  lastPost?: PostUpdateOneInput;
+}
+
+export interface PostUpdateOneInput {
   create?: PostCreateInput;
   update?: PostUpdateDataInput;
   upsert?: PostUpsertNestedInput;
+  delete?: Boolean;
+  disconnect?: Boolean;
   connect?: PostWhereUniqueInput;
 }
 
@@ -1766,38 +1809,6 @@ export interface ThreadUpdateWithoutPostDataInput {
   createDate?: DateTimeInput;
 }
 
-export interface ForumUpdateOneRequiredInput {
-  create?: ForumCreateInput;
-  update?: ForumUpdateDataInput;
-  upsert?: ForumUpsertNestedInput;
-  connect?: ForumWhereUniqueInput;
-}
-
-export interface ForumUpdateDataInput {
-  name?: String;
-  threads?: Int;
-  lastPost?: PostUpdateOneInput;
-}
-
-export interface PostUpdateOneInput {
-  create?: PostCreateInput;
-  update?: PostUpdateDataInput;
-  upsert?: PostUpsertNestedInput;
-  delete?: Boolean;
-  disconnect?: Boolean;
-  connect?: PostWhereUniqueInput;
-}
-
-export interface PostUpsertNestedInput {
-  update: PostUpdateDataInput;
-  create: PostCreateInput;
-}
-
-export interface ForumUpsertNestedInput {
-  update: ForumUpdateDataInput;
-  create: ForumCreateInput;
-}
-
 export interface AttachUpdateManyWithoutThreadInput {
   create?: AttachCreateWithoutThreadInput[] | AttachCreateWithoutThreadInput;
   delete?: AttachWhereUniqueInput[] | AttachWhereUniqueInput;
@@ -1821,12 +1832,10 @@ export interface AttachUpdateWithWhereUniqueWithoutThreadInput {
 }
 
 export interface AttachUpdateWithoutThreadDataInput {
-  user?: UserUpdateOneRequiredInput;
-  post?: PostUpdateOneRequiredInput;
-  forum?: ForumUpdateOneRequiredInput;
   filesize?: Int;
   downloads?: Int;
   fileName?: String;
+  originalName?: String;
   createDate?: DateTimeInput;
 }
 
@@ -1881,6 +1890,20 @@ export interface AttachScalarWhereInput {
   fileName_not_starts_with?: String;
   fileName_ends_with?: String;
   fileName_not_ends_with?: String;
+  originalName?: String;
+  originalName_not?: String;
+  originalName_in?: String[] | String;
+  originalName_not_in?: String[] | String;
+  originalName_lt?: String;
+  originalName_lte?: String;
+  originalName_gt?: String;
+  originalName_gte?: String;
+  originalName_contains?: String;
+  originalName_not_contains?: String;
+  originalName_starts_with?: String;
+  originalName_not_starts_with?: String;
+  originalName_ends_with?: String;
+  originalName_not_ends_with?: String;
   createDate?: DateTimeInput;
   createDate_not?: DateTimeInput;
   createDate_in?: DateTimeInput[] | DateTimeInput;
@@ -1903,6 +1926,7 @@ export interface AttachUpdateManyDataInput {
   filesize?: Int;
   downloads?: Int;
   fileName?: String;
+  originalName?: String;
   createDate?: DateTimeInput;
 }
 
@@ -1911,25 +1935,14 @@ export interface ThreadUpsertWithoutPostInput {
   create: ThreadCreateWithoutPostInput;
 }
 
-export interface ThreadUpdateOneRequiredWithoutAttachInput {
-  create?: ThreadCreateWithoutAttachInput;
-  update?: ThreadUpdateWithoutAttachDataInput;
-  upsert?: ThreadUpsertWithoutAttachInput;
-  connect?: ThreadWhereUniqueInput;
+export interface PostUpsertNestedInput {
+  update: PostUpdateDataInput;
+  create: PostCreateInput;
 }
 
-export interface ThreadUpdateWithoutAttachDataInput {
-  user?: UserUpdateOneRequiredInput;
-  forum?: ForumUpdateOneRequiredInput;
-  subject?: String;
-  active?: Boolean;
-  postCount?: Int;
-  post?: PostUpdateManyWithoutThreadInput;
-  top?: Int;
-  closed?: Boolean;
-  diamond?: Boolean;
-  lastDate?: DateTimeInput;
-  createDate?: DateTimeInput;
+export interface ForumUpsertNestedInput {
+  update: ForumUpdateDataInput;
+  create: ForumCreateInput;
 }
 
 export interface PostUpdateManyWithoutThreadInput {
@@ -2045,6 +2058,7 @@ export interface AttachUpdateManyMutationInput {
   filesize?: Int;
   downloads?: Int;
   fileName?: String;
+  originalName?: String;
   createDate?: DateTimeInput;
 }
 
@@ -2459,18 +2473,17 @@ export interface Attach {
   filesize: Int;
   downloads: Int;
   fileName: String;
+  originalName: String;
   createDate: DateTimeOutput;
 }
 
 export interface AttachPromise extends Promise<Attach>, Fragmentable {
   id: () => Promise<ID_Output>;
-  user: <T = UserPromise>() => T;
-  post: <T = PostPromise>() => T;
   thread: <T = ThreadPromise>() => T;
-  forum: <T = ForumPromise>() => T;
   filesize: () => Promise<Int>;
   downloads: () => Promise<Int>;
   fileName: () => Promise<String>;
+  originalName: () => Promise<String>;
   createDate: () => Promise<DateTimeOutput>;
 }
 
@@ -2478,13 +2491,97 @@ export interface AttachSubscription
   extends Promise<AsyncIterator<Attach>>,
     Fragmentable {
   id: () => Promise<AsyncIterator<ID_Output>>;
-  user: <T = UserSubscription>() => T;
-  post: <T = PostSubscription>() => T;
   thread: <T = ThreadSubscription>() => T;
-  forum: <T = ForumSubscription>() => T;
   filesize: () => Promise<AsyncIterator<Int>>;
   downloads: () => Promise<AsyncIterator<Int>>;
   fileName: () => Promise<AsyncIterator<String>>;
+  originalName: () => Promise<AsyncIterator<String>>;
+  createDate: () => Promise<AsyncIterator<DateTimeOutput>>;
+}
+
+export interface Thread {
+  id: ID_Output;
+  subject: String;
+  active: Boolean;
+  postCount: Int;
+  top: Int;
+  closed: Boolean;
+  diamond: Boolean;
+  lastDate: DateTimeOutput;
+  createDate: DateTimeOutput;
+}
+
+export interface ThreadPromise extends Promise<Thread>, Fragmentable {
+  id: () => Promise<ID_Output>;
+  user: <T = UserPromise>() => T;
+  forum: <T = ForumPromise>() => T;
+  subject: () => Promise<String>;
+  active: () => Promise<Boolean>;
+  postCount: () => Promise<Int>;
+  post: <T = FragmentableArray<Post>>(
+    args?: {
+      where?: PostWhereInput;
+      orderBy?: PostOrderByInput;
+      skip?: Int;
+      after?: String;
+      before?: String;
+      first?: Int;
+      last?: Int;
+    }
+  ) => T;
+  top: () => Promise<Int>;
+  closed: () => Promise<Boolean>;
+  diamond: () => Promise<Boolean>;
+  attach: <T = FragmentableArray<Attach>>(
+    args?: {
+      where?: AttachWhereInput;
+      orderBy?: AttachOrderByInput;
+      skip?: Int;
+      after?: String;
+      before?: String;
+      first?: Int;
+      last?: Int;
+    }
+  ) => T;
+  lastDate: () => Promise<DateTimeOutput>;
+  createDate: () => Promise<DateTimeOutput>;
+}
+
+export interface ThreadSubscription
+  extends Promise<AsyncIterator<Thread>>,
+    Fragmentable {
+  id: () => Promise<AsyncIterator<ID_Output>>;
+  user: <T = UserSubscription>() => T;
+  forum: <T = ForumSubscription>() => T;
+  subject: () => Promise<AsyncIterator<String>>;
+  active: () => Promise<AsyncIterator<Boolean>>;
+  postCount: () => Promise<AsyncIterator<Int>>;
+  post: <T = Promise<AsyncIterator<PostSubscription>>>(
+    args?: {
+      where?: PostWhereInput;
+      orderBy?: PostOrderByInput;
+      skip?: Int;
+      after?: String;
+      before?: String;
+      first?: Int;
+      last?: Int;
+    }
+  ) => T;
+  top: () => Promise<AsyncIterator<Int>>;
+  closed: () => Promise<AsyncIterator<Boolean>>;
+  diamond: () => Promise<AsyncIterator<Boolean>>;
+  attach: <T = Promise<AsyncIterator<AttachSubscription>>>(
+    args?: {
+      where?: AttachWhereInput;
+      orderBy?: AttachOrderByInput;
+      skip?: Int;
+      after?: String;
+      before?: String;
+      first?: Int;
+      last?: Int;
+    }
+  ) => T;
+  lastDate: () => Promise<AsyncIterator<DateTimeOutput>>;
   createDate: () => Promise<AsyncIterator<DateTimeOutput>>;
 }
 
@@ -2661,6 +2758,28 @@ export interface ReportSubscription
   user: <T = UserSubscription>() => T;
 }
 
+export interface Forum {
+  id: ID_Output;
+  name: String;
+  threads: Int;
+}
+
+export interface ForumPromise extends Promise<Forum>, Fragmentable {
+  id: () => Promise<ID_Output>;
+  name: () => Promise<String>;
+  threads: () => Promise<Int>;
+  lastPost: <T = PostPromise>() => T;
+}
+
+export interface ForumSubscription
+  extends Promise<AsyncIterator<Forum>>,
+    Fragmentable {
+  id: () => Promise<AsyncIterator<ID_Output>>;
+  name: () => Promise<AsyncIterator<String>>;
+  threads: () => Promise<AsyncIterator<Int>>;
+  lastPost: <T = PostSubscription>() => T;
+}
+
 export interface Post {
   id: ID_Output;
   isFirst: Boolean;
@@ -2692,114 +2811,6 @@ export interface PostSubscription
   message: () => Promise<AsyncIterator<String>>;
   createDate: () => Promise<AsyncIterator<DateTimeOutput>>;
   active: () => Promise<AsyncIterator<Boolean>>;
-}
-
-export interface Thread {
-  id: ID_Output;
-  subject: String;
-  active: Boolean;
-  postCount: Int;
-  top: Int;
-  closed: Boolean;
-  diamond: Boolean;
-  lastDate: DateTimeOutput;
-  createDate: DateTimeOutput;
-}
-
-export interface ThreadPromise extends Promise<Thread>, Fragmentable {
-  id: () => Promise<ID_Output>;
-  user: <T = UserPromise>() => T;
-  forum: <T = ForumPromise>() => T;
-  subject: () => Promise<String>;
-  active: () => Promise<Boolean>;
-  postCount: () => Promise<Int>;
-  post: <T = FragmentableArray<Post>>(
-    args?: {
-      where?: PostWhereInput;
-      orderBy?: PostOrderByInput;
-      skip?: Int;
-      after?: String;
-      before?: String;
-      first?: Int;
-      last?: Int;
-    }
-  ) => T;
-  top: () => Promise<Int>;
-  closed: () => Promise<Boolean>;
-  diamond: () => Promise<Boolean>;
-  attach: <T = FragmentableArray<Attach>>(
-    args?: {
-      where?: AttachWhereInput;
-      orderBy?: AttachOrderByInput;
-      skip?: Int;
-      after?: String;
-      before?: String;
-      first?: Int;
-      last?: Int;
-    }
-  ) => T;
-  lastDate: () => Promise<DateTimeOutput>;
-  createDate: () => Promise<DateTimeOutput>;
-}
-
-export interface ThreadSubscription
-  extends Promise<AsyncIterator<Thread>>,
-    Fragmentable {
-  id: () => Promise<AsyncIterator<ID_Output>>;
-  user: <T = UserSubscription>() => T;
-  forum: <T = ForumSubscription>() => T;
-  subject: () => Promise<AsyncIterator<String>>;
-  active: () => Promise<AsyncIterator<Boolean>>;
-  postCount: () => Promise<AsyncIterator<Int>>;
-  post: <T = Promise<AsyncIterator<PostSubscription>>>(
-    args?: {
-      where?: PostWhereInput;
-      orderBy?: PostOrderByInput;
-      skip?: Int;
-      after?: String;
-      before?: String;
-      first?: Int;
-      last?: Int;
-    }
-  ) => T;
-  top: () => Promise<AsyncIterator<Int>>;
-  closed: () => Promise<AsyncIterator<Boolean>>;
-  diamond: () => Promise<AsyncIterator<Boolean>>;
-  attach: <T = Promise<AsyncIterator<AttachSubscription>>>(
-    args?: {
-      where?: AttachWhereInput;
-      orderBy?: AttachOrderByInput;
-      skip?: Int;
-      after?: String;
-      before?: String;
-      first?: Int;
-      last?: Int;
-    }
-  ) => T;
-  lastDate: () => Promise<AsyncIterator<DateTimeOutput>>;
-  createDate: () => Promise<AsyncIterator<DateTimeOutput>>;
-}
-
-export interface Forum {
-  id: ID_Output;
-  name: String;
-  threads: Int;
-}
-
-export interface ForumPromise extends Promise<Forum>, Fragmentable {
-  id: () => Promise<ID_Output>;
-  name: () => Promise<String>;
-  threads: () => Promise<Int>;
-  lastPost: <T = PostPromise>() => T;
-}
-
-export interface ForumSubscription
-  extends Promise<AsyncIterator<Forum>>,
-    Fragmentable {
-  id: () => Promise<AsyncIterator<ID_Output>>;
-  name: () => Promise<AsyncIterator<String>>;
-  threads: () => Promise<AsyncIterator<Int>>;
-  lastPost: <T = PostSubscription>() => T;
 }
 
 export interface AttachConnection {
@@ -3330,6 +3341,7 @@ export interface AttachPreviousValues {
   filesize: Int;
   downloads: Int;
   fileName: String;
+  originalName: String;
   createDate: DateTimeOutput;
 }
 
@@ -3340,6 +3352,7 @@ export interface AttachPreviousValuesPromise
   filesize: () => Promise<Int>;
   downloads: () => Promise<Int>;
   fileName: () => Promise<String>;
+  originalName: () => Promise<String>;
   createDate: () => Promise<DateTimeOutput>;
 }
 
@@ -3350,6 +3363,7 @@ export interface AttachPreviousValuesSubscription
   filesize: () => Promise<AsyncIterator<Int>>;
   downloads: () => Promise<AsyncIterator<Int>>;
   fileName: () => Promise<AsyncIterator<String>>;
+  originalName: () => Promise<AsyncIterator<String>>;
   createDate: () => Promise<AsyncIterator<DateTimeOutput>>;
 }
 

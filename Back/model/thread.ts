@@ -15,6 +15,7 @@ import {
     MESSAGE_DIAMOND
 } from "./message";
 import { redLock } from "../server";
+import { fileProcess, fileDelete } from "./attach";
 
 export const threadList = async function(req: Request, res: Response) {
     try {
@@ -164,13 +165,22 @@ export const threadInfo = async function(req: Request, res: Response) {
             }))
         );
 
+        const attachArr = await prisma.attaches({
+            where: {
+                thread: {
+                    id: tid
+                }
+            }
+        });
+
         res.json({
             code: 1,
             msg: {
                 threadInfo,
                 threadAuthor,
                 firstPost,
-                postArr
+                postArr,
+                attachArr
             }
         });
     } catch (e) {
@@ -179,6 +189,8 @@ export const threadInfo = async function(req: Request, res: Response) {
 };
 
 export const threadCreate = async function(req: Request, res: Response) {
+    const fileList = req.files as Array<Express.Multer.File>;
+
     try {
         const { fid, subject, message } = req.body;
         const { uid } = verifyJWT(req.header("Authorization"));
@@ -191,8 +203,12 @@ export const threadCreate = async function(req: Request, res: Response) {
             });
         }
 
-        const resultThread = await prisma
-            .createThread({
+        const lockCreatThread = await redLock.lock(
+            `createThreadUser:${uid}`,
+            1000
+        );
+        try {
+            const resultThread = await prisma.createThread({
                 subject: subject,
                 forum: {
                     connect: {
@@ -218,17 +234,38 @@ export const threadCreate = async function(req: Request, res: Response) {
                         createDate: new Date()
                     }
                 }
-            })
-            .post({
-                first: 1
             });
 
-        const [{ id: newPostPid }] = resultThread;
-        await forumThreadsAdd(fid, 1, newPostPid);
-        await userThreadsAdd(uid, 1);
+            const [newPost] = await prisma.posts({
+                where: {
+                    isFirst: true,
+                    thread: {
+                        id: resultThread.id
+                    }
+                },
+                first: 1,
+                orderBy: "createDate_ASC"
+            });
+            const newPostPid = newPost.id;
 
-        res.json({ code: 1 });
+            if (fileList.length !== 0) {
+                fileProcess(fileList, newPostPid, resultThread.id);
+            }
+
+            await forumThreadsAdd(fid, 1, newPostPid);
+            await userThreadsAdd(uid, 1);
+            res.json({ code: 1 });
+        } catch (e) {
+            res.json({ code: -1, msg: e.message });
+        } finally {
+            lockCreatThread.unlock();
+        }
     } catch (e) {
+        if (fileList instanceof Array) {
+            for (let _file of fileList) {
+                fileDelete(_file.destination + _file.filename);
+            }
+        }
         res.json({ code: -1, msg: e.message });
     }
 };

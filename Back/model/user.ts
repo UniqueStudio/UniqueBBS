@@ -1,6 +1,12 @@
 import { prisma, User } from "../generated/prisma-client";
 import fetch from "node-fetch";
-import { scanningURL, userIDURL, userInfoURL, getQRCodeURL } from "./consts";
+import {
+    scanningURL,
+    userIDURL,
+    userInfoURL,
+    getQRCodeURL,
+    pagesize
+} from "./consts";
 import { Request, Response } from "express";
 import {
     addSaltPasswordOnce,
@@ -19,6 +25,54 @@ export const userInfo = async function(req: Request, res: Response) {
             id: uid
         });
         res.json({ code: 1, msg: filterUserInfo(result) });
+    } catch (e) {
+        res.json({ code: -1, msg: e.message });
+    }
+};
+
+export const userThreads = async function(req: Request, res: Response) {
+    try {
+        const { uid: myUid, isAdmin } = verifyJWT(req.header("Authorization"));
+        let { uid, page } = req.params;
+        page = Number.parseInt(page);
+
+        const result = await prisma.threads({
+            where: {
+                user: {
+                    id: uid,
+                    active: myUid === uid || isAdmin ? undefined : true
+                }
+            },
+            orderBy: "lastDate_DESC",
+            skip: (page - 1) * pagesize,
+            first: pagesize
+        });
+
+        res.json({ code: 1, msg: result });
+    } catch (e) {
+        res.json({ code: -1, msg: e.message });
+    }
+};
+
+export const userPosts = async function(req: Request, res: Response) {
+    try {
+        const { uid: myUid, isAdmin } = verifyJWT(req.header("Authorization"));
+        let { uid, page } = req.params;
+        page = Number.parseInt(page);
+
+        const result = await prisma.posts({
+            where: {
+                user: {
+                    id: uid,
+                    active: myUid === uid || isAdmin ? undefined : true
+                }
+            },
+            orderBy: "createDate_DESC",
+            skip: (page - 1) * pagesize,
+            first: pagesize
+        });
+
+        res.json({ code: 1, msg: result });
     } catch (e) {
         res.json({ code: -1, msg: e.message });
     }

@@ -32,13 +32,11 @@ type AggregateUser {
 
 type Attach {
   id: ID!
-  user: User!
-  post: Post!
   thread: Thread!
-  forum: Forum!
   filesize: Int!
   downloads: Int!
   fileName: String!
+  originalName: String!
   createDate: DateTime!
 }
 
@@ -49,13 +47,11 @@ type AttachConnection {
 }
 
 input AttachCreateInput {
-  user: UserCreateOneInput!
-  post: PostCreateOneInput!
   thread: ThreadCreateOneWithoutAttachInput!
-  forum: ForumCreateOneInput!
   filesize: Int!
   downloads: Int
   fileName: String!
+  originalName: String!
   createDate: DateTime!
 }
 
@@ -65,12 +61,10 @@ input AttachCreateManyWithoutThreadInput {
 }
 
 input AttachCreateWithoutThreadInput {
-  user: UserCreateOneInput!
-  post: PostCreateOneInput!
-  forum: ForumCreateOneInput!
   filesize: Int!
   downloads: Int
   fileName: String!
+  originalName: String!
   createDate: DateTime!
 }
 
@@ -88,6 +82,8 @@ enum AttachOrderByInput {
   downloads_DESC
   fileName_ASC
   fileName_DESC
+  originalName_ASC
+  originalName_DESC
   createDate_ASC
   createDate_DESC
   createdAt_ASC
@@ -101,6 +97,7 @@ type AttachPreviousValues {
   filesize: Int!
   downloads: Int!
   fileName: String!
+  originalName: String!
   createDate: DateTime!
 }
 
@@ -149,6 +146,20 @@ input AttachScalarWhereInput {
   fileName_not_starts_with: String
   fileName_ends_with: String
   fileName_not_ends_with: String
+  originalName: String
+  originalName_not: String
+  originalName_in: [String!]
+  originalName_not_in: [String!]
+  originalName_lt: String
+  originalName_lte: String
+  originalName_gt: String
+  originalName_gte: String
+  originalName_contains: String
+  originalName_not_contains: String
+  originalName_starts_with: String
+  originalName_not_starts_with: String
+  originalName_ends_with: String
+  originalName_not_ends_with: String
   createDate: DateTime
   createDate_not: DateTime
   createDate_in: [DateTime!]
@@ -181,13 +192,11 @@ input AttachSubscriptionWhereInput {
 }
 
 input AttachUpdateInput {
-  user: UserUpdateOneRequiredInput
-  post: PostUpdateOneRequiredInput
   thread: ThreadUpdateOneRequiredWithoutAttachInput
-  forum: ForumUpdateOneRequiredInput
   filesize: Int
   downloads: Int
   fileName: String
+  originalName: String
   createDate: DateTime
 }
 
@@ -195,6 +204,7 @@ input AttachUpdateManyDataInput {
   filesize: Int
   downloads: Int
   fileName: String
+  originalName: String
   createDate: DateTime
 }
 
@@ -202,6 +212,7 @@ input AttachUpdateManyMutationInput {
   filesize: Int
   downloads: Int
   fileName: String
+  originalName: String
   createDate: DateTime
 }
 
@@ -222,12 +233,10 @@ input AttachUpdateManyWithWhereNestedInput {
 }
 
 input AttachUpdateWithoutThreadDataInput {
-  user: UserUpdateOneRequiredInput
-  post: PostUpdateOneRequiredInput
-  forum: ForumUpdateOneRequiredInput
   filesize: Int
   downloads: Int
   fileName: String
+  originalName: String
   createDate: DateTime
 }
 
@@ -257,10 +266,7 @@ input AttachWhereInput {
   id_not_starts_with: ID
   id_ends_with: ID
   id_not_ends_with: ID
-  user: UserWhereInput
-  post: PostWhereInput
   thread: ThreadWhereInput
-  forum: ForumWhereInput
   filesize: Int
   filesize_not: Int
   filesize_in: [Int!]
@@ -291,6 +297,20 @@ input AttachWhereInput {
   fileName_not_starts_with: String
   fileName_ends_with: String
   fileName_not_ends_with: String
+  originalName: String
+  originalName_not: String
+  originalName_in: [String!]
+  originalName_not_in: [String!]
+  originalName_lt: String
+  originalName_lte: String
+  originalName_gt: String
+  originalName_gte: String
+  originalName_contains: String
+  originalName_not_contains: String
+  originalName_starts_with: String
+  originalName_not_starts_with: String
+  originalName_ends_with: String
+  originalName_not_ends_with: String
   createDate: DateTime
   createDate_not: DateTime
   createDate_in: [DateTime!]
@@ -1076,13 +1096,6 @@ input PostUpdateOneInput {
   upsert: PostUpsertNestedInput
   delete: Boolean
   disconnect: Boolean
-  connect: PostWhereUniqueInput
-}
-
-input PostUpdateOneRequiredInput {
-  create: PostCreateInput
-  update: PostUpdateDataInput
-  upsert: PostUpsertNestedInput
   connect: PostWhereUniqueInput
 }
 

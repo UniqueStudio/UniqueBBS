@@ -66,19 +66,17 @@ type Thread {
     top: Int! @default(value: 0)
     closed: Boolean! @default(value: false)
     diamond: Boolean! @default(value: false)
-    attach: [Attach!]! @relation(name: "AttachList")
+    attach: [Attach!]!
     lastDate: DateTime!
     createDate: DateTime!
 }
 type Attach {
     id: ID! @unique
-    user: User!
-    post: Post!
-    thread: Thread! @relation(name: "AttachInThread")
-    forum: Forum!
+    thread: Thread!
     filesize: Int!
     downloads: Int! @default(value: 0)
     fileName: String!
+    originalName: String!
     createDate: DateTime!
 }
 type Message {
