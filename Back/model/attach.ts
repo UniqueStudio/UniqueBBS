@@ -16,6 +16,7 @@ export const fileDownload = async function(req: Request, res: Response) {
             const downloadItemPrevious = await prisma.attach({
                 id: aid
             });
+
             const downloadItemTemp = await prisma.updateAttach({
                 where: {
                     id: aid
@@ -24,11 +25,21 @@ export const fileDownload = async function(req: Request, res: Response) {
                     downloads: downloadItemPrevious.downloads + 1
                 }
             });
+
             downloadItem = downloadItemTemp;
         } catch (e) {
             res.json({ code: -1, msg: e.message });
         } finally {
             downloadLock.unlock();
+        }
+        const threadInfo = await prisma
+            .attach({
+                id: aid
+            })
+            .thread();
+
+        if (!isAdmin && !threadInfo.active) {
+            return res.json({ code: -1, msg: "该附件不存在！" });
         }
         res.download(downloadItem.fileName, downloadItem.originalName);
     } catch (e) {
@@ -114,4 +125,52 @@ export const fileDelete = function(filename: string) {
 
 export const fileMove = function(fromPath: string, toPath: string) {
     return fs.renameSync(fromPath, toPath);
+};
+
+export const fileRemove = async function(req: Request, res: Response) {
+    try {
+        const { uid, isAdmin } = verifyJWT(req.header("Authorization"));
+        const { aid } = req.params;
+
+        const attachLock = await redLock.lock(`updateThread${uid}`, 800);
+
+        try {
+            const attachAuthorInfo = await prisma
+                .attach({
+                    id: aid
+                })
+                .thread()
+                .user();
+
+            if (!isAdmin && uid !== attachAuthorInfo.id) {
+                return res.json({ code: -1, msg: "您无权删除此附件！" });
+            }
+
+            const attachThreadInfo = await prisma
+                .attach({
+                    id: aid
+                })
+                .thread();
+
+            const deleteResult = await prisma.updateThread({
+                where: {
+                    id: attachThreadInfo.id
+                },
+                data: {
+                    attach: {
+                        delete: {
+                            id: aid
+                        }
+                    }
+                }
+            });
+            res.json({ code: 1 });
+        } catch (e) {
+            res.json({ code: -1, msg: e.message });
+        } finally {
+            attachLock.unlock();
+        }
+    } catch (e) {
+        res.json({ code: -1, msg: e.message });
+    }
 };

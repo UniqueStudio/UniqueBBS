@@ -327,11 +327,11 @@ export const userScan = async function(req: Request, res: Response) {
                     res.json({ code: 1, msg: { uid: _user.id, token } });
                 }
             } else {
-                res.json({ code: -1, msg: "登录失败" });
+                res.json({ code: -1, msg: "登录失败！" });
                 return;
             }
         } else {
-            res.json({ code: -1, msg: "登录超时，请重新登录" });
+            res.json({ code: -1, msg: "登录超时，请重新登录！" });
             return;
         }
     } catch (err) {

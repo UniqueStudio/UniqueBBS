@@ -203,10 +203,7 @@ export const threadCreate = async function(req: Request, res: Response) {
             });
         }
 
-        const lockCreatThread = await redLock.lock(
-            `createThreadUser:${uid}`,
-            1000
-        );
+        const lockCreatThread = await redLock.lock(`updateThread:${uid}`, 1000);
         try {
             const resultThread = await prisma.createThread({
                 subject: subject,
@@ -261,10 +258,8 @@ export const threadCreate = async function(req: Request, res: Response) {
             lockCreatThread.unlock();
         }
     } catch (e) {
-        if (fileList instanceof Array) {
-            for (let _file of fileList) {
-                fileDelete(_file.destination + _file.filename);
-            }
+        for (let _file of fileList) {
+            fileDelete(_file.destination + _file.filename);
         }
         res.json({ code: -1, msg: e.message });
     }
@@ -284,7 +279,7 @@ export const threadReply = async function(req: Request, res: Response) {
             });
         }
 
-        const lock = await redLock.lock(`thread:${tid}`, 200);
+        const lock = await redLock.lock(`updateThread:${tid}`, 200);
 
         try {
             const threadInfo = await prisma.thread({
@@ -587,6 +582,7 @@ export const threadRecovery = async function(req: Request, res: Response) {
 };
 
 export const threadUpdate = async function(req: Request, res: Response) {
+    const fileList = req.files as Array<Express.Multer.File>;
     try {
         const { uid, isAdmin } = verifyJWT(req.header("Authorization"));
         const { tid } = req.params;
@@ -608,7 +604,7 @@ export const threadUpdate = async function(req: Request, res: Response) {
 
         const updateLock = await redLock.lock(`updateThread:${tid}`, 1000);
         try {
-            await prisma.updateThread({
+            const threadInfo = await prisma.updateThread({
                 where: {
                     id: tid
                 },
@@ -617,7 +613,7 @@ export const threadUpdate = async function(req: Request, res: Response) {
                 }
             });
 
-            await prisma.updateManyPosts({
+            const postInfo = await prisma.updateManyPosts({
                 where: {
                     thread: {
                         id: tid
@@ -628,6 +624,22 @@ export const threadUpdate = async function(req: Request, res: Response) {
                     message: message
                 }
             });
+
+            if (fileList.length !== 0) {
+                const postInfo = await prisma
+                    .thread({
+                        id: threadInfo.id
+                    })
+                    .post({
+                        where: {
+                            isFirst: true
+                        },
+                        orderBy: "createDate_ASC",
+                        first: 1
+                    });
+                fileProcess(fileList, postInfo[0].id, threadInfo.id);
+            }
+
             res.json({ code: 1 });
         } catch (e) {
             res.json({ code: -1, msg: e.message });
@@ -635,6 +647,9 @@ export const threadUpdate = async function(req: Request, res: Response) {
             updateLock.unlock();
         }
     } catch (e) {
+        for (let _file of fileList) {
+            fileDelete(_file.destination + _file.filename);
+        }
         res.json({ code: -1, msg: e.message });
     }
 };
