@@ -1,13 +1,7 @@
 import { prisma, Forum, Thread } from "../generated/prisma-client";
 import { Request, Response } from "express";
-import {
-    redLock,
-    redisClientExpireAsync,
-    redisClientGetAsync,
-    redisClientSetAsync,
-    redisClientIncrAsync
-} from "../server";
-import { pagesize, redisPostKey, RedisLockInterval } from "./consts";
+import { setLockExpire } from "./lock";
+import { pagesize } from "./consts";
 import { verifyJWT, filterUserInfo } from "./check";
 import {
     userThreadsAdd,
@@ -20,6 +14,7 @@ import {
     MESSAGE_QUOTE,
     MESSAGE_DIAMOND
 } from "./message";
+import { redLock } from "../server";
 
 export const threadList = async function(req: Request, res: Response) {
     try {
@@ -188,18 +183,12 @@ export const threadCreate = async function(req: Request, res: Response) {
         const { fid, subject, message } = req.body;
         const { uid } = verifyJWT(req.header("Authorization"));
 
-        const redisKey = redisPostKey(uid);
-        const redisValue = await redisClientGetAsync(redisKey);
-        if (redisValue) {
-            const redisValueNum: number = Number.parseInt(redisValue);
-            if (redisValueNum > 3) {
-                return res.json({ code: -1, msg: "您的请求过于频繁！" });
-            } else {
-                await redisClientIncrAsync(redisKey);
-                await redisClientExpireAsync(redisKey, RedisLockInterval);
-            }
-        } else {
-            await redisClientSetAsync(redisKey, "1", RedisLockInterval);
+        const lockFrequentReply = await setLockExpire(`postUser:${uid}`, "10");
+        if (!lockFrequentReply) {
+            return res.json({
+                code: -1,
+                msg: "每10秒只能发言一次，您的请求过快！"
+            });
         }
 
         const resultThread = await prisma
@@ -221,11 +210,6 @@ export const threadCreate = async function(req: Request, res: Response) {
                     create: {
                         isFirst: true,
                         message: message,
-                        forum: {
-                            connect: {
-                                id: fid
-                            }
-                        },
                         user: {
                             connect: {
                                 id: uid
@@ -255,19 +239,12 @@ export const threadReply = async function(req: Request, res: Response) {
         const authObj = verifyJWT(req.header("Authorization"));
         const uid = authObj.uid;
 
-        const redisKey = redisPostKey(uid);
-        const redisValue = await redisClientGetAsync(redisKey);
-        if (redisValue) {
-            const redisValueNum: number = Number.parseInt(redisValue);
-            if (redisValueNum > 3) {
-                return res.json({ code: -1, msg: "您的请求过于频繁！" });
-            } else {
-                await redisClientIncrAsync(redisKey);
-                await redisClientExpireAsync(redisKey, RedisLockInterval);
-            }
-        } else {
-            await redisClientSetAsync(redisKey, "1");
-            await redisClientExpireAsync(redisKey, RedisLockInterval);
+        const lockFrequentReply = await setLockExpire(`postUser:${uid}`, "10");
+        if (!lockFrequentReply) {
+            return res.json({
+                code: -1,
+                msg: "每10秒只能发言一次，您的请求过快！"
+            });
         }
 
         const lock = await redLock.lock(`thread:${tid}`, 200);
@@ -314,11 +291,6 @@ export const threadReply = async function(req: Request, res: Response) {
                             create: {
                                 isFirst: false,
                                 message: message,
-                                forum: {
-                                    connect: {
-                                        id: forumInfo.id
-                                    }
-                                },
                                 user: {
                                     connect: {
                                         id: uid
@@ -408,52 +380,6 @@ export const threadDelete = async function(req: Request, res: Response) {
                 }
             });
 
-            res.json({ code: 1 });
-        }
-    } catch (e) {
-        res.json({ code: -1, msg: e.message });
-    }
-};
-
-export const postDelete = async function(req: Request, res: Response) {
-    try {
-        const authObj = verifyJWT(req.header("Authorization"));
-        const { pid } = req.params;
-        const uid = authObj.uid;
-        const postAuthInfo = await prisma
-            .post({
-                id: pid
-            })
-            .user();
-
-        if (postAuthInfo.id !== uid && !authObj.isAdmin) {
-            return res.json({ code: -1, msg: "您无权操作此帖子！" });
-        } else {
-            await prisma.updatePost({
-                where: {
-                    id: pid
-                },
-                data: {
-                    active: false
-                }
-            });
-            res.json({ code: 1 });
-        }
-    } catch (e) {
-        res.json({ code: -1, msg: e.message });
-    }
-};
-
-export const postDeleteHard = async function(req: Request, res: Response) {
-    try {
-        const authObj = verifyJWT(req.header("Authorization"));
-        if (!authObj.isAdmin) {
-            return res.json({ code: -1, msg: "您无权操作此帖子！" });
-        } else {
-            const { pid } = req.params;
-            await prisma.deletePost({
-                id: pid
-            });
             res.json({ code: 1 });
         }
     } catch (e) {
@@ -623,52 +549,126 @@ export const threadRecovery = async function(req: Request, res: Response) {
     }
 };
 
-export const postRecovery = async function(req: Request, res: Response) {
+export const threadUpdate = async function(req: Request, res: Response) {
     try {
-        const authObj = verifyJWT(req.header("Authorization"));
-        if (!authObj.isAdmin) {
-            return res.json({ code: -1, msg: "您无权操作此帖子！" });
-        } else {
-            const { pid } = req.params;
-            const postInfo = await prisma.updatePost({
+        const { uid, isAdmin } = verifyJWT(req.header("Authorization"));
+        const { tid } = req.params;
+        const { subject, message } = req.body;
+
+        const threadAuthor = await prisma
+            .thread({
+                id: tid
+            })
+            .user();
+
+        const threadInfo = await prisma.thread({
+            id: tid
+        });
+
+        if (!isAdmin && (threadAuthor.id !== uid || !threadInfo.active)) {
+            return res.json({ code: -1, msg: "您无权编辑此帖子！" });
+        }
+
+        const updateLock = await redLock.lock(`updateThread:${tid}`, 1000);
+        try {
+            await prisma.updateThread({
                 where: {
-                    id: pid
+                    id: tid
                 },
                 data: {
-                    active: true
+                    subject: subject
+                }
+            });
+
+            await prisma.updateManyPosts({
+                where: {
+                    thread: {
+                        id: tid
+                    },
+                    isFirst: true
+                },
+                data: {
+                    message: message
                 }
             });
             res.json({ code: 1 });
+        } catch (e) {
+            res.json({ code: -1, msg: e.message });
+        } finally {
+            updateLock.unlock();
         }
     } catch (e) {
         res.json({ code: -1, msg: e.message });
     }
 };
 
-export const threadGraph = async function(req: Request, res: Response) {
+export const threadMove = async function(req: Request, res: Response) {
     try {
-        const { uid } = verifyJWT(req.header("Authorization"));
+        const { uid, isAdmin } = verifyJWT(req.header("Authorization"));
         const { tid } = req.params;
+        const { toFid } = req.body;
 
-        const fragment = `fragment PostsWithDate on Post{
-            createDate
-        }`;
-        const PostsWithDate = await prisma
-            .posts({
-                where: {
-                    thread: {
-                        id: tid
-                        // active: true
-                    },
-                    user: {
-                        id: uid
-                    }
-                    // active: true
-                },
-                orderBy: "createDate_ASC"
+        const threadAuthor = await prisma
+            .thread({
+                id: tid
             })
-            .$fragment(fragment);
-        res.json({ code: 1, msg: PostsWithDate });
+            .user();
+
+        const threadInfo = await prisma.thread({
+            id: tid
+        });
+
+        if (!isAdmin && (threadAuthor.id !== uid || !threadInfo.active)) {
+            return res.json({ code: -1, msg: "您无权移动该帖子！" });
+        }
+
+        const moveLock = await redLock.lock(`moveThread`, 500);
+        try {
+            const previousForum = await prisma
+                .thread({
+                    id: tid
+                })
+                .forum();
+            const newForum = await prisma.forum({
+                id: toFid
+            });
+
+            await prisma.updateForum({
+                where: {
+                    id: previousForum.id
+                },
+                data: {
+                    threads: previousForum.threads - 1
+                }
+            });
+
+            await prisma.updateForum({
+                where: {
+                    id: toFid
+                },
+                data: {
+                    threads: newForum.threads + 1
+                }
+            });
+
+            await prisma.updateThread({
+                where: {
+                    id: tid
+                },
+                data: {
+                    forum: {
+                        connect: {
+                            id: toFid
+                        }
+                    }
+                }
+            });
+            res.json({ code: 1 });
+        } catch (e) {
+            res.json({ code: -1, msg: e.message });
+        } finally {
+            moveLock.unlock();
+        }
     } catch (e) {
         res.json({ code: -1, msg: e.message });
     }

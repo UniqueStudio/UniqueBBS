@@ -19,7 +19,6 @@ export const userThreadsAdd = async function(uid, addNum: number = 1) {
     } finally {
         lock.unlock();
     }
-
     return true;
 };
 

@@ -65,10 +65,3 @@ export const filterUsersInfo = function(users: Array<User>) {
     }
     return users;
 };
-
-export const get0Date = function(date: Date): Date {
-    date.setHours(0);
-    date.setMinutes(0);
-    date.setSeconds(0);
-    return date;
-};

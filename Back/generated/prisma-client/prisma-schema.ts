@@ -330,22 +330,12 @@ type ForumConnection {
 input ForumCreateInput {
   name: String!
   threads: Int
-  lastPost: PostCreateOneWithoutForumInput
+  lastPost: PostCreateOneInput
 }
 
 input ForumCreateOneInput {
   create: ForumCreateInput
   connect: ForumWhereUniqueInput
-}
-
-input ForumCreateOneWithoutLastPostInput {
-  create: ForumCreateWithoutLastPostInput
-  connect: ForumWhereUniqueInput
-}
-
-input ForumCreateWithoutLastPostInput {
-  name: String!
-  threads: Int
 }
 
 type ForumEdge {
@@ -393,13 +383,13 @@ input ForumSubscriptionWhereInput {
 input ForumUpdateDataInput {
   name: String
   threads: Int
-  lastPost: PostUpdateOneWithoutForumInput
+  lastPost: PostUpdateOneInput
 }
 
 input ForumUpdateInput {
   name: String
   threads: Int
-  lastPost: PostUpdateOneWithoutForumInput
+  lastPost: PostUpdateOneInput
 }
 
 input ForumUpdateManyMutationInput {
@@ -414,26 +404,9 @@ input ForumUpdateOneRequiredInput {
   connect: ForumWhereUniqueInput
 }
 
-input ForumUpdateOneRequiredWithoutLastPostInput {
-  create: ForumCreateWithoutLastPostInput
-  update: ForumUpdateWithoutLastPostDataInput
-  upsert: ForumUpsertWithoutLastPostInput
-  connect: ForumWhereUniqueInput
-}
-
-input ForumUpdateWithoutLastPostDataInput {
-  name: String
-  threads: Int
-}
-
 input ForumUpsertNestedInput {
   update: ForumUpdateDataInput!
   create: ForumCreateInput!
-}
-
-input ForumUpsertWithoutLastPostInput {
-  update: ForumUpdateWithoutLastPostDataInput!
-  create: ForumCreateWithoutLastPostInput!
 }
 
 input ForumWhereInput {
@@ -896,7 +869,6 @@ type PageInfo {
 
 type Post {
   id: ID!
-  forum: Forum!
   user: User!
   thread: Thread!
   isFirst: Boolean!
@@ -913,7 +885,6 @@ type PostConnection {
 }
 
 input PostCreateInput {
-  forum: ForumCreateOneWithoutLastPostInput!
   user: UserCreateOneInput!
   thread: ThreadCreateOneWithoutPostInput!
   isFirst: Boolean
@@ -933,23 +904,7 @@ input PostCreateOneInput {
   connect: PostWhereUniqueInput
 }
 
-input PostCreateOneWithoutForumInput {
-  create: PostCreateWithoutForumInput
-  connect: PostWhereUniqueInput
-}
-
-input PostCreateWithoutForumInput {
-  user: UserCreateOneInput!
-  thread: ThreadCreateOneWithoutPostInput!
-  isFirst: Boolean
-  quote: Int
-  message: String!
-  createDate: DateTime!
-  active: Boolean
-}
-
 input PostCreateWithoutThreadInput {
-  forum: ForumCreateOneWithoutLastPostInput!
   user: UserCreateOneInput!
   isFirst: Boolean
   quote: Int
@@ -1064,7 +1019,6 @@ input PostSubscriptionWhereInput {
 }
 
 input PostUpdateDataInput {
-  forum: ForumUpdateOneRequiredWithoutLastPostInput
   user: UserUpdateOneRequiredInput
   thread: ThreadUpdateOneRequiredWithoutPostInput
   isFirst: Boolean
@@ -1075,7 +1029,6 @@ input PostUpdateDataInput {
 }
 
 input PostUpdateInput {
-  forum: ForumUpdateOneRequiredWithoutLastPostInput
   user: UserUpdateOneRequiredInput
   thread: ThreadUpdateOneRequiredWithoutPostInput
   isFirst: Boolean
@@ -1117,6 +1070,15 @@ input PostUpdateManyWithWhereNestedInput {
   data: PostUpdateManyDataInput!
 }
 
+input PostUpdateOneInput {
+  create: PostCreateInput
+  update: PostUpdateDataInput
+  upsert: PostUpsertNestedInput
+  delete: Boolean
+  disconnect: Boolean
+  connect: PostWhereUniqueInput
+}
+
 input PostUpdateOneRequiredInput {
   create: PostCreateInput
   update: PostUpdateDataInput
@@ -1124,27 +1086,7 @@ input PostUpdateOneRequiredInput {
   connect: PostWhereUniqueInput
 }
 
-input PostUpdateOneWithoutForumInput {
-  create: PostCreateWithoutForumInput
-  update: PostUpdateWithoutForumDataInput
-  upsert: PostUpsertWithoutForumInput
-  delete: Boolean
-  disconnect: Boolean
-  connect: PostWhereUniqueInput
-}
-
-input PostUpdateWithoutForumDataInput {
-  user: UserUpdateOneRequiredInput
-  thread: ThreadUpdateOneRequiredWithoutPostInput
-  isFirst: Boolean
-  quote: Int
-  message: String
-  createDate: DateTime
-  active: Boolean
-}
-
 input PostUpdateWithoutThreadDataInput {
-  forum: ForumUpdateOneRequiredWithoutLastPostInput
   user: UserUpdateOneRequiredInput
   isFirst: Boolean
   quote: Int
@@ -1161,11 +1103,6 @@ input PostUpdateWithWhereUniqueWithoutThreadInput {
 input PostUpsertNestedInput {
   update: PostUpdateDataInput!
   create: PostCreateInput!
-}
-
-input PostUpsertWithoutForumInput {
-  update: PostUpdateWithoutForumDataInput!
-  create: PostCreateWithoutForumInput!
 }
 
 input PostUpsertWithWhereUniqueWithoutThreadInput {
@@ -1189,7 +1126,6 @@ input PostWhereInput {
   id_not_starts_with: ID
   id_ends_with: ID
   id_not_ends_with: ID
-  forum: ForumWhereInput
   user: UserWhereInput
   thread: ThreadWhereInput
   isFirst: Boolean

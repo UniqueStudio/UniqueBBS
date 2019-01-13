@@ -7,7 +7,6 @@ import {
     getAccessToken,
     signJWT,
     verifyJWT,
-    filterUsersInfo,
     filterMyInfo,
     filterUserInfo
 } from "./check";
@@ -65,6 +64,13 @@ export const userLoginByPwd = async function(req: Request, res: Response) {
 
     const pwd_salt = addSaltPasswordOnce(pwd);
     if (pwd_salt === userInfo.password) {
+        if (!userInfo.active) {
+            return res.json({
+                code: -1,
+                msg: "当前账号不活跃，请联系管理员！"
+            });
+        }
+
         const token = signJWT(userInfo.id, userInfo.isAdmin);
         prisma.updateUser({
             where: {
@@ -74,7 +80,7 @@ export const userLoginByPwd = async function(req: Request, res: Response) {
                 lastLogin: new Date()
             }
         });
-        res.send({ code: 1, msg: { uid: userInfo.id, token } });
+        res.json({ code: 1, msg: { uid: userInfo.id, token } });
     } else {
         return res.json({ code: -1, msg: "密码错误！" });
     }
@@ -246,9 +252,15 @@ export const userScan = async function(req: Request, res: Response) {
                 });
 
                 if (!user.length) {
-                    res.send({ code: -1, msg: "用户不存在！" });
+                    res.json({ code: -1, msg: "用户不存在！" });
                 } else {
                     let _user = user[0];
+                    if (!_user.active) {
+                        return res.json({
+                            code: -1,
+                            msg: "当前账号不活跃，请联系管理员！"
+                        });
+                    }
                     const token = signJWT(_user.id, _user.isAdmin);
                     prisma.updateUser({
                         where: {
@@ -258,18 +270,18 @@ export const userScan = async function(req: Request, res: Response) {
                             lastLogin: new Date()
                         }
                     });
-                    res.send({ code: 1, msg: { uid: _user.id, token } });
+                    res.json({ code: 1, msg: { uid: _user.id, token } });
                 }
             } else {
-                res.send({ code: -1, msg: "登录失败" });
+                res.json({ code: -1, msg: "登录失败" });
                 return;
             }
         } else {
-            res.send({ code: -1, msg: "登录超时，请重新登录" });
+            res.json({ code: -1, msg: "登录超时，请重新登录" });
             return;
         }
     } catch (err) {
-        res.send({ code: -1, msg: err.message });
+        res.json({ code: -1, msg: err.message });
     }
 };
 
@@ -278,8 +290,8 @@ export const userQRLogin = async function(req: Request, res: Response) {
         const response = await fetch(getQRCodeURL);
         const html = await response.text();
         const key = html.match(/key ?: ?"\w+/)![0].replace(/key ?: ?"/, "");
-        res.send({ code: 1, msg: key });
+        res.json({ code: 1, msg: key });
     } catch (err) {
-        res.send({ code: -1, msg: err.message });
+        res.json({ code: -1, msg: err.message });
     }
 };

@@ -47,7 +47,6 @@ type Forum {
 }
 type Post {
     id: ID! @unique
-    forum: Forum! @relation(name: "PostBelongForum")
     user: User!
     thread: Thread!
     isFirst: Boolean! @default(value: false)

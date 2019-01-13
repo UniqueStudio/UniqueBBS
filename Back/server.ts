@@ -12,8 +12,6 @@ import {
 } from "./model/user";
 import {
     threadDeleteHard,
-    postDeleteHard,
-    postDelete,
     threadList,
     threadInfo,
     threadCreate,
@@ -23,16 +21,23 @@ import {
     threadTop,
     threadClose,
     threadRecovery,
-    postRecovery,
-    threadGraph
+    threadUpdate,
+    threadMove
 } from "./model/thread";
+import {
+    postDeleteHard,
+    postDelete,
+    postRecovery,
+    postUpdate
+} from "./model/post";
 import { forumList, forumListSimple } from "./model/forum";
 import { mentorGet, mentorSet } from "./model/mentor";
 import {
     reportCreate,
     reportInfo,
     reportGraph,
-    reportList
+    reportList,
+    reportUpdate
 } from "./model/report";
 
 import * as Redis from "redis";
@@ -106,8 +111,9 @@ app.get("/forum/listSimple", forumListSimple);
 //Thread
 app.get("/thread/list/:fid/:page", threadList);
 app.get("/thread/info/:tid/:page", threadInfo);
-app.get("/thread/graph/:tid", threadGraph);
 app.post("/thread/create", threadCreate);
+app.post("/thread/update/:tid", threadUpdate);
+app.post("/thread/move/:tid", threadMove);
 app.post("/thread/reply", threadReply);
 app.post("/thread/diamond", threadDiamond);
 app.post("/thread/top", threadTop);
@@ -118,6 +124,7 @@ app.post("/thread/recovery/:tid/:postsBool", threadRecovery);
 
 //Post
 app.post("/post/delete/:pid", postDelete);
+app.post("/post/update/:pid", postUpdate);
 app.post("/post/deleteHard/:pid", postDeleteHard);
 app.post("/post/recovery/:pid", postRecovery);
 
@@ -134,6 +141,7 @@ app.get("/report/info/:rid", reportInfo);
 app.get("/report/graph/:uid", reportGraph);
 app.get("/report/list/:page", reportList);
 app.post("/report/create", reportCreate);
+app.post("/report/update/:rid", reportUpdate);
 
 app.listen(7010, () => {
     console.log(

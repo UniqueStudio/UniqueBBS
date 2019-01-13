@@ -974,7 +974,6 @@ export interface PostWhereInput {
   id_not_starts_with?: ID_Input;
   id_ends_with?: ID_Input;
   id_not_ends_with?: ID_Input;
-  forum?: ForumWhereInput;
   user?: UserWhereInput;
   thread?: ThreadWhereInput;
   isFirst?: Boolean;
@@ -1014,49 +1013,6 @@ export interface PostWhereInput {
   AND?: PostWhereInput[] | PostWhereInput;
   OR?: PostWhereInput[] | PostWhereInput;
   NOT?: PostWhereInput[] | PostWhereInput;
-}
-
-export interface ForumWhereInput {
-  id?: ID_Input;
-  id_not?: ID_Input;
-  id_in?: ID_Input[] | ID_Input;
-  id_not_in?: ID_Input[] | ID_Input;
-  id_lt?: ID_Input;
-  id_lte?: ID_Input;
-  id_gt?: ID_Input;
-  id_gte?: ID_Input;
-  id_contains?: ID_Input;
-  id_not_contains?: ID_Input;
-  id_starts_with?: ID_Input;
-  id_not_starts_with?: ID_Input;
-  id_ends_with?: ID_Input;
-  id_not_ends_with?: ID_Input;
-  name?: String;
-  name_not?: String;
-  name_in?: String[] | String;
-  name_not_in?: String[] | String;
-  name_lt?: String;
-  name_lte?: String;
-  name_gt?: String;
-  name_gte?: String;
-  name_contains?: String;
-  name_not_contains?: String;
-  name_starts_with?: String;
-  name_not_starts_with?: String;
-  name_ends_with?: String;
-  name_not_ends_with?: String;
-  threads?: Int;
-  threads_not?: Int;
-  threads_in?: Int[] | Int;
-  threads_not_in?: Int[] | Int;
-  threads_lt?: Int;
-  threads_lte?: Int;
-  threads_gt?: Int;
-  threads_gte?: Int;
-  lastPost?: PostWhereInput;
-  AND?: ForumWhereInput[] | ForumWhereInput;
-  OR?: ForumWhereInput[] | ForumWhereInput;
-  NOT?: ForumWhereInput[] | ForumWhereInput;
 }
 
 export interface ThreadWhereInput {
@@ -1137,6 +1093,49 @@ export interface ThreadWhereInput {
   AND?: ThreadWhereInput[] | ThreadWhereInput;
   OR?: ThreadWhereInput[] | ThreadWhereInput;
   NOT?: ThreadWhereInput[] | ThreadWhereInput;
+}
+
+export interface ForumWhereInput {
+  id?: ID_Input;
+  id_not?: ID_Input;
+  id_in?: ID_Input[] | ID_Input;
+  id_not_in?: ID_Input[] | ID_Input;
+  id_lt?: ID_Input;
+  id_lte?: ID_Input;
+  id_gt?: ID_Input;
+  id_gte?: ID_Input;
+  id_contains?: ID_Input;
+  id_not_contains?: ID_Input;
+  id_starts_with?: ID_Input;
+  id_not_starts_with?: ID_Input;
+  id_ends_with?: ID_Input;
+  id_not_ends_with?: ID_Input;
+  name?: String;
+  name_not?: String;
+  name_in?: String[] | String;
+  name_not_in?: String[] | String;
+  name_lt?: String;
+  name_lte?: String;
+  name_gt?: String;
+  name_gte?: String;
+  name_contains?: String;
+  name_not_contains?: String;
+  name_starts_with?: String;
+  name_not_starts_with?: String;
+  name_ends_with?: String;
+  name_not_ends_with?: String;
+  threads?: Int;
+  threads_not?: Int;
+  threads_in?: Int[] | Int;
+  threads_not_in?: Int[] | Int;
+  threads_lt?: Int;
+  threads_lte?: Int;
+  threads_gt?: Int;
+  threads_gte?: Int;
+  lastPost?: PostWhereInput;
+  AND?: ForumWhereInput[] | ForumWhereInput;
+  OR?: ForumWhereInput[] | ForumWhereInput;
+  NOT?: ForumWhereInput[] | ForumWhereInput;
 }
 
 export interface AttachWhereInput {
@@ -1348,7 +1347,6 @@ export interface PostCreateOneInput {
 }
 
 export interface PostCreateInput {
-  forum: ForumCreateOneWithoutLastPostInput;
   user: UserCreateOneInput;
   thread: ThreadCreateOneWithoutPostInput;
   isFirst?: Boolean;
@@ -1356,16 +1354,6 @@ export interface PostCreateInput {
   message: String;
   createDate: DateTimeInput;
   active?: Boolean;
-}
-
-export interface ForumCreateOneWithoutLastPostInput {
-  create?: ForumCreateWithoutLastPostInput;
-  connect?: ForumWhereUniqueInput;
-}
-
-export interface ForumCreateWithoutLastPostInput {
-  name: String;
-  threads?: Int;
 }
 
 export interface ThreadCreateOneWithoutPostInput {
@@ -1395,22 +1383,7 @@ export interface ForumCreateOneInput {
 export interface ForumCreateInput {
   name: String;
   threads?: Int;
-  lastPost?: PostCreateOneWithoutForumInput;
-}
-
-export interface PostCreateOneWithoutForumInput {
-  create?: PostCreateWithoutForumInput;
-  connect?: PostWhereUniqueInput;
-}
-
-export interface PostCreateWithoutForumInput {
-  user: UserCreateOneInput;
-  thread: ThreadCreateOneWithoutPostInput;
-  isFirst?: Boolean;
-  quote?: Int;
-  message: String;
-  createDate: DateTimeInput;
-  active?: Boolean;
+  lastPost?: PostCreateOneInput;
 }
 
 export interface AttachCreateManyWithoutThreadInput {
@@ -1453,7 +1426,6 @@ export interface PostCreateManyWithoutThreadInput {
 }
 
 export interface PostCreateWithoutThreadInput {
-  forum: ForumCreateOneWithoutLastPostInput;
   user: UserCreateOneInput;
   isFirst?: Boolean;
   quote?: Int;
@@ -1764,7 +1736,6 @@ export interface PostUpdateOneRequiredInput {
 }
 
 export interface PostUpdateDataInput {
-  forum?: ForumUpdateOneRequiredWithoutLastPostInput;
   user?: UserUpdateOneRequiredInput;
   thread?: ThreadUpdateOneRequiredWithoutPostInput;
   isFirst?: Boolean;
@@ -1772,23 +1743,6 @@ export interface PostUpdateDataInput {
   message?: String;
   createDate?: DateTimeInput;
   active?: Boolean;
-}
-
-export interface ForumUpdateOneRequiredWithoutLastPostInput {
-  create?: ForumCreateWithoutLastPostInput;
-  update?: ForumUpdateWithoutLastPostDataInput;
-  upsert?: ForumUpsertWithoutLastPostInput;
-  connect?: ForumWhereUniqueInput;
-}
-
-export interface ForumUpdateWithoutLastPostDataInput {
-  name?: String;
-  threads?: Int;
-}
-
-export interface ForumUpsertWithoutLastPostInput {
-  update: ForumUpdateWithoutLastPostDataInput;
-  create: ForumCreateWithoutLastPostInput;
 }
 
 export interface ThreadUpdateOneRequiredWithoutPostInput {
@@ -1822,31 +1776,21 @@ export interface ForumUpdateOneRequiredInput {
 export interface ForumUpdateDataInput {
   name?: String;
   threads?: Int;
-  lastPost?: PostUpdateOneWithoutForumInput;
+  lastPost?: PostUpdateOneInput;
 }
 
-export interface PostUpdateOneWithoutForumInput {
-  create?: PostCreateWithoutForumInput;
-  update?: PostUpdateWithoutForumDataInput;
-  upsert?: PostUpsertWithoutForumInput;
+export interface PostUpdateOneInput {
+  create?: PostCreateInput;
+  update?: PostUpdateDataInput;
+  upsert?: PostUpsertNestedInput;
   delete?: Boolean;
   disconnect?: Boolean;
   connect?: PostWhereUniqueInput;
 }
 
-export interface PostUpdateWithoutForumDataInput {
-  user?: UserUpdateOneRequiredInput;
-  thread?: ThreadUpdateOneRequiredWithoutPostInput;
-  isFirst?: Boolean;
-  quote?: Int;
-  message?: String;
-  createDate?: DateTimeInput;
-  active?: Boolean;
-}
-
-export interface PostUpsertWithoutForumInput {
-  update: PostUpdateWithoutForumDataInput;
-  create: PostCreateWithoutForumInput;
+export interface PostUpsertNestedInput {
+  update: PostUpdateDataInput;
+  create: PostCreateInput;
 }
 
 export interface ForumUpsertNestedInput {
@@ -1967,11 +1911,6 @@ export interface ThreadUpsertWithoutPostInput {
   create: ThreadCreateWithoutPostInput;
 }
 
-export interface PostUpsertNestedInput {
-  update: PostUpdateDataInput;
-  create: PostCreateInput;
-}
-
 export interface ThreadUpdateOneRequiredWithoutAttachInput {
   create?: ThreadCreateWithoutAttachInput;
   update?: ThreadUpdateWithoutAttachDataInput;
@@ -2016,7 +1955,6 @@ export interface PostUpdateWithWhereUniqueWithoutThreadInput {
 }
 
 export interface PostUpdateWithoutThreadDataInput {
-  forum?: ForumUpdateOneRequiredWithoutLastPostInput;
   user?: UserUpdateOneRequiredInput;
   isFirst?: Boolean;
   quote?: Int;
@@ -2113,7 +2051,7 @@ export interface AttachUpdateManyMutationInput {
 export interface ForumUpdateInput {
   name?: String;
   threads?: Int;
-  lastPost?: PostUpdateOneWithoutForumInput;
+  lastPost?: PostUpdateOneInput;
 }
 
 export interface ForumUpdateManyMutationInput {
@@ -2226,7 +2164,6 @@ export interface MessageUpdateManyMutationInput {
 }
 
 export interface PostUpdateInput {
-  forum?: ForumUpdateOneRequiredWithoutLastPostInput;
   user?: UserUpdateOneRequiredInput;
   thread?: ThreadUpdateOneRequiredWithoutPostInput;
   isFirst?: Boolean;
@@ -2735,7 +2672,6 @@ export interface Post {
 
 export interface PostPromise extends Promise<Post>, Fragmentable {
   id: () => Promise<ID_Output>;
-  forum: <T = ForumPromise>() => T;
   user: <T = UserPromise>() => T;
   thread: <T = ThreadPromise>() => T;
   isFirst: () => Promise<Boolean>;
@@ -2749,7 +2685,6 @@ export interface PostSubscription
   extends Promise<AsyncIterator<Post>>,
     Fragmentable {
   id: () => Promise<AsyncIterator<ID_Output>>;
-  forum: <T = ForumSubscription>() => T;
   user: <T = UserSubscription>() => T;
   thread: <T = ThreadSubscription>() => T;
   isFirst: () => Promise<AsyncIterator<Boolean>>;
@@ -2757,28 +2692,6 @@ export interface PostSubscription
   message: () => Promise<AsyncIterator<String>>;
   createDate: () => Promise<AsyncIterator<DateTimeOutput>>;
   active: () => Promise<AsyncIterator<Boolean>>;
-}
-
-export interface Forum {
-  id: ID_Output;
-  name: String;
-  threads: Int;
-}
-
-export interface ForumPromise extends Promise<Forum>, Fragmentable {
-  id: () => Promise<ID_Output>;
-  name: () => Promise<String>;
-  threads: () => Promise<Int>;
-  lastPost: <T = PostPromise>() => T;
-}
-
-export interface ForumSubscription
-  extends Promise<AsyncIterator<Forum>>,
-    Fragmentable {
-  id: () => Promise<AsyncIterator<ID_Output>>;
-  name: () => Promise<AsyncIterator<String>>;
-  threads: () => Promise<AsyncIterator<Int>>;
-  lastPost: <T = PostSubscription>() => T;
 }
 
 export interface Thread {
@@ -2865,6 +2778,28 @@ export interface ThreadSubscription
   ) => T;
   lastDate: () => Promise<AsyncIterator<DateTimeOutput>>;
   createDate: () => Promise<AsyncIterator<DateTimeOutput>>;
+}
+
+export interface Forum {
+  id: ID_Output;
+  name: String;
+  threads: Int;
+}
+
+export interface ForumPromise extends Promise<Forum>, Fragmentable {
+  id: () => Promise<ID_Output>;
+  name: () => Promise<String>;
+  threads: () => Promise<Int>;
+  lastPost: <T = PostPromise>() => T;
+}
+
+export interface ForumSubscription
+  extends Promise<AsyncIterator<Forum>>,
+    Fragmentable {
+  id: () => Promise<AsyncIterator<ID_Output>>;
+  name: () => Promise<AsyncIterator<String>>;
+  threads: () => Promise<AsyncIterator<Int>>;
+  lastPost: <T = PostSubscription>() => T;
 }
 
 export interface AttachConnection {
