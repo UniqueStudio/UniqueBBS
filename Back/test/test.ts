@@ -1,17 +1,15 @@
 import {
     redisClientSetAsync,
     redisClientKeysAsync,
-    redisClientDelAsync
+    redisClientDelAsync,
+    redisClientIncrAsync,
+    redisClientExpireAsync,
+    redisClientGetAsync
 } from "../server";
 
 async function hzytql() {
-    await redisClientSetAsync("HZYTQL:1:YZY","hello");
-    await redisClientSetAsync("HZYTQL:2:YZY","hello");
-    await redisClientSetAsync("HZYTQL:3:YZY","hello");
-
-    const arr = await redisClientKeysAsync("HZYTQL:*:YZY");
-    for(let key of arr){
-        await redisClientDelAsync(key);
-    }
+    let result = await redisClientGetAsync("hzytql");
+    console.log(result);
+    console.log(typeof result);
 }
 hzytql();

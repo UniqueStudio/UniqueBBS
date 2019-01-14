@@ -10,7 +10,9 @@ import {
     userInfoUpdateFromWx,
     userQRLogin,
     userScan,
-    userPwdReset
+    userPwdReset,
+    mentorGet,
+    mentorSet
 } from "./model/user";
 import {
     threadDeleteHard,
@@ -33,7 +35,6 @@ import {
     postUpdate
 } from "./model/post";
 import { forumList, forumListSimple } from "./model/forum";
-import { mentorGet, mentorSet } from "./model/mentor";
 import {
     reportCreate,
     reportInfo,
@@ -64,7 +65,9 @@ export const redisClient = Redis.createClient({
 
 export const redisClientGetAsync = promisify(redisClient.get).bind(redisClient);
 export const redisClientSetAsync = promisify(redisClient.set).bind(redisClient);
-export const redisClientKeysAsync = promisify(redisClient.keys).bind(redisClient);
+export const redisClientKeysAsync = promisify(redisClient.keys).bind(
+    redisClient
+);
 export const redisClientDelAsync = promisify(redisClient.del).bind(redisClient);
 export const redisClientIncrAsync = promisify(redisClient.incr).bind(
     redisClient
