@@ -16,6 +16,7 @@ import {
     filterMyInfo,
     filterUserInfo
 } from "./check";
+import { setLockExpire } from "./lock";
 
 export const userInfo = async function(req: Request, res: Response) {
     try {
@@ -226,6 +227,18 @@ export const userInfoUpdateFromWx = async function(
 ) {
     try {
         const authObj = verifyJWT(req.header("Authorization"));
+
+        const wxUpdateLock = setLockExpire(
+            `wxUpdateUser:${authObj.uid}`,
+            "300"
+        );
+        if (!wxUpdateLock) {
+            return res.json({
+                code: -1,
+                msg: "每5分钟只能同步一次微信个人信息，请稍后重试！"
+            });
+        }
+
         const userInfo = await prisma.user({
             id: authObj.uid
         });

@@ -15,6 +15,7 @@ export type AtLeastOne<T, U = { [K in keyof T]: Pick<T, K> }> = Partial<T> &
 
 export interface Exists {
   attach: (where?: AttachWhereInput) => Promise<boolean>;
+  filter: (where?: FilterWhereInput) => Promise<boolean>;
   forum: (where?: ForumWhereInput) => Promise<boolean>;
   group: (where?: GroupWhereInput) => Promise<boolean>;
   message: (where?: MessageWhereInput) => Promise<boolean>;
@@ -66,6 +67,29 @@ export interface Prisma {
       last?: Int;
     }
   ) => AttachConnectionPromise;
+  filter: (where: FilterWhereUniqueInput) => FilterPromise;
+  filters: (
+    args?: {
+      where?: FilterWhereInput;
+      orderBy?: FilterOrderByInput;
+      skip?: Int;
+      after?: String;
+      before?: String;
+      first?: Int;
+      last?: Int;
+    }
+  ) => FragmentableArray<Filter>;
+  filtersConnection: (
+    args?: {
+      where?: FilterWhereInput;
+      orderBy?: FilterOrderByInput;
+      skip?: Int;
+      after?: String;
+      before?: String;
+      first?: Int;
+      last?: Int;
+    }
+  ) => FilterConnectionPromise;
   forum: (where: ForumWhereUniqueInput) => ForumPromise;
   forums: (
     args?: {
@@ -249,6 +273,22 @@ export interface Prisma {
   ) => AttachPromise;
   deleteAttach: (where: AttachWhereUniqueInput) => AttachPromise;
   deleteManyAttaches: (where?: AttachWhereInput) => BatchPayloadPromise;
+  createFilter: (data: FilterCreateInput) => FilterPromise;
+  updateFilter: (
+    args: { data: FilterUpdateInput; where: FilterWhereUniqueInput }
+  ) => FilterPromise;
+  updateManyFilters: (
+    args: { data: FilterUpdateManyMutationInput; where?: FilterWhereInput }
+  ) => BatchPayloadPromise;
+  upsertFilter: (
+    args: {
+      where: FilterWhereUniqueInput;
+      create: FilterCreateInput;
+      update: FilterUpdateInput;
+    }
+  ) => FilterPromise;
+  deleteFilter: (where: FilterWhereUniqueInput) => FilterPromise;
+  deleteManyFilters: (where?: FilterWhereInput) => BatchPayloadPromise;
   createForum: (data: ForumCreateInput) => ForumPromise;
   updateForum: (
     args: { data: ForumUpdateInput; where: ForumWhereUniqueInput }
@@ -373,6 +413,9 @@ export interface Subscription {
   attach: (
     where?: AttachSubscriptionWhereInput
   ) => AttachSubscriptionPayloadSubscription;
+  filter: (
+    where?: FilterSubscriptionWhereInput
+  ) => FilterSubscriptionPayloadSubscription;
   forum: (
     where?: ForumSubscriptionWhereInput
   ) => ForumSubscriptionPayloadSubscription;
@@ -474,6 +517,62 @@ export type AttachOrderByInput =
   | "updatedAt_ASC"
   | "updatedAt_DESC";
 
+export type UserOrderByInput =
+  | "id_ASC"
+  | "id_DESC"
+  | "username_ASC"
+  | "username_DESC"
+  | "nickname_ASC"
+  | "nickname_DESC"
+  | "password_ASC"
+  | "password_DESC"
+  | "email_ASC"
+  | "email_DESC"
+  | "studentID_ASC"
+  | "studentID_DESC"
+  | "dormitory_ASC"
+  | "dormitory_DESC"
+  | "qq_ASC"
+  | "qq_DESC"
+  | "wechat_ASC"
+  | "wechat_DESC"
+  | "major_ASC"
+  | "major_DESC"
+  | "className_ASC"
+  | "className_DESC"
+  | "active_ASC"
+  | "active_DESC"
+  | "mobile_ASC"
+  | "mobile_DESC"
+  | "avatar_ASC"
+  | "avatar_DESC"
+  | "userid_ASC"
+  | "userid_DESC"
+  | "isAdmin_ASC"
+  | "isAdmin_DESC"
+  | "threads_ASC"
+  | "threads_DESC"
+  | "lastLogin_ASC"
+  | "lastLogin_DESC"
+  | "signature_ASC"
+  | "signature_DESC"
+  | "createdAt_ASC"
+  | "createdAt_DESC"
+  | "updatedAt_ASC"
+  | "updatedAt_DESC";
+
+export type FilterOrderByInput =
+  | "id_ASC"
+  | "id_DESC"
+  | "userType_ASC"
+  | "userType_DESC"
+  | "groupType_ASC"
+  | "groupType_DESC"
+  | "createdAt_ASC"
+  | "createdAt_DESC"
+  | "updatedAt_ASC"
+  | "updatedAt_DESC";
+
 export type ForumOrderByInput =
   | "id_ASC"
   | "id_DESC"
@@ -519,50 +618,6 @@ export type ThreadOrderByInput =
   | "lastDate_DESC"
   | "createDate_ASC"
   | "createDate_DESC"
-  | "createdAt_ASC"
-  | "createdAt_DESC"
-  | "updatedAt_ASC"
-  | "updatedAt_DESC";
-
-export type UserOrderByInput =
-  | "id_ASC"
-  | "id_DESC"
-  | "username_ASC"
-  | "username_DESC"
-  | "nickname_ASC"
-  | "nickname_DESC"
-  | "password_ASC"
-  | "password_DESC"
-  | "email_ASC"
-  | "email_DESC"
-  | "studentID_ASC"
-  | "studentID_DESC"
-  | "dormitory_ASC"
-  | "dormitory_DESC"
-  | "qq_ASC"
-  | "qq_DESC"
-  | "wechat_ASC"
-  | "wechat_DESC"
-  | "major_ASC"
-  | "major_DESC"
-  | "className_ASC"
-  | "className_DESC"
-  | "active_ASC"
-  | "active_DESC"
-  | "mobile_ASC"
-  | "mobile_DESC"
-  | "avatar_ASC"
-  | "avatar_DESC"
-  | "userid_ASC"
-  | "userid_DESC"
-  | "isAdmin_ASC"
-  | "isAdmin_DESC"
-  | "threads_ASC"
-  | "threads_DESC"
-  | "lastLogin_ASC"
-  | "lastLogin_DESC"
-  | "signature_ASC"
-  | "signature_DESC"
   | "createdAt_ASC"
   | "createdAt_DESC"
   | "updatedAt_ASC"
@@ -1092,6 +1147,7 @@ export interface ThreadWhereInput {
   createDate_lte?: DateTimeInput;
   createDate_gt?: DateTimeInput;
   createDate_gte?: DateTimeInput;
+  filter?: FilterWhereInput;
   AND?: ThreadWhereInput[] | ThreadWhereInput;
   OR?: ThreadWhereInput[] | ThreadWhereInput;
   NOT?: ThreadWhereInput[] | ThreadWhereInput;
@@ -1213,6 +1269,52 @@ export interface AttachWhereInput {
   NOT?: AttachWhereInput[] | AttachWhereInput;
 }
 
+export interface FilterWhereInput {
+  id?: ID_Input;
+  id_not?: ID_Input;
+  id_in?: ID_Input[] | ID_Input;
+  id_not_in?: ID_Input[] | ID_Input;
+  id_lt?: ID_Input;
+  id_lte?: ID_Input;
+  id_gt?: ID_Input;
+  id_gte?: ID_Input;
+  id_contains?: ID_Input;
+  id_not_contains?: ID_Input;
+  id_starts_with?: ID_Input;
+  id_not_starts_with?: ID_Input;
+  id_ends_with?: ID_Input;
+  id_not_ends_with?: ID_Input;
+  userList_every?: UserWhereInput;
+  userList_some?: UserWhereInput;
+  userList_none?: UserWhereInput;
+  groupList_every?: GroupWhereInput;
+  groupList_some?: GroupWhereInput;
+  groupList_none?: GroupWhereInput;
+  userType?: Int;
+  userType_not?: Int;
+  userType_in?: Int[] | Int;
+  userType_not_in?: Int[] | Int;
+  userType_lt?: Int;
+  userType_lte?: Int;
+  userType_gt?: Int;
+  userType_gte?: Int;
+  groupType?: Int;
+  groupType_not?: Int;
+  groupType_in?: Int[] | Int;
+  groupType_not_in?: Int[] | Int;
+  groupType_lt?: Int;
+  groupType_lte?: Int;
+  groupType_gt?: Int;
+  groupType_gte?: Int;
+  AND?: FilterWhereInput[] | FilterWhereInput;
+  OR?: FilterWhereInput[] | FilterWhereInput;
+  NOT?: FilterWhereInput[] | FilterWhereInput;
+}
+
+export type FilterWhereUniqueInput = AtLeastOne<{
+  id: ID_Input;
+}>;
+
 export type ForumWhereUniqueInput = AtLeastOne<{
   id: ID_Input;
 }>;
@@ -1315,6 +1417,7 @@ export interface ThreadCreateWithoutAttachInput {
   diamond?: Boolean;
   lastDate: DateTimeInput;
   createDate: DateTimeInput;
+  filter?: FilterCreateOneInput;
 }
 
 export interface UserCreateOneInput {
@@ -1414,6 +1517,7 @@ export interface ThreadCreateWithoutPostInput {
   attach?: AttachCreateManyWithoutThreadInput;
   lastDate: DateTimeInput;
   createDate: DateTimeInput;
+  filter?: FilterCreateOneInput;
 }
 
 export interface AttachCreateManyWithoutThreadInput {
@@ -1427,6 +1531,62 @@ export interface AttachCreateWithoutThreadInput {
   fileName: String;
   originalName: String;
   createDate: DateTimeInput;
+}
+
+export interface FilterCreateOneInput {
+  create?: FilterCreateInput;
+  connect?: FilterWhereUniqueInput;
+}
+
+export interface FilterCreateInput {
+  userList?: UserCreateManyInput;
+  groupList?: GroupCreateManyInput;
+  userType: Int;
+  groupType: Int;
+}
+
+export interface UserCreateManyInput {
+  create?: UserCreateInput[] | UserCreateInput;
+  connect?: UserWhereUniqueInput[] | UserWhereUniqueInput;
+}
+
+export interface GroupCreateManyInput {
+  create?: GroupCreateInput[] | GroupCreateInput;
+  connect?: GroupWhereUniqueInput[] | GroupWhereUniqueInput;
+}
+
+export interface GroupCreateInput {
+  key: Int;
+  name: String;
+  master?: UserCreateOneWithoutGroupInput;
+}
+
+export interface UserCreateOneWithoutGroupInput {
+  create?: UserCreateWithoutGroupInput;
+  connect?: UserWhereUniqueInput;
+}
+
+export interface UserCreateWithoutGroupInput {
+  username: String;
+  nickname?: String;
+  password?: String;
+  email?: String;
+  studentID?: String;
+  dormitory?: String;
+  qq?: String;
+  wechat?: String;
+  major?: String;
+  className?: String;
+  active?: Boolean;
+  mobile?: String;
+  avatar?: String;
+  userid: String;
+  isAdmin?: Boolean;
+  threads?: Int;
+  lastLogin: DateTimeInput;
+  signature?: String;
+  mentor?: UserCreateOneInput;
+  report?: ReportCreateManyWithoutUserInput;
 }
 
 export interface PostCreateManyWithoutThreadInput {
@@ -1471,6 +1631,7 @@ export interface ThreadUpdateWithoutAttachDataInput {
   diamond?: Boolean;
   lastDate?: DateTimeInput;
   createDate?: DateTimeInput;
+  filter?: FilterUpdateOneInput;
 }
 
 export interface UserUpdateOneRequiredInput {
@@ -1807,6 +1968,7 @@ export interface ThreadUpdateWithoutPostDataInput {
   attach?: AttachUpdateManyWithoutThreadInput;
   lastDate?: DateTimeInput;
   createDate?: DateTimeInput;
+  filter?: FilterUpdateOneInput;
 }
 
 export interface AttachUpdateManyWithoutThreadInput {
@@ -1928,6 +2090,388 @@ export interface AttachUpdateManyDataInput {
   fileName?: String;
   originalName?: String;
   createDate?: DateTimeInput;
+}
+
+export interface FilterUpdateOneInput {
+  create?: FilterCreateInput;
+  update?: FilterUpdateDataInput;
+  upsert?: FilterUpsertNestedInput;
+  delete?: Boolean;
+  disconnect?: Boolean;
+  connect?: FilterWhereUniqueInput;
+}
+
+export interface FilterUpdateDataInput {
+  userList?: UserUpdateManyInput;
+  groupList?: GroupUpdateManyInput;
+  userType?: Int;
+  groupType?: Int;
+}
+
+export interface UserUpdateManyInput {
+  create?: UserCreateInput[] | UserCreateInput;
+  update?:
+    | UserUpdateWithWhereUniqueNestedInput[]
+    | UserUpdateWithWhereUniqueNestedInput;
+  upsert?:
+    | UserUpsertWithWhereUniqueNestedInput[]
+    | UserUpsertWithWhereUniqueNestedInput;
+  delete?: UserWhereUniqueInput[] | UserWhereUniqueInput;
+  connect?: UserWhereUniqueInput[] | UserWhereUniqueInput;
+  disconnect?: UserWhereUniqueInput[] | UserWhereUniqueInput;
+  deleteMany?: UserScalarWhereInput[] | UserScalarWhereInput;
+  updateMany?:
+    | UserUpdateManyWithWhereNestedInput[]
+    | UserUpdateManyWithWhereNestedInput;
+}
+
+export interface UserUpdateWithWhereUniqueNestedInput {
+  where: UserWhereUniqueInput;
+  data: UserUpdateDataInput;
+}
+
+export interface UserUpsertWithWhereUniqueNestedInput {
+  where: UserWhereUniqueInput;
+  update: UserUpdateDataInput;
+  create: UserCreateInput;
+}
+
+export interface UserScalarWhereInput {
+  id?: ID_Input;
+  id_not?: ID_Input;
+  id_in?: ID_Input[] | ID_Input;
+  id_not_in?: ID_Input[] | ID_Input;
+  id_lt?: ID_Input;
+  id_lte?: ID_Input;
+  id_gt?: ID_Input;
+  id_gte?: ID_Input;
+  id_contains?: ID_Input;
+  id_not_contains?: ID_Input;
+  id_starts_with?: ID_Input;
+  id_not_starts_with?: ID_Input;
+  id_ends_with?: ID_Input;
+  id_not_ends_with?: ID_Input;
+  username?: String;
+  username_not?: String;
+  username_in?: String[] | String;
+  username_not_in?: String[] | String;
+  username_lt?: String;
+  username_lte?: String;
+  username_gt?: String;
+  username_gte?: String;
+  username_contains?: String;
+  username_not_contains?: String;
+  username_starts_with?: String;
+  username_not_starts_with?: String;
+  username_ends_with?: String;
+  username_not_ends_with?: String;
+  nickname?: String;
+  nickname_not?: String;
+  nickname_in?: String[] | String;
+  nickname_not_in?: String[] | String;
+  nickname_lt?: String;
+  nickname_lte?: String;
+  nickname_gt?: String;
+  nickname_gte?: String;
+  nickname_contains?: String;
+  nickname_not_contains?: String;
+  nickname_starts_with?: String;
+  nickname_not_starts_with?: String;
+  nickname_ends_with?: String;
+  nickname_not_ends_with?: String;
+  password?: String;
+  password_not?: String;
+  password_in?: String[] | String;
+  password_not_in?: String[] | String;
+  password_lt?: String;
+  password_lte?: String;
+  password_gt?: String;
+  password_gte?: String;
+  password_contains?: String;
+  password_not_contains?: String;
+  password_starts_with?: String;
+  password_not_starts_with?: String;
+  password_ends_with?: String;
+  password_not_ends_with?: String;
+  email?: String;
+  email_not?: String;
+  email_in?: String[] | String;
+  email_not_in?: String[] | String;
+  email_lt?: String;
+  email_lte?: String;
+  email_gt?: String;
+  email_gte?: String;
+  email_contains?: String;
+  email_not_contains?: String;
+  email_starts_with?: String;
+  email_not_starts_with?: String;
+  email_ends_with?: String;
+  email_not_ends_with?: String;
+  studentID?: String;
+  studentID_not?: String;
+  studentID_in?: String[] | String;
+  studentID_not_in?: String[] | String;
+  studentID_lt?: String;
+  studentID_lte?: String;
+  studentID_gt?: String;
+  studentID_gte?: String;
+  studentID_contains?: String;
+  studentID_not_contains?: String;
+  studentID_starts_with?: String;
+  studentID_not_starts_with?: String;
+  studentID_ends_with?: String;
+  studentID_not_ends_with?: String;
+  dormitory?: String;
+  dormitory_not?: String;
+  dormitory_in?: String[] | String;
+  dormitory_not_in?: String[] | String;
+  dormitory_lt?: String;
+  dormitory_lte?: String;
+  dormitory_gt?: String;
+  dormitory_gte?: String;
+  dormitory_contains?: String;
+  dormitory_not_contains?: String;
+  dormitory_starts_with?: String;
+  dormitory_not_starts_with?: String;
+  dormitory_ends_with?: String;
+  dormitory_not_ends_with?: String;
+  qq?: String;
+  qq_not?: String;
+  qq_in?: String[] | String;
+  qq_not_in?: String[] | String;
+  qq_lt?: String;
+  qq_lte?: String;
+  qq_gt?: String;
+  qq_gte?: String;
+  qq_contains?: String;
+  qq_not_contains?: String;
+  qq_starts_with?: String;
+  qq_not_starts_with?: String;
+  qq_ends_with?: String;
+  qq_not_ends_with?: String;
+  wechat?: String;
+  wechat_not?: String;
+  wechat_in?: String[] | String;
+  wechat_not_in?: String[] | String;
+  wechat_lt?: String;
+  wechat_lte?: String;
+  wechat_gt?: String;
+  wechat_gte?: String;
+  wechat_contains?: String;
+  wechat_not_contains?: String;
+  wechat_starts_with?: String;
+  wechat_not_starts_with?: String;
+  wechat_ends_with?: String;
+  wechat_not_ends_with?: String;
+  major?: String;
+  major_not?: String;
+  major_in?: String[] | String;
+  major_not_in?: String[] | String;
+  major_lt?: String;
+  major_lte?: String;
+  major_gt?: String;
+  major_gte?: String;
+  major_contains?: String;
+  major_not_contains?: String;
+  major_starts_with?: String;
+  major_not_starts_with?: String;
+  major_ends_with?: String;
+  major_not_ends_with?: String;
+  className?: String;
+  className_not?: String;
+  className_in?: String[] | String;
+  className_not_in?: String[] | String;
+  className_lt?: String;
+  className_lte?: String;
+  className_gt?: String;
+  className_gte?: String;
+  className_contains?: String;
+  className_not_contains?: String;
+  className_starts_with?: String;
+  className_not_starts_with?: String;
+  className_ends_with?: String;
+  className_not_ends_with?: String;
+  active?: Boolean;
+  active_not?: Boolean;
+  mobile?: String;
+  mobile_not?: String;
+  mobile_in?: String[] | String;
+  mobile_not_in?: String[] | String;
+  mobile_lt?: String;
+  mobile_lte?: String;
+  mobile_gt?: String;
+  mobile_gte?: String;
+  mobile_contains?: String;
+  mobile_not_contains?: String;
+  mobile_starts_with?: String;
+  mobile_not_starts_with?: String;
+  mobile_ends_with?: String;
+  mobile_not_ends_with?: String;
+  avatar?: String;
+  avatar_not?: String;
+  avatar_in?: String[] | String;
+  avatar_not_in?: String[] | String;
+  avatar_lt?: String;
+  avatar_lte?: String;
+  avatar_gt?: String;
+  avatar_gte?: String;
+  avatar_contains?: String;
+  avatar_not_contains?: String;
+  avatar_starts_with?: String;
+  avatar_not_starts_with?: String;
+  avatar_ends_with?: String;
+  avatar_not_ends_with?: String;
+  userid?: String;
+  userid_not?: String;
+  userid_in?: String[] | String;
+  userid_not_in?: String[] | String;
+  userid_lt?: String;
+  userid_lte?: String;
+  userid_gt?: String;
+  userid_gte?: String;
+  userid_contains?: String;
+  userid_not_contains?: String;
+  userid_starts_with?: String;
+  userid_not_starts_with?: String;
+  userid_ends_with?: String;
+  userid_not_ends_with?: String;
+  isAdmin?: Boolean;
+  isAdmin_not?: Boolean;
+  threads?: Int;
+  threads_not?: Int;
+  threads_in?: Int[] | Int;
+  threads_not_in?: Int[] | Int;
+  threads_lt?: Int;
+  threads_lte?: Int;
+  threads_gt?: Int;
+  threads_gte?: Int;
+  lastLogin?: DateTimeInput;
+  lastLogin_not?: DateTimeInput;
+  lastLogin_in?: DateTimeInput[] | DateTimeInput;
+  lastLogin_not_in?: DateTimeInput[] | DateTimeInput;
+  lastLogin_lt?: DateTimeInput;
+  lastLogin_lte?: DateTimeInput;
+  lastLogin_gt?: DateTimeInput;
+  lastLogin_gte?: DateTimeInput;
+  signature?: String;
+  signature_not?: String;
+  signature_in?: String[] | String;
+  signature_not_in?: String[] | String;
+  signature_lt?: String;
+  signature_lte?: String;
+  signature_gt?: String;
+  signature_gte?: String;
+  signature_contains?: String;
+  signature_not_contains?: String;
+  signature_starts_with?: String;
+  signature_not_starts_with?: String;
+  signature_ends_with?: String;
+  signature_not_ends_with?: String;
+  AND?: UserScalarWhereInput[] | UserScalarWhereInput;
+  OR?: UserScalarWhereInput[] | UserScalarWhereInput;
+  NOT?: UserScalarWhereInput[] | UserScalarWhereInput;
+}
+
+export interface UserUpdateManyWithWhereNestedInput {
+  where: UserScalarWhereInput;
+  data: UserUpdateManyDataInput;
+}
+
+export interface UserUpdateManyDataInput {
+  username?: String;
+  nickname?: String;
+  password?: String;
+  email?: String;
+  studentID?: String;
+  dormitory?: String;
+  qq?: String;
+  wechat?: String;
+  major?: String;
+  className?: String;
+  active?: Boolean;
+  mobile?: String;
+  avatar?: String;
+  userid?: String;
+  isAdmin?: Boolean;
+  threads?: Int;
+  lastLogin?: DateTimeInput;
+  signature?: String;
+}
+
+export interface GroupUpdateManyInput {
+  create?: GroupCreateInput[] | GroupCreateInput;
+  update?:
+    | GroupUpdateWithWhereUniqueNestedInput[]
+    | GroupUpdateWithWhereUniqueNestedInput;
+  upsert?:
+    | GroupUpsertWithWhereUniqueNestedInput[]
+    | GroupUpsertWithWhereUniqueNestedInput;
+  delete?: GroupWhereUniqueInput[] | GroupWhereUniqueInput;
+  connect?: GroupWhereUniqueInput[] | GroupWhereUniqueInput;
+  disconnect?: GroupWhereUniqueInput[] | GroupWhereUniqueInput;
+  deleteMany?: GroupScalarWhereInput[] | GroupScalarWhereInput;
+  updateMany?:
+    | GroupUpdateManyWithWhereNestedInput[]
+    | GroupUpdateManyWithWhereNestedInput;
+}
+
+export interface GroupUpdateWithWhereUniqueNestedInput {
+  where: GroupWhereUniqueInput;
+  data: GroupUpdateDataInput;
+}
+
+export interface GroupUpdateDataInput {
+  key?: Int;
+  name?: String;
+  master?: UserUpdateOneWithoutGroupInput;
+}
+
+export interface UserUpdateOneWithoutGroupInput {
+  create?: UserCreateWithoutGroupInput;
+  update?: UserUpdateWithoutGroupDataInput;
+  upsert?: UserUpsertWithoutGroupInput;
+  delete?: Boolean;
+  disconnect?: Boolean;
+  connect?: UserWhereUniqueInput;
+}
+
+export interface UserUpdateWithoutGroupDataInput {
+  username?: String;
+  nickname?: String;
+  password?: String;
+  email?: String;
+  studentID?: String;
+  dormitory?: String;
+  qq?: String;
+  wechat?: String;
+  major?: String;
+  className?: String;
+  active?: Boolean;
+  mobile?: String;
+  avatar?: String;
+  userid?: String;
+  isAdmin?: Boolean;
+  threads?: Int;
+  lastLogin?: DateTimeInput;
+  signature?: String;
+  mentor?: UserUpdateOneInput;
+  report?: ReportUpdateManyWithoutUserInput;
+}
+
+export interface UserUpsertWithoutGroupInput {
+  update: UserUpdateWithoutGroupDataInput;
+  create: UserCreateWithoutGroupInput;
+}
+
+export interface GroupUpsertWithWhereUniqueNestedInput {
+  where: GroupWhereUniqueInput;
+  update: GroupUpdateDataInput;
+  create: GroupCreateInput;
+}
+
+export interface FilterUpsertNestedInput {
+  update: FilterUpdateDataInput;
+  create: FilterCreateInput;
 }
 
 export interface ThreadUpsertWithoutPostInput {
@@ -2062,6 +2606,18 @@ export interface AttachUpdateManyMutationInput {
   createDate?: DateTimeInput;
 }
 
+export interface FilterUpdateInput {
+  userList?: UserUpdateManyInput;
+  groupList?: GroupUpdateManyInput;
+  userType?: Int;
+  groupType?: Int;
+}
+
+export interface FilterUpdateManyMutationInput {
+  userType?: Int;
+  groupType?: Int;
+}
+
 export interface ForumUpdateInput {
   name?: String;
   threads?: Int;
@@ -2073,81 +2629,10 @@ export interface ForumUpdateManyMutationInput {
   threads?: Int;
 }
 
-export interface GroupCreateInput {
-  key: Int;
-  name: String;
-  master?: UserCreateOneWithoutGroupInput;
-}
-
-export interface UserCreateOneWithoutGroupInput {
-  create?: UserCreateWithoutGroupInput;
-  connect?: UserWhereUniqueInput;
-}
-
-export interface UserCreateWithoutGroupInput {
-  username: String;
-  nickname?: String;
-  password?: String;
-  email?: String;
-  studentID?: String;
-  dormitory?: String;
-  qq?: String;
-  wechat?: String;
-  major?: String;
-  className?: String;
-  active?: Boolean;
-  mobile?: String;
-  avatar?: String;
-  userid: String;
-  isAdmin?: Boolean;
-  threads?: Int;
-  lastLogin: DateTimeInput;
-  signature?: String;
-  mentor?: UserCreateOneInput;
-  report?: ReportCreateManyWithoutUserInput;
-}
-
 export interface GroupUpdateInput {
   key?: Int;
   name?: String;
   master?: UserUpdateOneWithoutGroupInput;
-}
-
-export interface UserUpdateOneWithoutGroupInput {
-  create?: UserCreateWithoutGroupInput;
-  update?: UserUpdateWithoutGroupDataInput;
-  upsert?: UserUpsertWithoutGroupInput;
-  delete?: Boolean;
-  disconnect?: Boolean;
-  connect?: UserWhereUniqueInput;
-}
-
-export interface UserUpdateWithoutGroupDataInput {
-  username?: String;
-  nickname?: String;
-  password?: String;
-  email?: String;
-  studentID?: String;
-  dormitory?: String;
-  qq?: String;
-  wechat?: String;
-  major?: String;
-  className?: String;
-  active?: Boolean;
-  mobile?: String;
-  avatar?: String;
-  userid?: String;
-  isAdmin?: Boolean;
-  threads?: Int;
-  lastLogin?: DateTimeInput;
-  signature?: String;
-  mentor?: UserUpdateOneInput;
-  report?: ReportUpdateManyWithoutUserInput;
-}
-
-export interface UserUpsertWithoutGroupInput {
-  update: UserUpdateWithoutGroupDataInput;
-  create: UserCreateWithoutGroupInput;
 }
 
 export interface GroupUpdateManyMutationInput {
@@ -2303,6 +2788,7 @@ export interface ThreadCreateInput {
   attach?: AttachCreateManyWithoutThreadInput;
   lastDate: DateTimeInput;
   createDate: DateTimeInput;
+  filter?: FilterCreateOneInput;
 }
 
 export interface ThreadUpdateInput {
@@ -2318,6 +2804,7 @@ export interface ThreadUpdateInput {
   attach?: AttachUpdateManyWithoutThreadInput;
   lastDate?: DateTimeInput;
   createDate?: DateTimeInput;
+  filter?: FilterUpdateOneInput;
 }
 
 export interface ThreadUpdateManyMutationInput {
@@ -2385,6 +2872,17 @@ export interface AttachSubscriptionWhereInput {
   AND?: AttachSubscriptionWhereInput[] | AttachSubscriptionWhereInput;
   OR?: AttachSubscriptionWhereInput[] | AttachSubscriptionWhereInput;
   NOT?: AttachSubscriptionWhereInput[] | AttachSubscriptionWhereInput;
+}
+
+export interface FilterSubscriptionWhereInput {
+  mutation_in?: MutationType[] | MutationType;
+  updatedFields_contains?: String;
+  updatedFields_contains_every?: String[] | String;
+  updatedFields_contains_some?: String[] | String;
+  node?: FilterWhereInput;
+  AND?: FilterSubscriptionWhereInput[] | FilterSubscriptionWhereInput;
+  OR?: FilterSubscriptionWhereInput[] | FilterSubscriptionWhereInput;
+  NOT?: FilterSubscriptionWhereInput[] | FilterSubscriptionWhereInput;
 }
 
 export interface ForumSubscriptionWhereInput {
@@ -2545,6 +3043,7 @@ export interface ThreadPromise extends Promise<Thread>, Fragmentable {
   ) => T;
   lastDate: () => Promise<DateTimeOutput>;
   createDate: () => Promise<DateTimeOutput>;
+  filter: <T = FilterPromise>() => T;
 }
 
 export interface ThreadSubscription
@@ -2583,6 +3082,7 @@ export interface ThreadSubscription
   ) => T;
   lastDate: () => Promise<AsyncIterator<DateTimeOutput>>;
   createDate: () => Promise<AsyncIterator<DateTimeOutput>>;
+  filter: <T = FilterSubscription>() => T;
 }
 
 export interface User {
@@ -2813,6 +3313,70 @@ export interface PostSubscription
   active: () => Promise<AsyncIterator<Boolean>>;
 }
 
+export interface Filter {
+  id: ID_Output;
+  userType: Int;
+  groupType: Int;
+}
+
+export interface FilterPromise extends Promise<Filter>, Fragmentable {
+  id: () => Promise<ID_Output>;
+  userList: <T = FragmentableArray<User>>(
+    args?: {
+      where?: UserWhereInput;
+      orderBy?: UserOrderByInput;
+      skip?: Int;
+      after?: String;
+      before?: String;
+      first?: Int;
+      last?: Int;
+    }
+  ) => T;
+  groupList: <T = FragmentableArray<Group>>(
+    args?: {
+      where?: GroupWhereInput;
+      orderBy?: GroupOrderByInput;
+      skip?: Int;
+      after?: String;
+      before?: String;
+      first?: Int;
+      last?: Int;
+    }
+  ) => T;
+  userType: () => Promise<Int>;
+  groupType: () => Promise<Int>;
+}
+
+export interface FilterSubscription
+  extends Promise<AsyncIterator<Filter>>,
+    Fragmentable {
+  id: () => Promise<AsyncIterator<ID_Output>>;
+  userList: <T = Promise<AsyncIterator<UserSubscription>>>(
+    args?: {
+      where?: UserWhereInput;
+      orderBy?: UserOrderByInput;
+      skip?: Int;
+      after?: String;
+      before?: String;
+      first?: Int;
+      last?: Int;
+    }
+  ) => T;
+  groupList: <T = Promise<AsyncIterator<GroupSubscription>>>(
+    args?: {
+      where?: GroupWhereInput;
+      orderBy?: GroupOrderByInput;
+      skip?: Int;
+      after?: String;
+      before?: String;
+      first?: Int;
+      last?: Int;
+    }
+  ) => T;
+  userType: () => Promise<AsyncIterator<Int>>;
+  groupType: () => Promise<AsyncIterator<Int>>;
+}
+
 export interface AttachConnection {
   pageInfo: PageInfo;
   edges: AttachEdge[];
@@ -2886,6 +3450,60 @@ export interface AggregateAttachPromise
 
 export interface AggregateAttachSubscription
   extends Promise<AsyncIterator<AggregateAttach>>,
+    Fragmentable {
+  count: () => Promise<AsyncIterator<Int>>;
+}
+
+export interface FilterConnection {
+  pageInfo: PageInfo;
+  edges: FilterEdge[];
+}
+
+export interface FilterConnectionPromise
+  extends Promise<FilterConnection>,
+    Fragmentable {
+  pageInfo: <T = PageInfoPromise>() => T;
+  edges: <T = FragmentableArray<FilterEdge>>() => T;
+  aggregate: <T = AggregateFilterPromise>() => T;
+}
+
+export interface FilterConnectionSubscription
+  extends Promise<AsyncIterator<FilterConnection>>,
+    Fragmentable {
+  pageInfo: <T = PageInfoSubscription>() => T;
+  edges: <T = Promise<AsyncIterator<FilterEdgeSubscription>>>() => T;
+  aggregate: <T = AggregateFilterSubscription>() => T;
+}
+
+export interface FilterEdge {
+  node: Filter;
+  cursor: String;
+}
+
+export interface FilterEdgePromise extends Promise<FilterEdge>, Fragmentable {
+  node: <T = FilterPromise>() => T;
+  cursor: () => Promise<String>;
+}
+
+export interface FilterEdgeSubscription
+  extends Promise<AsyncIterator<FilterEdge>>,
+    Fragmentable {
+  node: <T = FilterSubscription>() => T;
+  cursor: () => Promise<AsyncIterator<String>>;
+}
+
+export interface AggregateFilter {
+  count: Int;
+}
+
+export interface AggregateFilterPromise
+  extends Promise<AggregateFilter>,
+    Fragmentable {
+  count: () => Promise<Int>;
+}
+
+export interface AggregateFilterSubscription
+  extends Promise<AsyncIterator<AggregateFilter>>,
     Fragmentable {
   count: () => Promise<AsyncIterator<Int>>;
 }
@@ -3367,6 +3985,53 @@ export interface AttachPreviousValuesSubscription
   createDate: () => Promise<AsyncIterator<DateTimeOutput>>;
 }
 
+export interface FilterSubscriptionPayload {
+  mutation: MutationType;
+  node: Filter;
+  updatedFields: String[];
+  previousValues: FilterPreviousValues;
+}
+
+export interface FilterSubscriptionPayloadPromise
+  extends Promise<FilterSubscriptionPayload>,
+    Fragmentable {
+  mutation: () => Promise<MutationType>;
+  node: <T = FilterPromise>() => T;
+  updatedFields: () => Promise<String[]>;
+  previousValues: <T = FilterPreviousValuesPromise>() => T;
+}
+
+export interface FilterSubscriptionPayloadSubscription
+  extends Promise<AsyncIterator<FilterSubscriptionPayload>>,
+    Fragmentable {
+  mutation: () => Promise<AsyncIterator<MutationType>>;
+  node: <T = FilterSubscription>() => T;
+  updatedFields: () => Promise<AsyncIterator<String[]>>;
+  previousValues: <T = FilterPreviousValuesSubscription>() => T;
+}
+
+export interface FilterPreviousValues {
+  id: ID_Output;
+  userType: Int;
+  groupType: Int;
+}
+
+export interface FilterPreviousValuesPromise
+  extends Promise<FilterPreviousValues>,
+    Fragmentable {
+  id: () => Promise<ID_Output>;
+  userType: () => Promise<Int>;
+  groupType: () => Promise<Int>;
+}
+
+export interface FilterPreviousValuesSubscription
+  extends Promise<AsyncIterator<FilterPreviousValues>>,
+    Fragmentable {
+  id: () => Promise<AsyncIterator<ID_Output>>;
+  userType: () => Promise<AsyncIterator<Int>>;
+  groupType: () => Promise<AsyncIterator<Int>>;
+}
+
 export interface ForumSubscriptionPayload {
   mutation: MutationType;
   node: Forum;
@@ -3829,6 +4494,10 @@ export type Long = string;
 export const models: Model[] = [
   {
     name: "Attach",
+    embedded: false
+  },
+  {
+    name: "Filter",
     embedded: false
   },
   {

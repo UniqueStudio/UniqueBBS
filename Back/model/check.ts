@@ -3,6 +3,11 @@ import { secret, accessTokenURL, filterUserKeys, filterMyKeys } from "./consts";
 import * as crypto from "crypto";
 import { User } from "../generated/prisma-client";
 
+export interface JWTContent {
+    uid: string;
+    isAdmin: boolean;
+}
+
 export const signJWT = (uid: string, isAdmin: boolean) => {
     return jwt.sign(
         {
@@ -23,7 +28,7 @@ export const verifyJWT = (token?: string) => {
     if (token.indexOf("Bearer ") === 0) {
         token = token.replace("Bearer ", "");
     }
-    return jwt.verify(token, secret);
+    return jwt.verify(token, secret) as JWTContent;
 };
 
 export const addSaltPassword = (pwd: string) => {

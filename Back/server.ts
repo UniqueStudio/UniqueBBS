@@ -51,7 +51,8 @@ import {
     fileDownload,
     fileUpload,
     fileDestination,
-    fileRemove
+    fileRemove,
+    fileFilter
 } from "./model/attach";
 
 const SERVER_VERSION = "1.00";
@@ -108,7 +109,11 @@ const storage = multer.diskStorage({
     destination: fileDestination,
     filename: fileUpload
 });
-const upload = multer({ storage: storage, limits: { fileSize: 20971520 } }); //20MB
+const upload = multer({
+    storage: storage,
+    limits: { fileSize: 20971520 },
+    fileFilter: fileFilter
+}); //20MB
 
 //User & Mentor
 app.get("/user/info/:uid", userInfo);

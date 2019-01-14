@@ -1,4 +1,10 @@
-import { prisma, Forum, Thread } from "../generated/prisma-client";
+import {
+    prisma,
+    Forum,
+    Thread,
+    FilterCreateOneInput,
+    FilterUpdateOneInput
+} from "../generated/prisma-client";
 import { Request, Response } from "express";
 import { setLockExpire } from "./lock";
 import { pagesize } from "./consts";
@@ -16,6 +22,11 @@ import {
 } from "./message";
 import { redLock } from "../server";
 import { fileProcess, fileDelete } from "./attach";
+import {
+    filterCalculate,
+    filterCheckTypeAvailable,
+    filterObjGenerate
+} from "./filter";
 
 export const threadList = async function(req: Request, res: Response) {
     try {
@@ -108,21 +119,26 @@ export const threadList = async function(req: Request, res: Response) {
 
 export const threadInfo = async function(req: Request, res: Response) {
     try {
-        const authObj = verifyJWT(req.header("Authorization"));
+        const { uid, isAdmin } = verifyJWT(req.header("Authorization"));
         let { tid, page } = req.params;
         page = Number.parseInt(page);
 
         const threadInfoObj = {
             id: tid,
-            active: authObj.isAdmin ? undefined : true
+            active: isAdmin ? undefined : true
         };
 
         const threadInfo = await prisma.thread({
             id: tid
         });
 
-        if (!threadInfo || (!threadInfo.active && !authObj.isAdmin)) {
+        if (!threadInfo || (!threadInfo.active && !isAdmin)) {
             return res.json({ code: -1, msg: "主题不存在！" });
+        }
+
+        const havePermission = await filterCalculate(uid, tid, isAdmin);
+        if (!havePermission) {
+            return res.json({ code: -1, msg: "您无权查看此帖子！" });
         }
 
         const threadAuthor = filterUserInfo(
@@ -137,7 +153,7 @@ export const threadInfo = async function(req: Request, res: Response) {
             where: {
                 thread: threadInfoObj,
                 isFirst: false,
-                active: authObj.isAdmin ? undefined : true
+                active: isAdmin ? undefined : true
             },
             skip: (page - 1) * pagesize,
             first: pagesize
@@ -192,7 +208,16 @@ export const threadCreate = async function(req: Request, res: Response) {
     const fileList = req.files as Array<Express.Multer.File>;
 
     try {
-        const { fid, subject, message } = req.body;
+        const {
+            fid,
+            subject,
+            message,
+            filterSwitch,
+            filterUserType,
+            filterGroupType,
+            filterUserArr,
+            filterGroupArr
+        } = req.body;
         const { uid } = verifyJWT(req.header("Authorization"));
 
         const lockFrequentReply = await setLockExpire(`postUser:${uid}`, "10");
@@ -203,7 +228,23 @@ export const threadCreate = async function(req: Request, res: Response) {
             });
         }
 
-        const lockCreatThread = await redLock.lock(`updateThread:${uid}`, 1000);
+        let filterObj: undefined | FilterCreateOneInput = undefined;
+        if (
+            filterSwitch === "1" &&
+            filterCheckTypeAvailable(filterUserType) &&
+            filterCheckTypeAvailable(filterGroupType)
+        ) {
+            filterObj = {
+                create: filterObjGenerate(
+                    filterUserArr,
+                    filterGroupArr,
+                    filterUserType,
+                    filterGroupType
+                )
+            };
+        }
+
+        const lockCreatThread = await redLock.lock(`updateThread:${uid}`, 2000);
         try {
             const resultThread = await prisma.createThread({
                 subject: subject,
@@ -230,7 +271,8 @@ export const threadCreate = async function(req: Request, res: Response) {
                         },
                         createDate: new Date()
                     }
-                }
+                },
+                filter: filterObj
             });
 
             const [newPost] = await prisma.posts({
@@ -268,8 +310,7 @@ export const threadCreate = async function(req: Request, res: Response) {
 export const threadReply = async function(req: Request, res: Response) {
     try {
         const { tid, message, quote } = req.body;
-        const authObj = verifyJWT(req.header("Authorization"));
-        const uid = authObj.uid;
+        const { uid, isAdmin } = verifyJWT(req.header("Authorization"));
 
         const lockFrequentReply = await setLockExpire(`postUser:${uid}`, "10");
         if (!lockFrequentReply) {
@@ -279,6 +320,11 @@ export const threadReply = async function(req: Request, res: Response) {
             });
         }
 
+        const havePermission = await filterCalculate(uid, tid, isAdmin);
+        if (!havePermission) {
+            return res.json({ code: -1, msg: "您无权回复此帖子！" });
+        }
+
         const lock = await redLock.lock(`updateThread:${tid}`, 200);
 
         try {
@@ -286,7 +332,7 @@ export const threadReply = async function(req: Request, res: Response) {
                 id: tid
             });
 
-            if (threadInfo.closed && !authObj.isAdmin) {
+            if (threadInfo.closed && !isAdmin) {
                 return res.json({
                     code: -1,
                     msg: "该帖子已被关闭，您无权回复！"
@@ -586,7 +632,15 @@ export const threadUpdate = async function(req: Request, res: Response) {
     try {
         const { uid, isAdmin } = verifyJWT(req.header("Authorization"));
         const { tid } = req.params;
-        const { subject, message } = req.body;
+        const {
+            subject,
+            message,
+            filterSwitch,
+            filterUserType,
+            filterGroupType,
+            filterUserArr,
+            filterGroupArr
+        } = req.body;
 
         const threadAuthor = await prisma
             .thread({
@@ -604,12 +658,29 @@ export const threadUpdate = async function(req: Request, res: Response) {
 
         const updateLock = await redLock.lock(`updateThread:${tid}`, 1000);
         try {
+            let filterObj: undefined | FilterUpdateOneInput = undefined;
+            if (
+                filterSwitch === "1" &&
+                filterCheckTypeAvailable(filterUserType) &&
+                filterCheckTypeAvailable(filterGroupType)
+            ) {
+                filterObj = {
+                    update: filterObjGenerate(
+                        filterUserArr,
+                        filterGroupArr,
+                        filterUserType,
+                        filterGroupType
+                    )
+                };
+            }
+
             const threadInfo = await prisma.updateThread({
                 where: {
                     id: tid
                 },
                 data: {
-                    subject: subject
+                    subject: subject,
+                    filter: filterObj
                 }
             });
 

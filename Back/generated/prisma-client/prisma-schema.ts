@@ -2,6 +2,10 @@ export const typeDefs = /* GraphQL */ `type AggregateAttach {
   count: Int!
 }
 
+type AggregateFilter {
+  count: Int!
+}
+
 type AggregateForum {
   count: Int!
 }
@@ -334,6 +338,153 @@ type BatchPayload {
 
 scalar DateTime
 
+type Filter {
+  id: ID!
+  userList(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [User!]
+  groupList(where: GroupWhereInput, orderBy: GroupOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Group!]
+  userType: Int!
+  groupType: Int!
+}
+
+type FilterConnection {
+  pageInfo: PageInfo!
+  edges: [FilterEdge]!
+  aggregate: AggregateFilter!
+}
+
+input FilterCreateInput {
+  userList: UserCreateManyInput
+  groupList: GroupCreateManyInput
+  userType: Int!
+  groupType: Int!
+}
+
+input FilterCreateOneInput {
+  create: FilterCreateInput
+  connect: FilterWhereUniqueInput
+}
+
+type FilterEdge {
+  node: Filter!
+  cursor: String!
+}
+
+enum FilterOrderByInput {
+  id_ASC
+  id_DESC
+  userType_ASC
+  userType_DESC
+  groupType_ASC
+  groupType_DESC
+  createdAt_ASC
+  createdAt_DESC
+  updatedAt_ASC
+  updatedAt_DESC
+}
+
+type FilterPreviousValues {
+  id: ID!
+  userType: Int!
+  groupType: Int!
+}
+
+type FilterSubscriptionPayload {
+  mutation: MutationType!
+  node: Filter
+  updatedFields: [String!]
+  previousValues: FilterPreviousValues
+}
+
+input FilterSubscriptionWhereInput {
+  mutation_in: [MutationType!]
+  updatedFields_contains: String
+  updatedFields_contains_every: [String!]
+  updatedFields_contains_some: [String!]
+  node: FilterWhereInput
+  AND: [FilterSubscriptionWhereInput!]
+  OR: [FilterSubscriptionWhereInput!]
+  NOT: [FilterSubscriptionWhereInput!]
+}
+
+input FilterUpdateDataInput {
+  userList: UserUpdateManyInput
+  groupList: GroupUpdateManyInput
+  userType: Int
+  groupType: Int
+}
+
+input FilterUpdateInput {
+  userList: UserUpdateManyInput
+  groupList: GroupUpdateManyInput
+  userType: Int
+  groupType: Int
+}
+
+input FilterUpdateManyMutationInput {
+  userType: Int
+  groupType: Int
+}
+
+input FilterUpdateOneInput {
+  create: FilterCreateInput
+  update: FilterUpdateDataInput
+  upsert: FilterUpsertNestedInput
+  delete: Boolean
+  disconnect: Boolean
+  connect: FilterWhereUniqueInput
+}
+
+input FilterUpsertNestedInput {
+  update: FilterUpdateDataInput!
+  create: FilterCreateInput!
+}
+
+input FilterWhereInput {
+  id: ID
+  id_not: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
+  id_lt: ID
+  id_lte: ID
+  id_gt: ID
+  id_gte: ID
+  id_contains: ID
+  id_not_contains: ID
+  id_starts_with: ID
+  id_not_starts_with: ID
+  id_ends_with: ID
+  id_not_ends_with: ID
+  userList_every: UserWhereInput
+  userList_some: UserWhereInput
+  userList_none: UserWhereInput
+  groupList_every: GroupWhereInput
+  groupList_some: GroupWhereInput
+  groupList_none: GroupWhereInput
+  userType: Int
+  userType_not: Int
+  userType_in: [Int!]
+  userType_not_in: [Int!]
+  userType_lt: Int
+  userType_lte: Int
+  userType_gt: Int
+  userType_gte: Int
+  groupType: Int
+  groupType_not: Int
+  groupType_in: [Int!]
+  groupType_not_in: [Int!]
+  groupType_lt: Int
+  groupType_lte: Int
+  groupType_gt: Int
+  groupType_gte: Int
+  AND: [FilterWhereInput!]
+  OR: [FilterWhereInput!]
+  NOT: [FilterWhereInput!]
+}
+
+input FilterWhereUniqueInput {
+  id: ID
+}
+
 type Forum {
   id: ID!
   name: String!
@@ -495,6 +646,11 @@ input GroupCreateInput {
   master: UserCreateOneWithoutGroupInput
 }
 
+input GroupCreateManyInput {
+  create: [GroupCreateInput!]
+  connect: [GroupWhereUniqueInput!]
+}
+
 input GroupCreateManyWithoutMasterInput {
   create: [GroupCreateWithoutMasterInput!]
   connect: [GroupWhereUniqueInput!]
@@ -589,6 +745,12 @@ input GroupSubscriptionWhereInput {
   NOT: [GroupSubscriptionWhereInput!]
 }
 
+input GroupUpdateDataInput {
+  key: Int
+  name: String
+  master: UserUpdateOneWithoutGroupInput
+}
+
 input GroupUpdateInput {
   key: Int
   name: String
@@ -598,6 +760,17 @@ input GroupUpdateInput {
 input GroupUpdateManyDataInput {
   key: Int
   name: String
+}
+
+input GroupUpdateManyInput {
+  create: [GroupCreateInput!]
+  update: [GroupUpdateWithWhereUniqueNestedInput!]
+  upsert: [GroupUpsertWithWhereUniqueNestedInput!]
+  delete: [GroupWhereUniqueInput!]
+  connect: [GroupWhereUniqueInput!]
+  disconnect: [GroupWhereUniqueInput!]
+  deleteMany: [GroupScalarWhereInput!]
+  updateMany: [GroupUpdateManyWithWhereNestedInput!]
 }
 
 input GroupUpdateManyMutationInput {
@@ -626,9 +799,20 @@ input GroupUpdateWithoutMasterDataInput {
   name: String
 }
 
+input GroupUpdateWithWhereUniqueNestedInput {
+  where: GroupWhereUniqueInput!
+  data: GroupUpdateDataInput!
+}
+
 input GroupUpdateWithWhereUniqueWithoutMasterInput {
   where: GroupWhereUniqueInput!
   data: GroupUpdateWithoutMasterDataInput!
+}
+
+input GroupUpsertWithWhereUniqueNestedInput {
+  where: GroupWhereUniqueInput!
+  update: GroupUpdateDataInput!
+  create: GroupCreateInput!
 }
 
 input GroupUpsertWithWhereUniqueWithoutMasterInput {
@@ -826,6 +1010,12 @@ type Mutation {
   upsertAttach(where: AttachWhereUniqueInput!, create: AttachCreateInput!, update: AttachUpdateInput!): Attach!
   deleteAttach(where: AttachWhereUniqueInput!): Attach
   deleteManyAttaches(where: AttachWhereInput): BatchPayload!
+  createFilter(data: FilterCreateInput!): Filter!
+  updateFilter(data: FilterUpdateInput!, where: FilterWhereUniqueInput!): Filter
+  updateManyFilters(data: FilterUpdateManyMutationInput!, where: FilterWhereInput): BatchPayload!
+  upsertFilter(where: FilterWhereUniqueInput!, create: FilterCreateInput!, update: FilterUpdateInput!): Filter!
+  deleteFilter(where: FilterWhereUniqueInput!): Filter
+  deleteManyFilters(where: FilterWhereInput): BatchPayload!
   createForum(data: ForumCreateInput!): Forum!
   updateForum(data: ForumUpdateInput!, where: ForumWhereUniqueInput!): Forum
   updateManyForums(data: ForumUpdateManyMutationInput!, where: ForumWhereInput): BatchPayload!
@@ -1188,6 +1378,9 @@ type Query {
   attach(where: AttachWhereUniqueInput!): Attach
   attaches(where: AttachWhereInput, orderBy: AttachOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Attach]!
   attachesConnection(where: AttachWhereInput, orderBy: AttachOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): AttachConnection!
+  filter(where: FilterWhereUniqueInput!): Filter
+  filters(where: FilterWhereInput, orderBy: FilterOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Filter]!
+  filtersConnection(where: FilterWhereInput, orderBy: FilterOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): FilterConnection!
   forum(where: ForumWhereUniqueInput!): Forum
   forums(where: ForumWhereInput, orderBy: ForumOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Forum]!
   forumsConnection(where: ForumWhereInput, orderBy: ForumOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): ForumConnection!
@@ -1588,6 +1781,7 @@ input ReportWhereUniqueInput {
 
 type Subscription {
   attach(where: AttachSubscriptionWhereInput): AttachSubscriptionPayload
+  filter(where: FilterSubscriptionWhereInput): FilterSubscriptionPayload
   forum(where: ForumSubscriptionWhereInput): ForumSubscriptionPayload
   group(where: GroupSubscriptionWhereInput): GroupSubscriptionPayload
   message(where: MessageSubscriptionWhereInput): MessageSubscriptionPayload
@@ -1611,6 +1805,7 @@ type Thread {
   attach(where: AttachWhereInput, orderBy: AttachOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Attach!]
   lastDate: DateTime!
   createDate: DateTime!
+  filter: Filter
 }
 
 type ThreadConnection {
@@ -1632,6 +1827,7 @@ input ThreadCreateInput {
   attach: AttachCreateManyWithoutThreadInput
   lastDate: DateTime!
   createDate: DateTime!
+  filter: FilterCreateOneInput
 }
 
 input ThreadCreateOneWithoutAttachInput {
@@ -1656,6 +1852,7 @@ input ThreadCreateWithoutAttachInput {
   diamond: Boolean
   lastDate: DateTime!
   createDate: DateTime!
+  filter: FilterCreateOneInput
 }
 
 input ThreadCreateWithoutPostInput {
@@ -1670,6 +1867,7 @@ input ThreadCreateWithoutPostInput {
   attach: AttachCreateManyWithoutThreadInput
   lastDate: DateTime!
   createDate: DateTime!
+  filter: FilterCreateOneInput
 }
 
 type ThreadEdge {
@@ -1745,6 +1943,7 @@ input ThreadUpdateInput {
   attach: AttachUpdateManyWithoutThreadInput
   lastDate: DateTime
   createDate: DateTime
+  filter: FilterUpdateOneInput
 }
 
 input ThreadUpdateManyMutationInput {
@@ -1784,6 +1983,7 @@ input ThreadUpdateWithoutAttachDataInput {
   diamond: Boolean
   lastDate: DateTime
   createDate: DateTime
+  filter: FilterUpdateOneInput
 }
 
 input ThreadUpdateWithoutPostDataInput {
@@ -1798,6 +1998,7 @@ input ThreadUpdateWithoutPostDataInput {
   attach: AttachUpdateManyWithoutThreadInput
   lastDate: DateTime
   createDate: DateTime
+  filter: FilterUpdateOneInput
 }
 
 input ThreadUpsertWithoutAttachInput {
@@ -1885,6 +2086,7 @@ input ThreadWhereInput {
   createDate_lte: DateTime
   createDate_gt: DateTime
   createDate_gte: DateTime
+  filter: FilterWhereInput
   AND: [ThreadWhereInput!]
   OR: [ThreadWhereInput!]
   NOT: [ThreadWhereInput!]
@@ -1947,6 +2149,11 @@ input UserCreateInput {
   signature: String
   mentor: UserCreateOneInput
   report: ReportCreateManyWithoutUserInput
+}
+
+input UserCreateManyInput {
+  create: [UserCreateInput!]
+  connect: [UserWhereUniqueInput!]
 }
 
 input UserCreateOneInput {
@@ -2082,6 +2289,242 @@ type UserPreviousValues {
   signature: String!
 }
 
+input UserScalarWhereInput {
+  id: ID
+  id_not: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
+  id_lt: ID
+  id_lte: ID
+  id_gt: ID
+  id_gte: ID
+  id_contains: ID
+  id_not_contains: ID
+  id_starts_with: ID
+  id_not_starts_with: ID
+  id_ends_with: ID
+  id_not_ends_with: ID
+  username: String
+  username_not: String
+  username_in: [String!]
+  username_not_in: [String!]
+  username_lt: String
+  username_lte: String
+  username_gt: String
+  username_gte: String
+  username_contains: String
+  username_not_contains: String
+  username_starts_with: String
+  username_not_starts_with: String
+  username_ends_with: String
+  username_not_ends_with: String
+  nickname: String
+  nickname_not: String
+  nickname_in: [String!]
+  nickname_not_in: [String!]
+  nickname_lt: String
+  nickname_lte: String
+  nickname_gt: String
+  nickname_gte: String
+  nickname_contains: String
+  nickname_not_contains: String
+  nickname_starts_with: String
+  nickname_not_starts_with: String
+  nickname_ends_with: String
+  nickname_not_ends_with: String
+  password: String
+  password_not: String
+  password_in: [String!]
+  password_not_in: [String!]
+  password_lt: String
+  password_lte: String
+  password_gt: String
+  password_gte: String
+  password_contains: String
+  password_not_contains: String
+  password_starts_with: String
+  password_not_starts_with: String
+  password_ends_with: String
+  password_not_ends_with: String
+  email: String
+  email_not: String
+  email_in: [String!]
+  email_not_in: [String!]
+  email_lt: String
+  email_lte: String
+  email_gt: String
+  email_gte: String
+  email_contains: String
+  email_not_contains: String
+  email_starts_with: String
+  email_not_starts_with: String
+  email_ends_with: String
+  email_not_ends_with: String
+  studentID: String
+  studentID_not: String
+  studentID_in: [String!]
+  studentID_not_in: [String!]
+  studentID_lt: String
+  studentID_lte: String
+  studentID_gt: String
+  studentID_gte: String
+  studentID_contains: String
+  studentID_not_contains: String
+  studentID_starts_with: String
+  studentID_not_starts_with: String
+  studentID_ends_with: String
+  studentID_not_ends_with: String
+  dormitory: String
+  dormitory_not: String
+  dormitory_in: [String!]
+  dormitory_not_in: [String!]
+  dormitory_lt: String
+  dormitory_lte: String
+  dormitory_gt: String
+  dormitory_gte: String
+  dormitory_contains: String
+  dormitory_not_contains: String
+  dormitory_starts_with: String
+  dormitory_not_starts_with: String
+  dormitory_ends_with: String
+  dormitory_not_ends_with: String
+  qq: String
+  qq_not: String
+  qq_in: [String!]
+  qq_not_in: [String!]
+  qq_lt: String
+  qq_lte: String
+  qq_gt: String
+  qq_gte: String
+  qq_contains: String
+  qq_not_contains: String
+  qq_starts_with: String
+  qq_not_starts_with: String
+  qq_ends_with: String
+  qq_not_ends_with: String
+  wechat: String
+  wechat_not: String
+  wechat_in: [String!]
+  wechat_not_in: [String!]
+  wechat_lt: String
+  wechat_lte: String
+  wechat_gt: String
+  wechat_gte: String
+  wechat_contains: String
+  wechat_not_contains: String
+  wechat_starts_with: String
+  wechat_not_starts_with: String
+  wechat_ends_with: String
+  wechat_not_ends_with: String
+  major: String
+  major_not: String
+  major_in: [String!]
+  major_not_in: [String!]
+  major_lt: String
+  major_lte: String
+  major_gt: String
+  major_gte: String
+  major_contains: String
+  major_not_contains: String
+  major_starts_with: String
+  major_not_starts_with: String
+  major_ends_with: String
+  major_not_ends_with: String
+  className: String
+  className_not: String
+  className_in: [String!]
+  className_not_in: [String!]
+  className_lt: String
+  className_lte: String
+  className_gt: String
+  className_gte: String
+  className_contains: String
+  className_not_contains: String
+  className_starts_with: String
+  className_not_starts_with: String
+  className_ends_with: String
+  className_not_ends_with: String
+  active: Boolean
+  active_not: Boolean
+  mobile: String
+  mobile_not: String
+  mobile_in: [String!]
+  mobile_not_in: [String!]
+  mobile_lt: String
+  mobile_lte: String
+  mobile_gt: String
+  mobile_gte: String
+  mobile_contains: String
+  mobile_not_contains: String
+  mobile_starts_with: String
+  mobile_not_starts_with: String
+  mobile_ends_with: String
+  mobile_not_ends_with: String
+  avatar: String
+  avatar_not: String
+  avatar_in: [String!]
+  avatar_not_in: [String!]
+  avatar_lt: String
+  avatar_lte: String
+  avatar_gt: String
+  avatar_gte: String
+  avatar_contains: String
+  avatar_not_contains: String
+  avatar_starts_with: String
+  avatar_not_starts_with: String
+  avatar_ends_with: String
+  avatar_not_ends_with: String
+  userid: String
+  userid_not: String
+  userid_in: [String!]
+  userid_not_in: [String!]
+  userid_lt: String
+  userid_lte: String
+  userid_gt: String
+  userid_gte: String
+  userid_contains: String
+  userid_not_contains: String
+  userid_starts_with: String
+  userid_not_starts_with: String
+  userid_ends_with: String
+  userid_not_ends_with: String
+  isAdmin: Boolean
+  isAdmin_not: Boolean
+  threads: Int
+  threads_not: Int
+  threads_in: [Int!]
+  threads_not_in: [Int!]
+  threads_lt: Int
+  threads_lte: Int
+  threads_gt: Int
+  threads_gte: Int
+  lastLogin: DateTime
+  lastLogin_not: DateTime
+  lastLogin_in: [DateTime!]
+  lastLogin_not_in: [DateTime!]
+  lastLogin_lt: DateTime
+  lastLogin_lte: DateTime
+  lastLogin_gt: DateTime
+  lastLogin_gte: DateTime
+  signature: String
+  signature_not: String
+  signature_in: [String!]
+  signature_not_in: [String!]
+  signature_lt: String
+  signature_lte: String
+  signature_gt: String
+  signature_gte: String
+  signature_contains: String
+  signature_not_contains: String
+  signature_starts_with: String
+  signature_not_starts_with: String
+  signature_ends_with: String
+  signature_not_ends_with: String
+  AND: [UserScalarWhereInput!]
+  OR: [UserScalarWhereInput!]
+  NOT: [UserScalarWhereInput!]
+}
+
 type UserSubscriptionPayload {
   mutation: MutationType!
   node: User
@@ -2148,6 +2591,38 @@ input UserUpdateInput {
   report: ReportUpdateManyWithoutUserInput
 }
 
+input UserUpdateManyDataInput {
+  username: String
+  nickname: String
+  password: String
+  email: String
+  studentID: String
+  dormitory: String
+  qq: String
+  wechat: String
+  major: String
+  className: String
+  active: Boolean
+  mobile: String
+  avatar: String
+  userid: String
+  isAdmin: Boolean
+  threads: Int
+  lastLogin: DateTime
+  signature: String
+}
+
+input UserUpdateManyInput {
+  create: [UserCreateInput!]
+  update: [UserUpdateWithWhereUniqueNestedInput!]
+  upsert: [UserUpsertWithWhereUniqueNestedInput!]
+  delete: [UserWhereUniqueInput!]
+  connect: [UserWhereUniqueInput!]
+  disconnect: [UserWhereUniqueInput!]
+  deleteMany: [UserScalarWhereInput!]
+  updateMany: [UserUpdateManyWithWhereNestedInput!]
+}
+
 input UserUpdateManyMutationInput {
   username: String
   nickname: String
@@ -2167,6 +2642,11 @@ input UserUpdateManyMutationInput {
   threads: Int
   lastLogin: DateTime
   signature: String
+}
+
+input UserUpdateManyWithWhereNestedInput {
+  where: UserScalarWhereInput!
+  data: UserUpdateManyDataInput!
 }
 
 input UserUpdateOneInput {
@@ -2247,6 +2727,11 @@ input UserUpdateWithoutReportDataInput {
   mentor: UserUpdateOneInput
 }
 
+input UserUpdateWithWhereUniqueNestedInput {
+  where: UserWhereUniqueInput!
+  data: UserUpdateDataInput!
+}
+
 input UserUpsertNestedInput {
   update: UserUpdateDataInput!
   create: UserCreateInput!
@@ -2260,6 +2745,12 @@ input UserUpsertWithoutGroupInput {
 input UserUpsertWithoutReportInput {
   update: UserUpdateWithoutReportDataInput!
   create: UserCreateWithoutReportInput!
+}
+
+input UserUpsertWithWhereUniqueNestedInput {
+  where: UserWhereUniqueInput!
+  update: UserUpdateDataInput!
+  create: UserCreateInput!
 }
 
 input UserWhereInput {

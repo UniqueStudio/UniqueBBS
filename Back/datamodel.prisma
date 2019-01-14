@@ -26,7 +26,7 @@ type User {
     lastLogin: DateTime!
     signature: String! @default(value: "")
     mentor: User
-    report: [Report!]! @relation(name:"ReportList")
+    report: [Report!]! @relation(name: "ReportList")
 }
 type Report {
     id: ID! @unique
@@ -37,7 +37,7 @@ type Report {
     conclusion: String!
     createDate: DateTime!
     isWeek: Boolean! @default(value: false)
-    user: User! @relation(name:"ReportList")
+    user: User! @relation(name: "ReportList")
 }
 type Forum {
     id: ID! @unique
@@ -69,6 +69,7 @@ type Thread {
     attach: [Attach!]!
     lastDate: DateTime!
     createDate: DateTime!
+    filter: Filter
 }
 type Attach {
     id: ID! @unique
@@ -86,4 +87,11 @@ type Message {
     message: String!
     isRead: Boolean! @default(value: false)
     createDate: DateTime!
+}
+type Filter {
+    id: ID! @unique
+    userList: [User!]!
+    groupList: [Group!]!
+    userType: Int!
+    groupType: Int!
 }

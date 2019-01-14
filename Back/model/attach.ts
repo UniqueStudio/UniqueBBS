@@ -2,12 +2,32 @@ import { verifyJWT } from "./check";
 import { Request, Response } from "express";
 import { prisma, Attach } from "../generated/prisma-client";
 import { redLock } from "../server";
+import { filterCalculate } from "./filter";
 import * as fs from "fs";
 
 export const fileDownload = async function(req: Request, res: Response) {
     try {
         const { uid, isAdmin } = verifyJWT(req.header("Authorization"));
         const { aid } = req.params;
+
+        const threadInfo = await prisma
+            .attach({
+                id: aid
+            })
+            .thread();
+
+        if (!isAdmin && !threadInfo.active) {
+            return res.json({ code: -1, msg: "该附件不存在！" });
+        }
+
+        const havePermission = await filterCalculate(
+            uid,
+            threadInfo.id,
+            isAdmin
+        );
+        if (!havePermission) {
+            return res.json({ code: -1, msg: "您无权下载此附件！" });
+        }
 
         let downloadItem: Attach;
 
@@ -32,18 +52,19 @@ export const fileDownload = async function(req: Request, res: Response) {
         } finally {
             downloadLock.unlock();
         }
-        const threadInfo = await prisma
-            .attach({
-                id: aid
-            })
-            .thread();
 
-        if (!isAdmin && !threadInfo.active) {
-            return res.json({ code: -1, msg: "该附件不存在！" });
-        }
         res.download(downloadItem.fileName, downloadItem.originalName);
     } catch (e) {
         res.json({ code: -1, msg: e.message });
+    }
+};
+
+export const fileFilter = function(req, file, cb) {
+    try {
+        const authObj = verifyJWT(req["header"]("Authorization"));
+        cb(null, true);
+    } catch {
+        cb(null, false);
     }
 };
 
@@ -52,7 +73,7 @@ export const fileUpload = function(req, file, cb) {
         const { uid } = verifyJWT(req["header"]("Authorization"));
         cb(null, `${uid}_${file.originalname}_${new Date().getTime()}.rabbit`);
     } catch {
-        cb(null, false);
+        cb(null, `ERR_${file.originalname}_${new Date().getTime()}.rabbit`);
     }
 };
 
