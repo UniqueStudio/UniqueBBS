@@ -64,6 +64,8 @@ export const redisClient = Redis.createClient({
 
 export const redisClientGetAsync = promisify(redisClient.get).bind(redisClient);
 export const redisClientSetAsync = promisify(redisClient.set).bind(redisClient);
+export const redisClientKeysAsync = promisify(redisClient.keys).bind(redisClient);
+export const redisClientDelAsync = promisify(redisClient.del).bind(redisClient);
 export const redisClientIncrAsync = promisify(redisClient.incr).bind(
     redisClient
 );

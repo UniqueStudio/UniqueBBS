@@ -300,9 +300,9 @@ export const threadCreate = async function(req: Request, res: Response) {
             lockCreatThread.unlock();
         }
     } catch (e) {
-        for (let _file of fileList) {
-            fileDelete(_file.destination + _file.filename);
-        }
+        fileList.forEach(item => {
+            fileDelete(item.destination + item.filename);
+        });
         res.json({ code: -1, msg: e.message });
     }
 };
@@ -718,9 +718,9 @@ export const threadUpdate = async function(req: Request, res: Response) {
             updateLock.unlock();
         }
     } catch (e) {
-        for (let _file of fileList) {
-            fileDelete(_file.destination + _file.filename);
-        }
+        fileList.forEach(item => {
+            fileDelete(item.destination + item.filename);
+        });
         res.json({ code: -1, msg: e.message });
     }
 };

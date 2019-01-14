@@ -3,7 +3,12 @@ const FILTER_CAN_SEE = 1;
 const FILTER_CANNOT_SEE = 2;
 const FILTER_EXPIRE_SECONDS = 12 * 60 * 60;
 
-import { redisClientGetAsync, redisClientSetAsync } from "../server";
+import {
+    redisClientGetAsync,
+    redisClientSetAsync,
+    redisClientKeysAsync,
+    redisClientDelAsync
+} from "../server";
 import { prisma, Group } from "../generated/prisma-client";
 
 export const filterCheckTypeAvailable = function(filterType: string): boolean {
@@ -20,19 +25,13 @@ export const filterObjGenerate = function(
     filterUserType: string,
     filterGroupType: string
 ) {
-    let userListArr: Array<{ id: string }> = [],
-        groupListArr: Array<{ id: string }> = [];
-    for (let _user of filterUserArr) {
-        userListArr.push({
-            id: _user
-        });
-    }
+    const userListArr: Array<{ id: string }> = filterUserArr.map(item => ({
+        id: item
+    }));
 
-    for (let _group of filterGroupArr) {
-        groupListArr.push({
-            id: _group
-        });
-    }
+    const groupListArr: Array<{ id: string }> = filterGroupArr.map(item => ({
+        id: item
+    }));
 
     return {
         userType: Number.parseInt(filterUserType),
@@ -89,17 +88,16 @@ export const filterCalculate = async function(
             })
             .userList();
 
-        for (let userFilterItem of userFilterList) {
-            if (userFilterItem.id === uid) {
+        userFilterList.some(item => {
+            if (item.id === uid) {
                 result = decideFlag;
-                break;
             }
-        }
+            return item.id === uid;
+        });
     }
 
     if (filterGroupType !== FILTER_CLOSE && result !== undefined) {
-        const decideFlag: boolean =
-            filterGroupType === FILTER_CAN_SEE ? true : false;
+        const decideFlag: boolean = filterGroupType === FILTER_CAN_SEE;
 
         const groupFilterList = await prisma
             .filter({
@@ -114,12 +112,12 @@ export const filterCalculate = async function(
                 })
                 .group();
 
-            for (let userGroupItem of userGroupList) {
-                if (userGroupItem.id === groupFilterItem.id) {
+            userGroupList.some(item => {
+                if (item.id === groupFilterItem.id) {
                     result = decideFlag;
-                    break;
                 }
-            }
+                return item.id === groupFilterItem.id;
+            });
 
             if (result !== undefined) {
                 break;
@@ -137,4 +135,11 @@ export const filterCalculate = async function(
         FILTER_EXPIRE_SECONDS
     );
     return finalResult;
+};
+
+export const filterClearCache = async function(tid: string) {
+    const arr = await redisClientKeysAsync(`filterThread:*:${tid}`);
+    arr.forEach(item => {
+        redisClientDelAsync(item);
+    });
 };
