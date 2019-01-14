@@ -59,7 +59,11 @@ export const fileDownload = async function(req: Request, res: Response) {
     }
 };
 
-export const fileFilter = function(req, file, cb) {
+export const fileFilter = function(
+    req: Express.Request,
+    file: Express.Multer.File,
+    cb: (error: Error, acceptFile: boolean) => void
+) {
     try {
         const authObj = verifyJWT(req["header"]("Authorization"));
         cb(null, true);
@@ -68,7 +72,11 @@ export const fileFilter = function(req, file, cb) {
     }
 };
 
-export const fileUpload = function(req, file, cb) {
+export const fileUpload = function(
+    req: Express.Request,
+    file: Express.Multer.File,
+    cb: (error: Error, filename: string) => void
+) {
     try {
         const { uid } = verifyJWT(req["header"]("Authorization"));
         cb(null, `${uid}_${file.originalname}_${new Date().getTime()}.rabbit`);
@@ -121,7 +129,11 @@ export const fileProcess = async function(
     }
 };
 
-export const fileDestination = function(req, file, cb) {
+export const fileDestination = function(
+    req: Express.Request,
+    file: Express.Multer.File,
+    cb: (error: Error, destination: string) => void
+) {
     const date = new Date();
     const dirName =
         date.getFullYear().toString() +

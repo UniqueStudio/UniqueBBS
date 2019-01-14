@@ -31,19 +31,19 @@ export const verifyJWT = (token?: string) => {
     return jwt.verify(token, secret) as JWTContent;
 };
 
-export const addSaltPassword = (pwd: string) => {
+export const addSaltPassword = function(pwd: string) {
     const md5 = crypto.createHash("md5");
     const firstMD5 = md5.update(pwd).digest("hex");
     const md5_2 = crypto.createHash("md5");
     return md5_2.update(firstMD5 + secret).digest("hex");
 };
 
-export const addSaltPasswordOnce = (pwd_MD5: string) => {
+export const addSaltPasswordOnce = function(pwd_MD5: string) {
     const md5 = crypto.createHash("md5");
     return md5.update(pwd_MD5 + secret).digest("hex");
 };
 
-export const getAccessToken = async () => {
+export const getAccessToken = async function() {
     const accessTokenResponse = await fetch(accessTokenURL);
     const accessTokenResult = await accessTokenResponse.json();
     const accessToken = accessTokenResult.access_token;

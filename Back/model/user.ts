@@ -368,9 +368,11 @@ export const mentorGet = async function(req: Request, res: Response) {
         const authObj = verifyJWT(req.header("Authorization"));
         const uid: string = authObj.uid;
 
-        const result = await prisma.user({
-            id:uid
-        }).mentor();
+        const result = await prisma
+            .user({
+                id: uid
+            })
+            .mentor();
 
         res.json({ code: 1, msg: filterUserInfo(result) });
     } catch (e) {

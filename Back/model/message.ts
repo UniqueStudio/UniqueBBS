@@ -10,7 +10,11 @@ export const MESSAGE_QUOTE = (username, subject) =>
 export const MESSAGE_DIAMOND = subject =>
     `您的帖子《${subject}》被管理员设置为精华帖子！`;
 
-export const pushMessage = async function(fromUid, toUid, msg) {
+export const pushMessage = async function(
+    fromUid: string,
+    toUid: string,
+    msg: string
+) {
     const result: Message = await prisma.createMessage({
         fromUser: {
             connect: {
