@@ -25,7 +25,8 @@ import { fileProcess, fileDelete } from "./attach";
 import {
     filterCalculate,
     filterCheckTypeAvailable,
-    filterObjGenerate
+    filterObjGenerate,
+    filterClearCache
 } from "./filter";
 
 export const threadList = async function(req: Request, res: Response) {
@@ -657,6 +658,7 @@ export const threadUpdate = async function(req: Request, res: Response) {
         }
 
         const updateLock = await redLock.lock(`updateThread:${tid}`, 1000);
+        await filterClearCache(tid);
         try {
             let filterObj: undefined | FilterUpdateOneInput = undefined;
             if (

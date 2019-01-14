@@ -89,9 +89,8 @@ export const fileProcess = async function(
         (date.getMonth() + 1).toString() +
         "_" +
         date.getDate().toString();
-    let createAttachArr = [];
 
-    for (let file of files) {
+    const createAttachArr = files.map(file => {
         const oldPath = file.destination + file.filename;
         const newDir = `./upload/${dirName}`;
         const newPath = `${newDir}/${pid}_${new Date()
@@ -100,13 +99,13 @@ export const fileProcess = async function(
 
         if (!fs.existsSync(newDir)) fs.mkdirSync(newDir);
         fileMove(oldPath, newPath);
-        createAttachArr.push({
+        return {
             filesize: file.size,
             fileName: newPath,
             originalName: file.originalname,
             createDate: new Date()
-        });
-    }
+        };
+    });
 
     if (createAttachArr.length !== 0) {
         await prisma.updateThread({
