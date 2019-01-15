@@ -36,7 +36,8 @@ type AggregateUser {
 
 type Attach {
   id: ID!
-  thread: Thread!
+  thread: Thread
+  user: User!
   filesize: Int!
   downloads: Int!
   fileName: String!
@@ -51,7 +52,8 @@ type AttachConnection {
 }
 
 input AttachCreateInput {
-  thread: ThreadCreateOneWithoutAttachInput!
+  thread: ThreadCreateOneWithoutAttachInput
+  user: UserCreateOneInput!
   filesize: Int!
   downloads: Int
   fileName: String!
@@ -65,6 +67,7 @@ input AttachCreateManyWithoutThreadInput {
 }
 
 input AttachCreateWithoutThreadInput {
+  user: UserCreateOneInput!
   filesize: Int!
   downloads: Int
   fileName: String!
@@ -196,7 +199,8 @@ input AttachSubscriptionWhereInput {
 }
 
 input AttachUpdateInput {
-  thread: ThreadUpdateOneRequiredWithoutAttachInput
+  thread: ThreadUpdateOneWithoutAttachInput
+  user: UserUpdateOneRequiredInput
   filesize: Int
   downloads: Int
   fileName: String
@@ -237,6 +241,7 @@ input AttachUpdateManyWithWhereNestedInput {
 }
 
 input AttachUpdateWithoutThreadDataInput {
+  user: UserUpdateOneRequiredInput
   filesize: Int
   downloads: Int
   fileName: String
@@ -271,6 +276,7 @@ input AttachWhereInput {
   id_ends_with: ID
   id_not_ends_with: ID
   thread: ThreadWhereInput
+  user: UserWhereInput
   filesize: Int
   filesize_not: Int
   filesize_in: [Int!]
@@ -490,6 +496,7 @@ type Forum {
   name: String!
   threads: Int!
   lastPost: Post
+  icon: String!
 }
 
 type ForumConnection {
@@ -502,6 +509,7 @@ input ForumCreateInput {
   name: String!
   threads: Int
   lastPost: PostCreateOneInput
+  icon: String!
 }
 
 input ForumCreateOneInput {
@@ -521,6 +529,8 @@ enum ForumOrderByInput {
   name_DESC
   threads_ASC
   threads_DESC
+  icon_ASC
+  icon_DESC
   createdAt_ASC
   createdAt_DESC
   updatedAt_ASC
@@ -531,6 +541,7 @@ type ForumPreviousValues {
   id: ID!
   name: String!
   threads: Int!
+  icon: String!
 }
 
 type ForumSubscriptionPayload {
@@ -555,17 +566,20 @@ input ForumUpdateDataInput {
   name: String
   threads: Int
   lastPost: PostUpdateOneInput
+  icon: String
 }
 
 input ForumUpdateInput {
   name: String
   threads: Int
   lastPost: PostUpdateOneInput
+  icon: String
 }
 
 input ForumUpdateManyMutationInput {
   name: String
   threads: Int
+  icon: String
 }
 
 input ForumUpdateOneRequiredInput {
@@ -618,6 +632,20 @@ input ForumWhereInput {
   threads_gt: Int
   threads_gte: Int
   lastPost: PostWhereInput
+  icon: String
+  icon_not: String
+  icon_in: [String!]
+  icon_not_in: [String!]
+  icon_lt: String
+  icon_lte: String
+  icon_gt: String
+  icon_gte: String
+  icon_contains: String
+  icon_not_contains: String
+  icon_starts_with: String
+  icon_not_starts_with: String
+  icon_ends_with: String
+  icon_not_ends_with: String
   AND: [ForumWhereInput!]
   OR: [ForumWhereInput!]
   NOT: [ForumWhereInput!]
@@ -1957,17 +1985,19 @@ input ThreadUpdateManyMutationInput {
   createDate: DateTime
 }
 
-input ThreadUpdateOneRequiredWithoutAttachInput {
-  create: ThreadCreateWithoutAttachInput
-  update: ThreadUpdateWithoutAttachDataInput
-  upsert: ThreadUpsertWithoutAttachInput
-  connect: ThreadWhereUniqueInput
-}
-
 input ThreadUpdateOneRequiredWithoutPostInput {
   create: ThreadCreateWithoutPostInput
   update: ThreadUpdateWithoutPostDataInput
   upsert: ThreadUpsertWithoutPostInput
+  connect: ThreadWhereUniqueInput
+}
+
+input ThreadUpdateOneWithoutAttachInput {
+  create: ThreadCreateWithoutAttachInput
+  update: ThreadUpdateWithoutAttachDataInput
+  upsert: ThreadUpsertWithoutAttachInput
+  delete: Boolean
+  disconnect: Boolean
   connect: ThreadWhereUniqueInput
 }
 

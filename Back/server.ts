@@ -51,6 +51,7 @@ import * as multer from "multer";
 import {
     fileDownload,
     fileUpload,
+    fileName,
     fileDestination,
     fileRemove,
     fileFilter
@@ -112,7 +113,7 @@ app.use(
 
 const storage = multer.diskStorage({
     destination: fileDestination,
-    filename: fileUpload
+    filename: fileName
 });
 const upload = multer({
     storage: storage,
@@ -141,8 +142,8 @@ app.get("/forum/listSimple", forumListSimple);
 //Thread
 app.get("/thread/list/:fid/:page", threadList);
 app.get("/thread/info/:tid/:page", threadInfo);
-app.post("/thread/create", upload.array("attaches", 10), threadCreate);
-app.post("/thread/update/:tid", upload.array("attaches", 10), threadUpdate);
+app.post("/thread/create", threadCreate);
+app.post("/thread/update/:tid", threadUpdate);
 app.post("/thread/move/:tid", threadMove);
 app.post("/thread/reply", threadReply);
 app.post("/thread/diamond", threadDiamond);
@@ -172,6 +173,7 @@ app.post("/report/update/:rid", reportUpdate);
 //Attach
 app.get("/attach/download/:aid", fileDownload);
 app.post("/attach/remove/:aid", fileRemove);
+app.post("/attach/upload", upload.array("attaches", 10), fileUpload);
 
 app.listen(7010, () => {
     console.log(

@@ -44,6 +44,7 @@ type Forum {
     name: String!
     threads: Int! @default(value: 0)
     lastPost: Post @relation(name: "ForumLastPost")
+    icon: String!
 }
 type Post {
     id: ID! @unique
@@ -73,7 +74,8 @@ type Thread {
 }
 type Attach {
     id: ID! @unique
-    thread: Thread!
+    thread: Thread
+    user: User!
     filesize: Int!
     downloads: Int! @default(value: 0)
     fileName: String!

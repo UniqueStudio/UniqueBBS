@@ -5,6 +5,73 @@ import { redLock } from "../server";
 import { filterCalculate } from "./filter";
 import * as fs from "fs";
 
+export const fileUpload = async function(req: Request, res: Response) {
+    const fileList = req.files as Array<Express.Multer.File>;
+    try {
+        const { uid, isAdmin } = verifyJWT(req.header("Authorization"));
+
+        const result = await Promise.all(
+            fileList.map(async item => {
+                const result = await prisma.createAttach({
+                    user: {
+                        connect: {
+                            id: uid
+                        }
+                    },
+                    filesize: item.size,
+                    downloads: 0,
+                    fileName: item.destination + item.filename,
+                    originalName: item.originalname,
+                    createDate: new Date()
+                });
+                return {
+                    id: result.id
+                };
+            })
+        );
+
+        res.json({ code: 1, msg: result });
+    } catch (e) {
+        res.json({ code: -1, msg: e.message });
+        fileList.forEach(item => {
+            fileDelete(item.destination + item.filename);
+        });
+    }
+};
+
+export const fileGetUnlink = async function(req: Request, res: Response) {
+    try {
+        const { uid } = verifyJWT(req.header("Authorization"));
+        const result = await prisma.attaches({
+            where: {
+                user: {
+                    id: uid
+                }
+            },
+            orderBy: "createDate_DESC"
+        });
+        res.json({ code: -1, msg: result });
+    } catch (e) {
+        res.json({ code: -1, msg: e.message });
+    }
+};
+
+export const fileClearAllUnlink = async function() {
+    const arr = await prisma.attaches({
+        where: {
+            thread: null
+        }
+    });
+
+    arr.forEach(item => {
+        fileDelete(item.fileName);
+    });
+
+    await prisma.deleteManyAttaches({
+        thread: null
+    });
+};
+
 export const fileDownload = async function(req: Request, res: Response) {
     try {
         const { uid, isAdmin } = verifyJWT(req.header("Authorization"));
@@ -72,7 +139,7 @@ export const fileFilter = function(
     }
 };
 
-export const fileUpload = function(
+export const fileName = function(
     req: Express.Request,
     file: Express.Multer.File,
     cb: (error: Error, filename: string) => void
@@ -86,7 +153,7 @@ export const fileUpload = function(
 };
 
 export const fileProcess = async function(
-    files: Array<Express.Multer.File>,
+    files: Array<string>,
     pid: string,
     tid: string
 ) {
@@ -98,31 +165,42 @@ export const fileProcess = async function(
         "_" +
         date.getDate().toString();
 
-    const createAttachArr = files.map(file => {
-        const oldPath = file.destination + file.filename;
-        const newDir = `./upload/${dirName}`;
-        const newPath = `${newDir}/${pid}_${new Date()
-            .getTime()
-            .toString()}_${createAttachArr.length.toString()}.rabbit`;
+    const connectAttachArr = await Promise.all(
+        files.map(async aid => {
+            const attach = await prisma.attach({ id: aid });
 
-        if (!fs.existsSync(newDir)) fs.mkdirSync(newDir);
-        fileMove(oldPath, newPath);
-        return {
-            filesize: file.size,
-            fileName: newPath,
-            originalName: file.originalname,
-            createDate: new Date()
-        };
-    });
+            const oldPath = attach.fileName;
+            const newDir = `./upload/${dirName}`;
+            const newPath = `${newDir}/${pid}_${new Date()
+                .getTime()
+                .toString()}_${aid}.rabbit`;
 
-    if (createAttachArr.length !== 0) {
+            if (!fs.existsSync(newDir)) fs.mkdirSync(newDir);
+            fileMove(oldPath, newPath);
+
+            await prisma.updateAttach({
+                where: {
+                    id: aid
+                },
+                data: {
+                    fileName: newPath
+                }
+            });
+
+            return {
+                id: aid
+            };
+        })
+    );
+
+    if (connectAttachArr.length !== 0) {
         await prisma.updateThread({
             where: {
                 id: tid
             },
             data: {
                 attach: {
-                    create: createAttachArr
+                    connect: connectAttachArr
                 }
             }
         });

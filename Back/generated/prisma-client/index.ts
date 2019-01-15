@@ -580,6 +580,8 @@ export type ForumOrderByInput =
   | "name_DESC"
   | "threads_ASC"
   | "threads_DESC"
+  | "icon_ASC"
+  | "icon_DESC"
   | "createdAt_ASC"
   | "createdAt_DESC"
   | "updatedAt_ASC"
@@ -1191,6 +1193,20 @@ export interface ForumWhereInput {
   threads_gt?: Int;
   threads_gte?: Int;
   lastPost?: PostWhereInput;
+  icon?: String;
+  icon_not?: String;
+  icon_in?: String[] | String;
+  icon_not_in?: String[] | String;
+  icon_lt?: String;
+  icon_lte?: String;
+  icon_gt?: String;
+  icon_gte?: String;
+  icon_contains?: String;
+  icon_not_contains?: String;
+  icon_starts_with?: String;
+  icon_not_starts_with?: String;
+  icon_ends_with?: String;
+  icon_not_ends_with?: String;
   AND?: ForumWhereInput[] | ForumWhereInput;
   OR?: ForumWhereInput[] | ForumWhereInput;
   NOT?: ForumWhereInput[] | ForumWhereInput;
@@ -1212,6 +1228,7 @@ export interface AttachWhereInput {
   id_ends_with?: ID_Input;
   id_not_ends_with?: ID_Input;
   thread?: ThreadWhereInput;
+  user?: UserWhereInput;
   filesize?: Int;
   filesize_not?: Int;
   filesize_in?: Int[] | Int;
@@ -1392,7 +1409,8 @@ export type UserWhereUniqueInput = AtLeastOne<{
 }>;
 
 export interface AttachCreateInput {
-  thread: ThreadCreateOneWithoutAttachInput;
+  thread?: ThreadCreateOneWithoutAttachInput;
+  user: UserCreateOneInput;
   filesize: Int;
   downloads?: Int;
   fileName: String;
@@ -1483,6 +1501,7 @@ export interface ForumCreateInput {
   name: String;
   threads?: Int;
   lastPost?: PostCreateOneInput;
+  icon: String;
 }
 
 export interface PostCreateOneInput {
@@ -1526,6 +1545,7 @@ export interface AttachCreateManyWithoutThreadInput {
 }
 
 export interface AttachCreateWithoutThreadInput {
+  user: UserCreateOneInput;
   filesize: Int;
   downloads?: Int;
   fileName: String;
@@ -1604,7 +1624,8 @@ export interface PostCreateWithoutThreadInput {
 }
 
 export interface AttachUpdateInput {
-  thread?: ThreadUpdateOneRequiredWithoutAttachInput;
+  thread?: ThreadUpdateOneWithoutAttachInput;
+  user?: UserUpdateOneRequiredInput;
   filesize?: Int;
   downloads?: Int;
   fileName?: String;
@@ -1612,10 +1633,12 @@ export interface AttachUpdateInput {
   createDate?: DateTimeInput;
 }
 
-export interface ThreadUpdateOneRequiredWithoutAttachInput {
+export interface ThreadUpdateOneWithoutAttachInput {
   create?: ThreadCreateWithoutAttachInput;
   update?: ThreadUpdateWithoutAttachDataInput;
   upsert?: ThreadUpsertWithoutAttachInput;
+  delete?: Boolean;
+  disconnect?: Boolean;
   connect?: ThreadWhereUniqueInput;
 }
 
@@ -1928,6 +1951,7 @@ export interface ForumUpdateDataInput {
   name?: String;
   threads?: Int;
   lastPost?: PostUpdateOneInput;
+  icon?: String;
 }
 
 export interface PostUpdateOneInput {
@@ -1994,6 +2018,7 @@ export interface AttachUpdateWithWhereUniqueWithoutThreadInput {
 }
 
 export interface AttachUpdateWithoutThreadDataInput {
+  user?: UserUpdateOneRequiredInput;
   filesize?: Int;
   downloads?: Int;
   fileName?: String;
@@ -2622,11 +2647,13 @@ export interface ForumUpdateInput {
   name?: String;
   threads?: Int;
   lastPost?: PostUpdateOneInput;
+  icon?: String;
 }
 
 export interface ForumUpdateManyMutationInput {
   name?: String;
   threads?: Int;
+  icon?: String;
 }
 
 export interface GroupUpdateInput {
@@ -2978,6 +3005,7 @@ export interface Attach {
 export interface AttachPromise extends Promise<Attach>, Fragmentable {
   id: () => Promise<ID_Output>;
   thread: <T = ThreadPromise>() => T;
+  user: <T = UserPromise>() => T;
   filesize: () => Promise<Int>;
   downloads: () => Promise<Int>;
   fileName: () => Promise<String>;
@@ -2990,6 +3018,7 @@ export interface AttachSubscription
     Fragmentable {
   id: () => Promise<AsyncIterator<ID_Output>>;
   thread: <T = ThreadSubscription>() => T;
+  user: <T = UserSubscription>() => T;
   filesize: () => Promise<AsyncIterator<Int>>;
   downloads: () => Promise<AsyncIterator<Int>>;
   fileName: () => Promise<AsyncIterator<String>>;
@@ -3262,6 +3291,7 @@ export interface Forum {
   id: ID_Output;
   name: String;
   threads: Int;
+  icon: String;
 }
 
 export interface ForumPromise extends Promise<Forum>, Fragmentable {
@@ -3269,6 +3299,7 @@ export interface ForumPromise extends Promise<Forum>, Fragmentable {
   name: () => Promise<String>;
   threads: () => Promise<Int>;
   lastPost: <T = PostPromise>() => T;
+  icon: () => Promise<String>;
 }
 
 export interface ForumSubscription
@@ -3278,6 +3309,7 @@ export interface ForumSubscription
   name: () => Promise<AsyncIterator<String>>;
   threads: () => Promise<AsyncIterator<Int>>;
   lastPost: <T = PostSubscription>() => T;
+  icon: () => Promise<AsyncIterator<String>>;
 }
 
 export interface Post {
@@ -4061,6 +4093,7 @@ export interface ForumPreviousValues {
   id: ID_Output;
   name: String;
   threads: Int;
+  icon: String;
 }
 
 export interface ForumPreviousValuesPromise
@@ -4069,6 +4102,7 @@ export interface ForumPreviousValuesPromise
   id: () => Promise<ID_Output>;
   name: () => Promise<String>;
   threads: () => Promise<Int>;
+  icon: () => Promise<String>;
 }
 
 export interface ForumPreviousValuesSubscription
@@ -4077,6 +4111,7 @@ export interface ForumPreviousValuesSubscription
   id: () => Promise<AsyncIterator<ID_Output>>;
   name: () => Promise<AsyncIterator<String>>;
   threads: () => Promise<AsyncIterator<Int>>;
+  icon: () => Promise<AsyncIterator<String>>;
 }
 
 export interface GroupSubscriptionPayload {

@@ -23,7 +23,7 @@
       </div>
     </div>
     <div class="body">
-      <router-view></router-view>
+      <router-view @changeAvatar="userAvatarSrc = $event;"></router-view>
     </div>
     <footer>
       <p class="footer-left">
@@ -44,6 +44,9 @@ export default {
       userAvatarSrc:
         "http://p.qlogo.cn/bizmail/DaKOA6aHxn24gyNbZg1ZeEuiaDwI83BxRkg16o7nMOJ6WFZAEtzBIpA/"
     };
+  },
+  methods:{
+
   }
 };
 </script>

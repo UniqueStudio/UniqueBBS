@@ -34,9 +34,10 @@ export const forumListSimple = async function(req: Request, res: Response) {
     }
 };
 
-export const forumCreate = async function(name: string) {
+export const forumCreate = async function(name: string, icon: string) {
     const result = await prisma.createForum({
-        name: name
+        name: name,
+        icon: icon
     });
     return result;
 };

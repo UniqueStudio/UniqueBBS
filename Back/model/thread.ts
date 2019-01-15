@@ -206,8 +206,6 @@ export const threadInfo = async function(req: Request, res: Response) {
 };
 
 export const threadCreate = async function(req: Request, res: Response) {
-    const fileList = req.files as Array<Express.Multer.File>;
-
     try {
         const {
             fid,
@@ -217,7 +215,8 @@ export const threadCreate = async function(req: Request, res: Response) {
             filterUserType,
             filterGroupType,
             filterUserArr,
-            filterGroupArr
+            filterGroupArr,
+            fileListArr
         } = req.body;
         const { uid } = verifyJWT(req.header("Authorization"));
 
@@ -288,8 +287,8 @@ export const threadCreate = async function(req: Request, res: Response) {
             });
             const newPostPid = newPost.id;
 
-            if (fileList.length !== 0) {
-                fileProcess(fileList, newPostPid, resultThread.id);
+            if (fileListArr.length !== 0) {
+                fileProcess(fileListArr, newPostPid, resultThread.id);
             }
 
             await forumThreadsAdd(fid, 1, newPostPid);
@@ -301,9 +300,6 @@ export const threadCreate = async function(req: Request, res: Response) {
             lockCreatThread.unlock();
         }
     } catch (e) {
-        fileList.forEach(item => {
-            fileDelete(item.destination + item.filename);
-        });
         res.json({ code: -1, msg: e.message });
     }
 };
@@ -629,7 +625,6 @@ export const threadRecovery = async function(req: Request, res: Response) {
 };
 
 export const threadUpdate = async function(req: Request, res: Response) {
-    const fileList = req.files as Array<Express.Multer.File>;
     try {
         const { uid, isAdmin } = verifyJWT(req.header("Authorization"));
         const { tid } = req.params;
@@ -640,7 +635,8 @@ export const threadUpdate = async function(req: Request, res: Response) {
             filterUserType,
             filterGroupType,
             filterUserArr,
-            filterGroupArr
+            filterGroupArr,
+            fileListArr
         } = req.body;
 
         const threadAuthor = await prisma
@@ -698,7 +694,7 @@ export const threadUpdate = async function(req: Request, res: Response) {
                 }
             });
 
-            if (fileList.length !== 0) {
+            if (fileListArr.length !== 0) {
                 const postInfo = await prisma
                     .thread({
                         id: threadInfo.id
@@ -710,7 +706,7 @@ export const threadUpdate = async function(req: Request, res: Response) {
                         orderBy: "createDate_ASC",
                         first: 1
                     });
-                fileProcess(fileList, postInfo[0].id, threadInfo.id);
+                fileProcess(fileListArr, postInfo[0].id, threadInfo.id);
             }
 
             res.json({ code: 1 });
@@ -720,9 +716,6 @@ export const threadUpdate = async function(req: Request, res: Response) {
             updateLock.unlock();
         }
     } catch (e) {
-        fileList.forEach(item => {
-            fileDelete(item.destination + item.filename);
-        });
         res.json({ code: -1, msg: e.message });
     }
 };
