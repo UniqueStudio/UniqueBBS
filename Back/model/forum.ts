@@ -11,6 +11,7 @@ export const forumList = async function(req: Request, res: Response) {
                 id: item.id,
                 name: item.name,
                 threads: item.threads,
+                icon: item.icon,
                 lastPost: await prisma
                     .forum({
                         id: item.id

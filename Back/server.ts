@@ -42,20 +42,21 @@ import {
     reportList,
     reportUpdate
 } from "./model/report";
-
-import * as Redis from "redis";
-import * as Redlock from "redlock";
-import { messageIsRead, messageList } from "./model/message";
-import { promisify } from "util";
-import * as multer from "multer";
 import {
     fileDownload,
     fileUpload,
     fileName,
     fileDestination,
     fileRemove,
-    fileFilter
+    fileFilter,
+    fileGetUnlink
 } from "./model/attach";
+
+import * as Redis from "redis";
+import * as Redlock from "redlock";
+import { messageIsRead, messageList } from "./model/message";
+import { promisify } from "util";
+import * as multer from "multer";
 
 const SERVER_VERSION = "1.00";
 
@@ -172,6 +173,7 @@ app.post("/report/update/:rid", reportUpdate);
 
 //Attach
 app.get("/attach/download/:aid", fileDownload);
+app.get("/attach/unlink", fileGetUnlink);
 app.post("/attach/remove/:aid", fileRemove);
 app.post("/attach/upload", upload.array("attaches", 10), fileUpload);
 

@@ -288,7 +288,7 @@ export const threadCreate = async function(req: Request, res: Response) {
             const newPostPid = newPost.id;
 
             if (fileListArr.length !== 0) {
-                fileProcess(fileListArr, newPostPid, resultThread.id);
+                fileProcess(fileListArr, newPostPid, resultThread.id, uid);
             }
 
             await forumThreadsAdd(fid, 1, newPostPid);
@@ -706,7 +706,7 @@ export const threadUpdate = async function(req: Request, res: Response) {
                         orderBy: "createDate_ASC",
                         first: 1
                     });
-                fileProcess(fileListArr, postInfo[0].id, threadInfo.id);
+                fileProcess(fileListArr, postInfo[0].id, threadInfo.id, uid);
             }
 
             res.json({ code: 1 });

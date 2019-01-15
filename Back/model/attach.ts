@@ -24,9 +24,7 @@ export const fileUpload = async function(req: Request, res: Response) {
                     originalName: item.originalname,
                     createDate: new Date()
                 });
-                return {
-                    id: result.id
-                };
+                return result.id;
             })
         );
 
@@ -46,11 +44,12 @@ export const fileGetUnlink = async function(req: Request, res: Response) {
             where: {
                 user: {
                     id: uid
-                }
+                },
+                thread: null
             },
             orderBy: "createDate_DESC"
         });
-        res.json({ code: -1, msg: result });
+        res.json({ code: 1, msg: result });
     } catch (e) {
         res.json({ code: -1, msg: e.message });
     }
@@ -83,17 +82,28 @@ export const fileDownload = async function(req: Request, res: Response) {
             })
             .thread();
 
-        if (!isAdmin && !threadInfo.active) {
-            return res.json({ code: -1, msg: "该附件不存在！" });
-        }
+        const attachAuthorInfo = await prisma
+            .attach({
+                id: aid
+            })
+            .user();
 
-        const havePermission = await filterCalculate(
-            uid,
-            threadInfo.id,
-            isAdmin
-        );
-        if (!havePermission) {
-            return res.json({ code: -1, msg: "您无权下载此附件！" });
+        if (threadInfo === null) {
+            if (!isAdmin && uid !== attachAuthorInfo.id) {
+                return res.json({ code: -1, msg: "该附件不存在！" });
+            }
+        } else {
+            if (!isAdmin && !threadInfo.active) {
+                return res.json({ code: -1, msg: "该附件不存在！" });
+            }
+            const havePermission = await filterCalculate(
+                uid,
+                threadInfo.id,
+                isAdmin
+            );
+            if (!havePermission) {
+                return res.json({ code: -1, msg: "您无权下载此附件！" });
+            }
         }
 
         let downloadItem: Attach;
@@ -153,9 +163,10 @@ export const fileName = function(
 };
 
 export const fileProcess = async function(
-    files: Array<string>,
+    files: Array<string> | string,
     pid: string,
-    tid: string
+    tid: string,
+    uid: string
 ) {
     const date = new Date();
     const dirName =
@@ -165,9 +176,17 @@ export const fileProcess = async function(
         "_" +
         date.getDate().toString();
 
-    const connectAttachArr = await Promise.all(
-        files.map(async aid => {
+    const fileList: Array<string> = files instanceof Array ? files : [files];
+
+    const connectAttachArrRaw = await Promise.all(
+        fileList.map(async aid => {
             const attach = await prisma.attach({ id: aid });
+            const attachAuthor = await prisma.attach({ id: aid }).user();
+            const attachThread = await prisma.attach({ id: aid }).thread();
+
+            if (attachAuthor.id !== uid || attachThread !== null) {
+                return undefined;
+            }
 
             const oldPath = attach.fileName;
             const newDir = `./upload/${dirName}`;
@@ -183,7 +202,12 @@ export const fileProcess = async function(
                     id: aid
                 },
                 data: {
-                    fileName: newPath
+                    fileName: newPath,
+                    thread: {
+                        connect: {
+                            id: tid
+                        }
+                    }
                 }
             });
 
@@ -192,6 +216,10 @@ export const fileProcess = async function(
             };
         })
     );
+
+    const connectAttachArr = connectAttachArrRaw.filter(item => {
+        return item !== undefined;
+    });
 
     if (connectAttachArr.length !== 0) {
         await prisma.updateThread({
