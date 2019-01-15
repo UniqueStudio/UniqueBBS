@@ -8,13 +8,13 @@
         <div class="nav-item-content">
           <div></div>
           <div class="nav-item-icon-container">
-            <a-icon type="appstore" style="font-size:24px;" theme="filled"/>
+            <a-icon type="appstore" style="font-size:24px;" title="板块" :theme="navActive===0?'filled':'outlined'"/>
           </div>
           <div class="nav-item-icon-container">
-            <a-icon type="pushpin" style="font-size:24px;" title="论坛"/>
+            <a-icon type="pushpin" style="font-size:24px;" title="论坛" :theme="navActive===1?'filled':'outlined'"/>
           </div>
           <div class="nav-item-icon-container">
-            <a-icon type="star" style="font-size:24px;" title="个人"/>
+            <a-icon type="star" style="font-size:24px;" title="个人" :theme="navActive===2?'filled':'outlined'"/>
           </div>
         </div>
       </div>
@@ -42,12 +42,11 @@ export default {
   data() {
     return {
       userAvatarSrc:
-        "http://p.qlogo.cn/bizmail/DaKOA6aHxn24gyNbZg1ZeEuiaDwI83BxRkg16o7nMOJ6WFZAEtzBIpA/"
+        "http://p.qlogo.cn/bizmail/DaKOA6aHxn24gyNbZg1ZeEuiaDwI83BxRkg16o7nMOJ6WFZAEtzBIpA/",
+      navActive: 0
     };
   },
-  methods:{
-
-  }
+  methods: {}
 };
 </script>
 <style scoped>
@@ -55,18 +54,18 @@ export default {
   color: white !important;
 }
 footer {
-  margin: 32px 7%;
+  margin: 32px 6%;
   display: grid;
   color: white;
   grid-template-columns: 50% 50%;
   user-select: none;
-  cursor:default;
+  cursor: default;
 }
 .footer-right {
   text-align: right;
 }
 
-@media screen and (max-width: 800px) {
+@media screen and (max-width: 1000px) {
   .body {
     width: 95%;
     margin-left: 2.5%;
@@ -75,13 +74,13 @@ footer {
     grid-template-columns: 20% 60% 20%;
   }
 }
-@media screen and (min-width: 800px) {
+@media screen and (min-width: 1000px) {
   .body {
     width: 90%;
     margin-left: 5%;
   }
   .nav {
-    grid-template-columns: 5% 90% 5%;
+    grid-template-columns: 10% 80% 10%;
   }
 }
 .avatar-img {
@@ -153,5 +152,8 @@ footer {
 .nav-logo {
   transition: all 0.9s cubic-bezier(0.33, 0.63, 0.65, 0.99);
   cursor: pointer;
+}
+.footer-left > a {
+  color: white;
 }
 </style>
