@@ -42,7 +42,7 @@ import {
     fileFilter,
     fileGetUnlink
 } from "./model/attach";
-import { groupList, groupMemberList } from "./model/group";
+import { groupList, groupMemberList, groupUser } from "./model/group";
 
 import * as Redis from "redis";
 import * as Redlock from "redlock";
@@ -50,6 +50,7 @@ import { messageIsRead, messageList } from "./model/message";
 import { promisify } from "util";
 import * as multer from "multer";
 import { from } from "apollo-link";
+import { prisma } from "./generated/prisma-client";
 
 const SERVER_VERSION = "1.00";
 
@@ -147,6 +148,7 @@ app.post("/post/recovery/:pid", postRecovery);
 //Group
 app.get("/group/list", groupList);
 app.get("/group/members/:gid", groupMemberList);
+app.get("/group/user/:uid", groupUser);
 
 //Message
 app.post("/message/read/:id", messageIsRead);

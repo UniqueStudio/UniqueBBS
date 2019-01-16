@@ -9,6 +9,8 @@ const urls = {
   threadList: (fid, page) => `${domain}thread/list/${fid}/${page}`,
   threadInfo: (tid, page) => `${domain}thread/info/${tid}/${page}`,
   groupMemberList: gid => `${domain}group/members/${gid}`,
-  userInfo: uid => `${domain}user/info/${uid}`
+  userInfo: uid => `${domain}user/info/${uid}`,
+  userThreadList: (uid, page) => `${domain}user/threads/${uid}/${page}`,
+  userGroup: uid => `${domain}group/user/${uid}`
 };
 export default urls;

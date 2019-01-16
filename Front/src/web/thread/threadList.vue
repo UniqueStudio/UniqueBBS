@@ -40,6 +40,14 @@
           </p>
         </div>
       </div>
+      <div class="pagination" v-if="forum.threads > defaultPageSize">
+        <a-pagination
+          :current="page"
+          :defaultPageSize="defaultPageSize"
+          :total="forum.threads"
+          @change="pageOnchange"
+        ></a-pagination>
+      </div>
     </div>
   </div>
 </template>
@@ -56,16 +64,24 @@ export default {
         icon: "check"
       },
       fid: "0",
-      page: "0"
+      page: 0,
+      defaultPageSize: 20
     };
   },
+  computed: {},
   methods: {
+    pageOnchange(page) {
+      this.$router.push({
+        path: `/thread/list/${this.fid}/${page}`
+      });
+      this.getData();
+    },
     humanDate(date) {
       return this.$humanDate(date);
     },
     async getData() {
       this.fid = this.$route.params.fid;
-      this.page = this.$route.params.page;
+      this.page = Number.parseInt(this.$route.params.page);
       const threadListResponseRaw = await this.$ajax.get(
         this.$urls.threadList(this.fid, this.page)
       );
@@ -94,8 +110,6 @@ export default {
 };
 </script>
 <style scoped>
-.thread-item-last-reply {
-}
 @media screen and (min-width: 800px) {
   .thread-item-info-subject {
     font-size: 20px;
@@ -174,5 +188,9 @@ export default {
 }
 .thread-item-author {
   text-align: right;
+}
+.pagination {
+  text-align: center;
+  margin: 36px auto;
 }
 </style>

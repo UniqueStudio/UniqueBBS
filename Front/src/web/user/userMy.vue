@@ -26,7 +26,7 @@
         </router-link>
       </a-menu-item>
       <a-menu-item key="4">
-        <router-link to="/user/my/threads">
+        <router-link to="/user/my/threads/1">
           <a-icon type="copy"/>
           <span class="user-nav-text">帖子</span>
         </router-link>

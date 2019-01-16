@@ -11,6 +11,7 @@
         <p class="thread-sub-info">
           <a-icon type="user"/>
           {{user.username}}&nbsp;
+          <a-tag v-for="group in groupList" :key="group.id" :color="group.color">{{group.name}}</a-tag>
           <span :title="fullCreateDate">
             <a-icon type="clock-circle"/>
             {{createDate}}&nbsp;
@@ -43,7 +44,9 @@ export default {
       page: "0",
       postCount: 0,
       attachList: [],
-      content: ""
+      content: "",
+      groupList: [],
+      defaultPageSize: 20
     };
   },
   computed: {
@@ -79,8 +82,20 @@ export default {
         this.attachList = data.attachArr;
         this.content = data.firstPost.message;
       } else {
-        this.$store.dispute("updateLoginStatus");
+        return this.$store.dispute("updateLoginStatus");
       }
+      const userGroupListResponseRaw = await this.$ajax.get(
+        this.$urls.userGroup(this.user.id)
+      );
+
+      const userGroupListResponse = userGroupListResponseRaw.data;
+      if (userGroupListResponse.code !== 1) {
+        return this.$store.dispute("updateLoginStatus");
+      }
+      this.groupList = userGroupListResponse.msg.map(item => ({
+        name: item.name,
+        color: item.color
+      }));
     }
   },
   mounted() {

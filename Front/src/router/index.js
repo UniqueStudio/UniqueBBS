@@ -12,7 +12,7 @@ import userMyPwdReset from "@/web/user/userMyPwdReset.vue";
 import userVisit from "@/web/user/userVisit.vue";
 import userReport from "@/web/user/userReport.vue";
 import userGroup from "@/web/user/userGroup.vue";
-import userThreads from "@/web/user/userThreads.vue";
+import userMyThreads from "@/web/user/userMyThreads.vue";
 import thread from "@/web/thread/thread.vue";
 import threadList from "@/web/thread/threadList.vue";
 import threadInfo from "@/web/thread/threadInfo.vue";
@@ -97,9 +97,9 @@ const router = new Router({
                   }
                 },
                 {
-                  path: "threads",
+                  path: "threads/:page",
                   name: "threads",
-                  component: userThreads,
+                  component: userMyThreads,
                   meta: {
                     requireLogin: true
                   }

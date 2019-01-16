@@ -5,7 +5,7 @@
       <div v-for="user in group.list" :key="user.id" class="group-user-container">
         <router-link :to="'/user/visit/'+user.id">
           <a-avatar shape="circle" :src="user.avatar" class="avatar-img" size="small"></a-avatar>
-          <span :style="{color: user.isAdmin? 'orange' : 'black'}">{{user.username}}</span>
+          <span :style="{color: user.isAdmin? 'red' : 'black'}">{{user.username}}</span>
         </router-link>
       </div>
     </div>

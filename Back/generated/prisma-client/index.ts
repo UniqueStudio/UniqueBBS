@@ -454,6 +454,8 @@ export type GroupOrderByInput =
   | "key_DESC"
   | "name_ASC"
   | "name_DESC"
+  | "color_ASC"
+  | "color_DESC"
   | "createdAt_ASC"
   | "createdAt_DESC"
   | "updatedAt_ASC"
@@ -670,6 +672,20 @@ export interface GroupWhereInput {
   name_not_starts_with?: String;
   name_ends_with?: String;
   name_not_ends_with?: String;
+  color?: String;
+  color_not?: String;
+  color_in?: String[] | String;
+  color_not_in?: String[] | String;
+  color_lt?: String;
+  color_lte?: String;
+  color_gt?: String;
+  color_gte?: String;
+  color_contains?: String;
+  color_not_contains?: String;
+  color_starts_with?: String;
+  color_not_starts_with?: String;
+  color_ends_with?: String;
+  color_not_ends_with?: String;
   master?: UserWhereInput;
   AND?: GroupWhereInput[] | GroupWhereInput;
   OR?: GroupWhereInput[] | GroupWhereInput;
@@ -1491,6 +1507,7 @@ export interface GroupCreateManyWithoutMasterInput {
 export interface GroupCreateWithoutMasterInput {
   key: Int;
   name: String;
+  color?: String;
 }
 
 export interface ReportCreateManyWithoutUserInput {
@@ -1595,6 +1612,7 @@ export interface GroupCreateManyInput {
 export interface GroupCreateInput {
   key: Int;
   name: String;
+  color?: String;
   master?: UserCreateOneWithoutGroupInput;
 }
 
@@ -1730,6 +1748,7 @@ export interface GroupUpdateWithWhereUniqueWithoutMasterInput {
 export interface GroupUpdateWithoutMasterDataInput {
   key?: Int;
   name?: String;
+  color?: String;
 }
 
 export interface GroupUpsertWithWhereUniqueWithoutMasterInput {
@@ -1775,6 +1794,20 @@ export interface GroupScalarWhereInput {
   name_not_starts_with?: String;
   name_ends_with?: String;
   name_not_ends_with?: String;
+  color?: String;
+  color_not?: String;
+  color_in?: String[] | String;
+  color_not_in?: String[] | String;
+  color_lt?: String;
+  color_lte?: String;
+  color_gt?: String;
+  color_gte?: String;
+  color_contains?: String;
+  color_not_contains?: String;
+  color_starts_with?: String;
+  color_not_starts_with?: String;
+  color_ends_with?: String;
+  color_not_ends_with?: String;
   AND?: GroupScalarWhereInput[] | GroupScalarWhereInput;
   OR?: GroupScalarWhereInput[] | GroupScalarWhereInput;
   NOT?: GroupScalarWhereInput[] | GroupScalarWhereInput;
@@ -1788,6 +1821,7 @@ export interface GroupUpdateManyWithWhereNestedInput {
 export interface GroupUpdateManyDataInput {
   key?: Int;
   name?: String;
+  color?: String;
 }
 
 export interface UserUpdateOneInput {
@@ -2466,6 +2500,7 @@ export interface GroupUpdateWithWhereUniqueNestedInput {
 export interface GroupUpdateDataInput {
   key?: Int;
   name?: String;
+  color?: String;
   master?: UserUpdateOneWithoutGroupInput;
 }
 
@@ -2679,12 +2714,14 @@ export interface ForumUpdateManyMutationInput {
 export interface GroupUpdateInput {
   key?: Int;
   name?: String;
+  color?: String;
   master?: UserUpdateOneWithoutGroupInput;
 }
 
 export interface GroupUpdateManyMutationInput {
   key?: Int;
   name?: String;
+  color?: String;
 }
 
 export interface MessageCreateInput {
@@ -3252,12 +3289,14 @@ export interface Group {
   id: ID_Output;
   key: Int;
   name: String;
+  color: String;
 }
 
 export interface GroupPromise extends Promise<Group>, Fragmentable {
   id: () => Promise<ID_Output>;
   key: () => Promise<Int>;
   name: () => Promise<String>;
+  color: () => Promise<String>;
   master: <T = UserPromise>() => T;
 }
 
@@ -3267,6 +3306,7 @@ export interface GroupSubscription
   id: () => Promise<AsyncIterator<ID_Output>>;
   key: () => Promise<AsyncIterator<Int>>;
   name: () => Promise<AsyncIterator<String>>;
+  color: () => Promise<AsyncIterator<String>>;
   master: <T = UserSubscription>() => T;
 }
 
@@ -4169,6 +4209,7 @@ export interface GroupPreviousValues {
   id: ID_Output;
   key: Int;
   name: String;
+  color: String;
 }
 
 export interface GroupPreviousValuesPromise
@@ -4177,6 +4218,7 @@ export interface GroupPreviousValuesPromise
   id: () => Promise<ID_Output>;
   key: () => Promise<Int>;
   name: () => Promise<String>;
+  color: () => Promise<String>;
 }
 
 export interface GroupPreviousValuesSubscription
@@ -4185,6 +4227,7 @@ export interface GroupPreviousValuesSubscription
   id: () => Promise<AsyncIterator<ID_Output>>;
   key: () => Promise<AsyncIterator<Int>>;
   name: () => Promise<AsyncIterator<String>>;
+  color: () => Promise<AsyncIterator<String>>;
 }
 
 export interface MessageSubscriptionPayload {

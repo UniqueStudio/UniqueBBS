@@ -3,12 +3,17 @@
     <div class="avatar-container">
       <a-avatar shape="circle" :src="userDatas.avatar" class="avatar-img" size="large"></a-avatar>
     </div>
-    <h2>{{userDatas.username}}</h2>
-    <h4>{{group.join(" ")}}</h4>
-    <h5>上次登录：{{lastLoginHumanDate}}</h5>
+    <h2 :style="{color: userDatas.isAdmin? 'red': 'black'}">{{userDatas.username}}</h2>
+    <p class="group-container">
+      <a-tag v-for="group in groupList" :key="group.id" :color="group.color">{{group.name}}</a-tag>
+    </p>
+    <h5>{{userDatas.signature}}</h5>
+    <h5 class="last-login">
+      <a-icon type="clock-circle"/>
+      {{lastLoginHumanDate}}
+    </h5>
     <div class="user-detail-info">
       <a-input-group>
-        <a-input addonBefore="姓名" readonly :value="userDatas.username" size="large"/>
         <a-input addonBefore="邮箱" readonly :value="userDatas.email" size="large"/>
         <a-input addonBefore="手机" readonly :value="userDatas.mobile" size="large"/>
         <a-input addonBefore="昵称" readonly v-model="userDatas.nickname" size="large"/>
@@ -18,7 +23,6 @@
         <a-input addonBefore="微信" readonly v-model="userDatas.wechat" size="large"/>
         <a-input addonBefore="专业" readonly v-model="userDatas.major" size="large"/>
         <a-input addonBefore="班级" readonly v-model="userDatas.className" size="large"/>
-        <a-input addonBefore="签名" readonly v-model="userDatas.signature" size="large"/>
       </a-input-group>
     </div>
   </div>
@@ -41,9 +45,10 @@ export default {
         className: "",
         signature: "",
         lastLogin: "",
-        threads: 0
+        threads: 0,
+        isAdmin: false
       },
-      group: []
+      groupList: []
     };
   },
   computed: {
@@ -62,7 +67,10 @@ export default {
       Object.keys(this.userDatas).forEach(item => {
         this.userDatas[item] = userInfo.data.msg.user[item];
       });
-      this.group = userInfo.data.msg.group.map(item => item.name);
+      this.groupList = userInfo.data.msg.group.map(item => ({
+        name: item.name,
+        color: item.color
+      }));
     }
   },
   mounted() {
@@ -92,14 +100,21 @@ export default {
   transform: scale(3, 3);
 }
 h2,
-h4,
 h5 {
   text-align: center;
+  user-select: none;
+  margin: 0;
 }
 .user-detail-info {
   margin-top: 36px;
 }
 .user-detail-info span {
   margin: 6px auto;
+}
+.last-login {
+  color: gray;
+}
+.group-container {
+  text-align: center;
 }
 </style>

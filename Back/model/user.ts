@@ -41,7 +41,19 @@ export const userThreads = async function(req: Request, res: Response) {
             first: pagesize
         });
 
-        res.json({ code: 1, msg: result });
+        const number = await prisma
+            .threadsConnection({
+                where: {
+                    user: {
+                        id: uid,
+                        active: myUid === uid || isAdmin ? undefined : true
+                    }
+                }
+            })
+            .aggregate()
+            .count();
+
+        res.json({ code: 1, msg: { list: result, count: number } });
     } catch (e) {
         res.json({ code: -1, msg: e.message });
     }
@@ -114,12 +126,12 @@ export const userLoginByPwd = async function(req: Request, res: Response) {
         if (!userInfo.active) {
             return res.json({
                 code: -1,
-                msg: "当前账号不活跃，请联系管理员！"
+                msg: "当前账号不活跃，无法登陆！"
             });
         }
 
         const token = signJWT(userInfo.id, userInfo.isAdmin);
-        prisma.updateUser({
+        await prisma.updateUser({
             where: {
                 id: userInfo.id
             },

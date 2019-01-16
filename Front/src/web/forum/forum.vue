@@ -10,7 +10,13 @@
         <router-link :to="'/thread/list/'+forum.id+'/1'">
           <p class="forum-item-title">{{forum.name}}</p>
         </router-link>
-        <p v-if="forum.description !== null" class="forum-item-description">{{forum.description}}</p>
+        <p v-if="forum.description !== null" class="forum-item-description">
+          <span class="forum-icon">
+            <a-icon type="message"/>
+            {{forum.threads}}
+          </span>
+          {{forum.description}}
+        </p>
       </div>
       <div class="forum-item-last">
         <div v-if="forum.lastPost!==null">
@@ -130,5 +136,9 @@ export default {
 .forum-item-last-time {
   font-size: 14px;
   color: #777;
+}
+.forum-icon {
+  margin: 6px;
+  color: dodgerblue;
 }
 </style>

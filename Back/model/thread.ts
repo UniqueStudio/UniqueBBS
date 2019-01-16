@@ -6,7 +6,7 @@ import { verifyJWT, filterUserInfo } from "./check";
 import { userThreadsAdd, forumThreadsAdd, forumLastPostUpdate } from "./runtime";
 import { pushMessage, MESSAGE_REPLY, MESSAGE_QUOTE, MESSAGE_DIAMOND } from "./message";
 import { redLock } from "../server";
-import { fileProcess, fileDelete } from "./attach";
+import { fileProcess } from "./attach";
 import { filterCalculate, filterCheckTypeAvailable, filterObjGenerate, filterClearCache } from "./filter";
 
 export const threadList = async function(req: Request, res: Response) {
@@ -261,7 +261,7 @@ export const threadCreate = async function(req: Request, res: Response) {
             });
             const newPostPid = newPost.id;
 
-            if (fileListArr.length !== 0) {
+            if (fileListArr && fileListArr.length !== 0) {
                 fileProcess(fileListArr, newPostPid, resultThread.id, uid);
             }
 

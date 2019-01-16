@@ -39,29 +39,4 @@ async function func() {
         }
     });
 }
-async function updateForumInfo() {
-    newForum.forEach(async item => {
-        await prisma.updateManyForums({
-            where: {
-                name: item[0]
-            },
-            data: {
-                icon: item[1],
-                description: item[2]
-            }
-        });
-    });
-}
-async function updateUserInfo() {
-    const result = await prisma.updateUser({
-        where: {
-            userid: "YangJiaXi"
-        },
-        data: {
-            nickname: "hzytql",
-            password: addSaltPassword("20000301")
-        }
-    });
-}
-updateUserInfo();
-//func();
+func();

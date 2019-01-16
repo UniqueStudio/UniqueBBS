@@ -681,6 +681,7 @@ type Group {
   id: ID!
   key: Int!
   name: String!
+  color: String!
   master: User
 }
 
@@ -693,6 +694,7 @@ type GroupConnection {
 input GroupCreateInput {
   key: Int!
   name: String!
+  color: String
   master: UserCreateOneWithoutGroupInput
 }
 
@@ -709,6 +711,7 @@ input GroupCreateManyWithoutMasterInput {
 input GroupCreateWithoutMasterInput {
   key: Int!
   name: String!
+  color: String
 }
 
 type GroupEdge {
@@ -723,6 +726,8 @@ enum GroupOrderByInput {
   key_DESC
   name_ASC
   name_DESC
+  color_ASC
+  color_DESC
   createdAt_ASC
   createdAt_DESC
   updatedAt_ASC
@@ -733,6 +738,7 @@ type GroupPreviousValues {
   id: ID!
   key: Int!
   name: String!
+  color: String!
 }
 
 input GroupScalarWhereInput {
@@ -772,6 +778,20 @@ input GroupScalarWhereInput {
   name_not_starts_with: String
   name_ends_with: String
   name_not_ends_with: String
+  color: String
+  color_not: String
+  color_in: [String!]
+  color_not_in: [String!]
+  color_lt: String
+  color_lte: String
+  color_gt: String
+  color_gte: String
+  color_contains: String
+  color_not_contains: String
+  color_starts_with: String
+  color_not_starts_with: String
+  color_ends_with: String
+  color_not_ends_with: String
   AND: [GroupScalarWhereInput!]
   OR: [GroupScalarWhereInput!]
   NOT: [GroupScalarWhereInput!]
@@ -798,18 +818,21 @@ input GroupSubscriptionWhereInput {
 input GroupUpdateDataInput {
   key: Int
   name: String
+  color: String
   master: UserUpdateOneWithoutGroupInput
 }
 
 input GroupUpdateInput {
   key: Int
   name: String
+  color: String
   master: UserUpdateOneWithoutGroupInput
 }
 
 input GroupUpdateManyDataInput {
   key: Int
   name: String
+  color: String
 }
 
 input GroupUpdateManyInput {
@@ -826,6 +849,7 @@ input GroupUpdateManyInput {
 input GroupUpdateManyMutationInput {
   key: Int
   name: String
+  color: String
 }
 
 input GroupUpdateManyWithoutMasterInput {
@@ -847,6 +871,7 @@ input GroupUpdateManyWithWhereNestedInput {
 input GroupUpdateWithoutMasterDataInput {
   key: Int
   name: String
+  color: String
 }
 
 input GroupUpdateWithWhereUniqueNestedInput {
@@ -908,6 +933,20 @@ input GroupWhereInput {
   name_not_starts_with: String
   name_ends_with: String
   name_not_ends_with: String
+  color: String
+  color_not: String
+  color_in: [String!]
+  color_not_in: [String!]
+  color_lt: String
+  color_lte: String
+  color_gt: String
+  color_gte: String
+  color_contains: String
+  color_not_contains: String
+  color_starts_with: String
+  color_not_starts_with: String
+  color_ends_with: String
+  color_not_ends_with: String
   master: UserWhereInput
   AND: [GroupWhereInput!]
   OR: [GroupWhereInput!]

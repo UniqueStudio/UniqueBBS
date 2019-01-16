@@ -2,6 +2,21 @@ import { prisma, Group, User } from "../generated/prisma-client";
 import { verifyJWT } from "./check";
 import { Request, Response } from "express";
 
+export const groupUser = async function(req: Request, res: Response) {
+    try {
+        verifyJWT(req.header("Authorization"));
+        const { uid } = req.params;
+        const group = await prisma
+            .user({
+                id: uid
+            })
+            .group();
+        res.json({ code: 1, msg: group });
+    } catch (err) {
+        res.json({ code: -1, msg: err.message });
+    }
+};
+
 export const groupList = async function(req: Request, res: Response) {
     try {
         verifyJWT(req.header("Authorization"));

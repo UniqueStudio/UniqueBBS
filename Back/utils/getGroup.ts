@@ -1,9 +1,9 @@
-import { prisma } from "../generated/prisma-client"
-import fetch from 'node-fetch'
-import { getGroupURL } from '../model/consts'
-import { getAccessToken } from "../model/check"
+import { prisma } from "../generated/prisma-client";
+import fetch from "node-fetch";
+import { getGroupURL } from "../model/consts";
+import { getAccessToken } from "../model/check";
 
-export const updateGroup = async function () {
+export const updateGroup = async function() {
     const accessToken = await getAccessToken();
     const groupRequestResponse = await fetch(getGroupURL(accessToken));
     const groupRequestResult = await groupRequestResponse.json();
@@ -17,20 +17,22 @@ export const updateGroup = async function () {
 
     //diff
     let willDeleteArr = [];
-    for (let group of nowGroup) {
+
+    nowGroup.forEach(group => {
         let willDelete = 1;
-        for (let department of departmentArr) {
+
+        departmentArr.some(department => {
             if (department.id === group.key) {
                 willDelete = 0;
-                break;
             }
-        }
+            return department.id === group.key;
+        });
 
         if (willDelete) {
             console.log(`Will Delete Group key=${group.key} \n ${group.name}`);
             willDeleteArr.push(group.id);
         }
-    }
+    });
 
     for (let department of departmentArr) {
         let key = department.id;
