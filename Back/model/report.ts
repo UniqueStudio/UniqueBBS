@@ -8,24 +8,14 @@ import { setLockExpire } from "./lock";
 export const reportCreate = async function(req: Request, res: Response) {
     try {
         const { uid } = verifyJWT(req.header("Authorization"));
-        const {
-            length,
-            content,
-            plan,
-            solution,
-            conclusion,
-            isWeekRAW
-        } = req.body;
+        const { length, content, plan, solution, conclusion, isWeekRAW } = req.body;
 
         const isWeek: boolean = isWeekRAW === "1";
 
         const todayDate = new Date();
         if (isWeek) {
             //Weekly Report
-            const resultLock = await setLockExpire(
-                `weeklyReport:${uid}`,
-                (5 * 24 * 60 * 60).toString()
-            );
+            const resultLock = await setLockExpire(`weeklyReport:${uid}`, (5 * 24 * 60 * 60).toString());
             if (!resultLock) {
                 return res.json({
                     code: -1,
@@ -160,14 +150,9 @@ export const reportUpdate = async function(req: Request, res: Response) {
             })
             .user();
 
-        const todayFirstTimeStamp = getTodayFirstTimestamp(
-            new Date()
-        ).getTime();
+        const todayFirstTimeStamp = getTodayFirstTimestamp(new Date()).getTime();
 
-        if (
-            new Date(reportInfo.createDate).getTime() < todayFirstTimeStamp &&
-            !isAdmin
-        ) {
+        if (new Date(reportInfo.createDate).getTime() < todayFirstTimeStamp && !isAdmin) {
             return res.json({ code: 1, msg: "该Report仅限当天更改！如果您想更改，请联系管理员！" });
         }
 

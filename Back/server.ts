@@ -12,7 +12,8 @@ import {
     userScan,
     userPwdReset,
     mentorGet,
-    mentorSet
+    mentorSet,
+    userSearch
 } from "./model/user";
 import {
     threadDeleteHard,
@@ -26,22 +27,12 @@ import {
     threadClose,
     threadRecovery,
     threadUpdate,
-    threadMove
+    threadMove,
+    threadSearch
 } from "./model/thread";
-import {
-    postDeleteHard,
-    postDelete,
-    postRecovery,
-    postUpdate
-} from "./model/post";
+import { postDeleteHard, postDelete, postRecovery, postUpdate, postSearch } from "./model/post";
 import { forumList, forumListSimple } from "./model/forum";
-import {
-    reportCreate,
-    reportInfo,
-    reportGraph,
-    reportList,
-    reportUpdate
-} from "./model/report";
+import { reportCreate, reportInfo, reportGraph, reportList, reportUpdate } from "./model/report";
 import {
     fileDownload,
     fileUpload,
@@ -67,16 +58,10 @@ export const redisClient = Redis.createClient({
 
 export const redisClientGetAsync = promisify(redisClient.get).bind(redisClient);
 export const redisClientSetAsync = promisify(redisClient.set).bind(redisClient);
-export const redisClientKeysAsync = promisify(redisClient.keys).bind(
-    redisClient
-);
+export const redisClientKeysAsync = promisify(redisClient.keys).bind(redisClient);
 export const redisClientDelAsync = promisify(redisClient.del).bind(redisClient);
-export const redisClientIncrAsync = promisify(redisClient.incr).bind(
-    redisClient
-);
-export const redisClientExpireAsync = promisify(redisClient.expire).bind(
-    redisClient
-);
+export const redisClientIncrAsync = promisify(redisClient.incr).bind(redisClient);
+export const redisClientExpireAsync = promisify(redisClient.expire).bind(redisClient);
 
 redisClient.on("error", err => {
     console.log("Redis Error: " + err);
@@ -90,21 +75,7 @@ export const redLock = new Redlock([redisClient], {
 });
 
 const app = express();
-app.use(
-    bodyParser.json({
-        limit: "1mb"
-    })
-);
-app.use((req, res, next) => {
-    res.header("Access-Control-Allow-Origin", "*");
-    res.header("Access-Control-Allow-Methods", "POST, GET");
-    res.header(
-        "Access-Control-Allow-Headers",
-        "Origin, X-Requested-With, Content-Type, Accept, Authorization"
-    );
-    res.header("X-Powered-By", `Rabbit/${SERVER_VERSION}`);
-    next();
-});
+app.use(bodyParser.json({ limit: "1mb" }));
 
 app.use(
     bodyParser.urlencoded({
@@ -122,6 +93,14 @@ const upload = multer({
     fileFilter: fileFilter
 }); //20MB
 
+app.use((req, res, next) => {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Methods", "POST, GET");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
+    res.header("X-Powered-By", `Rabbit/${SERVER_VERSION}`);
+    next();
+});
+
 //User & Mentor
 app.get("/user/info/:uid", userInfo);
 app.get("/user/threads/:uid/:page", userThreads);
@@ -135,6 +114,7 @@ app.post("/user/update/normal", userInfoUpdate);
 app.post("/user/update/pwd", userPwdReset);
 app.post("/user/update/wx", userInfoUpdateFromWx);
 app.post("/user/mentor/set", mentorSet);
+app.post("/user/search", userSearch);
 
 //Forum
 app.get("/forum/list", forumList);
@@ -150,6 +130,7 @@ app.post("/thread/reply", threadReply);
 app.post("/thread/diamond", threadDiamond);
 app.post("/thread/top", threadTop);
 app.post("/thread/close", threadClose);
+app.post("/thread/search", threadSearch);
 app.post("/thread/delete/:tid", threadDelete);
 app.post("/thread/deleteHard/:tid", threadDeleteHard);
 app.post("/thread/recovery/:tid/:postsBool", threadRecovery);
@@ -157,6 +138,7 @@ app.post("/thread/recovery/:tid/:postsBool", threadRecovery);
 //Post
 app.post("/post/delete/:pid", postDelete);
 app.post("/post/update/:pid", postUpdate);
+app.post("/post/search", postSearch);
 app.post("/post/deleteHard/:pid", postDeleteHard);
 app.post("/post/recovery/:pid", postRecovery);
 

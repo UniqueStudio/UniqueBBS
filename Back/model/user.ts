@@ -1,21 +1,8 @@
 import { prisma, User } from "../generated/prisma-client";
 import fetch from "node-fetch";
-import {
-    scanningURL,
-    userIDURL,
-    userInfoURL,
-    getQRCodeURL,
-    pagesize
-} from "./consts";
+import { scanningURL, userIDURL, userInfoURL, getQRCodeURL, pagesize } from "./consts";
 import { Request, Response } from "express";
-import {
-    addSaltPasswordOnce,
-    getAccessToken,
-    signJWT,
-    verifyJWT,
-    filterMyInfo,
-    filterUserInfo
-} from "./check";
+import { addSaltPasswordOnce, getAccessToken, signJWT, verifyJWT, filterMyInfo, filterUserInfo } from "./check";
 import { setLockExpire } from "./lock";
 
 export const userInfo = async function(req: Request, res: Response) {
@@ -94,7 +81,6 @@ export const userMyInfo = async function(req: Request, res: Response) {
 
 export const userLoginByPwd = async function(req: Request, res: Response) {
     const { nickname, pwd } = req.body;
-
     const userInfoArr = await prisma.users({
         where: {
             nickname: nickname
@@ -109,11 +95,7 @@ export const userLoginByPwd = async function(req: Request, res: Response) {
     }
 
     const userInfo = userInfoArr[0];
-    if (
-        userInfo.password === "" ||
-        userInfo.password === null ||
-        userInfo.password === undefined
-    ) {
+    if (userInfo.password === "" || userInfo.password === null || userInfo.password === undefined) {
         return res.json({ code: -1, msg: "未设置密码，请通过扫码登录！" });
     }
 
@@ -151,11 +133,7 @@ export const userPwdReset = async function(req: Request, res: Response) {
         });
 
         const previousPwdSalted = addSaltPasswordOnce(previousPwd);
-        if (
-            previousPwdSalted !== nowUser.password &&
-            nowUser.password !== null &&
-            nowUser.password !== undefined
-        ) {
+        if (previousPwdSalted !== nowUser.password && nowUser.password !== null && nowUser.password !== undefined) {
             return res.json({
                 code: -1,
                 msg: "您当前的密码输入错误，请重新输入！"
@@ -180,16 +158,7 @@ export const userInfoUpdate = async function(req: Request, res: Response) {
     try {
         const authObj = verifyJWT(req.header("Authorization"));
         const uid = authObj.uid;
-        const {
-            studentID,
-            dormitory,
-            qq,
-            wechat,
-            major,
-            className,
-            nickname,
-            signature
-        } = req.body;
+        const { studentID, dormitory, qq, wechat, major, className, nickname, signature } = req.body;
 
         const checkUser = await prisma.users({
             where: {
@@ -221,17 +190,11 @@ export const userInfoUpdate = async function(req: Request, res: Response) {
     }
 };
 
-export const userInfoUpdateFromWx = async function(
-    req: Request,
-    res: Response
-) {
+export const userInfoUpdateFromWx = async function(req: Request, res: Response) {
     try {
         const authObj = verifyJWT(req.header("Authorization"));
 
-        const wxUpdateLock = setLockExpire(
-            `wxUpdateUser:${authObj.uid}`,
-            "300"
-        );
+        const wxUpdateLock = setLockExpire(`wxUpdateUser:${authObj.uid}`, "300");
         if (!wxUpdateLock) {
             return res.json({
                 code: -1,
@@ -244,9 +207,7 @@ export const userInfoUpdateFromWx = async function(
         });
 
         const accessToken = await getAccessToken();
-        const userInfoResponse = await fetch(
-            userInfoURL(accessToken, userInfo.userid)
-        );
+        const userInfoResponse = await fetch(userInfoURL(accessToken, userInfo.userid));
         const user = await userInfoResponse.json();
         if (user.errcode !== 0) {
             return res.json({ code: -1, msg: user.errcode });
@@ -299,17 +260,13 @@ export const userScan = async function(req: Request, res: Response) {
         const scanResult = await scanResponse.text();
         const status = JSON.parse(scanResult.match(/{.+}/)![0]).status;
         if (status === "QRCODE_SCAN_ING") {
-            const loginResponse = await fetch(
-                `${scanningURL}${req.params.key}&lastStatus=${status}`
-            );
+            const loginResponse = await fetch(`${scanningURL}${req.params.key}&lastStatus=${status}`);
             const loginResult = await loginResponse.text();
             const loginObj = JSON.parse(loginResult.match(/{.+}/)![0]);
             if (loginObj.status === "QRCODE_SCAN_SUCC") {
                 const auth_code = loginObj.auth_code;
                 const accessToken = await getAccessToken();
-                const userIDResponse = await fetch(
-                    userIDURL(accessToken, auth_code)
-                );
+                const userIDResponse = await fetch(userIDURL(accessToken, auth_code));
                 const userIDResult = await userIDResponse.json();
                 const userID = userIDResult.UserId;
                 const user = await prisma.users({
@@ -409,6 +366,31 @@ export const mentorSet = async function(req: Request, res: Response) {
         });
 
         res.json({ code: 1 });
+    } catch (e) {
+        res.json({ code: -1, msg: e.message });
+    }
+};
+
+export const userSearch = async function(req: Request, res: Response) {
+    try {
+        verifyJWT(req.header("Authorization"));
+        const { keyword } = req.body;
+        const result = await prisma.users({
+            where: {
+                OR: [
+                    {
+                        id_contains: keyword
+                    },
+                    {
+                        username_contains: keyword
+                    },
+                    {
+                        userid_contains: keyword
+                    }
+                ]
+            }
+        });
+        res.json({ code: 1, msg: result });
     } catch (e) {
         res.json({ code: -1, msg: e.message });
     }

@@ -96,11 +96,7 @@ export const fileDownload = async function(req: Request, res: Response) {
             if (!isAdmin && !threadInfo.active) {
                 return res.json({ code: -1, msg: "该附件不存在！" });
             }
-            const havePermission = await filterCalculate(
-                uid,
-                threadInfo.id,
-                isAdmin
-            );
+            const havePermission = await filterCalculate(uid, threadInfo.id, isAdmin);
             if (!havePermission) {
                 return res.json({ code: -1, msg: "您无权下载此附件！" });
             }
@@ -162,19 +158,10 @@ export const fileName = function(
     }
 };
 
-export const fileProcess = async function(
-    files: Array<string> | string,
-    pid: string,
-    tid: string,
-    uid: string
-) {
+export const fileProcess = async function(files: Array<string> | string, pid: string, tid: string, uid: string) {
     const date = new Date();
     const dirName =
-        date.getFullYear().toString() +
-        "_" +
-        (date.getMonth() + 1).toString() +
-        "_" +
-        date.getDate().toString();
+        date.getFullYear().toString() + "_" + (date.getMonth() + 1).toString() + "_" + date.getDate().toString();
 
     const fileList: Array<string> = files instanceof Array ? files : [files];
 
@@ -190,9 +177,7 @@ export const fileProcess = async function(
 
             const oldPath = attach.fileName;
             const newDir = `./upload/${dirName}`;
-            const newPath = `${newDir}/${pid}_${new Date()
-                .getTime()
-                .toString()}_${aid}.rabbit`;
+            const newPath = `${newDir}/${pid}_${new Date().getTime().toString()}_${aid}.rabbit`;
 
             if (!fs.existsSync(newDir)) fs.mkdirSync(newDir);
             fileMove(oldPath, newPath);
@@ -242,11 +227,7 @@ export const fileDestination = function(
 ) {
     const date = new Date();
     const dirName =
-        date.getFullYear().toString() +
-        "_" +
-        (date.getMonth() + 1).toString() +
-        "_" +
-        date.getDate().toString();
+        date.getFullYear().toString() + "_" + (date.getMonth() + 1).toString() + "_" + date.getDate().toString();
     const parentDir = `./upload/tmp`;
     const childDir = `${parentDir}/${dirName}`;
     if (!fs.existsSync("./upload")) fs.mkdirSync("./upload");

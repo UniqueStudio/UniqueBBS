@@ -1,13 +1,24 @@
 import Vue from "vue";
 import Router from "vue-router";
-// import Main from "@/components/main/main.vue";
-// import forumList from "@/pages/forumList/forumList.vue";
-// import user from "@/pages/user/user.vue";
-// import userLoginPwd from "@/components/userLoginPwd/loginPwd.vue";
+import Main from "@/web/main.vue";
+import forum from "@/web/forum/forum.vue";
+import user from "@/web/user/user.vue";
+import userLogin from "@/web/user/userLogin.vue";
+import userLoginPwd from "@/web/user/userLoginPwd.vue";
+import userLoginWx from "@/web/user/userLoginWx.vue";
+import userMy from "@/web/user/userMy.vue";
+import userMyInfo from "@/web/user/userMyInfo.vue";
+import userMyPwdReset from "@/web/user/userMyPwdReset.vue";
+import userVisit from "@/web/user/userVisit.vue";
+import userReport from "@/web/user/userReport.vue";
+import thread from "@/web/thread/thread.vue";
+import threadList from "@/web/thread/threadList.vue";
+import threadInfo from "@/web/thread/threadInfo.vue";
+import threadCreate from "@/web/thread/threadCreate.vue";
 
 Vue.use(Router);
 
-export default new Router({
+const router = new Router({
   routes: [
     {
       path: "/",
@@ -26,10 +37,12 @@ export default new Router({
           path: "user",
           name: "user",
           component: user,
+          redirect: "/user/my/info",
           children: [
             {
               path: "login",
               name: "login",
+              redirect: "/user/login/pwd",
               component: userLogin,
               meta: {
                 requireUnLogin: true
@@ -56,24 +69,22 @@ export default new Router({
               },
               children: [
                 {
-                  path: "wxInfo",
-                  name: "userMyWxInfo",
-                  component: userWxInfo
-                },
-                {
-                  path: "detailInfo",
-                  name: "userMyDetailInfo",
-                  component: userDetailInfo
-                },
-                {
-                  path: "mentorInfo",
-                  name: "userMyMentorInfo",
-                  component: userMentorInfo
+                  path: "info",
+                  name: "userMyInfo",
+                  component: userMyInfo
                 },
                 {
                   path: "pwdReset",
                   name: "userMyPwdReset",
-                  component: userPwdReset
+                  component: userMyPwdReset
+                },
+                {
+                  path: "report",
+                  name: "report",
+                  component: userReport,
+                  meta: {
+                    requireLogin: true
+                  }
                 }
               ]
             },
@@ -81,14 +92,6 @@ export default new Router({
               path: "visit",
               name: "userVisit",
               component: userVisit,
-              meta: {
-                requireLogin: true
-              }
-            },
-            {
-              path: "report",
-              name: "report",
-              component: userReport,
               meta: {
                 requireLogin: true
               }
@@ -124,3 +127,11 @@ export default new Router({
     }
   ]
 });
+
+router.beforeEach((from, to, next) => {
+  if (to.matched.some(item => item.meta.requireLogin)) {
+  }
+  next();
+});
+
+export default router;

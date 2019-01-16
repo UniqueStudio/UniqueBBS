@@ -1,33 +1,13 @@
-import {
-    prisma,
-    Forum,
-    Thread,
-    FilterCreateOneInput,
-    FilterUpdateOneInput
-} from "../generated/prisma-client";
+import { prisma, Forum, Thread, FilterCreateOneInput, FilterUpdateOneInput } from "../generated/prisma-client";
 import { Request, Response } from "express";
 import { setLockExpire } from "./lock";
 import { pagesize } from "./consts";
 import { verifyJWT, filterUserInfo } from "./check";
-import {
-    userThreadsAdd,
-    forumThreadsAdd,
-    forumLastPostUpdate
-} from "./runtime";
-import {
-    pushMessage,
-    MESSAGE_REPLY,
-    MESSAGE_QUOTE,
-    MESSAGE_DIAMOND
-} from "./message";
+import { userThreadsAdd, forumThreadsAdd, forumLastPostUpdate } from "./runtime";
+import { pushMessage, MESSAGE_REPLY, MESSAGE_QUOTE, MESSAGE_DIAMOND } from "./message";
 import { redLock } from "../server";
 import { fileProcess, fileDelete } from "./attach";
-import {
-    filterCalculate,
-    filterCheckTypeAvailable,
-    filterObjGenerate,
-    filterClearCache
-} from "./filter";
+import { filterCalculate, filterCheckTypeAvailable, filterObjGenerate, filterClearCache } from "./filter";
 
 export const threadList = async function(req: Request, res: Response) {
     try {
@@ -89,9 +69,7 @@ export const threadList = async function(req: Request, res: Response) {
             resultArrRaw.map(async item => {
                 return {
                     thread: item,
-                    user: filterUserInfo(
-                        await prisma.thread({ id: item.id }).user()
-                    ),
+                    user: filterUserInfo(await prisma.thread({ id: item.id }).user()),
                     lastReply: await prisma.posts({
                         where: {
                             thread: {
@@ -235,12 +213,7 @@ export const threadCreate = async function(req: Request, res: Response) {
             filterCheckTypeAvailable(filterGroupType)
         ) {
             filterObj = {
-                create: filterObjGenerate(
-                    filterUserArr,
-                    filterGroupArr,
-                    filterUserType,
-                    filterGroupType
-                )
+                create: filterObjGenerate(filterUserArr, filterGroupArr, filterUserType, filterGroupType)
             };
         }
 
@@ -384,11 +357,7 @@ export const threadReply = async function(req: Request, res: Response) {
 
             await forumLastPostUpdate(forumInfo.id, resultThread[0].id);
             if (uid !== authorInfo.id) {
-                await pushMessage(
-                    uid,
-                    authorInfo.id,
-                    MESSAGE_REPLY(authorInfo.username, threadInfo.subject)
-                );
+                await pushMessage(uid, authorInfo.id, MESSAGE_REPLY(authorInfo.username, threadInfo.subject));
                 if (quote !== -1) {
                     const quotePost = await prisma.post({
                         id: quote
@@ -402,10 +371,7 @@ export const threadReply = async function(req: Request, res: Response) {
                         await pushMessage(
                             uid,
                             quotePostAuthor.id,
-                            MESSAGE_QUOTE(
-                                authorInfo.username,
-                                threadInfo.subject
-                            )
+                            MESSAGE_QUOTE(authorInfo.username, threadInfo.subject)
                         );
                     }
                 }
@@ -520,11 +486,7 @@ export const threadDiamond = async function(req: Request, res: Response) {
                 const [firstUser] = await prisma.users({
                     first: 1
                 });
-                pushMessage(
-                    firstUser.id,
-                    threadAuthor.id,
-                    MESSAGE_DIAMOND(threadInfo.subject)
-                );
+                pushMessage(firstUser.id, threadAuthor.id, MESSAGE_DIAMOND(threadInfo.subject));
             }
             res.json({ code: 1 });
         }
@@ -663,12 +625,7 @@ export const threadUpdate = async function(req: Request, res: Response) {
                 filterCheckTypeAvailable(filterGroupType)
             ) {
                 filterObj = {
-                    update: filterObjGenerate(
-                        filterUserArr,
-                        filterGroupArr,
-                        filterUserType,
-                        filterGroupType
-                    )
+                    update: filterObjGenerate(filterUserArr, filterGroupArr, filterUserType, filterGroupType)
                 };
             }
 
@@ -787,6 +744,21 @@ export const threadMove = async function(req: Request, res: Response) {
         } finally {
             moveLock.unlock();
         }
+    } catch (e) {
+        res.json({ code: -1, msg: e.message });
+    }
+};
+
+export const threadSearch = async function(req: Request, res: Response) {
+    try {
+        verifyJWT(req.header("Authorization"));
+        const { keyword } = req.body;
+        const result = await prisma.threads({
+            where: {
+                subject_contains: keyword
+            }
+        });
+        res.json({ code: 1, msg: result });
     } catch (e) {
         res.json({ code: -1, msg: e.message });
     }

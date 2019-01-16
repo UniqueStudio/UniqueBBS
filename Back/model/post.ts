@@ -103,3 +103,18 @@ export const postUpdate = async function(req: Request, res: Response) {
         res.json({ code: -1, msg: e.message });
     }
 };
+
+export const postSearch = async function(req: Request, res: Response) {
+    try {
+        verifyJWT(req.header("Authorization"));
+        const { keyword } = req.body;
+        const result = await prisma.posts({
+            where: {
+                message_contains: keyword
+            }
+        });
+        res.json({ code: 1, msg: result });
+    } catch (e) {
+        res.json({ code: -1, msg: e.message });
+    }
+};

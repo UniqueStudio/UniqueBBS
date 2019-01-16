@@ -3,12 +3,7 @@ const FILTER_CAN_SEE = 1;
 const FILTER_CANNOT_SEE = 2;
 const FILTER_EXPIRE_SECONDS = 12 * 60 * 60;
 
-import {
-    redisClientGetAsync,
-    redisClientSetAsync,
-    redisClientKeysAsync,
-    redisClientDelAsync
-} from "../server";
+import { redisClientGetAsync, redisClientSetAsync, redisClientKeysAsync, redisClientDelAsync } from "../server";
 import { prisma, Group } from "../generated/prisma-client";
 
 export const filterCheckTypeAvailable = function(filterType: string): boolean {
@@ -45,11 +40,7 @@ export const filterObjGenerate = function(
     };
 };
 
-export const filterCalculate = async function(
-    uid: string,
-    tid: string,
-    isAdmin: boolean
-): Promise<boolean> {
+export const filterCalculate = async function(uid: string, tid: string, isAdmin: boolean): Promise<boolean> {
     if (isAdmin) return true;
 
     const filter = await prisma
@@ -64,8 +55,7 @@ export const filterCalculate = async function(
         })
         .user();
 
-    if (filter === null || filter === undefined || threadAuthor.id === uid)
-        return true;
+    if (filter === null || filter === undefined || threadAuthor.id === uid) return true;
 
     const cacheKey = `filterThread:${uid}:${tid}`;
     const cacheResult = redisClientGetAsync(cacheKey);
@@ -79,8 +69,7 @@ export const filterCalculate = async function(
     const filterGroupType = filter.groupType;
 
     if (filterUserType !== FILTER_CLOSE) {
-        const decideFlag: boolean =
-            filterUserType === FILTER_CAN_SEE ? true : false;
+        const decideFlag: boolean = filterUserType === FILTER_CAN_SEE ? true : false;
 
         const userFilterList = await prisma
             .filter({
@@ -125,15 +114,9 @@ export const filterCalculate = async function(
         }
     }
 
-    const finalResult: boolean =
-        result === undefined ? true : (result as boolean);
+    const finalResult: boolean = result === undefined ? true : (result as boolean);
 
-    redisClientSetAsync(
-        cacheKey,
-        finalResult ? "1" : "0",
-        "EX",
-        FILTER_EXPIRE_SECONDS
-    );
+    redisClientSetAsync(cacheKey, finalResult ? "1" : "0", "EX", FILTER_EXPIRE_SECONDS);
     return finalResult;
 };
 

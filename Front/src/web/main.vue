@@ -7,15 +7,36 @@
       <div class="nav-item">
         <div class="nav-item-content">
           <div></div>
-          <div class="nav-item-icon-container">
-            <a-icon type="appstore" style="font-size:24px;" title="板块" :theme="navActive===0?'filled':'outlined'"/>
-          </div>
-          <div class="nav-item-icon-container">
-            <a-icon type="pushpin" style="font-size:24px;" title="论坛" :theme="navActive===1?'filled':'outlined'"/>
-          </div>
-          <div class="nav-item-icon-container">
-            <a-icon type="star" style="font-size:24px;" title="个人" :theme="navActive===2?'filled':'outlined'"/>
-          </div>
+          <router-link to="/">
+            <div class="nav-item-icon-container">
+              <a-icon
+                type="appstore"
+                style="font-size:24px;"
+                title="板块"
+                :theme="navActive===0?'filled':'outlined'"
+              />
+            </div>
+          </router-link>
+          <router-link to="/forum">
+            <div class="nav-item-icon-container">
+              <a-icon
+                type="pushpin"
+                style="font-size:24px;"
+                title="论坛"
+                :theme="navActive===1?'filled':'outlined'"
+              />
+            </div>
+          </router-link>
+          <router-link to="/user">
+            <div class="nav-item-icon-container">
+              <a-icon
+                type="star"
+                style="font-size:24px;"
+                title="个人"
+                :theme="navActive===2?'filled':'outlined'"
+              />
+            </div>
+          </router-link>
         </div>
       </div>
       <div class="nav-avatar">
@@ -23,7 +44,7 @@
       </div>
     </div>
     <div class="body">
-      <router-view @changeAvatar="userAvatarSrc = $event;"></router-view>
+      <router-view></router-view>
     </div>
     <footer>
       <p class="footer-left">
@@ -32,7 +53,7 @@
         <a href="https://github.com/ttzztztz" target="_blank">Rabbit</a> @ 811
       </p>
       <p class="footer-right">Unique Studio
-        <br>January 14 2019
+        <br>January 30 2019
       </p>
     </footer>
   </div>
@@ -41,10 +62,14 @@
 export default {
   data() {
     return {
-      userAvatarSrc:
-        "http://p.qlogo.cn/bizmail/DaKOA6aHxn24gyNbZg1ZeEuiaDwI83BxRkg16o7nMOJ6WFZAEtzBIpA/",
-      navActive: 0
+      navActive: 0,
+      isLogin: false
     };
+  },
+  computed: {
+    userAvatarSrc() {
+      return this.$store.state.avatarSrc;
+    }
   },
   methods: {}
 };
@@ -87,7 +112,7 @@ footer {
   margin: 6px 24px;
 }
 .body {
-  min-height: 1800px;
+  min-height: 900px;
   border-radius: 6px;
   background: white;
   position: relative;
@@ -153,7 +178,8 @@ footer {
   transition: all 0.9s cubic-bezier(0.33, 0.63, 0.65, 0.99);
   cursor: pointer;
 }
-.footer-left > a {
+.footer-left > a,
+.nav-item a {
   color: white;
 }
 </style>
