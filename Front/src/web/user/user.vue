@@ -4,7 +4,11 @@
   </div>
 </template>
 <script>
-export default {};
+export default {
+  mounted() {
+    this.$store.commit("setActiveNav", 2);
+  }
+};
 </script>
 <style scoped>
 </style>

@@ -1,5 +1,5 @@
 <template>
-  <div class="threadInfo"></div>
+  <div class="thread-info"></div>
 </template>
 <script>
 export default {};

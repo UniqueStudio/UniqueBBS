@@ -38,7 +38,7 @@ export default {
       document.getElementById("login").focus();
       const nickname = this.nickname;
       const pwd = this.pwd_md5;
-      const result = await this.$axios.post(this.$urls.login, {
+      const result = await this.$ajax.post(this.$urls.login, {
         nickname: nickname,
         pwd: pwd
       });
@@ -56,7 +56,7 @@ export default {
         const uid = response.msg.uid;
         localStorage.setItem("token", token);
         localStorage.setItem("uid", uid);
-        this.$store.dispatch("updateAvatarSrcAsync");
+        this.$store.dispatch("checkLoginStatus");
         this.$message.success("登陆成功！", 3);
         this.$router.push({ path: "/user/my/info" });
       }

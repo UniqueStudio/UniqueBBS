@@ -45,6 +45,7 @@ type Forum {
     threads: Int! @default(value: 0)
     lastPost: Post @relation(name: "ForumLastPost")
     icon: String!
+    description: String
 }
 type Post {
     id: ID! @unique

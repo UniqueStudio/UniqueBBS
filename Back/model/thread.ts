@@ -86,10 +86,10 @@ export const threadList = async function(req: Request, res: Response) {
         if (fid === "*") {
             res.json({
                 code: 1,
-                msg: { forum: resultForum, list: resultArr, top: topArr }
+                msg: { list: resultArr, top: topArr }
             });
         } else {
-            res.json({ code: 1, msg: { list: resultArr, top: topArr } });
+            res.json({ code: 1, msg: { list: resultArr, top: topArr, forum: resultForum } });
         }
     } catch (e) {
         res.json({ code: -1 });

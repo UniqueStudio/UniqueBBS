@@ -497,6 +497,7 @@ type Forum {
   threads: Int!
   lastPost: Post
   icon: String!
+  description: String
 }
 
 type ForumConnection {
@@ -510,6 +511,7 @@ input ForumCreateInput {
   threads: Int
   lastPost: PostCreateOneInput
   icon: String!
+  description: String
 }
 
 input ForumCreateOneInput {
@@ -531,6 +533,8 @@ enum ForumOrderByInput {
   threads_DESC
   icon_ASC
   icon_DESC
+  description_ASC
+  description_DESC
   createdAt_ASC
   createdAt_DESC
   updatedAt_ASC
@@ -542,6 +546,7 @@ type ForumPreviousValues {
   name: String!
   threads: Int!
   icon: String!
+  description: String
 }
 
 type ForumSubscriptionPayload {
@@ -567,6 +572,7 @@ input ForumUpdateDataInput {
   threads: Int
   lastPost: PostUpdateOneInput
   icon: String
+  description: String
 }
 
 input ForumUpdateInput {
@@ -574,12 +580,14 @@ input ForumUpdateInput {
   threads: Int
   lastPost: PostUpdateOneInput
   icon: String
+  description: String
 }
 
 input ForumUpdateManyMutationInput {
   name: String
   threads: Int
   icon: String
+  description: String
 }
 
 input ForumUpdateOneRequiredInput {
@@ -646,6 +654,20 @@ input ForumWhereInput {
   icon_not_starts_with: String
   icon_ends_with: String
   icon_not_ends_with: String
+  description: String
+  description_not: String
+  description_in: [String!]
+  description_not_in: [String!]
+  description_lt: String
+  description_lte: String
+  description_gt: String
+  description_gte: String
+  description_contains: String
+  description_not_contains: String
+  description_starts_with: String
+  description_not_starts_with: String
+  description_ends_with: String
+  description_not_ends_with: String
   AND: [ForumWhereInput!]
   OR: [ForumWhereInput!]
   NOT: [ForumWhereInput!]

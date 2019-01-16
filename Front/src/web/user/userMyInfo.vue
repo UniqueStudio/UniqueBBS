@@ -7,7 +7,7 @@
       <a-input addonBefore="手机" readonly :value="wxInfo.mobile" size="large"/>
     </a-input-group>
     <div class="submit-container">
-      <a-button icon="wechat" type="primary">同步</a-button>
+      <a-button icon="wechat" type="primary" @click="syncWxInfo">同步</a-button>
     </div>
     <a-alert message="以下资料可自行更改。" type="success" showIcon="true"></a-alert>
     <a-input-group>
@@ -55,8 +55,26 @@ export default {
     }
   },
   methods: {
+    async syncWxInfo() {
+      const responseRaw = await this.$ajax.post(this.$urls.syncWxInfo);
+      const response = responseRaw.data;
+      if (response.code === 1) {
+        this.renderInfo();
+        this.$message.success("同步成功！", 3);
+      } else {
+        const modal = this.$error();
+        modal.update({
+          title: "同步错误",
+          content: response.msg
+        });
+      }
+    },
     async renderInfo() {
       const responseRaw = await this.$ajax.get(this.$urls.myInfo);
+      if (responseRaw.data.code !== 1) {
+        return this.$store.dispatch("checkLoginStatus");
+      }
+
       const response = responseRaw.data.msg;
 
       this.keys1.forEach(item => {
@@ -68,18 +86,18 @@ export default {
       });
     },
     async updateInfo() {
-      const response = await this.$ajax.post(
+      const responseRaw = await this.$ajax.post(
         this.$urls.updateMyInfo,
         this.detailInfo
       );
-      const result = response.data;
-      if (result.code === 1) {
+      const response = responseRaw.data;
+      if (response.code === 1) {
         this.$message.success("设置成功！", 3);
       } else {
         const modal = this.$error();
         modal.update({
           title: "设置错误",
-          content: result.msg
+          content: response.msg
         });
       }
     }

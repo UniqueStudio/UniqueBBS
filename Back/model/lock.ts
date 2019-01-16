@@ -2,6 +2,7 @@ import { redisClientGetAsync, redisClientSetAsync, redisClientIncrAsync, redisCl
 
 export const setLockExpire = async function(key: string, expireSeconds: string) {
     const checkLockResult = await redisClientGetAsync(key);
+
     if (checkLockResult === "1") {
         return false;
     }

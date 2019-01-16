@@ -40,7 +40,15 @@
         </div>
       </div>
       <div class="nav-avatar">
-        <a-avatar shape="circle" :src="userAvatarSrc" class="avatar-img"></a-avatar>
+        <router-link to="/user">
+          <a-avatar
+            shape="circle"
+            :src="this.$store.state.avatarSrc"
+            class="avatar-img"
+            v-if="this.$store.state.loginStatus"
+          ></a-avatar>
+          <a-avatar shape="circle" icon="cloud" class="avatar-img avatar-nologin" v-else></a-avatar>
+        </router-link>
       </div>
     </div>
     <div class="body">
@@ -61,17 +69,16 @@
 <script>
 export default {
   data() {
-    return {
-      navActive: 0,
-      isLogin: false
-    };
+    return {};
+  },
+  mounted() {
+    this.$store.dispatch("checkLoginStatus");
   },
   computed: {
-    userAvatarSrc() {
-      return this.$store.state.avatarSrc;
+    navActive() {
+      return this.$store.state.navActive;
     }
-  },
-  methods: {}
+  }
 };
 </script>
 <style scoped>
@@ -181,5 +188,9 @@ footer {
 .footer-left > a,
 .nav-item a {
   color: white;
+}
+.avatar-nologin {
+  background-color: transparent;
+  transform: scale(1.5, 1.5);
 }
 </style>

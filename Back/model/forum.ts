@@ -12,11 +12,26 @@ export const forumList = async function(req: Request, res: Response) {
                 name: item.name,
                 threads: item.threads,
                 icon: item.icon,
+                description: item.description,
                 lastPost: await prisma
                     .forum({
                         id: item.id
                     })
-                    .lastPost()
+                    .lastPost(),
+                lastPostInfo: {
+                    user: await prisma
+                        .forum({
+                            id: item.id
+                        })
+                        .lastPost()
+                        .user(),
+                    thread: await prisma
+                        .forum({
+                            id: item.id
+                        })
+                        .lastPost()
+                        .thread()
+                }
             }))
         );
         res.json({ code: 1, msg: result });

@@ -582,6 +582,8 @@ export type ForumOrderByInput =
   | "threads_DESC"
   | "icon_ASC"
   | "icon_DESC"
+  | "description_ASC"
+  | "description_DESC"
   | "createdAt_ASC"
   | "createdAt_DESC"
   | "updatedAt_ASC"
@@ -1207,6 +1209,20 @@ export interface ForumWhereInput {
   icon_not_starts_with?: String;
   icon_ends_with?: String;
   icon_not_ends_with?: String;
+  description?: String;
+  description_not?: String;
+  description_in?: String[] | String;
+  description_not_in?: String[] | String;
+  description_lt?: String;
+  description_lte?: String;
+  description_gt?: String;
+  description_gte?: String;
+  description_contains?: String;
+  description_not_contains?: String;
+  description_starts_with?: String;
+  description_not_starts_with?: String;
+  description_ends_with?: String;
+  description_not_ends_with?: String;
   AND?: ForumWhereInput[] | ForumWhereInput;
   OR?: ForumWhereInput[] | ForumWhereInput;
   NOT?: ForumWhereInput[] | ForumWhereInput;
@@ -1502,6 +1518,7 @@ export interface ForumCreateInput {
   threads?: Int;
   lastPost?: PostCreateOneInput;
   icon: String;
+  description?: String;
 }
 
 export interface PostCreateOneInput {
@@ -1952,6 +1969,7 @@ export interface ForumUpdateDataInput {
   threads?: Int;
   lastPost?: PostUpdateOneInput;
   icon?: String;
+  description?: String;
 }
 
 export interface PostUpdateOneInput {
@@ -2648,12 +2666,14 @@ export interface ForumUpdateInput {
   threads?: Int;
   lastPost?: PostUpdateOneInput;
   icon?: String;
+  description?: String;
 }
 
 export interface ForumUpdateManyMutationInput {
   name?: String;
   threads?: Int;
   icon?: String;
+  description?: String;
 }
 
 export interface GroupUpdateInput {
@@ -3292,6 +3312,7 @@ export interface Forum {
   name: String;
   threads: Int;
   icon: String;
+  description?: String;
 }
 
 export interface ForumPromise extends Promise<Forum>, Fragmentable {
@@ -3300,6 +3321,7 @@ export interface ForumPromise extends Promise<Forum>, Fragmentable {
   threads: () => Promise<Int>;
   lastPost: <T = PostPromise>() => T;
   icon: () => Promise<String>;
+  description: () => Promise<String>;
 }
 
 export interface ForumSubscription
@@ -3310,6 +3332,7 @@ export interface ForumSubscription
   threads: () => Promise<AsyncIterator<Int>>;
   lastPost: <T = PostSubscription>() => T;
   icon: () => Promise<AsyncIterator<String>>;
+  description: () => Promise<AsyncIterator<String>>;
 }
 
 export interface Post {
@@ -4094,6 +4117,7 @@ export interface ForumPreviousValues {
   name: String;
   threads: Int;
   icon: String;
+  description?: String;
 }
 
 export interface ForumPreviousValuesPromise
@@ -4103,6 +4127,7 @@ export interface ForumPreviousValuesPromise
   name: () => Promise<String>;
   threads: () => Promise<Int>;
   icon: () => Promise<String>;
+  description: () => Promise<String>;
 }
 
 export interface ForumPreviousValuesSubscription
@@ -4112,6 +4137,7 @@ export interface ForumPreviousValuesSubscription
   name: () => Promise<AsyncIterator<String>>;
   threads: () => Promise<AsyncIterator<Int>>;
   icon: () => Promise<AsyncIterator<String>>;
+  description: () => Promise<AsyncIterator<String>>;
 }
 
 export interface GroupSubscriptionPayload {

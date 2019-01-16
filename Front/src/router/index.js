@@ -107,12 +107,12 @@ const router = new Router({
           },
           children: [
             {
-              path: "list",
+              path: "list/:fid/:page",
               name: "threadList",
               component: threadList
             },
             {
-              path: "info",
+              path: "info/:tid/:page",
               name: "threadInfo",
               component: threadInfo
             },

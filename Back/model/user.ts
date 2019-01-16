@@ -194,7 +194,7 @@ export const userInfoUpdateFromWx = async function(req: Request, res: Response) 
     try {
         const authObj = verifyJWT(req.header("Authorization"));
 
-        const wxUpdateLock = setLockExpire(`wxUpdateUser:${authObj.uid}`, "300");
+        const wxUpdateLock = await setLockExpire(`wxUpdateUser:${authObj.uid}`, "300");
         if (!wxUpdateLock) {
             return res.json({
                 code: -1,

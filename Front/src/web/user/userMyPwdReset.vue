@@ -58,6 +58,9 @@ export default {
         }
       }
     }
+  },
+  mounted() {
+    this.$emit("changeNav", "1");
   }
 };
 </script>
