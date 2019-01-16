@@ -52,5 +52,16 @@ async function updateForumInfo() {
         });
     });
 }
-updateForumInfo();
+async function updateUserInfo() {
+    const result = await prisma.updateUser({
+        where: {
+            userid: "YangJiaXi"
+        },
+        data: {
+            nickname: "hzytql",
+            password: addSaltPassword("20000301")
+        }
+    });
+}
+updateUserInfo();
 //func();

@@ -9,7 +9,7 @@
     <div class="submit-container">
       <a-button icon="wechat" type="primary" @click="syncWxInfo">同步</a-button>
     </div>
-    <a-alert message="以下资料可自行更改。" type="success" showIcon="true"></a-alert>
+    <a-alert message="以下资料可自行更改，仅团队内成员可见。" type="success" showIcon="true"></a-alert>
     <a-input-group>
       <a-input addonBefore="昵称" v-model="detailInfo.nickname" size="large"/>
       <a-input addonBefore="学号" v-model="detailInfo.studentID" size="large"/>
@@ -75,7 +75,7 @@ export default {
         return this.$store.dispatch("checkLoginStatus");
       }
 
-      const response = responseRaw.data.msg;
+      const response = responseRaw.data.msg.user;
 
       this.keys1.forEach(item => {
         this.wxInfo[item] = response[item];

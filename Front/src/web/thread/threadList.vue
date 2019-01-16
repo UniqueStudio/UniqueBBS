@@ -1,38 +1,42 @@
 <template>
   <div class="thread-list">
-    <div class="forum-info">
+    <div class="forum-info" :style="{backgroundColor:forum.backgroundColor}">
       <div class="forum-icon">
-        <div class="forum-item-icon-bg" :style="{backgroundColor:forum.backgroundColor}">
-          <a-icon :type="forum.icon" class="forum-item-icon"></a-icon>
-        </div>
+        <a-icon :type="forum.icon" class="forum-item-icon"></a-icon>
       </div>
-      <div class="forum-description">
-        <p class="forum-info-name">
-          {{forum.name}}
-          <span class="forum-info-number">
-            <a-icon type="message"/>
-            {{forum.threads}}
-          </span>
-        </p>
-        <p class="forum-info-description">{{forum.description}}</p>
+      <div class="forum-info-name">{{forum.name}}</div>
+      <div class="forum-number-name">
+        <a-icon type="message"/>
+        {{forum.threads}}
       </div>
     </div>
     <div class="thread-list-items">
       <div class="thread-item" v-for="thread in threadList" :key="thread.id">
         <div class="thread-item-author">
-          <a-avatar shape="circle" :src="thread.user.avatar" class="avatar-img"></a-avatar>
+          <router-link :to="'/user/visit/'+thread.user.id">
+            <a-avatar shape="circle" :src="thread.user.avatar" class="avatar-img"></a-avatar>
+          </router-link>
         </div>
         <div class="thread-item-info">
           <p class="thread-item-info-subject">
             <router-link :to="'/thread/info/'+thread.thread.id+'/1'">{{thread.thread.subject}}</router-link>
           </p>
           <p class="thread-item-info-author">
-            <a-icon type="message"/>
-            {{thread.thread.postCount}}&nbsp;
+            <a-icon type="user"/>
+            {{thread.user.username}}&nbsp;
             <a-icon type="clock-circle"/>
             {{humanDate(new Date(thread.thread.createDate))}} &nbsp;
-            <a-icon type="user"/>
-            {{thread.user.username}}
+            <a-icon type="message"/>
+            {{thread.thread.postCount}}
+          </p>
+        </div>
+        <div class="thread-item-last-reply">
+          <p class="thread-item-info-reply-message">
+            <router-link :to="'/thread/info/'+thread.thread.id+'/1'">{{thread.lastReply[0].message}}</router-link>
+          </p>
+          <p class="thread-item-info-author">
+            <a-icon type="clock-circle"/>
+            {{humanDate(new Date(thread.thread.lastDate))}} &nbsp;
           </p>
         </div>
       </div>
@@ -90,47 +94,56 @@ export default {
 };
 </script>
 <style scoped>
+.thread-item-last-reply {
+}
 @media screen and (min-width: 800px) {
-  .thread-list {
-    width: 80%;
-  }
   .thread-item-info-subject {
     font-size: 20px;
   }
   .thread-item-info-author {
     font-size: 14px;
   }
+  .thread-item {
+    grid-template-columns: 20% 50% 30%;
+  }
 }
 @media screen and (max-width: 800px) {
-  .thread-list {
-    width: 95%;
-  }
   .thread-item-info-subject {
     font-size: 18px;
   }
   .thread-item-info-author {
     font-size: 12px;
   }
+  .thread-item {
+    grid-template-columns: 20% 80%;
+  }
+  .thread-item-last-reply {
+    display: none;
+  }
+}
+.thread-item-info-reply-message {
+  font-size: 14px;
 }
 .forum-info-name {
   font-size: 20px;
 }
-.thread-list {
-  margin: 12px auto;
-}
 .forum-info {
-  display: grid;
-  grid-template-columns: 30% 70%;
-  margin: 64px auto;
+  margin: -12px -12px 36px -12px;
+  border-radius: 6px 6px 0 0;
+  height: 172px;
+  user-select: none;
 }
 .forum-icon {
-  text-align: right;
+  text-align: center;
+  padding-top: 16px;
 }
-.forum-item-icon-bg {
-  display: inline-block;
-  height: 72px;
-  width: 72px;
-  border-radius: 36px;
+.forum-number-name,
+.forum-info-name {
+  text-align: center;
+  color: white;
+}
+.forum-info-name {
+  margin-top: -8px;
 }
 .forum-item-icon {
   color: white;
@@ -139,24 +152,16 @@ export default {
   width: 72px;
   margin-top: 18px;
 }
-.forum-description {
-  padding: 0 36px;
-}
 .forum-info-description {
   color: #777;
 }
-.forum-description p,
-.thread-item-info p {
+.thread-item-info p,
+.thread-item-last-reply p {
   margin-bottom: 0;
   margin-top: 0;
 }
-.forum-info-number {
-  color: dodgerblue;
-  margin: 12px;
-}
 .thread-item {
   display: grid;
-  grid-template-columns: 30% 70%;
   margin: 12px auto;
   height: 72px;
 }

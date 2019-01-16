@@ -15,12 +15,14 @@
       <div class="forum-item-last">
         <div v-if="forum.lastPost!==null">
           <p>
-            <a-avatar
-              shape="circle"
-              :src="forum.lastPostInfo.user.avatar"
-              class="avatar-img"
-              size="small"
-            ></a-avatar>
+            <router-link :to="'/user/visit/'+forum.lastPostInfo.user.id">
+              <a-avatar
+                shape="circle"
+                :src="forum.lastPostInfo.user.avatar"
+                class="avatar-img"
+                size="small"
+              ></a-avatar>
+            </router-link>
             <router-link
               :to="'/thread/info/'+forum.lastPostInfo.thread.id+'/1'"
             >{{forum.lastPost.message}}</router-link>
@@ -76,7 +78,7 @@ export default {
     margin: 36px auto;
   }
   .forum-item {
-    grid-template-columns: 20% 60% 20%;
+    grid-template-columns: 20% 50% 30%;
   }
 }
 @media screen and (max-width: 800px) {

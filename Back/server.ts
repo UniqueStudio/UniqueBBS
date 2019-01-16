@@ -42,12 +42,14 @@ import {
     fileFilter,
     fileGetUnlink
 } from "./model/attach";
+import { groupList, groupMemberList } from "./model/group";
 
 import * as Redis from "redis";
 import * as Redlock from "redlock";
 import { messageIsRead, messageList } from "./model/message";
 import { promisify } from "util";
 import * as multer from "multer";
+import { from } from "apollo-link";
 
 const SERVER_VERSION = "1.00";
 
@@ -141,6 +143,10 @@ app.post("/post/update/:pid", postUpdate);
 app.post("/post/search", postSearch);
 app.post("/post/deleteHard/:pid", postDeleteHard);
 app.post("/post/recovery/:pid", postRecovery);
+
+//Group
+app.get("/group/list", groupList);
+app.get("/group/members/:gid", groupMemberList);
 
 //Message
 app.post("/message/read/:id", messageIsRead);

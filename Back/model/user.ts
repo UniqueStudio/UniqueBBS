@@ -12,7 +12,12 @@ export const userInfo = async function(req: Request, res: Response) {
         const result = await prisma.user({
             id: uid
         });
-        res.json({ code: 1, msg: filterUserInfo(result) });
+        const group = await prisma
+            .user({
+                id: uid
+            })
+            .group();
+        res.json({ code: 1, msg: { user: filterUserInfo(result), group: group } });
     } catch (e) {
         res.json({ code: -1, msg: e.message });
     }
@@ -73,7 +78,12 @@ export const userMyInfo = async function(req: Request, res: Response) {
         const result = await prisma.user({
             id: uid
         });
-        res.json({ code: 1, msg: filterMyInfo(result) });
+        const group = await prisma
+            .user({
+                id: uid
+            })
+            .group();
+        res.json({ code: 1, msg: { user: filterMyInfo(result), group: group } });
     } catch (e) {
         res.json({ code: -1, msg: e.message });
     }

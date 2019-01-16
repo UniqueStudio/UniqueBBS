@@ -6,6 +6,9 @@ const urls = {
   updateMyPwd: `${domain}user/update/pwd`,
   syncWxInfo: `${domain}user/update/wx`,
   forumList: `${domain}forum/list`,
-  threadList: (fid, page) => `${domain}thread/list/${fid}/${page}`
+  threadList: (fid, page) => `${domain}thread/list/${fid}/${page}`,
+  threadInfo: (tid, page) => `${domain}thread/info/${tid}/${page}`,
+  groupMemberList: gid => `${domain}group/members/${gid}`,
+  userInfo: uid => `${domain}user/info/${uid}`
 };
 export default urls;

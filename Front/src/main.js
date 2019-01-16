@@ -22,7 +22,7 @@ Vue.use(Vuex);
 
 const store = new Vuex.Store({
   state: {
-    avatarSrc: "http://p.qlogo.cn/bizmail/DaKOA6aHxn24gyNbZg1ZeEuiaDwI83BxRkg16o7nMOJ6WFZAEtzBIpA/",
+    avatarSrc: "",
     loginStatus: false,
     navActive: 0
   },
@@ -42,7 +42,7 @@ const store = new Vuex.Store({
       const responseRaw = await ajax.get(urls.myInfo);
       const response = responseRaw.data;
       if (response.code === 1) {
-        context.commit("updateAvatarSrc", response.msg.avatar);
+        context.commit("updateAvatarSrc", response.msg.user.avatar);
         context.commit("updateLoginStatus", true);
       } else {
         localStorage.removeItem("token");

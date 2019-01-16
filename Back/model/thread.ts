@@ -73,12 +73,13 @@ export const threadList = async function(req: Request, res: Response) {
                     lastReply: await prisma.posts({
                         where: {
                             thread: {
-                                id: item.id
+                                id: item.id,
+                                active: authObj.isAdmin ? undefined : true
                             }
                         },
                         orderBy: "createDate_DESC",
                         first: 1
-                    })[0]
+                    })
                 };
             })
         );

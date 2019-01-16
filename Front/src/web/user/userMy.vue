@@ -19,6 +19,18 @@
           <span class="user-nav-text">Report</span>
         </router-link>
       </a-menu-item>
+      <a-menu-item key="3">
+        <router-link to="/user/my/group">
+          <a-icon type="team"/>
+          <span class="user-nav-text">组别</span>
+        </router-link>
+      </a-menu-item>
+      <a-menu-item key="4">
+        <router-link to="/user/my/threads">
+          <a-icon type="copy"/>
+          <span class="user-nav-text">帖子</span>
+        </router-link>
+      </a-menu-item>
     </a-menu>
     <div class="avatar-container">
       <a-avatar shape="circle" :src="userAvatarSrc" class="avatar-img" size="large"></a-avatar>

@@ -11,6 +11,8 @@ import userMyInfo from "@/web/user/userMyInfo.vue";
 import userMyPwdReset from "@/web/user/userMyPwdReset.vue";
 import userVisit from "@/web/user/userVisit.vue";
 import userReport from "@/web/user/userReport.vue";
+import userGroup from "@/web/user/userGroup.vue";
+import userThreads from "@/web/user/userThreads.vue";
 import thread from "@/web/thread/thread.vue";
 import threadList from "@/web/thread/threadList.vue";
 import threadInfo from "@/web/thread/threadInfo.vue";
@@ -85,11 +87,27 @@ const router = new Router({
                   meta: {
                     requireLogin: true
                   }
+                },
+                {
+                  path: "group",
+                  name: "group",
+                  component: userGroup,
+                  meta: {
+                    requireLogin: true
+                  }
+                },
+                {
+                  path: "threads",
+                  name: "threads",
+                  component: userThreads,
+                  meta: {
+                    requireLogin: true
+                  }
                 }
               ]
             },
             {
-              path: "visit",
+              path: "visit/:uid",
               name: "userVisit",
               component: userVisit,
               meta: {
@@ -126,12 +144,6 @@ const router = new Router({
       ]
     }
   ]
-});
-
-router.beforeEach((from, to, next) => {
-  if (to.matched.some(item => item.meta.requireLogin)) {
-  }
-  next();
 });
 
 export default router;
