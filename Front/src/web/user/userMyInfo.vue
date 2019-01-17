@@ -7,7 +7,7 @@
       <a-input addonBefore="手机" readonly :value="wxInfo.mobile" size="large"/>
     </a-input-group>
     <div class="submit-container">
-      <a-button icon="wechat" type="primary" @click="syncWxInfo">同步</a-button>
+      <a-button icon="wechat" type="primary" @click="syncWxInfo" :disabled="syncBtnDisabled">同步</a-button>
     </div>
     <a-alert message="以下资料可自行更改，仅团队成员可见。" type="success" showIcon="true"></a-alert>
     <a-input-group>
@@ -21,7 +21,7 @@
       <a-input addonBefore="签名" v-model="detailInfo.signature" size="large"/>
     </a-input-group>
     <div class="submit-container">
-      <a-button icon="check" type="primary" @click="updateInfo">提交</a-button>
+      <a-button icon="check" type="primary" @click="updateInfo" :disabled="updateBtnDisabled">提交</a-button>
     </div>
   </div>
 </template>
@@ -43,7 +43,9 @@ export default {
         major: "",
         className: "",
         signature: ""
-      }
+      },
+      updateBtnDisabled: false,
+      syncBtnDisabled: false
     };
   },
   computed: {
@@ -56,6 +58,7 @@ export default {
   },
   methods: {
     async syncWxInfo() {
+      this.syncBtnDisabled = true;
       const responseRaw = await this.$ajax.post(this.$urls.syncWxInfo);
       const response = responseRaw.data;
       if (response.code === 1) {
@@ -68,6 +71,7 @@ export default {
           content: response.msg
         });
       }
+      this.syncBtnDisabled = false;
     },
     async renderInfo() {
       const responseRaw = await this.$ajax.get(this.$urls.myInfo);
@@ -86,6 +90,7 @@ export default {
       });
     },
     async updateInfo() {
+      this.updateBtnDisabled = true;
       const responseRaw = await this.$ajax.post(
         this.$urls.updateMyInfo,
         this.detailInfo
@@ -100,6 +105,7 @@ export default {
           content: response.msg
         });
       }
+      this.updateBtnDisabled = false;
     }
   },
   mounted() {

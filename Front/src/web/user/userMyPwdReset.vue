@@ -7,7 +7,7 @@
       <a-input addonBefore="重新输入密码" v-model="repeatPwd" type="password" size="large"/>
     </a-input-group>
     <div class="submit-container">
-      <a-button icon="key" type="primary" @click="updatePwd">重设密码</a-button>
+      <a-button icon="key" type="primary" @click="updatePwd" :disabled="resetBtnDisabled">重设密码</a-button>
     </div>
   </div>
 </template>
@@ -18,7 +18,8 @@ export default {
     return {
       oldPwd: "",
       newPwd: "",
-      repeatPwd: ""
+      repeatPwd: "",
+      resetBtnDisabled: false
     };
   },
   computed: {
@@ -33,6 +34,7 @@ export default {
   },
   methods: {
     async updatePwd() {
+      this.resetBtnDisabled = true;
       if (this.newPwd !== this.repeatPwd) {
         const modal = this.$error();
         modal.update({
@@ -57,6 +59,7 @@ export default {
           this.$message.success("新密码设置成功！", 3);
         }
       }
+      this.resetBtnDisabled = true;
     }
   },
   mounted() {

@@ -21,13 +21,19 @@
           <p class="thread-item-info-subject">
             <router-link :to="'/thread/info/'+thread.thread.id+'/1'">{{thread.thread.subject}}</router-link>
           </p>
-          <p class="thread-item-info-author">
-            <a-icon type="user"/>
-            {{thread.user.username}}&nbsp;
-            <a-icon type="clock-circle"/>
-            {{humanDate(new Date(thread.thread.createDate))}} &nbsp;
-            <a-icon type="message"/>
-            {{thread.thread.postCount}}
+          <p>
+            <a-tag :color="thread.user.isAdmin? 'red': 'blue'">
+              <a-icon type="user"/>
+              {{thread.user.username}}
+            </a-tag>
+            <a-tag color="green">
+              <a-icon type="clock-circle"/>
+              {{humanDate(new Date(thread.thread.createDate))}}
+            </a-tag>
+            <a-tag color="purple">
+              <a-icon type="message"/>
+              {{thread.thread.postCount}}
+            </a-tag>
           </p>
         </div>
         <div class="thread-item-last-reply">
@@ -35,8 +41,10 @@
             <router-link :to="'/thread/info/'+thread.thread.id+'/1'">{{thread.lastReply[0].message}}</router-link>
           </p>
           <p class="thread-item-info-author">
-            <a-icon type="clock-circle"/>
-            {{humanDate(new Date(thread.thread.lastDate))}} &nbsp;
+            <a-tag color="green">
+              <a-icon type="clock-circle"/>
+              {{humanDate(new Date(thread.thread.lastDate))}}
+            </a-tag>
           </p>
         </div>
       </div>
@@ -114,9 +122,6 @@ export default {
   .thread-item-info-subject {
     font-size: 20px;
   }
-  .thread-item-info-author {
-    font-size: 14px;
-  }
   .thread-item {
     grid-template-columns: 20% 50% 30%;
   }
@@ -124,9 +129,6 @@ export default {
 @media screen and (max-width: 800px) {
   .thread-item-info-subject {
     font-size: 18px;
-  }
-  .thread-item-info-author {
-    font-size: 12px;
   }
   .thread-item {
     grid-template-columns: 20% 80%;

@@ -3,10 +3,14 @@
     <div class="user-group-collections" v-for="group in groupList" :key="group.id">
       <h3>{{group.info.name}}</h3>
       <div v-for="user in group.list" :key="user.id" class="group-user-container">
-        <router-link :to="'/user/visit/'+user.id">
-          <a-avatar shape="circle" :src="user.avatar" class="avatar-img" size="small"></a-avatar>
+        <div class="group-user-avatar">
+          <router-link :to="'/user/visit/'+user.id">
+            <a-avatar shape="circle" :src="user.avatar" class="avatar-img"></a-avatar>
+          </router-link>
+        </div>
+        <div class="group-user-info">
           <span :style="{color: user.isAdmin? 'red' : 'black'}">{{user.username}}</span>
-        </router-link>
+        </div>
       </div>
     </div>
   </div>
@@ -44,12 +48,25 @@ export default {
 };
 </script>
 <style scoped>
-.group-user-container {
-  display: inline-block;
-  margin: 12px;
-  width: 98px;
-}
 .user-group-collections {
   margin-top: 64px;
+}
+.group-user-container {
+  display: grid;
+  grid-template-columns: 20% 80%;
+  margin: 24px 0;
+}
+.group-user-avatar {
+  text-align: right;
+}
+.avatar-img {
+  height: 48px;
+  width: 48px;
+}
+.group-user-info {
+  padding: 0 18px;
+}
+h3 {
+  text-align: center;
 }
 </style>

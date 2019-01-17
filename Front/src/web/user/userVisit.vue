@@ -6,12 +6,12 @@
     <h2 :style="{color: userDatas.isAdmin? 'red': 'black'}">{{userDatas.username}}</h2>
     <p class="group-container">
       <a-tag v-for="group in groupList" :key="group.id" :color="group.color">{{group.name}}</a-tag>
+      <a-tag color="green">
+        <a-icon type="clock-circle"/>
+        {{lastLoginHumanDate}}
+      </a-tag>
     </p>
     <h5>{{userDatas.signature}}</h5>
-    <h5 class="last-login">
-      <a-icon type="clock-circle"/>
-      {{lastLoginHumanDate}}
-    </h5>
     <div class="user-detail-info">
       <a-input-group>
         <a-input addonBefore="邮箱" readonly :value="userDatas.email" size="large"/>

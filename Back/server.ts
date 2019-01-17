@@ -42,7 +42,7 @@ import {
     fileFilter,
     fileGetUnlink
 } from "./model/attach";
-import { groupList, groupMemberList, groupUser } from "./model/group";
+import { groupList, groupUserList, groupUser } from "./model/group";
 
 import * as Redis from "redis";
 import * as Redlock from "redlock";
@@ -147,7 +147,7 @@ app.post("/post/recovery/:pid", postRecovery);
 
 //Group
 app.get("/group/list", groupList);
-app.get("/group/members/:gid", groupMemberList);
+app.get("/group/users/:gid", groupUserList);
 app.get("/group/user/:uid", groupUser);
 
 //Message

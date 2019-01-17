@@ -5,10 +5,14 @@
         <router-link :to="'/thread/info/'+thread.id+'/1'">{{thread.subject}}</router-link>
       </p>
       <p class="thread-item-content">
-        <a-icon type="message"/>
-        {{thread.postCount}}&nbsp;
-        <a-icon type="clock-circle"/>
-        {{getHumanDate(thread.createDate)}}
+        <a-tag color="purple">
+          <a-icon type="message"/>
+          {{thread.postCount}}
+        </a-tag>
+        <a-tag color="green">
+          <a-icon type="clock-circle"/>
+          {{getHumanDate(thread.createDate)}}
+        </a-tag>
       </p>
     </div>
     <div class="pagination" v-if="all > defaultPageSize">

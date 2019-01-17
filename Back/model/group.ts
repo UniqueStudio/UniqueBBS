@@ -27,18 +27,18 @@ export const groupList = async function(req: Request, res: Response) {
     }
 };
 
-export const groupMemberList = async function(req: Request, res: Response) {
+export const groupUserList = async function(req: Request, res: Response) {
     try {
         verifyJWT(req.header("Authorization"));
         const { gid } = req.params;
-        const groupMemberList: Array<User> = await prisma.users({
+        const groupUserList: Array<User> = await prisma.users({
             where: {
                 group_some: {
                     id: gid
                 }
             }
         });
-        res.json({ code: 1, msg: groupMemberList });
+        res.json({ code: 1, msg: groupUserList });
     } catch (err) {
         res.json({ code: -1, msg: err.message });
     }

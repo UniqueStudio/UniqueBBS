@@ -11,16 +11,16 @@
           <p class="forum-item-title">{{forum.name}}</p>
         </router-link>
         <p v-if="forum.description !== null" class="forum-item-description">
-          <span class="forum-icon">
+          <a-tag color="purple">
             <a-icon type="message"/>
             {{forum.threads}}
-          </span>
+          </a-tag>
           {{forum.description}}
         </p>
       </div>
       <div class="forum-item-last">
         <div v-if="forum.lastPost!==null">
-          <p>
+          <p class="forum-last-post">
             <router-link :to="'/user/visit/'+forum.lastPostInfo.user.id">
               <a-avatar
                 shape="circle"
@@ -33,10 +33,10 @@
               :to="'/thread/info/'+forum.lastPostInfo.thread.id+'/1'"
             >{{forum.lastPost.message}}</router-link>
           </p>
-          <p class="forum-item-last-time">
+          <a-tag color="green">
             <a-icon type="clock-circle"/>
             {{getHumanDate(forum.lastPost.createDate)}}
-          </p>
+          </a-tag>
         </div>
         <div v-else>暂无回帖</div>
       </div>
@@ -133,12 +133,7 @@ export default {
 .forum-item-description {
   color: #777;
 }
-.forum-item-last-time {
+.forum-last-post {
   font-size: 14px;
-  color: #777;
-}
-.forum-icon {
-  margin: 6px;
-  color: dodgerblue;
 }
 </style>

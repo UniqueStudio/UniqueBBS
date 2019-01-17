@@ -11,7 +11,13 @@
       </a-input-group>
     </div>
     <div class="login-btn-container">
-      <a-button icon="login" type="primary" @click="login" id="login">登录</a-button>
+      <a-button
+        icon="login"
+        type="primary"
+        @click="login"
+        id="login"
+        :disabled="loginBtnDisabled"
+      >登录</a-button>
     </div>
     <div>
       <a-button icon="wechat" type="primary">使用企业微信登录</a-button>
@@ -24,7 +30,8 @@ export default {
   data() {
     return {
       nickname: "",
-      pwd: ""
+      pwd: "",
+      loginBtnDisabled: false
     };
   },
   computed: {
@@ -35,6 +42,7 @@ export default {
   },
   methods: {
     async login() {
+      this.loginBtnDisabled = true;
       document.getElementById("login").focus();
       const nickname = this.nickname;
       const pwd = this.pwd_md5;
@@ -61,6 +69,7 @@ export default {
         this.$message.success("登录成功！", 3);
         this.$router.push({ path: "/user/my/info" });
       }
+      this.loginBtnDisabled = false;
     }
   }
 };

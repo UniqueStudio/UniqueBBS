@@ -157,7 +157,13 @@ export const threadInfo = async function(req: Request, res: Response) {
                             id: item.id
                         })
                         .user()
-                )
+                ),
+                group: await prisma
+                    .post({
+                        id: item.id
+                    })
+                    .user()
+                    .group()
             }))
         );
 
@@ -282,6 +288,13 @@ export const threadReply = async function(req: Request, res: Response) {
     try {
         const { tid, message, quote } = req.body;
         const { uid, isAdmin } = verifyJWT(req.header("Authorization"));
+
+        if (!message || message.length <= 10) {
+            return res.json({
+                code: -1,
+                msg: "每次发言至少10个字以上！"
+            });
+        }
 
         const lockFrequentReply = await setLockExpire(`postUser:${uid}`, "10");
         if (!lockFrequentReply) {
