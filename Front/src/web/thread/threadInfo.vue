@@ -2,17 +2,20 @@
   <div class="thread-info">
     <div class="thread-main-content">
       <div class="user-avatar-container">
-        <router-link :to="'/user/visit/'+user.id">
-          <a-avatar :src="user.avatar" class="user-avatar"></a-avatar>
+        <router-link :to="'/user/visit/'+author.id">
+          <a-avatar :src="author.avatar" class="user-avatar"></a-avatar>
         </router-link>
       </div>
       <div class="thread-main-info">
         <p class="thread-subject">{{thread.subject}}</p>
         <div class="thread-sub">
           <p class="thread-sub-info">
-            <a-tag :color="user.isAdmin?'orange':'blue'">
-              <a-icon :type="user.isAdmin?'crown': 'user'"/>
-              {{user.username}}
+            <a-tag color="cyan" v-if="thread.diamond">
+              <a-icon type="star"/>&nbsp;精华
+            </a-tag>
+            <a-tag :color="author.isAdmin?'orange':'blue'">
+              <a-icon :type="author.isAdmin?'crown': 'user'"/>
+              {{author.username}}
             </a-tag>&nbsp;
             <a-tag
               v-for="group in groupList"
@@ -23,29 +26,110 @@
               <a-icon type="team"/>
               {{group.name}}
             </a-tag>
-            <a-tag color="green" :title="fullCreateDate">
-              <a-icon type="clock-circle"/>
-              {{createDate}}
-            </a-tag>
             <a-tag color="purple" class="thread-item-info-messages">
               <a-icon type="message"/>
               {{postCount}}
             </a-tag>
           </p>
           <div class="thread-content">{{content}}</div>
+          <div class="thread-signature">
+            <div :title="fullCreateDate">
+              <a-icon type="clock-circle"/>
+              {{createDate}}
+            </div>
+            <div v-if="author.signature !== ''">
+              <a-icon type="pushpin"/>
+              {{author.signature}}
+            </div>
+          </div>
+          <a-divider class="thread-divider"></a-divider>
         </div>
       </div>
     </div>
-    <div class="thread-admin"></div>
+    <div class="thread-admin">
+      <a-tag color="blue" v-if="isAdmin || myUid===author.id">
+        <a-icon type="edit"/>&nbsp;编辑
+      </a-tag>
+      <a-tag color="red" v-if="isAdmin || myUid===author.id" @click="handleThreadDelete">
+        <a-drawer
+          title="帖子删除"
+          placement="top"
+          :visible="deleteDiag.visible"
+          @close="deleteDiag.visible=false;"
+        >
+          <div class="drawer-content">
+            <div>帖子删除不可逆，请谨慎操作！</div>
+            <div class="drawer-btn-container">
+              <a-button type="primary" @click="handleDelete(0)" title="软删除后，帖子仍在数据库中，仅管理员可见。">软删除</a-button>
+              <a-button
+                type="primary"
+                @click="handleDelete(1)"
+                title="硬删除不可逆，删除后将无法恢复，请谨慎操作！"
+                v-if="isAdmin"
+              >硬删除</a-button>
+              <a-button
+                type="primary"
+                @click="handleDelete(2)"
+                title="用于恢复被软删除的帖子，仅管理员可操作！"
+                v-if="isAdmin"
+              >恢复</a-button>
+            </div>
+          </div>
+        </a-drawer>
+        <a-icon type="delete"/>&nbsp;删除
+      </a-tag>
+      <a-tag color="orange" v-if="isAdmin" @click="visibleTop = true;">
+        <a-drawer title="帖子置顶" placement="top" :visible="visibleTop" @close="visibleTop=false;">
+          <div class="drawer-content">
+            <div>置顶帖子后，帖子将展示到板块的最前面。</div>
+            <div class="drawer-btn-container">
+              <a-button type="primary" @click="handleTopThread('2')">全局置顶</a-button>
+              <a-button type="primary" @click="handleTopThread('1')">本版置顶</a-button>
+              <a-button type="primary" @click="handleTopThread('0')">解除置顶</a-button>
+            </div>
+          </div>
+        </a-drawer>
+        <a-icon type="arrow-up"/>&nbsp;置顶
+      </a-tag>
+      <a-tag color="cyan" v-if="isAdmin" @click="visibleDiamond = true;">
+        <a-drawer
+          title="精华设置"
+          placement="top"
+          :visible="visibleDiamond"
+          @close="visibleDiamond=false;"
+        >
+          <div class="drawer-content">
+            <div>设置精华后，帖子将以特殊的形式展示。</div>
+            <div class="drawer-btn-container">
+              <a-button type="primary" @click="handleDiamondThread('1')">设置精华</a-button>
+              <a-button type="primary" @click="handleDiamondThread('0')">取消精华</a-button>
+            </div>
+          </div>
+        </a-drawer>
+        <a-icon type="star"/>&nbsp;精华
+      </a-tag>
+      <a-tag color="purple" v-if="isAdmin" @click="visibleClose = true;">
+        <a-drawer title="帖子锁定" placement="top" :visible="visibleClose" @close="visibleClose=false;">
+          <div class="drawer-content">
+            <div>帖子锁定后，只有管理员才可以发表评论。</div>
+            <div class="drawer-btn-container">
+              <a-button type="primary" @click="handleCloseThread('1')">锁定帖子</a-button>
+              <a-button type="primary" @click="handleCloseThread('0')">解除锁定</a-button>
+            </div>
+          </div>
+        </a-drawer>
+        <a-icon type="lock"/>&nbsp;锁帖
+      </a-tag>
+    </div>
     <div class="thread-post-list">
-      <div class="thread-post-list-item" v-for="post in postList" :key="post.id">
+      <div class="thread-post-list-item" v-for="(post,index) in postList" :key="post.id">
         <div class="thread-post-list-item-avatar-container">
           <router-link :to="'/user/visit/'+post.user.id">
             <a-avatar :src="post.user.avatar" class="user-avatar-small"></a-avatar>
           </router-link>
         </div>
         <div class="thread-post-list-item-content">
-          <p class="thread-post-list-item-author-info">
+          <div class="thread-post-list-item-author-info">
             <router-link :to="'/user/visit/'+post.user.id">
               <a-tag :color="post.user.isAdmin?'orange':'blue'">
                 <a-icon :type="post.user.isAdmin?'crown': 'user'"/>
@@ -61,12 +145,38 @@
               <a-icon type="team"/>
               {{group.name}}
             </a-tag>
-            <a-tag color="green" :title="getFullCreateDate(post.post.createDate)">
+            <a-tag color="pink" class="thread-item-info-messages">
+              <a-icon type="trophy"/>
+              {{(page -1) * defaultPageSize + index +1}}楼
+            </a-tag>
+          </div>
+          <div class="post-message">{{post.post.message}}</div>
+          <div class="thread-signature">
+            <div :title="getFullCreateDate(post.post.createDate)">
               <a-icon type="clock-circle"/>
               {{getHumanDate(post.post.createDate)}}&nbsp;
+            </div>
+            <div v-if="post.user.signature !== ''">
+              <a-icon type="pushpin"/>
+              {{post.user.signature}}
+            </div>
+          </div>
+          <a-divider class="thread-divider"></a-divider>
+          <div class="post-admin">
+            <a-tag color="blue" v-if="isAdmin || myUid===post.user.id">
+              <a-icon type="edit"/>&nbsp;编辑
             </a-tag>
-          </p>
-          <div>{{post.post.message}}</div>
+            <a-tag
+              color="red"
+              v-if="isAdmin || myUid===post.user.id"
+              @click="handlePostDelete(post.post.id)"
+            >
+              <a-icon type="delete"/>&nbsp;删除
+            </a-tag>
+            <a-tag color="orange">
+              <a-icon type="environment"/>&nbsp;引用
+            </a-tag>
+          </div>
         </div>
       </div>
     </div>
@@ -98,14 +208,18 @@ export default {
   data() {
     return {
       thread: {
-        id: 0,
+        id: "0",
         subject: "",
-        createDate: ""
+        createDate: "",
+        diamond: false,
+        top: 0,
+        close: false
       },
-      user: {
-        id: 0,
+      author: {
+        id: "0",
         username: "",
         avatar: "",
+        signature: "",
         isAdmin: false
       },
       postList: [],
@@ -118,7 +232,15 @@ export default {
       defaultPageSize: 20,
       replyInput: "",
       quote: -1,
-      btnDisabled: false
+      btnDisabled: false,
+      visibleDiamond: false,
+      visibleClose: false,
+      visibleTop: false,
+      deleteDiag: {
+        visible: false,
+        isThread: false,
+        pid: ""
+      }
     };
   },
   computed: {
@@ -131,6 +253,12 @@ export default {
     },
     readerAvatar() {
       return this.$store.state.avatarSrc;
+    },
+    isAdmin() {
+      return this.$store.state.isAdmin;
+    },
+    myUid() {
+      return this.$store.state.uid;
     }
   },
   methods: {
@@ -179,8 +307,8 @@ export default {
         Object.keys(this.thread).forEach(item => {
           this.thread[item] = data.threadInfo[item];
         });
-        Object.keys(this.user).forEach(item => {
-          this.user[item] = data.threadAuthor[item];
+        Object.keys(this.author).forEach(item => {
+          this.author[item] = data.threadAuthor[item];
         });
         this.postCount = data.threadInfo.postCount;
         this.postList = data.postArr;
@@ -190,7 +318,7 @@ export default {
         return this.$store.dispute("updateLoginStatus");
       }
       const userGroupListResponseRaw = await this.$ajax.get(
-        this.$urls.userGroup(this.user.id)
+        this.$urls.userGroup(this.author.id)
       );
 
       const userGroupListResponse = userGroupListResponseRaw.data;
@@ -201,6 +329,76 @@ export default {
         name: item.name,
         color: item.color
       }));
+    },
+    handleTopThread(val) {
+      this.visibleTop = false;
+      this.postServer(this.$urls.topThread, {
+        tid: this.thread.id,
+        setTop: val
+      });
+    },
+    handleDiamondThread(val) {
+      this.visibleDiamond = false;
+      this.postServer(this.$urls.diamondThread, {
+        tid: this.thread.id,
+        setDiamond: val
+      });
+    },
+    handleCloseThread(val) {
+      this.visibleClose = false;
+      this.postServer(this.$urls.closeThread, {
+        tid: this.thread.id,
+        setClose: val
+      });
+    },
+    handlePostDelete(pid) {
+      this.deleteDiag.isThread = false;
+      this.deleteDiag.pid = pid;
+      this.deleteDiag.visible = true;
+    },
+    handleThreadDelete() {
+      this.deleteDiag.isThread = true;
+      this.deleteDiag.visible = true;
+    },
+    handleDelete(mode) {
+      this.visibleThreadDelete = false;
+      let url = "";
+
+      const SOFT_DELETE = 0,
+        HARD_DELETE = 1,
+        RECOVERY = 2;
+
+      switch (mode) {
+        case SOFT_DELETE:
+          url = this.deleteDiag.isThread
+            ? this.$urls.deleteThread(this.thread.id)
+            : (url = this.$urls.deletePost(this.deleteDiag.pid));
+          break;
+        case HARD_DELETE:
+          url = this.deleteDiag.isThread
+            ? this.$urls.deleteThreadHard(this.thread.id)
+            : (url = this.$urls.deletePostHard(this.deleteDiag.pid));
+          break;
+        case RECOVERY:
+          url = this.deleteDiag.isThread
+            ? this.$urls.recoveryThread(this.thread.id)
+            : (url = this.$urls.recoveryPost(this.deleteDiag.pid));
+          break;
+      }
+
+      postServer(url);
+    },
+    async postServer(url, obj) {
+      const result = await this.$ajax.post(url, obj);
+      if (result.data.code === 1) {
+        this.$message.success("操作成功！", 3);
+      } else {
+        const modal = this.$error();
+        modal.update({
+          title: "操作错误",
+          content: result.data.msg
+        });
+      }
     }
   },
   mounted() {
@@ -213,6 +411,10 @@ export default {
   .thread-main-content,
   .thread-post-list-item {
     grid-template-columns: 20% 60% 20%;
+  }
+  .thread-admin {
+    width: 60%;
+    margin: 0 auto;
   }
   .user-avatar {
     height: 72px;
@@ -250,7 +452,6 @@ export default {
 }
 .thread-main-content {
   display: grid;
-  height: 72px;
   margin-top: 18px;
 }
 .user-avatar-container,
@@ -297,7 +498,33 @@ export default {
 }
 .thread-sub-info,
 .thread-sub,
-.thread-main-info {
+.thread-main-info,
+.thread-post-list,
+.thread-post-list-item,
+.thread-post-list-item-content {
   position: relative;
+}
+.thread-divider {
+  margin: 12px 0 6px 0;
+}
+.thread-signature {
+  font-size: 12px;
+  color: #777;
+  margin-top: 16px;
+  user-select: none;
+  cursor: default;
+}
+.post-message {
+  margin-top: 12px;
+}
+.thread-admin,
+.post-admin {
+  text-align: right;
+}
+.drawer-content {
+  text-align: center;
+}
+.drawer-btn-container {
+  margin-top: 36px;
 }
 </style>

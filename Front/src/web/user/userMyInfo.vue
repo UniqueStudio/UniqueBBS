@@ -1,6 +1,6 @@
 <template>
   <div class="userMyWx">
-    <a-alert message="以下资料同步自企业微信。" type="info" showIcon="true"></a-alert>
+    <a-alert message="以下资料同步自企业微信。" type="info" :showIcon="true"></a-alert>
     <a-input-group>
       <a-input addonBefore="姓名" readonly :value="wxInfo.username" size="large"/>
       <a-input addonBefore="邮箱" readonly :value="wxInfo.email" size="large"/>
@@ -9,7 +9,7 @@
     <div class="submit-container">
       <a-button icon="wechat" type="primary" @click="syncWxInfo" :disabled="syncBtnDisabled">同步</a-button>
     </div>
-    <a-alert message="以下资料可自行更改，仅团队成员可见。" type="success" showIcon="true"></a-alert>
+    <a-alert message="以下资料可自行更改，仅团队成员可见。" type="success" :showIcon="true"></a-alert>
     <a-input-group>
       <a-input addonBefore="昵称" v-model="detailInfo.nickname" size="large"/>
       <a-input addonBefore="学号" v-model="detailInfo.studentID" size="large"/>

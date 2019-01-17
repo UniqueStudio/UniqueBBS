@@ -3,8 +3,8 @@
     <div class="user-my-notice-control">
       <h3>消息列表</h3>
       <div class="user-my-notice-btn-container" v-if="messageList.length > 0">
-        <a-button type="primary" @click="readAllMessagesHandle">全部已读</a-button>
-        <a-button type="primary" @click="deleteAllMessagesHandle">全部删除</a-button>
+        <a-button type="primary" @click="readAllMessagesHandle" :disabled="isReadDisabled">全部已读</a-button>
+        <a-button type="primary" @click="deleteAllMessagesHandle" :disabled="deleteAllDisabled">全部删除</a-button>
       </div>
     </div>
     <a-comment
@@ -48,13 +48,25 @@
         :class="{'bold-message': !message.messageItem.isRead}"
       >{{message.messageItem.message}}</div>
     </a-comment>
+    <div class="pagination" v-if="totalMessages > defaultPageSize">
+      <a-pagination
+        :current="page"
+        :defaultPageSize="defaultPageSize"
+        :total="totalMessages"
+        @change="pageOnchange"
+      ></a-pagination>
+    </div>
   </div>
 </template>
 <script>
 export default {
   data() {
     return {
-      messageList: []
+      messageList: [],
+      isReadDisabled: false,
+      deleteAllDisabled: false,
+      defaultPageSize: 20,
+      totalMessages: 0
     };
   },
   computed: {
@@ -69,14 +81,20 @@ export default {
         path: `/user/visit/${uid}`
       });
     },
+    pageOnchange(page) {
+      this.$router.push({
+        path: `/user/my/notice/${page}`
+      });
+      this.getData();
+    },
     readAllMessagesHandle() {
       if (confirm("是否要将全部消息设置为已读？")) {
-        readAllMessages();
+        this.readAllMessages();
       }
     },
     deleteAllMessagesHandle() {
       if (confirm("是否要将全部消息删除？")) {
-        deleteAllMessages();
+        this.deleteAllMessages();
       }
     },
     getMessageHumandate(str) {
@@ -90,9 +108,21 @@ export default {
       }
     },
     async getMessageList() {
+      const messageCountResponseRaw = await this.$ajax.get(
+        this.$urls.messageCount
+      );
+
+      if (messageCountResponseRaw.data.code !== 1) {
+        return this.$dispute("checkLoginStatus");
+      }
+      this.totalMessages = Number.parseInt(
+        messageCountResponseRaw.data.msg.total
+      );
+
       const messageListResponseRaw = await this.$ajax.get(
         this.$urls.messageList(this.page)
       );
+
       if (messageListResponseRaw.data.code !== 1) {
         return this.$dispute("checkLoginStatus");
       }
@@ -116,6 +146,7 @@ export default {
       this.getMessageList();
     },
     async readAllMessages(e) {
+      this.isReadDisabled = true;
       const responseRaw = await this.$ajax.post(this.$urls.messageReadAll);
       if (responseRaw.data.code !== 1) {
         const modal = this.$error();
@@ -127,8 +158,10 @@ export default {
         this.$message.success("消息已全部设置为已读！", 3);
         this.getMessageList();
       }
+      this.isReadDisabled = false;
     },
     async deleteAllMessages(e) {
+      this.deleteAllDisabled = true;
       const responseRaw = await this.$ajax.post(this.$urls.messageDeleteAll);
       if (responseRaw.data.code !== 1) {
         const modal = this.$error();
@@ -140,6 +173,7 @@ export default {
         this.$message.success("消息已清空！", 3);
         this.getMessageList();
       }
+      this.deleteAllDisabled = false;
     }
   },
   mounted() {
@@ -186,5 +220,9 @@ export default {
 }
 .bold-message {
   font-weight: 700;
+}
+.pagination {
+  text-align: center;
+  margin: 36px auto;
 }
 </style>

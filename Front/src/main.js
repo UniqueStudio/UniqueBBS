@@ -22,30 +22,50 @@ const store = new Vuex.Store({
   state: {
     avatarSrc: "",
     loginStatus: false,
-    navActive: 0
+    navActive: 0,
+    unreadCount: 0,
+    isAdmin: false,
+    uid: ""
   },
   mutations: {
-    updateAvatarSrc(state, url) {
+    setAvatarSrc(state, url) {
       state.avatarSrc = url;
     },
-    updateLoginStatus(state, status) {
+    setLoginStatus(state, status) {
       state.loginStatus = status;
     },
     setActiveNav(state, val) {
       state.navActive = val;
+    },
+    setUnreadCount(state, val) {
+      state.unreadCount = val;
+    },
+    setisAdmin(state, val) {
+      state.isAdmin = val;
+    },
+    setUid(state, val) {
+      state.uid = val;
     }
   },
   actions: {
     async checkLoginStatus(context) {
       const responseRaw = await ajax.get(urls.myInfo);
       const response = responseRaw.data;
-      if (response.code === 1) {
-        context.commit("updateAvatarSrc", response.msg.user.avatar);
-        context.commit("updateLoginStatus", true);
-      } else {
+      if (response.code !== 1) {
         localStorage.removeItem("token");
         localStorage.removeItem("uid");
-        context.commit("updateLoginStatus", false);
+        context.commit("setLoginStatus", false);
+        context.commit("unreadCount", 0);
+        return;
+      }
+      context.commit("setAvatarSrc", response.msg.user.avatar);
+      context.commit("setLoginStatus", true);
+      context.commit("setisAdmin", response.msg.user.isAdmin);
+      context.commit("setUid", response.msg.user.id);
+      const messageCountResponseRaw = await ajax.get(urls.messageCount);
+      const messageCountResponse = messageCountResponseRaw.data;
+      if (messageCountResponse.code === 1) {
+        context.commit("setUnreadCount", Number.parseInt(messageCountResponse.msg.unread));
       }
     }
   }

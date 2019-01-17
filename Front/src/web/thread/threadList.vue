@@ -22,15 +22,21 @@
             <router-link :to="'/thread/info/'+thread.thread.id+'/1'">{{thread.thread.subject}}</router-link>
           </p>
           <p>
-            <a-tag :color="thread.user.isAdmin? 'orange': 'blue'">
-              <a-icon :type="thread.user.isAdmin? 'crown' : 'user'"/>
-              {{thread.user.username}}
+            <a-tag color="cyan" v-if="thread.thread.diamond">
+              <a-icon type="star"/>
+              <span class="diamond-text">&nbsp;精华</span>
             </a-tag>
+            <router-link :to="'/user/visit/'+thread.user.id">
+              <a-tag :color="thread.user.isAdmin? 'orange': 'blue'">
+                <a-icon :type="thread.user.isAdmin? 'crown' : 'user'"/>
+                {{thread.user.username}}
+              </a-tag>
+            </router-link>
             <a-tag color="green">
               <a-icon type="clock-circle"/>
               {{humanDate(new Date(thread.thread.createDate))}}
             </a-tag>
-            <a-tag color="purple">
+            <a-tag color="purple" class="thread-item-post-count">
               <a-icon type="message"/>
               {{thread.thread.postCount}}
             </a-tag>
@@ -76,7 +82,6 @@ export default {
       defaultPageSize: 20
     };
   },
-  computed: {},
   methods: {
     pageOnchange(page) {
       this.$router.push({
@@ -95,10 +100,7 @@ export default {
       );
       const threadListResponse = threadListResponseRaw.data;
       if (threadListResponse.code === 1) {
-        this.threadList = [
-          ...threadListResponse.msg.top,
-          ...threadListResponse.msg.list
-        ];
+        this.threadList = threadListResponse.msg.list;
 
         ["name", "description", "threads"].forEach(item => {
           this.forum[item] = threadListResponse.msg.forum[item];
@@ -133,7 +135,9 @@ export default {
   .thread-item {
     grid-template-columns: 20% 80%;
   }
-  .thread-item-last-reply {
+  .thread-item-last-reply,
+  .thread-item-post-count,
+  .diamond-text {
     display: none;
   }
 }

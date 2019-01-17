@@ -41,7 +41,7 @@
       </div>
       <div class="nav-avatar">
         <a-dropdown placement="bottomRight" v-if="this.$store.state.loginStatus">
-          <a-menu slot="overlay" @click="handleMenuClick">
+          <a-menu slot="overlay" @click="handleMenuClick" class="nav-menu">
             <a-menu-item key="1">
               <a-icon type="contacts"/>资料
             </a-menu-item>
@@ -50,6 +50,7 @@
             </a-menu-item>
             <a-menu-item key="3">
               <a-icon type="sound"/>消息
+              <a-badge :count="$store.state.unreadCount" class="user-menu-badage"></a-badge>
             </a-menu-item>
             <a-menu-item key="4">
               <a-icon type="team"/>组别
@@ -62,7 +63,10 @@
               <a-icon type="logout"/>注销
             </a-menu-item>
           </a-menu>
-          <a-avatar shape="circle" :src="this.$store.state.avatarSrc" class="avatar-img"></a-avatar>
+          <div class="user-avatar-box">
+            <a-badge :count="$store.state.unreadCount" class="user-badage"></a-badge>
+            <a-avatar shape="circle" :src="this.$store.state.avatarSrc" class="avatar-img"></a-avatar>
+          </div>
         </a-dropdown>
         <router-link to="/user/login/pwd" v-else>
           <a-avatar shape="circle" icon="cloud" class="avatar-img avatar-nologin"></a-avatar>
@@ -237,5 +241,19 @@ footer {
 .avatar-nologin {
   background-color: transparent;
   transform: scale(1.5, 1.5);
+}
+.user-badage {
+  position: absolute;
+  left: 48px;
+}
+.user-avatar-box {
+  position: relative;
+}
+.user-menu-badage {
+  position: absolute;
+  left: 72px;
+}
+.nav-menu {
+  width: 128px;
 }
 </style>

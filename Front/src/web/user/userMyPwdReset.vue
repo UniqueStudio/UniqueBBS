@@ -1,6 +1,6 @@
 <template>
   <div class="userMyPwdReset">
-    <a-alert message="如果之前没有设定过旧密码，则旧密码为空，无需填写。" type="info" showIcon="true"></a-alert>
+    <a-alert message="如果之前没有设定过旧密码，则旧密码为空，无需填写。" type="info" :showIcon="true"></a-alert>
     <a-input-group>
       <a-input addonBefore="请输入旧密码" v-model="oldPwd" type="password" size="large"/>
       <a-input addonBefore="请输入新密码" v-model="newPwd" type="password" size="large"/>

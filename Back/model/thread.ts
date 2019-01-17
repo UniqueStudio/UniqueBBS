@@ -58,15 +58,17 @@ export const threadList = async function(req: Request, res: Response) {
             }
         }
 
-        const resultArrRaw = await prisma.threads({
+        const resultArrRaw: Array<Thread> = await prisma.threads({
             where: whereArr,
             skip: (page - 1) * pagesize,
             first: pagesize,
             orderBy: "lastDate_DESC"
         });
 
+        const combinedArrRaw = [...topArr, ...resultArrRaw];
+
         const resultArr = await Promise.all(
-            resultArrRaw.map(async item => {
+            combinedArrRaw.map(async item => {
                 return {
                     thread: item,
                     user: filterUserInfo(await prisma.thread({ id: item.id }).user()),
@@ -87,10 +89,10 @@ export const threadList = async function(req: Request, res: Response) {
         if (fid === "*") {
             res.json({
                 code: 1,
-                msg: { list: resultArr, top: topArr }
+                msg: { list: resultArr }
             });
         } else {
-            res.json({ code: 1, msg: { list: resultArr, top: topArr, forum: resultForum } });
+            res.json({ code: 1, msg: { list: resultArr, forum: resultForum } });
         }
     } catch (e) {
         res.json({ code: -1 });
@@ -524,15 +526,7 @@ export const threadDiamond = async function(req: Request, res: Response) {
                 .user();
 
             if (setDiamond === "1") {
-                const [firstUser] = await prisma.users({
-                    first: 1
-                });
-                pushMessage(
-                    firstUser.id,
-                    threadAuthor.id,
-                    MESSAGE_DIAMOND(threadInfo.subject),
-                    MESSAGE_THREAD_URL(tid)
-                );
+                pushMessage(authObj.uid, threadAuthor.id, MESSAGE_DIAMOND(threadInfo.subject), MESSAGE_THREAD_URL(tid));
             }
             res.json({ code: 1 });
         }

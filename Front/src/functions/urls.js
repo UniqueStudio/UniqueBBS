@@ -18,6 +18,15 @@ const urls = {
   messageDelete: mid => `${domain}message/delete/${mid}`,
   messageReadAll: `${domain}message/all/read`,
   messageDeleteAll: `${domain}message/all/delete`,
-  messageCount: `${domain}message/count`
+  messageCount: `${domain}message/count`,
+  closeThread: `${domain}thread/close`,
+  diamondThread: `${domain}thread/diamond`,
+  topThread: `${domain}thread/top`,
+  deleteThread: tid => `${domain}thread/delete/${tid}`,
+  deletePost: pid => `${domain}post/delete/${pid}`,
+  deleteThreadHard: tid => `${domain}thread/deleteHard/${tid}`,
+  deletePostHard: pid => `${domain}post/deleteHard/${pid}`,
+  recoveryThread: tid => `${domain}thread/recovery/${tid}/1`,
+  recoveryPost: pid => `${domain}post/recovery/${pid}`
 };
 export default urls;
