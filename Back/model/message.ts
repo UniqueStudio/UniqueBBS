@@ -168,3 +168,33 @@ export const messageDeleteAll = async function(req: Request, res: Response) {
         res.json({ code: -1, msg: err.message });
     }
 };
+
+export const messageCount = async function(req: Request, res: Response) {
+    try {
+        const { uid } = verifyJWT(req.header("Authorization"));
+        const total = await prisma
+            .messagesConnection({
+                where: {
+                    toUser: {
+                        id: uid
+                    }
+                }
+            })
+            .aggregate()
+            .count();
+        const unread = await prisma
+            .messagesConnection({
+                where: {
+                    toUser: {
+                        id: uid
+                    },
+                    isRead: false
+                }
+            })
+            .aggregate()
+            .count();
+        res.json({ code: 1, msg: { total, unread } });
+    } catch (err) {
+        res.json({ code: -1, msg: err.message });
+    }
+};

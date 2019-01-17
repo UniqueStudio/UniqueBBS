@@ -17,6 +17,7 @@ const urls = {
   messageRead: mid => `${domain}message/read/${mid}`,
   messageDelete: mid => `${domain}message/delete/${mid}`,
   messageReadAll: `${domain}message/all/read`,
-  messageDeleteAll: `${domain}message/all/delete`
+  messageDeleteAll: `${domain}message/all/delete`,
+  messageCount: `${domain}message/count`
 };
 export default urls;

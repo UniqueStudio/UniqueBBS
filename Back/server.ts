@@ -1,5 +1,10 @@
 import * as express from "express";
 import * as bodyParser from "body-parser";
+import * as Redis from "redis";
+import * as Redlock from "redlock";
+import { promisify } from "util";
+import * as multer from "multer";
+
 import {
     userMyInfo,
     userInfo,
@@ -43,12 +48,14 @@ import {
     fileGetUnlink
 } from "./model/attach";
 import { groupList, groupUserList, groupUser } from "./model/group";
-
-import * as Redis from "redis";
-import * as Redlock from "redlock";
-import { messageIsRead, messageList, messageDelete, messageReadAll, messageDeleteAll } from "./model/message";
-import { promisify } from "util";
-import * as multer from "multer";
+import {
+    messageIsRead,
+    messageList,
+    messageDelete,
+    messageReadAll,
+    messageDeleteAll,
+    messageCount
+} from "./model/message";
 
 const SERVER_VERSION = "1.00";
 
@@ -150,6 +157,7 @@ app.get("/group/user/:uid", groupUser);
 
 //Message
 app.get("/message/list/:page", messageList);
+app.get("/message/count", messageCount);
 app.post("/message/read/:id", messageIsRead);
 app.post("/message/delete/:id", messageDelete);
 app.post("/message/all/read", messageReadAll);
