@@ -46,11 +46,9 @@ import { groupList, groupUserList, groupUser } from "./model/group";
 
 import * as Redis from "redis";
 import * as Redlock from "redlock";
-import { messageIsRead, messageList } from "./model/message";
+import { messageIsRead, messageList, messageDelete, messageReadAll, messageDeleteAll } from "./model/message";
 import { promisify } from "util";
 import * as multer from "multer";
-import { from } from "apollo-link";
-import { prisma } from "./generated/prisma-client";
 
 const SERVER_VERSION = "1.00";
 
@@ -151,8 +149,11 @@ app.get("/group/users/:gid", groupUserList);
 app.get("/group/user/:uid", groupUser);
 
 //Message
-app.post("/message/read/:id", messageIsRead);
 app.get("/message/list/:page", messageList);
+app.post("/message/read/:id", messageIsRead);
+app.post("/message/delete/:id", messageDelete);
+app.post("/message/all/read", messageReadAll);
+app.post("/message/all/delete", messageDeleteAll);
 
 //Report
 app.get("/report/info/:rid", reportInfo);

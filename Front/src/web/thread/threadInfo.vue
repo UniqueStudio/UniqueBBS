@@ -10,8 +10,8 @@
         <p class="thread-subject">{{thread.subject}}</p>
         <div class="thread-sub">
           <p class="thread-sub-info">
-            <a-tag :color="user.isAdmin?'red':'blue'">
-              <a-icon type="user"/>
+            <a-tag :color="user.isAdmin?'orange':'blue'">
+              <a-icon :type="user.isAdmin?'crown': 'user'"/>
               {{user.username}}
             </a-tag>&nbsp;
             <a-tag
@@ -19,12 +19,15 @@
               :key="group.id"
               :color="group.color"
               class="user-group"
-            >{{group.name}}</a-tag>
+            >
+              <a-icon type="team"/>
+              {{group.name}}
+            </a-tag>
             <a-tag color="green" :title="fullCreateDate">
               <a-icon type="clock-circle"/>
               {{createDate}}
             </a-tag>
-            <a-tag color="purple">
+            <a-tag color="purple" class="thread-item-info-messages">
               <a-icon type="message"/>
               {{postCount}}
             </a-tag>
@@ -44,9 +47,9 @@
         <div class="thread-post-list-item-content">
           <p class="thread-post-list-item-author-info">
             <router-link :to="'/user/visit/'+post.user.id">
-              <a-tag :color="user.isAdmin?'red':'blue'">
-                <a-icon type="user"/>
-                {{user.username}}
+              <a-tag :color="post.user.isAdmin?'orange':'blue'">
+                <a-icon :type="post.user.isAdmin?'crown': 'user'"/>
+                {{post.user.username}}
               </a-tag>
             </router-link>&nbsp;
             <a-tag
@@ -54,7 +57,10 @@
               :key="group.id"
               :color="group.color"
               class="user-group"
-            >{{group.name}}</a-tag>
+            >
+              <a-icon type="team"/>
+              {{group.name}}
+            </a-tag>
             <a-tag color="green" :title="getFullCreateDate(post.post.createDate)">
               <a-icon type="clock-circle"/>
               {{getHumanDate(post.post.createDate)}}&nbsp;
@@ -206,7 +212,7 @@ export default {
 @media screen and (min-width: 800px) {
   .thread-main-content,
   .thread-post-list-item {
-    grid-template-columns: 25% 50% 25%;
+    grid-template-columns: 20% 60% 20%;
   }
   .user-avatar {
     height: 72px;
@@ -284,5 +290,14 @@ export default {
 .pagination {
   text-align: center;
   margin: 36px auto;
+}
+.thread-item-info-messages {
+  position: absolute;
+  right: 0;
+}
+.thread-sub-info,
+.thread-sub,
+.thread-main-info {
+  position: relative;
 }
 </style>

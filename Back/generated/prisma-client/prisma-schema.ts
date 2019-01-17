@@ -967,6 +967,7 @@ type Message {
   message: String!
   isRead: Boolean!
   createDate: DateTime!
+  url: String
 }
 
 type MessageConnection {
@@ -981,6 +982,7 @@ input MessageCreateInput {
   message: String!
   isRead: Boolean
   createDate: DateTime!
+  url: String
 }
 
 type MessageEdge {
@@ -997,6 +999,8 @@ enum MessageOrderByInput {
   isRead_DESC
   createDate_ASC
   createDate_DESC
+  url_ASC
+  url_DESC
   createdAt_ASC
   createdAt_DESC
   updatedAt_ASC
@@ -1008,6 +1012,7 @@ type MessagePreviousValues {
   message: String!
   isRead: Boolean!
   createDate: DateTime!
+  url: String
 }
 
 type MessageSubscriptionPayload {
@@ -1034,12 +1039,14 @@ input MessageUpdateInput {
   message: String
   isRead: Boolean
   createDate: DateTime
+  url: String
 }
 
 input MessageUpdateManyMutationInput {
   message: String
   isRead: Boolean
   createDate: DateTime
+  url: String
 }
 
 input MessageWhereInput {
@@ -1083,6 +1090,20 @@ input MessageWhereInput {
   createDate_lte: DateTime
   createDate_gt: DateTime
   createDate_gte: DateTime
+  url: String
+  url_not: String
+  url_in: [String!]
+  url_not_in: [String!]
+  url_lt: String
+  url_lte: String
+  url_gt: String
+  url_gte: String
+  url_contains: String
+  url_not_contains: String
+  url_starts_with: String
+  url_not_starts_with: String
+  url_ends_with: String
+  url_not_ends_with: String
   AND: [MessageWhereInput!]
   OR: [MessageWhereInput!]
   NOT: [MessageWhereInput!]

@@ -9,7 +9,14 @@
           </router-link>
         </div>
         <div class="group-user-info">
-          <span :style="{color: user.isAdmin? 'red' : 'black'}">{{user.username}}</span>
+          <router-link :to="'/user/visit/'+user.id">
+            <span :style="{color: user.isAdmin? 'orange' : 'black'}">{{user.username}}</span>
+          </router-link>
+          <a-tag color="cyan" class="group-user-mobile">
+            <a-icon type="mobile"/>
+            {{user.mobile}}
+          </a-tag>
+          <p>{{user.signature}}</p>
         </div>
       </div>
     </div>
@@ -42,12 +49,15 @@ export default {
     }
   },
   mounted() {
-    this.$emit("changeNav", "3");
     this.getGroupList();
   }
 };
 </script>
 <style scoped>
+.user-group,
+.user-group-collections {
+  position: relative;
+}
 .user-group-collections {
   margin-top: 64px;
 }
@@ -68,5 +78,9 @@ export default {
 }
 h3 {
   text-align: center;
+}
+.group-user-mobile {
+  position: absolute;
+  right: 0;
 }
 </style>

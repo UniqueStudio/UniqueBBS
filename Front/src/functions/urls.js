@@ -12,6 +12,11 @@ const urls = {
   groupMemberList: gid => `${domain}group/users/${gid}`,
   userInfo: uid => `${domain}user/info/${uid}`,
   userThreadList: (uid, page) => `${domain}user/threads/${uid}/${page}`,
-  userGroup: uid => `${domain}group/user/${uid}`
+  userGroup: uid => `${domain}group/user/${uid}`,
+  messageList: page => `${domain}message/list/${page}`,
+  messageRead: mid => `${domain}message/read/${mid}`,
+  messageDelete: mid => `${domain}message/delete/${mid}`,
+  messageReadAll: `${domain}message/all/read`,
+  messageDeleteAll: `${domain}message/all/delete`
 };
 export default urls;

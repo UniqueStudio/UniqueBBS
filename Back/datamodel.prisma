@@ -91,6 +91,7 @@ type Message {
     message: String!
     isRead: Boolean! @default(value: false)
     createDate: DateTime!
+    url: String
 }
 type Filter {
     id: ID! @unique

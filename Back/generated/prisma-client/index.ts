@@ -600,6 +600,8 @@ export type MessageOrderByInput =
   | "isRead_DESC"
   | "createDate_ASC"
   | "createDate_DESC"
+  | "url_ASC"
+  | "url_DESC"
   | "createdAt_ASC"
   | "createdAt_DESC"
   | "updatedAt_ASC"
@@ -1418,6 +1420,20 @@ export interface MessageWhereInput {
   createDate_lte?: DateTimeInput;
   createDate_gt?: DateTimeInput;
   createDate_gte?: DateTimeInput;
+  url?: String;
+  url_not?: String;
+  url_in?: String[] | String;
+  url_not_in?: String[] | String;
+  url_lt?: String;
+  url_lte?: String;
+  url_gt?: String;
+  url_gte?: String;
+  url_contains?: String;
+  url_not_contains?: String;
+  url_starts_with?: String;
+  url_not_starts_with?: String;
+  url_ends_with?: String;
+  url_not_ends_with?: String;
   AND?: MessageWhereInput[] | MessageWhereInput;
   OR?: MessageWhereInput[] | MessageWhereInput;
   NOT?: MessageWhereInput[] | MessageWhereInput;
@@ -2730,6 +2746,7 @@ export interface MessageCreateInput {
   message: String;
   isRead?: Boolean;
   createDate: DateTimeInput;
+  url?: String;
 }
 
 export interface MessageUpdateInput {
@@ -2738,12 +2755,14 @@ export interface MessageUpdateInput {
   message?: String;
   isRead?: Boolean;
   createDate?: DateTimeInput;
+  url?: String;
 }
 
 export interface MessageUpdateManyMutationInput {
   message?: String;
   isRead?: Boolean;
   createDate?: DateTimeInput;
+  url?: String;
 }
 
 export interface PostUpdateInput {
@@ -3716,6 +3735,7 @@ export interface Message {
   message: String;
   isRead: Boolean;
   createDate: DateTimeOutput;
+  url?: String;
 }
 
 export interface MessagePromise extends Promise<Message>, Fragmentable {
@@ -3725,6 +3745,7 @@ export interface MessagePromise extends Promise<Message>, Fragmentable {
   message: () => Promise<String>;
   isRead: () => Promise<Boolean>;
   createDate: () => Promise<DateTimeOutput>;
+  url: () => Promise<String>;
 }
 
 export interface MessageSubscription
@@ -3736,6 +3757,7 @@ export interface MessageSubscription
   message: () => Promise<AsyncIterator<String>>;
   isRead: () => Promise<AsyncIterator<Boolean>>;
   createDate: () => Promise<AsyncIterator<DateTimeOutput>>;
+  url: () => Promise<AsyncIterator<String>>;
 }
 
 export interface MessageConnection {
@@ -4260,6 +4282,7 @@ export interface MessagePreviousValues {
   message: String;
   isRead: Boolean;
   createDate: DateTimeOutput;
+  url?: String;
 }
 
 export interface MessagePreviousValuesPromise
@@ -4269,6 +4292,7 @@ export interface MessagePreviousValuesPromise
   message: () => Promise<String>;
   isRead: () => Promise<Boolean>;
   createDate: () => Promise<DateTimeOutput>;
+  url: () => Promise<String>;
 }
 
 export interface MessagePreviousValuesSubscription
@@ -4278,6 +4302,7 @@ export interface MessagePreviousValuesSubscription
   message: () => Promise<AsyncIterator<String>>;
   isRead: () => Promise<AsyncIterator<Boolean>>;
   createDate: () => Promise<AsyncIterator<DateTimeOutput>>;
+  url: () => Promise<AsyncIterator<String>>;
 }
 
 export interface PostSubscriptionPayload {

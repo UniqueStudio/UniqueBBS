@@ -10,7 +10,7 @@ import userMy from "@/web/user/userMy.vue";
 import userMyInfo from "@/web/user/userMyInfo.vue";
 import userMyPwdReset from "@/web/user/userMyPwdReset.vue";
 import userVisit from "@/web/user/userVisit.vue";
-import userReport from "@/web/user/userReport.vue";
+import userMyNotice from "@/web/user/userMyNotice.vue";
 import userMyGroup from "@/web/user/userMyGroup.vue";
 import userMyThreads from "@/web/user/userMyThreads.vue";
 import thread from "@/web/thread/thread.vue";
@@ -73,35 +73,46 @@ const router = new Router({
                 {
                   path: "info",
                   name: "userMyInfo",
-                  component: userMyInfo
+                  component: userMyInfo,
+                  meta: {
+                    key: "0",
+                    showAvatar: true
+                  }
                 },
                 {
                   path: "pwdReset",
                   name: "userMyPwdReset",
-                  component: userMyPwdReset
+                  component: userMyPwdReset,
+                  meta: {
+                    key: "1",
+                    showAvatar: true
+                  }
                 },
                 {
-                  path: "report",
-                  name: "report",
-                  component: userReport,
+                  path: "notice/:page",
+                  name: "userMyNotice",
+                  component: userMyNotice,
                   meta: {
-                    requireLogin: true
+                    key: "2",
+                    showAvatar: false
                   }
                 },
                 {
                   path: "group",
-                  name: "group",
+                  name: "userMyGroups",
                   component: userMyGroup,
                   meta: {
-                    requireLogin: true
+                    key: "3",
+                    showAvatar: true
                   }
                 },
                 {
                   path: "threads/:page",
-                  name: "threads",
+                  name: "userMyThreads",
                   component: userMyThreads,
                   meta: {
-                    requireLogin: true
+                    key: "4",
+                    showAvatar: false
                   }
                 }
               ]

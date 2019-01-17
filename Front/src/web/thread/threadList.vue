@@ -22,8 +22,8 @@
             <router-link :to="'/thread/info/'+thread.thread.id+'/1'">{{thread.thread.subject}}</router-link>
           </p>
           <p>
-            <a-tag :color="thread.user.isAdmin? 'red': 'blue'">
-              <a-icon type="user"/>
+            <a-tag :color="thread.user.isAdmin? 'orange': 'blue'">
+              <a-icon :type="thread.user.isAdmin? 'crown' : 'user'"/>
               {{thread.user.username}}
             </a-tag>
             <a-tag color="green">

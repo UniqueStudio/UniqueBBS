@@ -61,7 +61,6 @@ export default {
     }
   },
   mounted() {
-    this.$emit("changeNav", "4");
     this.getMyThreadList();
   }
 };

@@ -62,9 +62,7 @@ export default {
       this.resetBtnDisabled = true;
     }
   },
-  mounted() {
-    this.$emit("changeNav", "1");
-  }
+  mounted() {}
 };
 </script>
 <style scoped>

@@ -3,9 +3,15 @@
     <div class="avatar-container">
       <a-avatar shape="circle" :src="userDatas.avatar" class="avatar-img" size="large"></a-avatar>
     </div>
-    <h2 :style="{color: userDatas.isAdmin? 'red': 'black'}">{{userDatas.username}}</h2>
+    <h2 :style="{color: userDatas.isAdmin? 'orange': 'black'}">{{userDatas.username}}</h2>
     <p class="group-container">
-      <a-tag v-for="group in groupList" :key="group.id" :color="group.color">{{group.name}}</a-tag>
+      <a-tag color="orange" v-if="userDatas.isAdmin">
+        <a-icon type="crown"/>&nbsp;管理员
+      </a-tag>
+      <a-tag v-for="group in groupList" :key="group.id" :color="group.color">
+        <a-icon type="team"/>
+        {{group.name}}
+      </a-tag>
       <a-tag color="green">
         <a-icon type="clock-circle"/>
         {{lastLoginHumanDate}}
@@ -14,15 +20,62 @@
     <h5>{{userDatas.signature}}</h5>
     <div class="user-detail-info">
       <a-input-group>
-        <a-input addonBefore="邮箱" readonly :value="userDatas.email" size="large"/>
-        <a-input addonBefore="手机" readonly :value="userDatas.mobile" size="large"/>
-        <a-input addonBefore="昵称" readonly v-model="userDatas.nickname" size="large"/>
-        <a-input addonBefore="学号" readonly v-model="userDatas.studentID" size="large"/>
-        <a-input addonBefore="宿舍" readonly v-model="userDatas.dormitory" size="large"/>
-        <a-input addonBefore=" Q Q " readonly v-model="userDatas.qq" size="large"/>
-        <a-input addonBefore="微信" readonly v-model="userDatas.wechat" size="large"/>
-        <a-input addonBefore="专业" readonly v-model="userDatas.major" size="large"/>
-        <a-input addonBefore="班级" readonly v-model="userDatas.className" size="large"/>
+        <a-input
+          addonBefore="邮箱"
+          readonly
+          :value="userDatas.email"
+          size="large"
+          v-if="userDatas.email !== ''"
+        />
+        <a-input
+          addonBefore="手机"
+          readonly
+          :value="userDatas.mobile"
+          size="large"
+          v-if="userDatas.mobile !== ''"
+        />
+        <a-input
+          addonBefore="学号"
+          readonly
+          v-model="userDatas.studentID"
+          size="large"
+          v-if="userDatas.studentID !== ''"
+        />
+        <a-input
+          addonBefore="宿舍"
+          readonly
+          v-model="userDatas.dormitory"
+          size="large"
+          v-if="userDatas.dormitory !== ''"
+        />
+        <a-input
+          addonBefore=" Q Q "
+          readonly
+          v-model="userDatas.qq"
+          size="large"
+          v-if="userDatas.qq !== ''"
+        />
+        <a-input
+          addonBefore="微信"
+          readonly
+          v-model="userDatas.wechat"
+          size="large"
+          v-if="userDatas.wechat !== ''"
+        />
+        <a-input
+          addonBefore="专业"
+          readonly
+          v-model="userDatas.major"
+          size="large"
+          v-if="userDatas.major !== ''"
+        />
+        <a-input
+          addonBefore="班级"
+          readonly
+          v-model="userDatas.className"
+          size="large"
+          v-if="userDatas.className !== ''"
+        />
       </a-input-group>
     </div>
   </div>

@@ -4,7 +4,7 @@ import { setLockExpire } from "./lock";
 import { pagesize } from "./consts";
 import { verifyJWT, filterUserInfo } from "./check";
 import { userThreadsAdd, forumThreadsAdd, forumLastPostUpdate } from "./runtime";
-import { pushMessage, MESSAGE_REPLY, MESSAGE_QUOTE, MESSAGE_DIAMOND } from "./message";
+import { pushMessage, MESSAGE_REPLY, MESSAGE_QUOTE, MESSAGE_DIAMOND, MESSAGE_THREAD_URL } from "./message";
 import { redLock } from "../server";
 import { fileProcess } from "./attach";
 import { filterCalculate, filterCheckTypeAvailable, filterObjGenerate, filterClearCache } from "./filter";
@@ -205,6 +205,27 @@ export const threadCreate = async function(req: Request, res: Response) {
         } = req.body;
         const { uid } = verifyJWT(req.header("Authorization"));
 
+        if (!message || message.length <= 5) {
+            return res.json({
+                code: -1,
+                msg: "每次发言至少5个字以上！"
+            });
+        }
+
+        if (!subject || subject.length < 5 || subject.length > 50) {
+            return res.json({
+                code: -1,
+                msg: "标题长度限制在5~50字！"
+            });
+        }
+
+        if (!fid) {
+            return res.json({
+                code: -1,
+                msg: "缺少板块信息！"
+            });
+        }
+
         const lockFrequentReply = await setLockExpire(`postUser:${uid}`, "10");
         if (!lockFrequentReply) {
             return res.json({
@@ -287,12 +308,12 @@ export const threadCreate = async function(req: Request, res: Response) {
 export const threadReply = async function(req: Request, res: Response) {
     try {
         const { tid, message, quote } = req.body;
-        const { uid, isAdmin } = verifyJWT(req.header("Authorization"));
+        const { uid, isAdmin, username } = verifyJWT(req.header("Authorization"));
 
-        if (!message || message.length <= 10) {
+        if (!message || message.length <= 5) {
             return res.json({
                 code: -1,
-                msg: "每次发言至少10个字以上！"
+                msg: "每次发言至少5个字以上！"
             });
         }
 
@@ -371,7 +392,12 @@ export const threadReply = async function(req: Request, res: Response) {
 
             await forumLastPostUpdate(forumInfo.id, resultThread[0].id);
             if (uid !== authorInfo.id) {
-                await pushMessage(uid, authorInfo.id, MESSAGE_REPLY(authorInfo.username, threadInfo.subject));
+                await pushMessage(
+                    uid,
+                    authorInfo.id,
+                    MESSAGE_REPLY(username, threadInfo.subject),
+                    MESSAGE_THREAD_URL(threadInfo.id)
+                );
                 if (quote !== -1) {
                     const quotePost = await prisma.post({
                         id: quote
@@ -385,7 +411,8 @@ export const threadReply = async function(req: Request, res: Response) {
                         await pushMessage(
                             uid,
                             quotePostAuthor.id,
-                            MESSAGE_QUOTE(authorInfo.username, threadInfo.subject)
+                            MESSAGE_QUOTE(authorInfo.username, threadInfo.subject),
+                            MESSAGE_THREAD_URL(threadInfo.id)
                         );
                     }
                 }
@@ -500,7 +527,12 @@ export const threadDiamond = async function(req: Request, res: Response) {
                 const [firstUser] = await prisma.users({
                     first: 1
                 });
-                pushMessage(firstUser.id, threadAuthor.id, MESSAGE_DIAMOND(threadInfo.subject));
+                pushMessage(
+                    firstUser.id,
+                    threadAuthor.id,
+                    MESSAGE_DIAMOND(threadInfo.subject),
+                    MESSAGE_THREAD_URL(tid)
+                );
             }
             res.json({ code: 1 });
         }

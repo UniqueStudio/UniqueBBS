@@ -6,13 +6,15 @@ import { User } from "../generated/prisma-client";
 export interface JWTContent {
     uid: string;
     isAdmin: boolean;
+    username: string;
 }
 
-export const signJWT = (uid: string, isAdmin: boolean) => {
+export const signJWT = function(uid: string, isAdmin: boolean, username: string) {
     return jwt.sign(
         {
             uid: uid,
-            isAdmin: isAdmin
+            isAdmin: isAdmin,
+            username: username
         },
         secret,
         {
@@ -21,7 +23,7 @@ export const signJWT = (uid: string, isAdmin: boolean) => {
     );
 };
 
-export const verifyJWT = (token?: string) => {
+export const verifyJWT = function(token?: string) {
     if (!token) {
         throw new Error("No token provided");
     }

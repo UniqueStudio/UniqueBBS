@@ -40,14 +40,32 @@
         </div>
       </div>
       <div class="nav-avatar">
-        <router-link to="/user">
-          <a-avatar
-            shape="circle"
-            :src="this.$store.state.avatarSrc"
-            class="avatar-img"
-            v-if="this.$store.state.loginStatus"
-          ></a-avatar>
-          <a-avatar shape="circle" icon="cloud" class="avatar-img avatar-nologin" v-else></a-avatar>
+        <a-dropdown placement="bottomRight" v-if="this.$store.state.loginStatus">
+          <a-menu slot="overlay" @click="handleMenuClick">
+            <a-menu-item key="1">
+              <a-icon type="contacts"/>资料
+            </a-menu-item>
+            <a-menu-item key="2">
+              <a-icon type="key"/>密码
+            </a-menu-item>
+            <a-menu-item key="3">
+              <a-icon type="sound"/>消息
+            </a-menu-item>
+            <a-menu-item key="4">
+              <a-icon type="team"/>组别
+            </a-menu-item>
+            <a-menu-item key="5">
+              <a-icon type="copy"/>帖子
+            </a-menu-item>
+            <a-menu-divider key="6"></a-menu-divider>
+            <a-menu-item key="7">
+              <a-icon type="logout"/>注销
+            </a-menu-item>
+          </a-menu>
+          <a-avatar shape="circle" :src="this.$store.state.avatarSrc" class="avatar-img"></a-avatar>
+        </a-dropdown>
+        <router-link to="/user/login/pwd" v-else>
+          <a-avatar shape="circle" icon="cloud" class="avatar-img avatar-nologin"></a-avatar>
         </router-link>
       </div>
     </div>
@@ -68,8 +86,35 @@
 </template>
 <script>
 export default {
-  data() {
-    return {};
+  methods: {
+    handleMenuClick(e) {
+      switch (e.key) {
+        case "1":
+          this.$router.push({ path: "/user/my/info" });
+          break;
+        case "2":
+          this.$router.push({ path: "/user/my/pwdReset" });
+          break;
+        case "3":
+          this.$router.push({ path: "/user/my/notice/1" });
+          break;
+        case "4":
+          this.$router.push({ path: "/user/my/group" });
+          break;
+        case "5":
+          this.$router.push({ path: "/user/my/threads/1" });
+          break;
+        case "7":
+          if (confirm("您确定要注销吗？")) {
+            localStorage.removeItem("token");
+            localStorage.removeItem("uid");
+            this.$store.commit("updateLoginStatus", false);
+            this.$store.dispatch("checkLoginStatus");
+            this.$router.push({ path: "/user/login/pwd" });
+          }
+          break;
+      }
+    }
   },
   mounted() {
     this.$store.dispatch("checkLoginStatus");
@@ -175,12 +220,12 @@ footer {
   padding: 10px;
 }
 .nav-item-icon-container:hover,
-.nav-avatar:hover,
-.nav-logo:hover {
+.nav-logo:hover,
+.avatar-img:hover {
   opacity: 0.5;
 }
 .nav-item-icon-container,
-.nav-avatar,
+.avatar-img,
 .nav-logo {
   transition: all 0.9s cubic-bezier(0.33, 0.63, 0.65, 0.99);
   cursor: pointer;

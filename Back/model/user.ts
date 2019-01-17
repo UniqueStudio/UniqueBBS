@@ -130,7 +130,7 @@ export const userLoginByPwd = async function(req: Request, res: Response) {
             });
         }
 
-        const token = signJWT(userInfo.id, userInfo.isAdmin);
+        const token = signJWT(userInfo.id, userInfo.isAdmin, userInfo.username);
         await prisma.updateUser({
             where: {
                 id: userInfo.id
@@ -307,7 +307,7 @@ export const userScan = async function(req: Request, res: Response) {
                             msg: "当前账号不活跃，请联系管理员！"
                         });
                     }
-                    const token = signJWT(_user.id, _user.isAdmin);
+                    const token = signJWT(_user.id, _user.isAdmin, _user.username);
                     prisma.updateUser({
                         where: {
                             id: _user.id
