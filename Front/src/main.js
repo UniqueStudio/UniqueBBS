@@ -67,11 +67,7 @@ const store = new Vuex.Store({
       context.commit("setLoginStatus", true);
       context.commit("setisAdmin", response.msg.user.isAdmin);
       context.commit("setUid", response.msg.user.id);
-      const messageCountResponseRaw = await ajax.get(urls.messageCount);
-      const messageCountResponse = messageCountResponseRaw.data;
-      if (messageCountResponse.code === 1) {
-        context.commit("setUnreadCount", Number.parseInt(messageCountResponse.msg.unread));
-      }
+      context.dispatch("updateUnreadMessage");
       if (context.state.socket === undefined) {
         const socket = io(urls.socket);
         socket.emit("login", response.msg.user.id);
@@ -79,6 +75,13 @@ const store = new Vuex.Store({
           context.commit("setUnreadCount", count);
         });
         context.commit("setSocket", socket);
+      }
+    },
+    async updateUnreadMessage(context) {
+      const messageCountResponseRaw = await ajax.get(urls.messageCount);
+      const messageCountResponse = messageCountResponseRaw.data;
+      if (messageCountResponse.code === 1) {
+        context.commit("setUnreadCount", Number.parseInt(messageCountResponse.msg.unread));
       }
     }
   }

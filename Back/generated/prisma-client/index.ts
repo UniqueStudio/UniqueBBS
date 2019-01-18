@@ -1057,14 +1057,20 @@ export interface PostWhereInput {
   thread?: ThreadWhereInput;
   isFirst?: Boolean;
   isFirst_not?: Boolean;
-  quote?: Int;
-  quote_not?: Int;
-  quote_in?: Int[] | Int;
-  quote_not_in?: Int[] | Int;
-  quote_lt?: Int;
-  quote_lte?: Int;
-  quote_gt?: Int;
-  quote_gte?: Int;
+  quote?: String;
+  quote_not?: String;
+  quote_in?: String[] | String;
+  quote_not_in?: String[] | String;
+  quote_lt?: String;
+  quote_lte?: String;
+  quote_gt?: String;
+  quote_gte?: String;
+  quote_contains?: String;
+  quote_not_contains?: String;
+  quote_starts_with?: String;
+  quote_not_starts_with?: String;
+  quote_ends_with?: String;
+  quote_not_ends_with?: String;
   message?: String;
   message_not?: String;
   message_in?: String[] | String;
@@ -1563,7 +1569,7 @@ export interface PostCreateInput {
   user: UserCreateOneInput;
   thread: ThreadCreateOneWithoutPostInput;
   isFirst?: Boolean;
-  quote?: Int;
+  quote?: String;
   message: String;
   createDate: DateTimeInput;
   active?: Boolean;
@@ -1668,7 +1674,7 @@ export interface PostCreateManyWithoutThreadInput {
 export interface PostCreateWithoutThreadInput {
   user: UserCreateOneInput;
   isFirst?: Boolean;
-  quote?: Int;
+  quote?: String;
   message: String;
   createDate: DateTimeInput;
   active?: Boolean;
@@ -2035,7 +2041,7 @@ export interface PostUpdateDataInput {
   user?: UserUpdateOneRequiredInput;
   thread?: ThreadUpdateOneRequiredWithoutPostInput;
   isFirst?: Boolean;
-  quote?: Int;
+  quote?: String;
   message?: String;
   createDate?: DateTimeInput;
   active?: Boolean;
@@ -2608,7 +2614,7 @@ export interface PostUpdateWithWhereUniqueWithoutThreadInput {
 export interface PostUpdateWithoutThreadDataInput {
   user?: UserUpdateOneRequiredInput;
   isFirst?: Boolean;
-  quote?: Int;
+  quote?: String;
   message?: String;
   createDate?: DateTimeInput;
   active?: Boolean;
@@ -2637,14 +2643,20 @@ export interface PostScalarWhereInput {
   id_not_ends_with?: ID_Input;
   isFirst?: Boolean;
   isFirst_not?: Boolean;
-  quote?: Int;
-  quote_not?: Int;
-  quote_in?: Int[] | Int;
-  quote_not_in?: Int[] | Int;
-  quote_lt?: Int;
-  quote_lte?: Int;
-  quote_gt?: Int;
-  quote_gte?: Int;
+  quote?: String;
+  quote_not?: String;
+  quote_in?: String[] | String;
+  quote_not_in?: String[] | String;
+  quote_lt?: String;
+  quote_lte?: String;
+  quote_gt?: String;
+  quote_gte?: String;
+  quote_contains?: String;
+  quote_not_contains?: String;
+  quote_starts_with?: String;
+  quote_not_starts_with?: String;
+  quote_ends_with?: String;
+  quote_not_ends_with?: String;
   message?: String;
   message_not?: String;
   message_in?: String[] | String;
@@ -2681,7 +2693,7 @@ export interface PostUpdateManyWithWhereNestedInput {
 
 export interface PostUpdateManyDataInput {
   isFirst?: Boolean;
-  quote?: Int;
+  quote?: String;
   message?: String;
   createDate?: DateTimeInput;
   active?: Boolean;
@@ -2769,7 +2781,7 @@ export interface PostUpdateInput {
   user?: UserUpdateOneRequiredInput;
   thread?: ThreadUpdateOneRequiredWithoutPostInput;
   isFirst?: Boolean;
-  quote?: Int;
+  quote?: String;
   message?: String;
   createDate?: DateTimeInput;
   active?: Boolean;
@@ -2777,7 +2789,7 @@ export interface PostUpdateInput {
 
 export interface PostUpdateManyMutationInput {
   isFirst?: Boolean;
-  quote?: Int;
+  quote?: String;
   message?: String;
   createDate?: DateTimeInput;
   active?: Boolean;
@@ -3397,7 +3409,7 @@ export interface ForumSubscription
 export interface Post {
   id: ID_Output;
   isFirst: Boolean;
-  quote: Int;
+  quote: String;
   message: String;
   createDate: DateTimeOutput;
   active: Boolean;
@@ -3408,7 +3420,7 @@ export interface PostPromise extends Promise<Post>, Fragmentable {
   user: <T = UserPromise>() => T;
   thread: <T = ThreadPromise>() => T;
   isFirst: () => Promise<Boolean>;
-  quote: () => Promise<Int>;
+  quote: () => Promise<String>;
   message: () => Promise<String>;
   createDate: () => Promise<DateTimeOutput>;
   active: () => Promise<Boolean>;
@@ -3421,7 +3433,7 @@ export interface PostSubscription
   user: <T = UserSubscription>() => T;
   thread: <T = ThreadSubscription>() => T;
   isFirst: () => Promise<AsyncIterator<Boolean>>;
-  quote: () => Promise<AsyncIterator<Int>>;
+  quote: () => Promise<AsyncIterator<String>>;
   message: () => Promise<AsyncIterator<String>>;
   createDate: () => Promise<AsyncIterator<DateTimeOutput>>;
   active: () => Promise<AsyncIterator<Boolean>>;
@@ -4333,7 +4345,7 @@ export interface PostSubscriptionPayloadSubscription
 export interface PostPreviousValues {
   id: ID_Output;
   isFirst: Boolean;
-  quote: Int;
+  quote: String;
   message: String;
   createDate: DateTimeOutput;
   active: Boolean;
@@ -4344,7 +4356,7 @@ export interface PostPreviousValuesPromise
     Fragmentable {
   id: () => Promise<ID_Output>;
   isFirst: () => Promise<Boolean>;
-  quote: () => Promise<Int>;
+  quote: () => Promise<String>;
   message: () => Promise<String>;
   createDate: () => Promise<DateTimeOutput>;
   active: () => Promise<Boolean>;
@@ -4355,7 +4367,7 @@ export interface PostPreviousValuesSubscription
     Fragmentable {
   id: () => Promise<AsyncIterator<ID_Output>>;
   isFirst: () => Promise<AsyncIterator<Boolean>>;
-  quote: () => Promise<AsyncIterator<Int>>;
+  quote: () => Promise<AsyncIterator<String>>;
   message: () => Promise<AsyncIterator<String>>;
   createDate: () => Promise<AsyncIterator<DateTimeOutput>>;
   active: () => Promise<AsyncIterator<Boolean>>;

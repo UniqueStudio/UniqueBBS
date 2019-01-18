@@ -7,6 +7,7 @@ const urls = {
   updateMyPwd: `${domain}user/update/pwd`,
   syncWxInfo: `${domain}user/update/wx`,
   forumList: `${domain}forum/list`,
+  threadCreate: `${domain}thread/create`,
   threadList: (fid, page) => `${domain}thread/list/${fid}/${page}`,
   threadInfo: (tid, page) => `${domain}thread/info/${tid}/${page}`,
   threadReply: `${domain}thread/reply`,
@@ -27,10 +28,11 @@ const urls = {
   deletePost: pid => `${domain}post/delete/${pid}`,
   deleteThreadHard: tid => `${domain}thread/deleteHard/${tid}`,
   deletePostHard: pid => `${domain}post/deleteHard/${pid}`,
-  recoveryThread: tid => `${domain}thread/recovery/${tid}/1`,
+  recoveryThread: tid => `${domain}thread/recovery/${tid}`,
   recoveryPost: pid => `${domain}post/recovery/${pid}`,
   groupList: `${domain}group/list`,
   groupUsers: gid => `${domain}group/users/${gid}`,
+  forumListSimple: `${domain}forum/listSimple`,
   socket: socket
 };
 export default urls;

@@ -120,7 +120,7 @@ export default {
       const userInfo = await this.$ajax.get(this.$urls.userInfo(this.uid));
 
       if (userInfo.data.code !== 1) {
-        return this.$store.dispute("checkLoginStatus");
+        return this.$store.dispatch("checkLoginStatus");
       }
       Object.keys(this.userDatas).forEach(item => {
         this.userDatas[item] = userInfo.data.msg.user[item];

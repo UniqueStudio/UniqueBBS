@@ -152,7 +152,7 @@ app.post("/thread/close", threadClose);
 app.post("/thread/search", threadSearch);
 app.post("/thread/delete/:tid", threadDelete);
 app.post("/thread/deleteHard/:tid", threadDeleteHard);
-app.post("/thread/recovery/:tid/:postsBool", threadRecovery);
+app.post("/thread/recovery/:tid", threadRecovery);
 
 //Post
 app.post("/post/delete/:pid", postDelete);

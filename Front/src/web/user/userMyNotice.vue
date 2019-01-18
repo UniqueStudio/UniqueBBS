@@ -108,12 +108,13 @@ export default {
       }
     },
     async getMessageList() {
+      this.$store.dispatch("updateUnreadMessage");
       const messageCountResponseRaw = await this.$ajax.get(
         this.$urls.messageCount
       );
 
       if (messageCountResponseRaw.data.code !== 1) {
-        return this.$dispute("checkLoginStatus");
+        return this.$store.dispatch("checkLoginStatus");
       }
       this.totalMessages = Number.parseInt(
         messageCountResponseRaw.data.msg.total
@@ -124,7 +125,7 @@ export default {
       );
 
       if (messageListResponseRaw.data.code !== 1) {
-        return this.$dispute("checkLoginStatus");
+        return this.$store.dispatch("checkLoginStatus");
       }
       this.messageList = messageListResponseRaw.data.msg;
     },
@@ -140,10 +141,12 @@ export default {
         this.$message.success("消息已删除！", 3);
         this.getMessageList();
       }
+      this.$store.dispatch("updateUnreadMessage");
     },
     async readMessage(mid) {
       await this.$ajax.post(this.$urls.messageRead(mid));
       this.getMessageList();
+      this.$store.dispatch("updateUnreadMessage");
     },
     async readAllMessages(e) {
       this.isReadDisabled = true;
@@ -158,6 +161,7 @@ export default {
         this.$message.success("消息已全部设置为已读！", 3);
         this.getMessageList();
       }
+      this.$store.dispatch("updateUnreadMessage");
       this.isReadDisabled = false;
     },
     async deleteAllMessages(e) {
@@ -173,6 +177,7 @@ export default {
         this.$message.success("消息已清空！", 3);
         this.getMessageList();
       }
+      this.$store.dispatch("updateUnreadMessage");
       this.deleteAllDisabled = false;
     }
   },

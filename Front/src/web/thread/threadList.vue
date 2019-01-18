@@ -10,6 +10,11 @@
         {{forum.threads}}
       </div>
     </div>
+    <div class="thread-controls">
+      <router-link to="/thread/create">
+        <a-button type="primary" icon="form">发帖</a-button>
+      </router-link>
+    </div>
     <div class="thread-list-items">
       <div class="thread-item" v-for="thread in threadList" :key="thread.id">
         <div :class="{'thread-item-author':true,'no-active-filter':!thread.thread.active}">
@@ -132,7 +137,7 @@ export default {
     font-size: 20px;
   }
   .thread-item {
-    grid-template-columns: 20% 50% 30%;
+    grid-template-columns: 20% 60% 20%;
   }
 }
 @media screen and (max-width: 800px) {
@@ -147,6 +152,10 @@ export default {
   .diamond-text {
     display: none;
   }
+}
+.thread-controls {
+  text-align: center;
+  margin-bottom: 24px;
 }
 .thread-item-info-reply-message {
   font-size: 14px;

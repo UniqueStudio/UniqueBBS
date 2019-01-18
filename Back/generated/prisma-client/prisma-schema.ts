@@ -1192,7 +1192,7 @@ type Post {
   user: User!
   thread: Thread!
   isFirst: Boolean!
-  quote: Int!
+  quote: String!
   message: String!
   createDate: DateTime!
   active: Boolean!
@@ -1208,7 +1208,7 @@ input PostCreateInput {
   user: UserCreateOneInput!
   thread: ThreadCreateOneWithoutPostInput!
   isFirst: Boolean
-  quote: Int
+  quote: String
   message: String!
   createDate: DateTime!
   active: Boolean
@@ -1227,7 +1227,7 @@ input PostCreateOneInput {
 input PostCreateWithoutThreadInput {
   user: UserCreateOneInput!
   isFirst: Boolean
-  quote: Int
+  quote: String
   message: String!
   createDate: DateTime!
   active: Boolean
@@ -1260,7 +1260,7 @@ enum PostOrderByInput {
 type PostPreviousValues {
   id: ID!
   isFirst: Boolean!
-  quote: Int!
+  quote: String!
   message: String!
   createDate: DateTime!
   active: Boolean!
@@ -1283,14 +1283,20 @@ input PostScalarWhereInput {
   id_not_ends_with: ID
   isFirst: Boolean
   isFirst_not: Boolean
-  quote: Int
-  quote_not: Int
-  quote_in: [Int!]
-  quote_not_in: [Int!]
-  quote_lt: Int
-  quote_lte: Int
-  quote_gt: Int
-  quote_gte: Int
+  quote: String
+  quote_not: String
+  quote_in: [String!]
+  quote_not_in: [String!]
+  quote_lt: String
+  quote_lte: String
+  quote_gt: String
+  quote_gte: String
+  quote_contains: String
+  quote_not_contains: String
+  quote_starts_with: String
+  quote_not_starts_with: String
+  quote_ends_with: String
+  quote_not_ends_with: String
   message: String
   message_not: String
   message_in: [String!]
@@ -1342,7 +1348,7 @@ input PostUpdateDataInput {
   user: UserUpdateOneRequiredInput
   thread: ThreadUpdateOneRequiredWithoutPostInput
   isFirst: Boolean
-  quote: Int
+  quote: String
   message: String
   createDate: DateTime
   active: Boolean
@@ -1352,7 +1358,7 @@ input PostUpdateInput {
   user: UserUpdateOneRequiredInput
   thread: ThreadUpdateOneRequiredWithoutPostInput
   isFirst: Boolean
-  quote: Int
+  quote: String
   message: String
   createDate: DateTime
   active: Boolean
@@ -1360,7 +1366,7 @@ input PostUpdateInput {
 
 input PostUpdateManyDataInput {
   isFirst: Boolean
-  quote: Int
+  quote: String
   message: String
   createDate: DateTime
   active: Boolean
@@ -1368,7 +1374,7 @@ input PostUpdateManyDataInput {
 
 input PostUpdateManyMutationInput {
   isFirst: Boolean
-  quote: Int
+  quote: String
   message: String
   createDate: DateTime
   active: Boolean
@@ -1402,7 +1408,7 @@ input PostUpdateOneInput {
 input PostUpdateWithoutThreadDataInput {
   user: UserUpdateOneRequiredInput
   isFirst: Boolean
-  quote: Int
+  quote: String
   message: String
   createDate: DateTime
   active: Boolean
@@ -1443,14 +1449,20 @@ input PostWhereInput {
   thread: ThreadWhereInput
   isFirst: Boolean
   isFirst_not: Boolean
-  quote: Int
-  quote_not: Int
-  quote_in: [Int!]
-  quote_not_in: [Int!]
-  quote_lt: Int
-  quote_lte: Int
-  quote_gt: Int
-  quote_gte: Int
+  quote: String
+  quote_not: String
+  quote_in: [String!]
+  quote_not_in: [String!]
+  quote_lt: String
+  quote_lte: String
+  quote_gt: String
+  quote_gte: String
+  quote_contains: String
+  quote_not_contains: String
+  quote_starts_with: String
+  quote_not_starts_with: String
+  quote_ends_with: String
+  quote_not_ends_with: String
   message: String
   message_not: String
   message_in: [String!]

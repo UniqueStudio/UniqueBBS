@@ -210,14 +210,14 @@ export const threadCreate = async function(req: Request, res: Response) {
         if (!message || message.length <= 5) {
             return res.json({
                 code: -1,
-                msg: "每次发言至少5个字以上！"
+                msg: "每次发言至少5个字！"
             });
         }
 
-        if (!subject || subject.length < 5 || subject.length > 50) {
+        if (!subject || subject.length < 3 || subject.length > 50) {
             return res.json({
                 code: -1,
-                msg: "标题长度限制在5~50字！"
+                msg: "标题长度限制在3~50字！"
             });
         }
 
@@ -296,7 +296,7 @@ export const threadCreate = async function(req: Request, res: Response) {
 
             await forumThreadsAdd(fid, 1, newPostPid);
             await userThreadsAdd(uid, 1);
-            res.json({ code: 1 });
+            res.json({ code: 1, msg: resultThread.id });
         } catch (e) {
             res.json({ code: -1, msg: e.message });
         } finally {
@@ -455,16 +455,6 @@ export const threadDelete = async function(req: Request, res: Response) {
                     active: false
                 }
             });
-            await prisma.updateManyPosts({
-                where: {
-                    thread: {
-                        id: tid
-                    }
-                },
-                data: {
-                    active: false
-                }
-            });
 
             res.json({ code: 1 });
         }
@@ -587,7 +577,7 @@ export const threadRecovery = async function(req: Request, res: Response) {
         if (!authObj.isAdmin) {
             return res.json({ code: -1, msg: "您无权操作此帖子！" });
         } else {
-            const { tid, postsBool } = req.params;
+            const { tid } = req.params;
             const threadInfo = await prisma.updateThread({
                 where: {
                     id: tid
@@ -609,17 +599,6 @@ export const threadRecovery = async function(req: Request, res: Response) {
                     active: true
                 }
             });
-            if (postsBool === "1") {
-                await prisma.updateManyPosts({
-                    where: {
-                        id: tid,
-                        active: false
-                    },
-                    data: {
-                        active: true
-                    }
-                });
-            }
 
             res.json({ code: 1 });
         }

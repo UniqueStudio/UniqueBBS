@@ -72,7 +72,7 @@
               {{postCount}}
             </a-tag>
           </div>
-          <div class="thread-content">{{content}}</div>
+          <div class="thread-content" v-html="renderMessage(content)"></div>
           <div class="thread-signature">
             <div :title="fullCreateDate">
               <a-icon type="clock-circle"/>
@@ -171,7 +171,7 @@
               {{(page -1) * defaultPageSize + index +1}}楼
             </a-tag>
           </div>
-          <div class="post-message">{{post.post.message}}</div>
+          <div class="post-message" v-html="renderMessage(post.post.message)"></div>
           <div class="thread-signature">
             <div :title="getFullCreateDate(post.post.createDate)">
               <a-icon type="clock-circle"/>
@@ -231,7 +231,11 @@
   </div>
 </template>
 <script>
+import marked from "marked";
 export default {
+  components: {
+    marked
+  },
   data() {
     return {
       thread: {
@@ -291,6 +295,21 @@ export default {
     }
   },
   methods: {
+    renderMessage(message) {
+      return marked(message, { sanitize: true });
+    },
+    markedConfig() {
+      marked.setOptions({
+        renderer: new marked.Renderer(),
+        gfm: true,
+        tables: true,
+        breaks: false,
+        pedantic: false,
+        sanitize: false,
+        smartLists: true,
+        smartypants: false
+      });
+    },
     pageOnchange(page) {
       this.$router.push({
         path: `/thread/info/${this.tid}/${page}`
@@ -344,7 +363,7 @@ export default {
         this.attachList = data.attachArr;
         this.content = data.firstPost.message;
       } else {
-        return this.$store.dispute("setLoginStatus");
+        return this.$store.dispatch("setLoginStatus");
       }
       const userGroupListResponseRaw = await this.$ajax.get(
         this.$urls.userGroup(this.author.id)
@@ -352,7 +371,7 @@ export default {
 
       const userGroupListResponse = userGroupListResponseRaw.data;
       if (userGroupListResponse.code !== 1) {
-        return this.$store.dispute("setLoginStatus");
+        return this.$store.dispatch("setLoginStatus");
       }
       this.groupList = userGroupListResponse.msg.map(item => ({
         name: item.name,
@@ -443,6 +462,7 @@ export default {
   },
   mounted() {
     this.getThreadInfo();
+    this.markedConfig();
   }
 };
 </script>
