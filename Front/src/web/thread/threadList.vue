@@ -11,7 +11,7 @@
       </div>
     </div>
     <div class="thread-controls">
-      <router-link to="/thread/create">
+      <router-link :to="'/thread/create/'+forum.id">
         <a-button type="primary" icon="form">发帖</a-button>
       </router-link>
     </div>
@@ -56,7 +56,9 @@
         </div>
         <div class="thread-item-last-reply">
           <p class="thread-item-info-reply-message">
-            <router-link :to="'/thread/info/'+thread.thread.id+'/1'">{{thread.lastReply[0].message}}</router-link>
+            <router-link
+              :to="'/thread/info/'+thread.thread.id+'/1'"
+            >{{thread.lastReply[0].message.length > 10? (thread.lastReply[0].message.substr(0,10)+'...') : thread.lastReply[0].message}}</router-link>
           </p>
           <p class="thread-item-info-author">
             <a-tag color="green">
@@ -87,7 +89,8 @@ export default {
         name: "板块",
         description: "板块描述",
         threads: 0,
-        icon: "check"
+        icon: "check",
+        id: ""
       },
       fid: "0",
       page: 0,
@@ -114,7 +117,7 @@ export default {
       if (threadListResponse.code === 1) {
         this.threadList = threadListResponse.msg.list;
 
-        ["name", "description", "threads"].forEach(item => {
+        ["name", "description", "threads", "id"].forEach(item => {
           this.forum[item] = threadListResponse.msg.forum[item];
         });
 
@@ -137,7 +140,7 @@ export default {
     font-size: 20px;
   }
   .thread-item {
-    grid-template-columns: 20% 60% 20%;
+    grid-template-columns: 20% 45% 35%;
   }
 }
 @media screen and (max-width: 800px) {

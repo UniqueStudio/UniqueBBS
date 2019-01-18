@@ -166,7 +166,26 @@ const router = new Router({
             {
               path: "create",
               name: "threadCreate",
-              component: threadCreate
+              component: threadCreate,
+              meta: {
+                mode: 0
+              }
+            },
+            {
+              path: "create/:fid",
+              name: "threadCreateFid",
+              component: threadCreate,
+              meta: {
+                mode: 0
+              }
+            },
+            {
+              path: "update/:tid",
+              name: "threadUpdate",
+              component: threadCreate,
+              meta: {
+                mode: 1
+              }
             }
           ]
         }

@@ -1,9 +1,14 @@
 <template>
   <div class="user-group-visit">
+    <router-link to="/user/grouplist">
+      <div class="group-info" style="background:rgb(99, 76, 184);">
+        <div class="group-icon">
+          <a-icon type="team" class="group-item-icon"></a-icon>
+          &nbsp;{{groupName}}
+        </div>
+      </div>
+    </router-link>
     <div class="user-group-collections">
-      <h3>
-        <router-link to="/user/grouplist">{{groupName}}</router-link>
-      </h3>
       <div v-for="user in groupUserList" :key="user.id" class="group-user-container">
         <div class="group-user-avatar">
           <router-link :to="'/user/visit/'+user.id">
@@ -57,24 +62,23 @@ export default {
 </script>
 <style scoped>
 @media screen and (min-width: 800px) {
-  .user-group-visit {
+  .user-group-collections {
     width: 40%;
   }
 }
 @media screen and (max-width: 800px) {
-  .user-group-visit {
+  .user-group-collections {
     width: 80%;
   }
 }
-.user-group-visit {
+.user-group-collections {
   margin: 0 auto;
 }
-.user-group-visit,
 .user-group-collections {
   position: relative;
 }
 .user-group-collections {
-  margin-top: 64px;
+  margin-top: 12px;
 }
 .group-user-container {
   display: grid;
@@ -97,5 +101,23 @@ h3 {
 .group-user-mobile {
   position: absolute;
   right: 0;
+}
+.group-info {
+  margin: -12px -12px 24px -12px;
+  border-radius: 5px 5px 0 0;
+  height: 52px;
+  user-select: none;
+}
+.group-icon {
+  text-align: center;
+  color: white;
+}
+.group-info-name {
+  text-align: center;
+  color: white;
+}
+.group-item-icon {
+  font-size: 16px;
+  margin-top: 18px;
 }
 </style>

@@ -31,7 +31,7 @@
             </router-link>
             <router-link
               :to="'/thread/info/'+forum.lastPostInfo.thread.id+'/1'"
-            >{{forum.lastPost.message}}</router-link>
+            >{{forum.lastPost.message.length>10 ? (forum.lastPost.message.substr(0,10)+"..."):forum.lastPost.message}}</router-link>
           </p>
           <a-tag color="green">
             <a-icon type="clock-circle"/>

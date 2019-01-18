@@ -1,5 +1,14 @@
 <template>
   <div class="thread-info" id="thread-info">
+    <router-link :to="'/thread/list/'+forum.id+'/1'">
+      <div class="forum-info" :style="{backgroundColor:forum.color}">
+        <div class="forum-icon">
+          <a-icon :type="forum.icon" class="forum-item-icon"></a-icon>
+          &nbsp;
+          {{forum.name}}
+        </div>
+      </div>
+    </router-link>
     <div :class="{'thread-main-content':true,'no-active-filter':!thread.active}">
       <div class="user-avatar-container">
         <router-link :to="'/user/visit/'+author.id">
@@ -88,9 +97,11 @@
       </div>
     </div>
     <div class="thread-admin">
-      <a-tag color="blue" v-if="isAdmin || myUid===author.id">
-        <a-icon type="edit"/>&nbsp;编辑
-      </a-tag>
+      <router-link :to="'/thread/update/'+thread.id">
+        <a-tag color="blue" v-if="isAdmin || myUid===author.id">
+          <a-icon type="edit"/>&nbsp;编辑
+        </a-tag>
+      </router-link>
       <a-tag color="red" v-if="isAdmin || myUid===author.id" @click="handleThreadDelete">
         <a-icon type="delete"/>
         &nbsp;{{thread.active? '删除' : '恢复'}}
@@ -254,6 +265,12 @@ export default {
         signature: "",
         isAdmin: false
       },
+      forum: {
+        name: "",
+        icon: "",
+        color: "",
+        id: ""
+      },
       postList: [],
       tid: "0",
       page: 0,
@@ -358,6 +375,14 @@ export default {
         Object.keys(this.author).forEach(item => {
           this.author[item] = data.threadAuthor[item];
         });
+
+        ["name", "id"].forEach(item => {
+          this.forum[item] = data.forumInfo[item];
+        });
+        const iconCollection = data.forumInfo.icon.split("|");
+        this.forum.icon = iconCollection[0];
+        this.forum.color = iconCollection[1];
+
         this.postCount = data.threadInfo.postCount;
         this.postList = data.postArr;
         this.attachList = data.attachArr;
@@ -513,7 +538,6 @@ export default {
 }
 .thread-main-content {
   display: grid;
-  margin-top: 18px;
 }
 .user-avatar-container,
 .thread-post-list-item-avatar-container {
@@ -596,5 +620,23 @@ export default {
 }
 .user-group {
   display: inline-block;
+}
+.forum-info {
+  margin: -12px -12px 24px -12px;
+  border-radius: 5px 5px 0 0;
+  height: 52px;
+  user-select: none;
+}
+.forum-icon {
+  text-align: center;
+  color: white;
+}
+.forum-info-name {
+  text-align: center;
+  color: white;
+}
+.forum-item-icon {
+  font-size: 16px;
+  margin-top: 18px;
 }
 </style>

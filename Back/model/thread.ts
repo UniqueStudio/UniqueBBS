@@ -177,6 +177,12 @@ export const threadInfo = async function(req: Request, res: Response) {
             }
         });
 
+        const forumInfo = await prisma
+            .thread({
+                id: tid
+            })
+            .forum();
+
         res.json({
             code: 1,
             msg: {
@@ -184,7 +190,8 @@ export const threadInfo = async function(req: Request, res: Response) {
                 threadAuthor,
                 firstPost,
                 postArr,
-                attachArr
+                attachArr,
+                forumInfo
             }
         });
     } catch (e) {
@@ -225,6 +232,17 @@ export const threadCreate = async function(req: Request, res: Response) {
             return res.json({
                 code: -1,
                 msg: "缺少板块信息！"
+            });
+        }
+
+        const newForum = await prisma.forum({
+            id: fid
+        });
+
+        if (!newForum) {
+            return res.json({
+                code: -1,
+                msg: "目标板块不存在！"
             });
         }
 
@@ -612,6 +630,7 @@ export const threadUpdate = async function(req: Request, res: Response) {
         const { uid, isAdmin } = verifyJWT(req.header("Authorization"));
         const { tid } = req.params;
         const {
+            fid,
             subject,
             message,
             filterSwitch,
@@ -636,6 +655,20 @@ export const threadUpdate = async function(req: Request, res: Response) {
             return res.json({ code: -1, msg: "您无权编辑此帖子！" });
         }
 
+        const previousForum = await prisma
+            .thread({
+                id: tid
+            })
+            .forum();
+
+        const newForum = await prisma.forum({
+            id: fid
+        });
+
+        if (!newForum) {
+            return res.json({ code: -1, msg: "目标板块不存在！" });
+        }
+
         const updateLock = await redLock.lock(`updateThread:${tid}`, 1000);
         await filterClearCache(tid);
         try {
@@ -648,6 +681,11 @@ export const threadUpdate = async function(req: Request, res: Response) {
                 filterObj = {
                     update: filterObjGenerate(filterUserArr, filterGroupArr, filterUserType, filterGroupType)
                 };
+            }
+
+            if (previousForum.id !== fid) {
+                await forumThreadsAdd(previousForum.id, -1);
+                await forumThreadsAdd(fid, 1);
             }
 
             const threadInfo = await prisma.updateThread({
@@ -672,7 +710,7 @@ export const threadUpdate = async function(req: Request, res: Response) {
                 }
             });
 
-            if (fileListArr.length !== 0) {
+            if (fileListArr && fileListArr.length !== 0) {
                 const postInfo = await prisma
                     .thread({
                         id: threadInfo.id

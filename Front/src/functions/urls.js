@@ -10,6 +10,7 @@ const urls = {
   threadCreate: `${domain}thread/create`,
   threadList: (fid, page) => `${domain}thread/list/${fid}/${page}`,
   threadInfo: (tid, page) => `${domain}thread/info/${tid}/${page}`,
+  threadUpdate: tid => `${domain}thread/update/${tid}`,
   threadReply: `${domain}thread/reply`,
   groupMemberList: gid => `${domain}group/users/${gid}`,
   userInfo: uid => `${domain}user/info/${uid}`,

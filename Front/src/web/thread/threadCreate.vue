@@ -22,7 +22,7 @@
       </div>
     </div>
     <div class="create-thread-btn">
-      <a-button type="primary" icon="check" @click="createThread">发表帖子</a-button>
+      <a-button type="primary" icon="check" @click="handleBtnClick">{{this.mode===0?'发表帖子':'更新帖子'}}</a-button>
     </div>
   </div>
 </template>
@@ -37,6 +37,8 @@ export default {
   components: { marked, codemirror },
   data() {
     return {
+      mode: 0,
+      tid: "",
       fid: "",
       subject: "",
       message: "",
@@ -66,7 +68,12 @@ export default {
         return this.$store.dispatch("checkLoginStatus");
       }
       this.forumList = threadListReponseRaw.data.msg;
-      this.fid = this.forumList[0].id;
+
+      if (this.$route.params.fid) {
+        this.fid = this.$route.params.fid;
+      } else {
+        this.fid = this.forumList[0].id;
+      }
     },
     markedConfig() {
       marked.setOptions({
@@ -79,6 +86,41 @@ export default {
         smartLists: true,
         smartypants: false
       });
+    },
+    handleBtnClick() {
+      const mode = this.$route.meta.mode;
+      const THREAD_CREATE = 0,
+        THREAD_UPDATE = 1;
+      switch (mode) {
+        case THREAD_CREATE:
+          this.createThread();
+          break;
+        case THREAD_UPDATE:
+          this.updateThread();
+          break;
+      }
+    },
+    async updateThread() {
+      const responseRaw = await this.$ajax.post(
+        this.$urls.threadUpdate(this.tid),
+        {
+          fid: this.fid,
+          subject: this.subject,
+          message: this.message
+        }
+      );
+      if (responseRaw.data.code === 1) {
+        this.$router.push({
+          path: `/thread/info/${this.tid}/1`
+        });
+        this.$message.success("更新成功！", 3);
+      } else {
+        const modal = this.$error();
+        modal.update({
+          title: "更新错误",
+          content: responseRaw.data.msg
+        });
+      }
     },
     async createThread() {
       const responseRaw = await this.$ajax.post(this.$urls.threadCreate, {
@@ -99,9 +141,28 @@ export default {
           content: responseRaw.data.msg
         });
       }
+    },
+    async getThreadInfo(tid) {
+      const threadInfoRaw = await this.$ajax.get(this.$urls.threadInfo(tid, 1));
+      if (threadInfoRaw.data.code !== 1) {
+        const modal = this.$error();
+        modal.update({
+          title: "错误",
+          content: threadInfoRaw.data.msg
+        });
+        return;
+      }
+      this.fid = threadInfoRaw.data.msg.forumInfo.id;
+      this.subject = threadInfoRaw.data.msg.threadInfo.subject;
+      this.message = threadInfoRaw.data.msg.firstPost.message;
     }
   },
   mounted() {
+    this.mode = this.$route.meta.mode;
+    if (this.mode === 1) {
+      this.tid = this.$route.params.tid;
+      this.getThreadInfo(this.tid);
+    }
     this.getForumList();
     this.markedConfig();
   }
