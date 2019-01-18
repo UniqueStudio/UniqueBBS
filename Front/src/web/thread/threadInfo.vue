@@ -1,36 +1,77 @@
 <template>
-  <div class="thread-info">
-    <div class="thread-main-content">
+  <div class="thread-info" id="thread-info">
+    <div :class="{'thread-main-content':true,'no-active-filter':!thread.active}">
       <div class="user-avatar-container">
         <router-link :to="'/user/visit/'+author.id">
           <a-avatar :src="author.avatar" class="user-avatar"></a-avatar>
         </router-link>
       </div>
       <div class="thread-main-info">
-        <p class="thread-subject">{{thread.subject}}</p>
+        <p class="thread-subject">
+          <span v-if="thread.top" :title="thread.top===1 ? '本版置顶':'全局置顶'">
+            <a-icon type="arrow-up" :style="{color: thread.top===1 ? 'orange' : 'red'}"/>
+          </span>
+          {{thread.subject}}
+        </p>
         <div class="thread-sub">
-          <p class="thread-sub-info">
+          <a-drawer
+            title="帖子删除"
+            placement="top"
+            :visible="deleteDiag.visible"
+            @close="deleteDiag.visible=false;"
+          >
+            <div class="drawer-content">
+              <div>帖子删除不可逆，请谨慎操作！</div>
+              <div class="drawer-btn-container">
+                <a-button
+                  type="primary"
+                  @click="handleDelete(0)"
+                  title="软删除后，帖子仍在数据库中，仅管理员可见。"
+                  v-if="!(isAdmin && !deleteDiag.active)"
+                >{{isAdmin? '软删除' : '删除'}}</a-button>
+                <a-button
+                  type="primary"
+                  @click="handleDelete(1)"
+                  title="硬删除不可逆，删除后将无法恢复，请谨慎操作！"
+                  v-if="isAdmin"
+                >硬删除</a-button>
+                <a-button
+                  type="primary"
+                  @click="handleDelete(2)"
+                  title="用于恢复被软删除的帖子，仅管理员可操作！"
+                  v-if="isAdmin"
+                >恢复</a-button>
+              </div>
+            </div>
+          </a-drawer>
+          <div class="thread-sub-info">
             <a-tag color="cyan" v-if="thread.diamond">
-              <a-icon type="star"/>&nbsp;精华
+              <a-icon type="star"/>
+              <span class="mobile-hidden-text">&nbsp;精华</span>
             </a-tag>
-            <a-tag :color="author.isAdmin?'orange':'blue'">
-              <a-icon :type="author.isAdmin?'crown': 'user'"/>
-              {{author.username}}
-            </a-tag>&nbsp;
-            <a-tag
-              v-for="group in groupList"
-              :key="group.id"
-              :color="group.color"
-              class="user-group"
-            >
-              <a-icon type="team"/>
-              {{group.name}}
+            <a-tag color="red" v-if="thread.closed">
+              <a-icon type="lock"/>
+              <span class="mobile-hidden-text">&nbsp;锁定</span>
             </a-tag>
+            <router-link :to="'/user/visit/'+author.id">
+              <a-tag :color="author.isAdmin?'orange':'blue'">
+                <a-icon :type="author.isAdmin?'crown': 'user'"/>
+                {{author.username}}
+              </a-tag>
+            </router-link>&nbsp;
+            <div class="user-group" v-for="group in groupList" :key="group.id">
+              <router-link :to="'/user/group/'+group.id">
+                <a-tag :color="group.color" class="user-group">
+                  <a-icon type="team"/>
+                  {{group.name}}
+                </a-tag>
+              </router-link>
+            </div>
             <a-tag color="purple" class="thread-item-info-messages">
               <a-icon type="message"/>
               {{postCount}}
             </a-tag>
-          </p>
+          </div>
           <div class="thread-content">{{content}}</div>
           <div class="thread-signature">
             <div :title="fullCreateDate">
@@ -51,32 +92,8 @@
         <a-icon type="edit"/>&nbsp;编辑
       </a-tag>
       <a-tag color="red" v-if="isAdmin || myUid===author.id" @click="handleThreadDelete">
-        <a-drawer
-          title="帖子删除"
-          placement="top"
-          :visible="deleteDiag.visible"
-          @close="deleteDiag.visible=false;"
-        >
-          <div class="drawer-content">
-            <div>帖子删除不可逆，请谨慎操作！</div>
-            <div class="drawer-btn-container">
-              <a-button type="primary" @click="handleDelete(0)" title="软删除后，帖子仍在数据库中，仅管理员可见。">软删除</a-button>
-              <a-button
-                type="primary"
-                @click="handleDelete(1)"
-                title="硬删除不可逆，删除后将无法恢复，请谨慎操作！"
-                v-if="isAdmin"
-              >硬删除</a-button>
-              <a-button
-                type="primary"
-                @click="handleDelete(2)"
-                title="用于恢复被软删除的帖子，仅管理员可操作！"
-                v-if="isAdmin"
-              >恢复</a-button>
-            </div>
-          </div>
-        </a-drawer>
-        <a-icon type="delete"/>&nbsp;删除
+        <a-icon type="delete"/>
+        &nbsp;{{thread.active? '删除' : '恢复'}}
       </a-tag>
       <a-tag color="orange" v-if="isAdmin" @click="visibleTop = true;">
         <a-drawer title="帖子置顶" placement="top" :visible="visibleTop" @close="visibleTop=false;">
@@ -122,13 +139,18 @@
       </a-tag>
     </div>
     <div class="thread-post-list">
-      <div class="thread-post-list-item" v-for="(post,index) in postList" :key="post.id">
-        <div class="thread-post-list-item-avatar-container">
+      <div
+        class="thread-post-list-item"
+        v-for="(post,index) in postList"
+        :key="post.id"
+        :class="{'no-active-filter':!post.post.active}"
+      >
+        <div class="thread-post-list-item-avatar-container" v-if="isAdmin || post.post.active">
           <router-link :to="'/user/visit/'+post.user.id">
             <a-avatar :src="post.user.avatar" class="user-avatar-small"></a-avatar>
           </router-link>
         </div>
-        <div class="thread-post-list-item-content">
+        <div class="thread-post-list-item-content" v-if="isAdmin || post.post.active">
           <div class="thread-post-list-item-author-info">
             <router-link :to="'/user/visit/'+post.user.id">
               <a-tag :color="post.user.isAdmin?'orange':'blue'">
@@ -136,15 +158,14 @@
                 {{post.user.username}}
               </a-tag>
             </router-link>&nbsp;
-            <a-tag
-              v-for="group in post.group"
-              :key="group.id"
-              :color="group.color"
-              class="user-group"
-            >
-              <a-icon type="team"/>
-              {{group.name}}
-            </a-tag>
+            <div class="user-group" v-for="group in post.group" :key="group.id">
+              <router-link :to="'/user/group/'+group.id">
+                <a-tag :color="group.color" class="user-group">
+                  <a-icon type="team"/>
+                  {{group.name}}
+                </a-tag>
+              </router-link>
+            </div>
             <a-tag color="pink" class="thread-item-info-messages">
               <a-icon type="trophy"/>
               {{(page -1) * defaultPageSize + index +1}}楼
@@ -169,11 +190,17 @@
             <a-tag
               color="red"
               v-if="isAdmin || myUid===post.user.id"
-              @click="handlePostDelete(post.post.id)"
+              @click="handlePostDelete(post.post.id,post.post.active)"
             >
-              <a-icon type="delete"/>&nbsp;删除
+              <a-icon type="delete"/>
+              &nbsp;{{post.post.active? '删除' : '恢复'}}
             </a-tag>
-            <a-tag color="orange">
+            <a-tag
+              color="orange"
+              v-if="(isAdmin || !thread.closed) && post.post.active"
+              :class="{'active-quote':quote === post.post.id}"
+              @click="handleQuote(post.post.id)"
+            >
               <a-icon type="environment"/>&nbsp;引用
             </a-tag>
           </div>
@@ -189,7 +216,7 @@
       ></a-pagination>
     </div>
     <div class="thread-send-post">
-      <div class="thread-post-list-item">
+      <div class="thread-post-list-item" v-if="isAdmin || !thread.closed">
         <div class="thread-post-list-item-avatar-container">
           <a-avatar :src="readerAvatar" class="user-avatar-small"></a-avatar>
         </div>
@@ -213,7 +240,8 @@ export default {
         createDate: "",
         diamond: false,
         top: 0,
-        close: false
+        closed: false,
+        active: true
       },
       author: {
         id: "0",
@@ -231,7 +259,7 @@ export default {
       groupList: [],
       defaultPageSize: 20,
       replyInput: "",
-      quote: -1,
+      quote: "-1",
       btnDisabled: false,
       visibleDiamond: false,
       visibleClose: false,
@@ -239,7 +267,8 @@ export default {
       deleteDiag: {
         visible: false,
         isThread: false,
-        pid: ""
+        pid: "",
+        active: true
       }
     };
   },
@@ -315,7 +344,7 @@ export default {
         this.attachList = data.attachArr;
         this.content = data.firstPost.message;
       } else {
-        return this.$store.dispute("updateLoginStatus");
+        return this.$store.dispute("setLoginStatus");
       }
       const userGroupListResponseRaw = await this.$ajax.get(
         this.$urls.userGroup(this.author.id)
@@ -323,11 +352,12 @@ export default {
 
       const userGroupListResponse = userGroupListResponseRaw.data;
       if (userGroupListResponse.code !== 1) {
-        return this.$store.dispute("updateLoginStatus");
+        return this.$store.dispute("setLoginStatus");
       }
       this.groupList = userGroupListResponse.msg.map(item => ({
         name: item.name,
-        color: item.color
+        color: item.color,
+        id: item.id
       }));
     },
     handleTopThread(val) {
@@ -351,17 +381,19 @@ export default {
         setClose: val
       });
     },
-    handlePostDelete(pid) {
+    handlePostDelete(pid, active) {
       this.deleteDiag.isThread = false;
       this.deleteDiag.pid = pid;
+      this.deleteDiag.active = active;
       this.deleteDiag.visible = true;
     },
     handleThreadDelete() {
       this.deleteDiag.isThread = true;
+      this.deleteDiag.active = this.thread.active;
       this.deleteDiag.visible = true;
     },
     handleDelete(mode) {
-      this.visibleThreadDelete = false;
+      this.deleteDiag.visible = false;
       let url = "";
 
       const SOFT_DELETE = 0,
@@ -386,12 +418,20 @@ export default {
           break;
       }
 
-      postServer(url);
+      this.postServer(url);
+    },
+    handleQuote(pid) {
+      if (this.quote === pid) {
+        this.quote = -1;
+      } else {
+        this.quote = pid;
+      }
     },
     async postServer(url, obj) {
       const result = await this.$ajax.post(url, obj);
       if (result.data.code === 1) {
         this.$message.success("操作成功！", 3);
+        this.getThreadInfo();
       } else {
         const modal = this.$error();
         modal.update({
@@ -442,7 +482,8 @@ export default {
     height: 36px;
     width: 36px;
   }
-  .user-group {
+  .user-group,
+  .mobile-hidden-text {
     display: none;
   }
   .thread-main-info,
@@ -526,5 +567,14 @@ export default {
 }
 .drawer-btn-container {
   margin-top: 36px;
+}
+.no-active-filter {
+  opacity: 0.4;
+}
+.active-quote {
+  transform: scale(1.2, 1.2);
+}
+.user-group {
+  display: inline-block;
 }
 </style>

@@ -1,9 +1,9 @@
-import { prisma, User } from "../generated/prisma-client";
+import { prisma } from "../generated/prisma-client";
 import fetch from "node-fetch";
 import { scanningURL, userIDURL, userInfoURL, getQRCodeURL, pagesize } from "./consts";
 import { Request, Response } from "express";
 import { addSaltPasswordOnce, getAccessToken, signJWT, verifyJWT, filterMyInfo, filterUserInfo } from "./check";
-import { setLockExpire } from "./lock";
+import { setLockExpireIncr } from "./lock";
 
 export const userInfo = async function(req: Request, res: Response) {
     try {
@@ -216,11 +216,11 @@ export const userInfoUpdateFromWx = async function(req: Request, res: Response) 
     try {
         const authObj = verifyJWT(req.header("Authorization"));
 
-        const wxUpdateLock = await setLockExpire(`wxUpdateUser:${authObj.uid}`, "300");
+        const wxUpdateLock = await setLockExpireIncr(`wxUpdateUser:${authObj.uid}`, "300", 2);
         if (!wxUpdateLock) {
             return res.json({
                 code: -1,
-                msg: "每5分钟只能同步一次微信个人信息，请稍后重试！"
+                msg: "每5分钟只能同步2次微信个人信息，请稍后重试！"
             });
         }
 

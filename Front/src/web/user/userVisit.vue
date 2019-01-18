@@ -4,19 +4,24 @@
       <a-avatar shape="circle" :src="userDatas.avatar" class="avatar-img" size="large"></a-avatar>
     </div>
     <h2 :style="{color: userDatas.isAdmin? 'orange': 'black'}">{{userDatas.username}}</h2>
-    <p class="group-container">
+    <div class="group-container">
       <a-tag color="orange" v-if="userDatas.isAdmin">
         <a-icon type="crown"/>&nbsp;管理员
       </a-tag>
-      <a-tag v-for="group in groupList" :key="group.id" :color="group.color">
-        <a-icon type="team"/>
-        {{group.name}}
-      </a-tag>
+      <div v-for="group in groupList" :key="group.id" class="group-item">
+        <router-link :to="'/user/group/'+ group.id">
+          <a-tag :color="group.color">
+            <a-icon type="team"/>
+            {{group.name}}
+          </a-tag>
+        </router-link>
+      </div>
+
       <a-tag color="green">
         <a-icon type="clock-circle"/>
         {{lastLoginHumanDate}}
       </a-tag>
-    </p>
+    </div>
     <h5>{{userDatas.signature}}</h5>
     <div class="user-detail-info">
       <a-input-group>
@@ -122,7 +127,8 @@ export default {
       });
       this.groupList = userInfo.data.msg.group.map(item => ({
         name: item.name,
-        color: item.color
+        color: item.color,
+        id: item.id
       }));
     }
   },
@@ -157,6 +163,9 @@ h5 {
   text-align: center;
   user-select: none;
   margin: 0;
+}
+.group-item {
+  display: inline-block;
 }
 .user-detail-info {
   margin-top: 36px;

@@ -4,6 +4,8 @@ import * as Redis from "redis";
 import * as Redlock from "redlock";
 import { promisify } from "util";
 import * as multer from "multer";
+import * as socket from "socket.io";
+import * as http from "http";
 
 import {
     userMyInfo,
@@ -56,6 +58,7 @@ import {
     messageDeleteAll,
     messageCount
 } from "./model/message";
+import { socketLogin, socketDisconnect } from "./model/socket";
 
 const SERVER_VERSION = "1.00";
 
@@ -83,6 +86,14 @@ export const redLock = new Redlock([redisClient], {
 });
 
 const app = express();
+const server = http.createServer(app);
+export const io = socket(server);
+
+io.on("connection", socket => {
+    socket.on("login", socketLogin(socket));
+    socket.on("disconnect", socketDisconnect(socket));
+});
+
 app.use(bodyParser.json({ limit: "1mb" }));
 
 app.use(
@@ -176,7 +187,7 @@ app.get("/attach/unlink", fileGetUnlink);
 app.post("/attach/remove/:aid", fileRemove);
 app.post("/attach/upload", upload.array("attaches", 10), fileUpload);
 
-app.listen(7010, () => {
+server.listen(7010, () => {
     console.log(
         `Rabbit WebServer / ${SERVER_VERSION} is running on port 7010.\nRedis:6379 , MySQL:3306 , graphQL:4466`
     );

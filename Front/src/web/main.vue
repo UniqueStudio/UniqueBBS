@@ -112,7 +112,7 @@ export default {
           if (confirm("您确定要注销吗？")) {
             localStorage.removeItem("token");
             localStorage.removeItem("uid");
-            this.$store.commit("updateLoginStatus", false);
+            this.$store.commit("setLoginStatus", false);
             this.$store.dispatch("checkLoginStatus");
             this.$router.push({ path: "/user/login/pwd" });
           }

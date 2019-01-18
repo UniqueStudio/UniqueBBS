@@ -7,6 +7,7 @@ import Vuex from "vuex";
 import ajax from "./functions/ajax";
 import urls from "./functions/urls";
 import getHumanDate from "./functions/humanDate";
+import io from "socket.io-client";
 
 Vue.prototype.$urls = urls;
 Vue.prototype.$antd = Antd;
@@ -25,7 +26,8 @@ const store = new Vuex.Store({
     navActive: 0,
     unreadCount: 0,
     isAdmin: false,
-    uid: ""
+    uid: "",
+    socket: undefined
   },
   mutations: {
     setAvatarSrc(state, url) {
@@ -38,13 +40,16 @@ const store = new Vuex.Store({
       state.navActive = val;
     },
     setUnreadCount(state, val) {
-      state.unreadCount = val;
+      state.unreadCount = Number.parseInt(val);
     },
     setisAdmin(state, val) {
       state.isAdmin = val;
     },
     setUid(state, val) {
       state.uid = val;
+    },
+    setSocket(state, socket) {
+      state.socket = socket;
     }
   },
   actions: {
@@ -55,7 +60,7 @@ const store = new Vuex.Store({
         localStorage.removeItem("token");
         localStorage.removeItem("uid");
         context.commit("setLoginStatus", false);
-        context.commit("unreadCount", 0);
+        context.commit("setUnreadCount", 0);
         return;
       }
       context.commit("setAvatarSrc", response.msg.user.avatar);
@@ -66,6 +71,14 @@ const store = new Vuex.Store({
       const messageCountResponse = messageCountResponseRaw.data;
       if (messageCountResponse.code === 1) {
         context.commit("setUnreadCount", Number.parseInt(messageCountResponse.msg.unread));
+      }
+      if (context.state.socket === undefined) {
+        const socket = io(urls.socket);
+        socket.emit("login", response.msg.user.id);
+        socket.on("pushMessage", count => {
+          context.commit("setUnreadCount", count);
+        });
+        context.commit("setSocket", socket);
       }
     }
   }

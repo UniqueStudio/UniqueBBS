@@ -381,7 +381,7 @@ export const threadReply = async function(req: Request, res: Response) {
                                         id: uid
                                     }
                                 },
-                                quote: Number.parseInt(quote),
+                                quote: quote,
                                 createDate: new Date(),
                                 active: true
                             }
@@ -404,11 +404,13 @@ export const threadReply = async function(req: Request, res: Response) {
                     const quotePost = await prisma.post({
                         id: quote
                     });
+
                     const quotePostAuthor = await prisma
                         .post({
                             id: quote
                         })
                         .user();
+
                     if (quotePost && quotePostAuthor.id !== uid) {
                         await pushMessage(
                             uid,

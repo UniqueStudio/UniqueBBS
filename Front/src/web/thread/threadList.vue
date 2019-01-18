@@ -12,19 +12,26 @@
     </div>
     <div class="thread-list-items">
       <div class="thread-item" v-for="thread in threadList" :key="thread.id">
-        <div class="thread-item-author">
+        <div :class="{'thread-item-author':true,'no-active-filter':!thread.thread.active}">
           <router-link :to="'/user/visit/'+thread.user.id">
             <a-avatar shape="circle" :src="thread.user.avatar" class="avatar-img"></a-avatar>
           </router-link>
         </div>
-        <div class="thread-item-info">
+        <div :class="{'thread-item-info':true,'no-active-filter':!thread.thread.active}">
           <p class="thread-item-info-subject">
+            <span v-if="thread.thread.top" :title="thread.thread.top===1 ? '本版置顶':'全局置顶'">
+              <a-icon type="arrow-up" :style="{color: thread.thread.top===1 ? 'orange' : 'red'}"/>
+            </span>
             <router-link :to="'/thread/info/'+thread.thread.id+'/1'">{{thread.thread.subject}}</router-link>
           </p>
           <p>
             <a-tag color="cyan" v-if="thread.thread.diamond">
               <a-icon type="star"/>
               <span class="diamond-text">&nbsp;精华</span>
+            </a-tag>
+            <a-tag color="red" v-if="thread.thread.closed">
+              <a-icon type="lock"/>
+              <span class="diamond-text">&nbsp;锁定</span>
             </a-tag>
             <router-link :to="'/user/visit/'+thread.user.id">
               <a-tag :color="thread.user.isAdmin? 'orange': 'blue'">
@@ -198,5 +205,8 @@ export default {
 .pagination {
   text-align: center;
   margin: 36px auto;
+}
+.no-active-filter {
+  opacity: 0.4;
 }
 </style>

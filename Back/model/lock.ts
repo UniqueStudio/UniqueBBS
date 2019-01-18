@@ -15,7 +15,7 @@ export const setLockExpire = async function(key: string, expireSeconds: string) 
 
 export const setLockExpireIncr = async function(key: string, expireSeconds: string, maxCount: number) {
     const checkLockResult = await redisClientGetAsync(key);
-    if (checkLockResult === null || Number.parseInt(checkLockResult) <= maxCount) {
+    if (checkLockResult === null || Number.parseInt(checkLockResult) < maxCount) {
         await redisClientIncrAsync(key);
         await redisClientExpireAsync(key, expireSeconds);
         return true;

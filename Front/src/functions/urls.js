@@ -1,4 +1,5 @@
 const domain = "http://localhost:7010/";
+const socket = "ws://localhost:7010/";
 const urls = {
   login: `${domain}user/login/pwd`,
   myInfo: `${domain}user/my/info`,
@@ -27,6 +28,9 @@ const urls = {
   deleteThreadHard: tid => `${domain}thread/deleteHard/${tid}`,
   deletePostHard: pid => `${domain}post/deleteHard/${pid}`,
   recoveryThread: tid => `${domain}thread/recovery/${tid}/1`,
-  recoveryPost: pid => `${domain}post/recovery/${pid}`
+  recoveryPost: pid => `${domain}post/recovery/${pid}`,
+  groupList: `${domain}group/list`,
+  groupUsers: gid => `${domain}group/users/${gid}`,
+  socket: socket
 };
 export default urls;

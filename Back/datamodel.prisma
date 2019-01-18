@@ -53,7 +53,7 @@ type Post {
     user: User!
     thread: Thread!
     isFirst: Boolean! @default(value: false)
-    quote: Int! @default(value: -1)
+    quote: String! @default(value: "-1")
     message: String!
     createDate: DateTime!
     active: Boolean! @default(value: true)

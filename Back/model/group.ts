@@ -20,7 +20,23 @@ export const groupUser = async function(req: Request, res: Response) {
 export const groupList = async function(req: Request, res: Response) {
     try {
         verifyJWT(req.header("Authorization"));
-        const groupList: Array<Group> = await prisma.groups();
+        const groupListRaw: Array<Group> = await prisma.groups();
+        const groupList = await Promise.all(
+            groupListRaw.map(async item => ({
+                group: item,
+                master: await prisma.group({ id: item.id }).master(),
+                count: await prisma
+                    .usersConnection({
+                        where: {
+                            group_some: {
+                                id: item.id
+                            }
+                        }
+                    })
+                    .aggregate()
+                    .count()
+            }))
+        );
         res.json({ code: 1, msg: groupList });
     } catch (err) {
         res.json({ code: -1, msg: err.message });
@@ -38,7 +54,10 @@ export const groupUserList = async function(req: Request, res: Response) {
                 }
             }
         });
-        res.json({ code: 1, msg: groupUserList });
+        const groupInfo = await prisma.group({
+            id: gid
+        });
+        res.json({ code: 1, msg: { list: groupUserList, info: groupInfo } });
     } catch (err) {
         res.json({ code: -1, msg: err.message });
     }

@@ -13,6 +13,8 @@ import userVisit from "@/web/user/userVisit.vue";
 import userMyNotice from "@/web/user/userMyNotice.vue";
 import userMyGroup from "@/web/user/userMyGroup.vue";
 import userMyThreads from "@/web/user/userMyThreads.vue";
+import userGroupList from "@/web/user/userGroupList.vue";
+import userGroupVisit from "@/web/user/userGroupVisit.vue";
 import thread from "@/web/thread/thread.vue";
 import threadList from "@/web/thread/threadList.vue";
 import threadInfo from "@/web/thread/threadInfo.vue";
@@ -121,6 +123,22 @@ const router = new Router({
               path: "visit/:uid",
               name: "userVisit",
               component: userVisit,
+              meta: {
+                requireLogin: true
+              }
+            },
+            {
+              path: "grouplist",
+              name: "userGroupList",
+              component: userGroupList,
+              meta: {
+                requireLogin: true
+              }
+            },
+            {
+              path: "group/:gid",
+              name: "userGroupVisit",
+              component: userGroupVisit,
               meta: {
                 requireLogin: true
               }

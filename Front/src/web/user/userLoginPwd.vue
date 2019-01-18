@@ -64,7 +64,7 @@ export default {
         const uid = response.msg.uid;
         localStorage.setItem("token", token);
         localStorage.setItem("uid", uid);
-        this.$store.commit("updateLoginStatus", true);
+        this.$store.commit("setLoginStatus", true);
         this.$store.dispatch("checkLoginStatus");
         this.$message.success("登录成功！", 3);
         this.$router.push({ path: "/user/my/info" });

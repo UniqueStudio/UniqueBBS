@@ -1,10 +1,10 @@
 <template>
-  <div class="user-group">
-    <div class="user-group-collections" v-for="group in groupList" :key="group.id">
+  <div class="user-group-visit">
+    <div class="user-group-collections">
       <h3>
-        <router-link to="/user/grouplist">{{group.info.name}}</router-link>
+        <router-link to="/user/grouplist">{{groupName}}</router-link>
       </h3>
-      <div v-for="user in group.list" :key="user.id" class="group-user-container">
+      <div v-for="user in groupUserList" :key="user.id" class="group-user-container">
         <div class="group-user-avatar">
           <router-link :to="'/user/visit/'+user.id">
             <a-avatar shape="circle" :src="user.avatar" class="avatar-img"></a-avatar>
@@ -28,35 +28,48 @@
 export default {
   data() {
     return {
-      groupList: []
+      groupUserList: [],
+      groupName: "",
+      gid: "",
+      groupColor: ""
     };
   },
   methods: {
-    async getGroupList() {
-      const responseMyInfoRaw = await this.$ajax.get(this.$urls.myInfo);
-      const responseMyInfo = responseMyInfoRaw.data;
-      if (responseMyInfo.code !== 1) {
+    async getGroupUserList() {
+      const { gid } = this.$route.params;
+      this.gid = gid;
+      const responseGroupInfoRaw = await this.$ajax.get(
+        this.$urls.groupUsers(gid)
+      );
+      const responseGroupInfo = responseGroupInfoRaw.data;
+      if (responseGroupInfo.code !== 1) {
         return this.$store.dispatch("checkLoginStatus");
       }
-      const userGroupList = responseMyInfo.msg.group;
-      this.groupList = await Promise.all(
-        userGroupList.map(async item => {
-          const groupInfo = { id: item.id, name: item.name };
-          const memberList = await this.$ajax.get(
-            this.$urls.groupMemberList(item.id)
-          );
-          return { info: groupInfo, list: memberList.data.msg.list };
-        })
-      );
+      this.groupUserList = responseGroupInfo.msg.list;
+      this.groupName = responseGroupInfo.msg.info.name;
+      this.groupColor = responseGroupInfo.msg.info.color;
     }
   },
   mounted() {
-    this.getGroupList();
+    this.getGroupUserList();
   }
 };
 </script>
 <style scoped>
-.user-group,
+@media screen and (min-width: 800px) {
+  .user-group-visit {
+    width: 40%;
+  }
+}
+@media screen and (max-width: 800px) {
+  .user-group-visit {
+    width: 80%;
+  }
+}
+.user-group-visit {
+  margin: 0 auto;
+}
+.user-group-visit,
 .user-group-collections {
   position: relative;
 }
