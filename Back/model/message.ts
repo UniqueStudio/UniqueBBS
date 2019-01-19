@@ -75,7 +75,7 @@ export const messageIsRead = async function(req: Request, res: Response) {
 export const messageList = async function(req: Request, res: Response) {
     try {
         const { uid } = verifyJWT(req.header("Authorization"));
-        let { page } = req.body;
+        let { page } = req.params;
         page = Number.parseInt(page);
 
         const resultRAW: Array<Message> = await prisma.messages({

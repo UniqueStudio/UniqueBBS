@@ -6,6 +6,7 @@ import { promisify } from "util";
 import * as multer from "multer";
 import * as socket from "socket.io";
 import * as http from "http";
+import { wxServer } from "./wxserver";
 
 import {
     userMyInfo,
@@ -37,7 +38,7 @@ import {
     threadMove,
     threadSearch
 } from "./model/thread";
-import { postDeleteHard, postDelete, postRecovery, postUpdate, postSearch } from "./model/post";
+import { postDeleteHard, postDelete, postRecovery, postUpdate, postSearch, postInfo } from "./model/post";
 import { forumList, forumListSimple } from "./model/forum";
 import { reportCreate, reportInfo, reportGraph, reportList, reportUpdate } from "./model/report";
 import {
@@ -155,6 +156,7 @@ app.post("/thread/deleteHard/:tid", threadDeleteHard);
 app.post("/thread/recovery/:tid", threadRecovery);
 
 //Post
+app.get("/post/info/:pid", postInfo);
 app.post("/post/delete/:pid", postDelete);
 app.post("/post/update/:pid", postUpdate);
 app.post("/post/search", postSearch);
@@ -191,4 +193,8 @@ server.listen(7010, () => {
     console.log(
         `Rabbit WebServer / ${SERVER_VERSION} is running on port 7010.\nRedis:6379 , MySQL:3306 , graphQL:4466`
     );
+});
+
+wxServer.listen(7011, () => {
+    console.log(`WeChat:7011`);
 });

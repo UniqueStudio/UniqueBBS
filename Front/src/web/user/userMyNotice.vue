@@ -66,14 +66,9 @@ export default {
       isReadDisabled: false,
       deleteAllDisabled: false,
       defaultPageSize: 20,
-      totalMessages: 0
+      totalMessages: 0,
+      page: 1
     };
-  },
-  computed: {
-    page() {
-      const { page } = this.$route.params;
-      return page;
-    }
   },
   methods: {
     jumpToUser(uid) {
@@ -82,10 +77,11 @@ export default {
       });
     },
     pageOnchange(page) {
+      this.page = Number.parseInt(page);
       this.$router.push({
         path: `/user/my/notice/${page}`
       });
-      this.getData();
+      this.getMessageList();
     },
     readAllMessagesHandle() {
       if (confirm("是否要将全部消息设置为已读？")) {
@@ -138,7 +134,11 @@ export default {
           content: responseRaw.data.msg
         });
       } else {
-        this.$message.success("消息已删除！", 3);
+        this.$notification.open({
+          message: "消息",
+          description: "消息已经全部删除！",
+          icon: <a-icon type="smile" style="color: #108ee9" />
+        });
         this.getMessageList();
       }
       this.$store.dispatch("updateUnreadMessage");
@@ -158,7 +158,11 @@ export default {
           content: responseRaw.data.msg
         });
       } else {
-        this.$message.success("消息已全部设置为已读！", 3);
+        this.$notification.open({
+          message: "消息",
+          description: "消息已经全部设为已读！",
+          icon: <a-icon type="smile" style="color: #108ee9" />
+        });
         this.getMessageList();
       }
       this.$store.dispatch("updateUnreadMessage");
@@ -174,7 +178,11 @@ export default {
           content: responseRaw.data.msg
         });
       } else {
-        this.$message.success("消息已清空！", 3);
+        this.$notification.open({
+          message: "消息",
+          description: "消息已经清空！",
+          icon: <a-icon type="smile" style="color: #108ee9" />
+        });
         this.getMessageList();
       }
       this.$store.dispatch("updateUnreadMessage");
@@ -182,6 +190,7 @@ export default {
     }
   },
   mounted() {
+    this.page = Number.parseInt(this.$route.params.page);
     this.getMessageList();
   }
 };

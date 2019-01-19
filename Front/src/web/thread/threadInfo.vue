@@ -195,9 +195,11 @@
           </div>
           <a-divider class="thread-divider"></a-divider>
           <div class="post-admin">
-            <a-tag color="blue" v-if="isAdmin || myUid===post.user.id">
-              <a-icon type="edit"/>&nbsp;编辑
-            </a-tag>
+            <router-link :to="'/post/update/'+post.post.id">
+              <a-tag color="blue" v-if="isAdmin || myUid===post.user.id">
+                <a-icon type="edit"/>&nbsp;编辑
+              </a-tag>
+            </router-link>
             <a-tag
               color="red"
               v-if="isAdmin || myUid===post.user.id"
@@ -341,7 +343,11 @@ export default {
         message: this.replyInput
       });
       if (replyRepsonseRaw.data.code === 1) {
-        this.$message.success("回帖成功！", 3);
+        this.$notification.open({
+          message: "回帖",
+          description: "回帖成功！",
+          icon: <a-icon type="smile" style="color: #108ee9" />
+        });
         this.replyInput = "";
         this.getThreadInfo();
       } else {
@@ -474,7 +480,11 @@ export default {
     async postServer(url, obj) {
       const result = await this.$ajax.post(url, obj);
       if (result.data.code === 1) {
-        this.$message.success("操作成功！", 3);
+        this.$notification.open({
+          message: "主题操作",
+          description: "操作成功！",
+          icon: <a-icon type="smile" style="color: #108ee9" />
+        });
         this.getThreadInfo();
       } else {
         const modal = this.$error();

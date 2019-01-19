@@ -70,6 +70,40 @@ export const postRecovery = async function(req: Request, res: Response) {
     }
 };
 
+export const postInfo = async function(req: Request, res: Response) {
+    try {
+        const { uid, isAdmin } = verifyJWT(req.header("Authorization"));
+        const { pid } = req.params;
+        const postResult = await prisma.post({
+            id: pid
+        });
+
+        const postAuthor = await prisma
+            .post({
+                id: pid
+            })
+            .user();
+
+        const postThread = await prisma
+            .post({
+                id: pid
+            })
+            .thread();
+
+        if (!isAdmin && (!postThread.active || !postResult.active)) {
+            return res.json({ code: -1, msg: "回帖不存在！" });
+        }
+
+        if (!isAdmin && postAuthor.id !== uid) {
+            return res.json({ code: -1, msg: "您无权编辑此回帖！" });
+        }
+
+        res.json({ code: 1, msg: postResult });
+    } catch (e) {
+        res.json({ code: -1, msg: e.message });
+    }
+};
+
 export const postUpdate = async function(req: Request, res: Response) {
     try {
         const { uid, isAdmin } = verifyJWT(req.header("Authorization"));
@@ -84,8 +118,13 @@ export const postUpdate = async function(req: Request, res: Response) {
         const postInfo = await prisma.post({
             id: pid
         });
+        const threadInfo = await prisma
+            .post({
+                id: pid
+            })
+            .thread();
 
-        if (!isAdmin && (postAuthor.id !== uid || !postInfo.active)) {
+        if (!isAdmin && (postAuthor.id !== uid || !postInfo.active || !threadInfo.active)) {
             return res.json({ code: -1, msg: "您无权编辑此回复！" });
         }
 
@@ -98,7 +137,7 @@ export const postUpdate = async function(req: Request, res: Response) {
             }
         });
 
-        res.json({ code: 1 });
+        res.json({ code: 1, msg: threadInfo.id });
     } catch (e) {
         res.json({ code: -1, msg: e.message });
     }

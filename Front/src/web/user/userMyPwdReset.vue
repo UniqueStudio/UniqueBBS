@@ -56,7 +56,11 @@ export default {
             content: response.msg
           });
         } else {
-          this.$message.success("新密码设置成功！", 3);
+          this.$notification.open({
+            message: "密码",
+            description: "新密码设定成功，请妥善保存！",
+            icon: <a-icon type="smile" style="color: #108ee9" />
+          });
         }
       }
       this.resetBtnDisabled = true;

@@ -339,10 +339,10 @@ export const threadReply = async function(req: Request, res: Response) {
 
         const lockFrequentReply = await setLockExpire(`postUser:${uid}`, "10");
         if (!lockFrequentReply) {
-            return res.json({
-                code: -1,
-                msg: "每10秒只能发言一次，您的请求过快！"
-            });
+            // return res.json({
+            //     code: -1,
+            //     msg: "每10秒只能发言一次，您的请求过快！"
+            // });
         }
 
         const havePermission = await filterCalculate(uid, tid, isAdmin);

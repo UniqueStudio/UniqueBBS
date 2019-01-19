@@ -9,6 +9,7 @@
         "body-parser": "^1.18.3",
         "express": "^4.16.4",
         "express-generator": "^4.16.0",
+        "fast-xml-parser": "^3.12.12",
         "graphql": "^14.0.2",
         "http": "^0.0.0",
         "jsonwebtoken": "^8.4.0",

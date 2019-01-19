@@ -34,15 +34,21 @@ export const verifyJWT = function(token?: string) {
 };
 
 export const addSaltPassword = function(pwd: string) {
-    const md5 = crypto.createHash("md5");
-    const firstMD5 = md5.update(pwd).digest("hex");
-    const md5_2 = crypto.createHash("md5");
-    return md5_2.update(firstMD5 + secret).digest("hex");
+    const firstMD5 = crypto
+        .createHash("md5")
+        .update(pwd)
+        .digest("hex");
+    return crypto
+        .createHash("md5")
+        .update(firstMD5 + secret)
+        .digest("hex");
 };
 
 export const addSaltPasswordOnce = function(pwd_MD5: string) {
-    const md5 = crypto.createHash("md5");
-    return md5.update(pwd_MD5 + secret).digest("hex");
+    return crypto
+        .createHash("md5")
+        .update(pwd_MD5 + secret)
+        .digest("hex");
 };
 
 export const getAccessToken = async function() {

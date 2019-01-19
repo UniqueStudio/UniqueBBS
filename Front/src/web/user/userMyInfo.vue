@@ -63,7 +63,11 @@ export default {
       const response = responseRaw.data;
       if (response.code === 1) {
         this.renderInfo();
-        this.$message.success("同步成功！", 3);
+        this.$notification.open({
+          message: "资料同步",
+          description: "资料同步成功！",
+          icon: <a-icon type="smile" style="color: #108ee9" />
+        });
       } else {
         const modal = this.$error();
         modal.update({
@@ -97,7 +101,11 @@ export default {
       );
       const response = responseRaw.data;
       if (response.code === 1) {
-        this.$message.success("设置成功！", 3);
+        this.$notification.open({
+          message: "资料设定",
+          description: "资料设定成功！",
+          icon: <a-icon type="smile" style="color: #108ee9" />
+        });
       } else {
         const modal = this.$error();
         modal.update({

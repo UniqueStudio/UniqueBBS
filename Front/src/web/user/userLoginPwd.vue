@@ -66,7 +66,11 @@ export default {
         localStorage.setItem("uid", uid);
         this.$store.commit("setLoginStatus", true);
         this.$store.dispatch("checkLoginStatus");
-        this.$message.success("登录成功！", 3);
+        this.$notification.open({
+          message: "登录",
+          description: "登陆成功，欢迎回来！",
+          icon: <a-icon type="smile" style="color: #108ee9" />
+        });
         this.$router.push({ path: "/user/my/info" });
       }
       this.loginBtnDisabled = false;

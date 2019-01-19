@@ -1,6 +1,6 @@
 <template>
   <div class="thread-create">
-    <div class="create-first-line">
+    <div class="create-first-line" v-if="mode !== 2">
       <div class="create-forum-list-container">
         <a-select v-model="fid" class="forum-list-selector">
           <a-select-option
@@ -22,7 +22,7 @@
       </div>
     </div>
     <div class="create-thread-btn">
-      <a-button type="primary" icon="check" @click="handleBtnClick">{{this.mode===0?'发表帖子':'更新帖子'}}</a-button>
+      <a-button type="primary" icon="check" @click="handleBtnClick">{{execBtnText}}</a-button>
     </div>
   </div>
 </template>
@@ -39,6 +39,7 @@ export default {
     return {
       mode: 0,
       tid: "",
+      pid: "",
       fid: "",
       subject: "",
       message: "",
@@ -57,6 +58,21 @@ export default {
   computed: {
     previewText() {
       return marked(this.message, { sanitize: true });
+    },
+    execBtnText() {
+      let result = "发表帖子";
+      switch (this.mode) {
+        case 0:
+          result = "发表帖子";
+          break;
+        case 1:
+          result = "更新帖子";
+          break;
+        case 2:
+          result = "更新回帖";
+          break;
+      }
+      return result;
     }
   },
   methods: {
@@ -90,13 +106,17 @@ export default {
     handleBtnClick() {
       const mode = this.$route.meta.mode;
       const THREAD_CREATE = 0,
-        THREAD_UPDATE = 1;
+        THREAD_UPDATE = 1,
+        POST_UPDATE = 2;
       switch (mode) {
         case THREAD_CREATE:
           this.createThread();
           break;
         case THREAD_UPDATE:
           this.updateThread();
+          break;
+        case POST_UPDATE:
+          this.updatePost();
           break;
       }
     },
@@ -113,7 +133,11 @@ export default {
         this.$router.push({
           path: `/thread/info/${this.tid}/1`
         });
-        this.$message.success("更新成功！", 3);
+        this.$notification.open({
+          message: "更新主题",
+          description: "主题更新成功！",
+          icon: <a-icon type="smile" style="color: #108ee9" />
+        });
       } else {
         const modal = this.$error();
         modal.update({
@@ -133,7 +157,11 @@ export default {
         this.$router.push({
           path: `/thread/info/${tid}/1`
         });
-        this.$message.success("发帖成功！", 3);
+        this.$notification.open({
+          message: "发表主题",
+          description: "发帖成功！",
+          icon: <a-icon type="smile" style="color: #108ee9" />
+        });
       } else {
         const modal = this.$error();
         modal.update({
@@ -155,6 +183,44 @@ export default {
       this.fid = threadInfoRaw.data.msg.forumInfo.id;
       this.subject = threadInfoRaw.data.msg.threadInfo.subject;
       this.message = threadInfoRaw.data.msg.firstPost.message;
+    },
+    async updatePost() {
+      const updatePostInfoRaw = await this.$ajax.post(
+        this.$urls.postUpdate(this.pid),
+        {
+          message: this.message
+        }
+      );
+      if (updatePostInfoRaw.data.code === 1) {
+        const tid = updatePostInfoRaw.data.msg;
+        this.$router.push({
+          path: `/thread/info/${tid}/1`
+        });
+        this.$notification.open({
+          message: "更新回帖",
+          description: "回帖更新成功！",
+          icon: <a-icon type="smile" style="color: #108ee9" />
+        });
+      } else {
+        const modal = this.$error();
+        modal.update({
+          title: "错误",
+          content: updatePostInfoRaw.data.msg
+        });
+      }
+    },
+    async getReplyInfo(pid) {
+      const replyInfoRaw = await this.$ajax.get(this.$urls.postInfo(pid));
+      if (replyInfoRaw.data.code !== 1) {
+        const modal = this.$error();
+        modal.update({
+          title: "错误",
+          content: replyInfoRaw.data.msg
+        });
+        return;
+      }
+      this.message = replyInfoRaw.data.msg.message;
+      this.pid = replyInfoRaw.data.msg.id;
     }
   },
   mounted() {
@@ -162,6 +228,9 @@ export default {
     if (this.mode === 1) {
       this.tid = this.$route.params.tid;
       this.getThreadInfo(this.tid);
+    } else if (this.mode === 2) {
+      this.pid = this.$route.params.pid;
+      this.getReplyInfo(this.pid);
     }
     this.getForumList();
     this.markedConfig();

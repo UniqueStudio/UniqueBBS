@@ -188,6 +188,24 @@ const router = new Router({
               }
             }
           ]
+        },
+        {
+          path: "post",
+          name: "post",
+          component: thread,
+          meta: {
+            requireLogin: true
+          },
+          children: [
+            {
+              path: "update/:pid",
+              name: "threadUpdate",
+              component: threadCreate,
+              meta: {
+                mode: 2
+              }
+            }
+          ]
         }
       ]
     }

@@ -25,6 +25,8 @@ const urls = {
   closeThread: `${domain}thread/close`,
   diamondThread: `${domain}thread/diamond`,
   topThread: `${domain}thread/top`,
+  postInfo: pid => `${domain}post/info/${pid}`,
+  postUpdate: pid => `${domain}post/update/${pid}`,
   deleteThread: tid => `${domain}thread/delete/${tid}`,
   deletePost: pid => `${domain}post/delete/${pid}`,
   deleteThreadHard: tid => `${domain}thread/deleteHard/${tid}`,
