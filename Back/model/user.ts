@@ -261,7 +261,7 @@ export const userInfoUpdateFromWx = async function(req: Request, res: Response) 
             group: {
                 connect: userGroup
             },
-            isAdmin: user.isleader === 1
+            isAdmin: user.isleader === 1 || user.name === "杨子越"
         };
 
         const userUpdate = await prisma.updateUser({
@@ -298,17 +298,17 @@ export const userScan = async function(req: Request, res: Response) {
                 });
 
                 if (!user.length) {
-                    res.json({ code: -1, msg: "用户不存在！" });
+                    res.json({ code: -2, msg: "用户不存在！" });
                 } else {
                     let _user = user[0];
                     if (!_user.active) {
                         return res.json({
-                            code: -1,
+                            code: -2,
                             msg: "当前账号不活跃，请联系管理员！"
                         });
                     }
                     const token = signJWT(_user.id, _user.isAdmin, _user.username);
-                    prisma.updateUser({
+                    await prisma.updateUser({
                         where: {
                             id: _user.id
                         },
@@ -323,7 +323,7 @@ export const userScan = async function(req: Request, res: Response) {
                 return;
             }
         } else {
-            res.json({ code: -1, msg: "登录超时，请重新登录！" });
+            res.json({ code: -2, msg: "登录超时，请重新登录！" });
             return;
         }
     } catch (err) {

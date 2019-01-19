@@ -82,6 +82,17 @@
             </a-tag>
           </div>
           <div class="thread-content" v-html="renderMessage(content)"></div>
+          <div class="thread-attach-list post-quote" v-if="attachList.length !== 0">
+            <h5>附件列表</h5>
+            <div v-for="attach in attachList" :key="attach.id">
+              <a :href="attachDownload(attach.id)" target="_blank">
+                <a-tag color="cyan" :title="getTitle(attach)">
+                  <a-icon type="paper-clip"/>
+                  {{attach.originalName}}
+                </a-tag>
+              </a>
+            </div>
+          </div>
           <div class="thread-signature">
             <div :title="fullCreateDate">
               <a-icon type="clock-circle"/>
@@ -182,6 +193,11 @@
               {{(page -1) * defaultPageSize + index +1}}楼
             </a-tag>
           </div>
+          <div
+            class="post-message post-quote"
+            v-if="post.quote !== null"
+            v-html="renderMessage(post.quote.message)"
+          ></div>
           <div class="post-message" v-html="renderMessage(post.post.message)"></div>
           <div class="thread-signature">
             <div :title="getFullCreateDate(post.post.createDate)">
@@ -212,7 +228,7 @@
               color="orange"
               v-if="(isAdmin || !thread.closed) && post.post.active"
               :class="{'active-quote':quote === post.post.id}"
-              @click="handleQuote(post.post.id)"
+              @click="handleQuote(post.post.id , post.user.username)"
             >
               <a-icon type="environment"/>&nbsp;引用
             </a-tag>
@@ -234,6 +250,16 @@
           <a-avatar :src="readerAvatar" class="user-avatar-small"></a-avatar>
         </div>
         <div class="thread-post-list-item-content">
+          <div class="quote-message">
+            <a-alert
+              type="info"
+              :message="'您正在引用'+quoteUsername+'的回复'"
+              :showIcon="true"
+              :closable="true"
+              v-if="quote !== '-1'"
+              @close="handleCloseQuote"
+            ></a-alert>
+          </div>
           <a-input type="textarea" v-model="replyInput"></a-input>
           <div class="thread-post-reply-btn">
             <a-button icon="message" type="primary" @click="reply" :disabled="btnDisabled">回帖</a-button>
@@ -283,6 +309,7 @@ export default {
       defaultPageSize: 20,
       replyInput: "",
       quote: "-1",
+      quoteUsername: "",
       btnDisabled: false,
       visibleDiamond: false,
       visibleClose: false,
@@ -314,6 +341,24 @@ export default {
     }
   },
   methods: {
+    attachDownload(aid) {
+      return this.$urls.attachDownload(aid, localStorage.getItem("token"));
+    },
+    getTitle(attach) {
+      let size = attach.filesize;
+      let unit = "B";
+      if (size > 1024) {
+        size /= 1024;
+        unit = "KB";
+      }
+      if (size > 1024) {
+        size /= 1024;
+        unit = "MB";
+      }
+      return `文件:${attach.originalName}\n下载:${
+        attach.downloads
+      }次\n大小:${size} ${unit}`;
+    },
     renderMessage(message) {
       return marked(message, { sanitize: true });
     },
@@ -470,11 +515,15 @@ export default {
 
       this.postServer(url);
     },
-    handleQuote(pid) {
+    handleCloseQuote() {
+      this.quote = "-1";
+    },
+    handleQuote(pid, username) {
       if (this.quote === pid) {
-        this.quote = -1;
+        this.quote = "-1";
       } else {
         this.quote = pid;
+        this.quoteUsername = username;
       }
     },
     async postServer(url, obj) {
@@ -648,5 +697,18 @@ export default {
 .forum-item-icon {
   font-size: 16px;
   margin-top: 18px;
+}
+.quote-message {
+  margin-bottom: 12px;
+}
+.post-quote {
+  color: #565656;
+  border-left: #e4e4e4 3px solid;
+  background: #f4f4f4;
+  border-radius: 0 6px 6px 0;
+  padding: 3px 8px;
+}
+.thread-attach-list h5 {
+  margin: 6px 2px;
 }
 </style>

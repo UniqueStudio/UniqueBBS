@@ -1529,11 +1529,7 @@ type Query {
 
 type Report {
   id: ID!
-  length: String!
-  content: String!
-  plan: String!
-  solution: String!
-  conclusion: String!
+  message: String!
   createDate: DateTime!
   isWeek: Boolean!
   user: User!
@@ -1546,11 +1542,7 @@ type ReportConnection {
 }
 
 input ReportCreateInput {
-  length: String!
-  content: String!
-  plan: String!
-  solution: String!
-  conclusion: String!
+  message: String!
   createDate: DateTime!
   isWeek: Boolean
   user: UserCreateOneWithoutReportInput!
@@ -1562,11 +1554,7 @@ input ReportCreateManyWithoutUserInput {
 }
 
 input ReportCreateWithoutUserInput {
-  length: String!
-  content: String!
-  plan: String!
-  solution: String!
-  conclusion: String!
+  message: String!
   createDate: DateTime!
   isWeek: Boolean
 }
@@ -1579,16 +1567,8 @@ type ReportEdge {
 enum ReportOrderByInput {
   id_ASC
   id_DESC
-  length_ASC
-  length_DESC
-  content_ASC
-  content_DESC
-  plan_ASC
-  plan_DESC
-  solution_ASC
-  solution_DESC
-  conclusion_ASC
-  conclusion_DESC
+  message_ASC
+  message_DESC
   createDate_ASC
   createDate_DESC
   isWeek_ASC
@@ -1601,11 +1581,7 @@ enum ReportOrderByInput {
 
 type ReportPreviousValues {
   id: ID!
-  length: String!
-  content: String!
-  plan: String!
-  solution: String!
-  conclusion: String!
+  message: String!
   createDate: DateTime!
   isWeek: Boolean!
 }
@@ -1625,76 +1601,20 @@ input ReportScalarWhereInput {
   id_not_starts_with: ID
   id_ends_with: ID
   id_not_ends_with: ID
-  length: String
-  length_not: String
-  length_in: [String!]
-  length_not_in: [String!]
-  length_lt: String
-  length_lte: String
-  length_gt: String
-  length_gte: String
-  length_contains: String
-  length_not_contains: String
-  length_starts_with: String
-  length_not_starts_with: String
-  length_ends_with: String
-  length_not_ends_with: String
-  content: String
-  content_not: String
-  content_in: [String!]
-  content_not_in: [String!]
-  content_lt: String
-  content_lte: String
-  content_gt: String
-  content_gte: String
-  content_contains: String
-  content_not_contains: String
-  content_starts_with: String
-  content_not_starts_with: String
-  content_ends_with: String
-  content_not_ends_with: String
-  plan: String
-  plan_not: String
-  plan_in: [String!]
-  plan_not_in: [String!]
-  plan_lt: String
-  plan_lte: String
-  plan_gt: String
-  plan_gte: String
-  plan_contains: String
-  plan_not_contains: String
-  plan_starts_with: String
-  plan_not_starts_with: String
-  plan_ends_with: String
-  plan_not_ends_with: String
-  solution: String
-  solution_not: String
-  solution_in: [String!]
-  solution_not_in: [String!]
-  solution_lt: String
-  solution_lte: String
-  solution_gt: String
-  solution_gte: String
-  solution_contains: String
-  solution_not_contains: String
-  solution_starts_with: String
-  solution_not_starts_with: String
-  solution_ends_with: String
-  solution_not_ends_with: String
-  conclusion: String
-  conclusion_not: String
-  conclusion_in: [String!]
-  conclusion_not_in: [String!]
-  conclusion_lt: String
-  conclusion_lte: String
-  conclusion_gt: String
-  conclusion_gte: String
-  conclusion_contains: String
-  conclusion_not_contains: String
-  conclusion_starts_with: String
-  conclusion_not_starts_with: String
-  conclusion_ends_with: String
-  conclusion_not_ends_with: String
+  message: String
+  message_not: String
+  message_in: [String!]
+  message_not_in: [String!]
+  message_lt: String
+  message_lte: String
+  message_gt: String
+  message_gte: String
+  message_contains: String
+  message_not_contains: String
+  message_starts_with: String
+  message_not_starts_with: String
+  message_ends_with: String
+  message_not_ends_with: String
   createDate: DateTime
   createDate_not: DateTime
   createDate_in: [DateTime!]
@@ -1729,32 +1649,20 @@ input ReportSubscriptionWhereInput {
 }
 
 input ReportUpdateInput {
-  length: String
-  content: String
-  plan: String
-  solution: String
-  conclusion: String
+  message: String
   createDate: DateTime
   isWeek: Boolean
   user: UserUpdateOneRequiredWithoutReportInput
 }
 
 input ReportUpdateManyDataInput {
-  length: String
-  content: String
-  plan: String
-  solution: String
-  conclusion: String
+  message: String
   createDate: DateTime
   isWeek: Boolean
 }
 
 input ReportUpdateManyMutationInput {
-  length: String
-  content: String
-  plan: String
-  solution: String
-  conclusion: String
+  message: String
   createDate: DateTime
   isWeek: Boolean
 }
@@ -1776,11 +1684,7 @@ input ReportUpdateManyWithWhereNestedInput {
 }
 
 input ReportUpdateWithoutUserDataInput {
-  length: String
-  content: String
-  plan: String
-  solution: String
-  conclusion: String
+  message: String
   createDate: DateTime
   isWeek: Boolean
 }
@@ -1811,76 +1715,20 @@ input ReportWhereInput {
   id_not_starts_with: ID
   id_ends_with: ID
   id_not_ends_with: ID
-  length: String
-  length_not: String
-  length_in: [String!]
-  length_not_in: [String!]
-  length_lt: String
-  length_lte: String
-  length_gt: String
-  length_gte: String
-  length_contains: String
-  length_not_contains: String
-  length_starts_with: String
-  length_not_starts_with: String
-  length_ends_with: String
-  length_not_ends_with: String
-  content: String
-  content_not: String
-  content_in: [String!]
-  content_not_in: [String!]
-  content_lt: String
-  content_lte: String
-  content_gt: String
-  content_gte: String
-  content_contains: String
-  content_not_contains: String
-  content_starts_with: String
-  content_not_starts_with: String
-  content_ends_with: String
-  content_not_ends_with: String
-  plan: String
-  plan_not: String
-  plan_in: [String!]
-  plan_not_in: [String!]
-  plan_lt: String
-  plan_lte: String
-  plan_gt: String
-  plan_gte: String
-  plan_contains: String
-  plan_not_contains: String
-  plan_starts_with: String
-  plan_not_starts_with: String
-  plan_ends_with: String
-  plan_not_ends_with: String
-  solution: String
-  solution_not: String
-  solution_in: [String!]
-  solution_not_in: [String!]
-  solution_lt: String
-  solution_lte: String
-  solution_gt: String
-  solution_gte: String
-  solution_contains: String
-  solution_not_contains: String
-  solution_starts_with: String
-  solution_not_starts_with: String
-  solution_ends_with: String
-  solution_not_ends_with: String
-  conclusion: String
-  conclusion_not: String
-  conclusion_in: [String!]
-  conclusion_not_in: [String!]
-  conclusion_lt: String
-  conclusion_lte: String
-  conclusion_gt: String
-  conclusion_gte: String
-  conclusion_contains: String
-  conclusion_not_contains: String
-  conclusion_starts_with: String
-  conclusion_not_starts_with: String
-  conclusion_ends_with: String
-  conclusion_not_ends_with: String
+  message: String
+  message_not: String
+  message_in: [String!]
+  message_not_in: [String!]
+  message_lt: String
+  message_lte: String
+  message_gt: String
+  message_gte: String
+  message_contains: String
+  message_not_contains: String
+  message_starts_with: String
+  message_not_starts_with: String
+  message_ends_with: String
+  message_not_ends_with: String
   createDate: DateTime
   createDate_not: DateTime
   createDate_in: [DateTime!]

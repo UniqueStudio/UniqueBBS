@@ -36,6 +36,12 @@ const urls = {
   groupList: `${domain}group/list`,
   groupUsers: gid => `${domain}group/users/${gid}`,
   forumListSimple: `${domain}forum/listSimple`,
+  wxLoginGetKey: `${domain}user/login/qrcode`,
+  wxLoginGetStatus: key => `${domain}user/login/scan/${key}/status`,
+  fileUpload: `${domain}attach/upload`,
+  attachUnlink: `${domain}attach/unlink`,
+  attachRemove: aid => `${domain}attach/remove/${aid}`,
+  attachDownload: (aid, token) => `${domain}attach/download/${aid}/${token}`,
   socket: socket
 };
 export default urls;

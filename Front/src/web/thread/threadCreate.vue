@@ -21,8 +21,27 @@
         <div class="create-preview" v-html="previewText"></div>
       </div>
     </div>
-    <div class="create-thread-btn">
-      <a-button type="primary" icon="check" @click="handleBtnClick">{{execBtnText}}</a-button>
+    <div class="bottom-controls">
+      <div>
+        <div class="thread-attach" v-if="mode !== 2">
+          <a-upload
+            name="attaches"
+            :action="fileUploadUrl"
+            @change="handleFileListChange"
+            :headers="uploadHeaderSet"
+            :multiple="true"
+            :defaultFileList="attachList"
+            v-if="showAttachList"
+          >
+            <a-button>
+              <a-icon type="upload"/>附件上传
+            </a-button>
+          </a-upload>
+        </div>
+      </div>
+      <div class="create-thread-btn">
+        <a-button type="primary" icon="check" @click="handleBtnClick">{{execBtnText}}</a-button>
+      </div>
     </div>
   </div>
 </template>
@@ -52,10 +71,20 @@ export default {
         line: true,
         mode: "text/x-markdown",
         theme: "idea"
-      }
+      },
+      attachList: [],
+      showAttachList: false
     };
   },
   computed: {
+    uploadHeaderSet() {
+      return {
+        Authorization: localStorage.getItem("token")
+      };
+    },
+    fileUploadUrl() {
+      return this.$urls.fileUpload;
+    },
     previewText() {
       return marked(this.message, { sanitize: true });
     },
@@ -76,6 +105,34 @@ export default {
     }
   },
   methods: {
+    async getAttachList() {
+      const unlinkListRaw = await this.$ajax.get(this.$urls.attachUnlink);
+      if (unlinkListRaw.data.code === 1) {
+        const unLinkList = unlinkListRaw.data.msg;
+        this.attachList = [
+          ...this.attachList,
+          ...unLinkList.map(item => ({
+            uid: item.id,
+            response: {
+              code: 1,
+              msg: item.id
+            },
+            name: item.originalName,
+            status: "done"
+          }))
+        ];
+      }
+      this.showAttachList = true;
+    },
+    async deleteAttach(aid) {
+      const response = await this.$ajax.post(this.$urls.attachRemove(aid));
+    },
+    handleFileListChange({ file, fileList }) {
+      if (file.status === "removed") {
+        this.deleteAttach(file.response.msg);
+      }
+      this.attachList = fileList;
+    },
     async getForumList() {
       const threadListReponseRaw = await this.$ajax.get(
         this.$urls.forumListSimple
@@ -126,7 +183,8 @@ export default {
         {
           fid: this.fid,
           subject: this.subject,
-          message: this.message
+          message: this.message,
+          fileListArr: this.attachList.map(item => item.response.msg)
         }
       );
       if (responseRaw.data.code === 1) {
@@ -150,7 +208,8 @@ export default {
       const responseRaw = await this.$ajax.post(this.$urls.threadCreate, {
         fid: this.fid,
         subject: this.subject,
-        message: this.message
+        message: this.message,
+        fileListArr: this.attachList.map(item => item.response.msg)
       });
       if (responseRaw.data.code === 1) {
         const tid = responseRaw.data.msg;
@@ -183,6 +242,18 @@ export default {
       this.fid = threadInfoRaw.data.msg.forumInfo.id;
       this.subject = threadInfoRaw.data.msg.threadInfo.subject;
       this.message = threadInfoRaw.data.msg.firstPost.message;
+
+      this.attachList = threadInfoRaw.data.msg.attachArr.map(item => ({
+        uid: item.id,
+        response: {
+          code: 1,
+          msg: item.id
+        },
+        name: item.originalName,
+        status: "done"
+      }));
+
+      this.getAttachList();
     },
     async updatePost() {
       const updatePostInfoRaw = await this.$ajax.post(
@@ -232,6 +303,9 @@ export default {
       this.pid = this.$route.params.pid;
       this.getReplyInfo(this.pid);
     }
+    if (this.mode === 0) {
+      this.getAttachList();
+    }
     this.getForumList();
     this.markedConfig();
   }
@@ -255,6 +329,9 @@ export default {
   .create-first-line {
     grid-template-columns: 40% 60%;
   }
+  .bottom-controls {
+    grid-template-columns: 50% 50%;
+  }
 }
 @media screen and (min-width: 800px) {
   .thread-create {
@@ -275,9 +352,15 @@ export default {
   .create-first-line {
     grid-template-columns: 20% 80%;
   }
+  .bottom-controls {
+    grid-template-columns: 70% 30%;
+  }
+}
+.bottom-controls {
+  display: grid;
+  margin-top: 24px;
 }
 .create-thread-btn {
-  margin-top: 24px;
   text-align: right;
 }
 .create-first-line {

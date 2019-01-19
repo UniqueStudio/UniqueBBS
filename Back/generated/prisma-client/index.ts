@@ -464,16 +464,8 @@ export type GroupOrderByInput =
 export type ReportOrderByInput =
   | "id_ASC"
   | "id_DESC"
-  | "length_ASC"
-  | "length_DESC"
-  | "content_ASC"
-  | "content_DESC"
-  | "plan_ASC"
-  | "plan_DESC"
-  | "solution_ASC"
-  | "solution_DESC"
-  | "conclusion_ASC"
-  | "conclusion_DESC"
+  | "message_ASC"
+  | "message_DESC"
   | "createDate_ASC"
   | "createDate_DESC"
   | "isWeek_ASC"
@@ -952,76 +944,20 @@ export interface ReportWhereInput {
   id_not_starts_with?: ID_Input;
   id_ends_with?: ID_Input;
   id_not_ends_with?: ID_Input;
-  length?: String;
-  length_not?: String;
-  length_in?: String[] | String;
-  length_not_in?: String[] | String;
-  length_lt?: String;
-  length_lte?: String;
-  length_gt?: String;
-  length_gte?: String;
-  length_contains?: String;
-  length_not_contains?: String;
-  length_starts_with?: String;
-  length_not_starts_with?: String;
-  length_ends_with?: String;
-  length_not_ends_with?: String;
-  content?: String;
-  content_not?: String;
-  content_in?: String[] | String;
-  content_not_in?: String[] | String;
-  content_lt?: String;
-  content_lte?: String;
-  content_gt?: String;
-  content_gte?: String;
-  content_contains?: String;
-  content_not_contains?: String;
-  content_starts_with?: String;
-  content_not_starts_with?: String;
-  content_ends_with?: String;
-  content_not_ends_with?: String;
-  plan?: String;
-  plan_not?: String;
-  plan_in?: String[] | String;
-  plan_not_in?: String[] | String;
-  plan_lt?: String;
-  plan_lte?: String;
-  plan_gt?: String;
-  plan_gte?: String;
-  plan_contains?: String;
-  plan_not_contains?: String;
-  plan_starts_with?: String;
-  plan_not_starts_with?: String;
-  plan_ends_with?: String;
-  plan_not_ends_with?: String;
-  solution?: String;
-  solution_not?: String;
-  solution_in?: String[] | String;
-  solution_not_in?: String[] | String;
-  solution_lt?: String;
-  solution_lte?: String;
-  solution_gt?: String;
-  solution_gte?: String;
-  solution_contains?: String;
-  solution_not_contains?: String;
-  solution_starts_with?: String;
-  solution_not_starts_with?: String;
-  solution_ends_with?: String;
-  solution_not_ends_with?: String;
-  conclusion?: String;
-  conclusion_not?: String;
-  conclusion_in?: String[] | String;
-  conclusion_not_in?: String[] | String;
-  conclusion_lt?: String;
-  conclusion_lte?: String;
-  conclusion_gt?: String;
-  conclusion_gte?: String;
-  conclusion_contains?: String;
-  conclusion_not_contains?: String;
-  conclusion_starts_with?: String;
-  conclusion_not_starts_with?: String;
-  conclusion_ends_with?: String;
-  conclusion_not_ends_with?: String;
+  message?: String;
+  message_not?: String;
+  message_in?: String[] | String;
+  message_not_in?: String[] | String;
+  message_lt?: String;
+  message_lte?: String;
+  message_gt?: String;
+  message_gte?: String;
+  message_contains?: String;
+  message_not_contains?: String;
+  message_starts_with?: String;
+  message_not_starts_with?: String;
+  message_ends_with?: String;
+  message_not_ends_with?: String;
   createDate?: DateTimeInput;
   createDate_not?: DateTimeInput;
   createDate_in?: DateTimeInput[] | DateTimeInput;
@@ -1538,11 +1474,7 @@ export interface ReportCreateManyWithoutUserInput {
 }
 
 export interface ReportCreateWithoutUserInput {
-  length: String;
-  content: String;
-  plan: String;
-  solution: String;
-  conclusion: String;
+  message: String;
   createDate: DateTimeInput;
   isWeek?: Boolean;
 }
@@ -1883,11 +1815,7 @@ export interface ReportUpdateWithWhereUniqueWithoutUserInput {
 }
 
 export interface ReportUpdateWithoutUserDataInput {
-  length?: String;
-  content?: String;
-  plan?: String;
-  solution?: String;
-  conclusion?: String;
+  message?: String;
   createDate?: DateTimeInput;
   isWeek?: Boolean;
 }
@@ -1913,76 +1841,20 @@ export interface ReportScalarWhereInput {
   id_not_starts_with?: ID_Input;
   id_ends_with?: ID_Input;
   id_not_ends_with?: ID_Input;
-  length?: String;
-  length_not?: String;
-  length_in?: String[] | String;
-  length_not_in?: String[] | String;
-  length_lt?: String;
-  length_lte?: String;
-  length_gt?: String;
-  length_gte?: String;
-  length_contains?: String;
-  length_not_contains?: String;
-  length_starts_with?: String;
-  length_not_starts_with?: String;
-  length_ends_with?: String;
-  length_not_ends_with?: String;
-  content?: String;
-  content_not?: String;
-  content_in?: String[] | String;
-  content_not_in?: String[] | String;
-  content_lt?: String;
-  content_lte?: String;
-  content_gt?: String;
-  content_gte?: String;
-  content_contains?: String;
-  content_not_contains?: String;
-  content_starts_with?: String;
-  content_not_starts_with?: String;
-  content_ends_with?: String;
-  content_not_ends_with?: String;
-  plan?: String;
-  plan_not?: String;
-  plan_in?: String[] | String;
-  plan_not_in?: String[] | String;
-  plan_lt?: String;
-  plan_lte?: String;
-  plan_gt?: String;
-  plan_gte?: String;
-  plan_contains?: String;
-  plan_not_contains?: String;
-  plan_starts_with?: String;
-  plan_not_starts_with?: String;
-  plan_ends_with?: String;
-  plan_not_ends_with?: String;
-  solution?: String;
-  solution_not?: String;
-  solution_in?: String[] | String;
-  solution_not_in?: String[] | String;
-  solution_lt?: String;
-  solution_lte?: String;
-  solution_gt?: String;
-  solution_gte?: String;
-  solution_contains?: String;
-  solution_not_contains?: String;
-  solution_starts_with?: String;
-  solution_not_starts_with?: String;
-  solution_ends_with?: String;
-  solution_not_ends_with?: String;
-  conclusion?: String;
-  conclusion_not?: String;
-  conclusion_in?: String[] | String;
-  conclusion_not_in?: String[] | String;
-  conclusion_lt?: String;
-  conclusion_lte?: String;
-  conclusion_gt?: String;
-  conclusion_gte?: String;
-  conclusion_contains?: String;
-  conclusion_not_contains?: String;
-  conclusion_starts_with?: String;
-  conclusion_not_starts_with?: String;
-  conclusion_ends_with?: String;
-  conclusion_not_ends_with?: String;
+  message?: String;
+  message_not?: String;
+  message_in?: String[] | String;
+  message_not_in?: String[] | String;
+  message_lt?: String;
+  message_lte?: String;
+  message_gt?: String;
+  message_gte?: String;
+  message_contains?: String;
+  message_not_contains?: String;
+  message_starts_with?: String;
+  message_not_starts_with?: String;
+  message_ends_with?: String;
+  message_not_ends_with?: String;
   createDate?: DateTimeInput;
   createDate_not?: DateTimeInput;
   createDate_in?: DateTimeInput[] | DateTimeInput;
@@ -2004,11 +1876,7 @@ export interface ReportUpdateManyWithWhereNestedInput {
 }
 
 export interface ReportUpdateManyDataInput {
-  length?: String;
-  content?: String;
-  plan?: String;
-  solution?: String;
-  conclusion?: String;
+  message?: String;
   createDate?: DateTimeInput;
   isWeek?: Boolean;
 }
@@ -2796,11 +2664,7 @@ export interface PostUpdateManyMutationInput {
 }
 
 export interface ReportCreateInput {
-  length: String;
-  content: String;
-  plan: String;
-  solution: String;
-  conclusion: String;
+  message: String;
   createDate: DateTimeInput;
   isWeek?: Boolean;
   user: UserCreateOneWithoutReportInput;
@@ -2835,11 +2699,7 @@ export interface UserCreateWithoutReportInput {
 }
 
 export interface ReportUpdateInput {
-  length?: String;
-  content?: String;
-  plan?: String;
-  solution?: String;
-  conclusion?: String;
+  message?: String;
   createDate?: DateTimeInput;
   isWeek?: Boolean;
   user?: UserUpdateOneRequiredWithoutReportInput;
@@ -2881,11 +2741,7 @@ export interface UserUpsertWithoutReportInput {
 }
 
 export interface ReportUpdateManyMutationInput {
-  length?: String;
-  content?: String;
-  plan?: String;
-  solution?: String;
-  conclusion?: String;
+  message?: String;
   createDate?: DateTimeInput;
   isWeek?: Boolean;
 }
@@ -3343,22 +3199,14 @@ export interface GroupSubscription
 
 export interface Report {
   id: ID_Output;
-  length: String;
-  content: String;
-  plan: String;
-  solution: String;
-  conclusion: String;
+  message: String;
   createDate: DateTimeOutput;
   isWeek: Boolean;
 }
 
 export interface ReportPromise extends Promise<Report>, Fragmentable {
   id: () => Promise<ID_Output>;
-  length: () => Promise<String>;
-  content: () => Promise<String>;
-  plan: () => Promise<String>;
-  solution: () => Promise<String>;
-  conclusion: () => Promise<String>;
+  message: () => Promise<String>;
   createDate: () => Promise<DateTimeOutput>;
   isWeek: () => Promise<Boolean>;
   user: <T = UserPromise>() => T;
@@ -3368,11 +3216,7 @@ export interface ReportSubscription
   extends Promise<AsyncIterator<Report>>,
     Fragmentable {
   id: () => Promise<AsyncIterator<ID_Output>>;
-  length: () => Promise<AsyncIterator<String>>;
-  content: () => Promise<AsyncIterator<String>>;
-  plan: () => Promise<AsyncIterator<String>>;
-  solution: () => Promise<AsyncIterator<String>>;
-  conclusion: () => Promise<AsyncIterator<String>>;
+  message: () => Promise<AsyncIterator<String>>;
   createDate: () => Promise<AsyncIterator<DateTimeOutput>>;
   isWeek: () => Promise<AsyncIterator<Boolean>>;
   user: <T = UserSubscription>() => T;
@@ -4400,11 +4244,7 @@ export interface ReportSubscriptionPayloadSubscription
 
 export interface ReportPreviousValues {
   id: ID_Output;
-  length: String;
-  content: String;
-  plan: String;
-  solution: String;
-  conclusion: String;
+  message: String;
   createDate: DateTimeOutput;
   isWeek: Boolean;
 }
@@ -4413,11 +4253,7 @@ export interface ReportPreviousValuesPromise
   extends Promise<ReportPreviousValues>,
     Fragmentable {
   id: () => Promise<ID_Output>;
-  length: () => Promise<String>;
-  content: () => Promise<String>;
-  plan: () => Promise<String>;
-  solution: () => Promise<String>;
-  conclusion: () => Promise<String>;
+  message: () => Promise<String>;
   createDate: () => Promise<DateTimeOutput>;
   isWeek: () => Promise<Boolean>;
 }
@@ -4426,11 +4262,7 @@ export interface ReportPreviousValuesSubscription
   extends Promise<AsyncIterator<ReportPreviousValues>>,
     Fragmentable {
   id: () => Promise<AsyncIterator<ID_Output>>;
-  length: () => Promise<AsyncIterator<String>>;
-  content: () => Promise<AsyncIterator<String>>;
-  plan: () => Promise<AsyncIterator<String>>;
-  solution: () => Promise<AsyncIterator<String>>;
-  conclusion: () => Promise<AsyncIterator<String>>;
+  message: () => Promise<AsyncIterator<String>>;
   createDate: () => Promise<AsyncIterator<DateTimeOutput>>;
   isWeek: () => Promise<AsyncIterator<Boolean>>;
 }

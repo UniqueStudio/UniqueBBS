@@ -165,7 +165,8 @@ export const threadInfo = async function(req: Request, res: Response) {
                         id: item.id
                     })
                     .user()
-                    .group()
+                    .group(),
+                quote: item.quote === "-1" ? null : await prisma.post({ id: item.quote })
             }))
         );
 
@@ -339,10 +340,10 @@ export const threadReply = async function(req: Request, res: Response) {
 
         const lockFrequentReply = await setLockExpire(`postUser:${uid}`, "10");
         if (!lockFrequentReply) {
-            // return res.json({
-            //     code: -1,
-            //     msg: "每10秒只能发言一次，您的请求过快！"
-            // });
+            return res.json({
+                code: -1,
+                msg: "每10秒只能发言一次，您的请求过快！"
+            });
         }
 
         const havePermission = await filterCalculate(uid, tid, isAdmin);
@@ -362,6 +363,32 @@ export const threadReply = async function(req: Request, res: Response) {
                     code: -1,
                     msg: "该帖子已被关闭，您无权回复！"
                 });
+            }
+
+            if (quote !== "-1") {
+                const quotePostInfo = await prisma.post({
+                    id: quote
+                });
+
+                if (!quotePostInfo) {
+                    return res.json({
+                        code: -1,
+                        msg: "引用不存在！"
+                    });
+                }
+
+                const quoteParentThreadInfo = await prisma
+                    .post({
+                        id: quote
+                    })
+                    .thread();
+
+                if (quoteParentThreadInfo.id !== tid) {
+                    return res.json({
+                        code: -1,
+                        msg: "只能引用本帖内的回复！"
+                    });
+                }
             }
 
             const authorInfo = await prisma
@@ -411,6 +438,7 @@ export const threadReply = async function(req: Request, res: Response) {
                 });
 
             await forumLastPostUpdate(forumInfo.id, resultThread[0].id);
+            let havePushMessage = 0;
             if (uid !== authorInfo.id) {
                 await pushMessage(
                     uid,
@@ -418,25 +446,25 @@ export const threadReply = async function(req: Request, res: Response) {
                     MESSAGE_REPLY(username, threadInfo.subject),
                     MESSAGE_THREAD_URL(threadInfo.id)
                 );
-                if (quote !== -1) {
-                    const quotePost = await prisma.post({
+                havePushMessage = 1;
+            }
+            if (quote !== -1 && !havePushMessage) {
+                const quotePost = await prisma.post({
+                    id: quote
+                });
+
+                const quotePostAuthor = await prisma
+                    .post({
                         id: quote
-                    });
-
-                    const quotePostAuthor = await prisma
-                        .post({
-                            id: quote
-                        })
-                        .user();
-
-                    if (quotePost && quotePostAuthor.id !== uid) {
-                        await pushMessage(
-                            uid,
-                            quotePostAuthor.id,
-                            MESSAGE_QUOTE(authorInfo.username, threadInfo.subject),
-                            MESSAGE_THREAD_URL(threadInfo.id)
-                        );
-                    }
+                    })
+                    .user();
+                if (quotePost && quotePostAuthor.id !== uid) {
+                    await pushMessage(
+                        uid,
+                        quotePostAuthor.id,
+                        MESSAGE_QUOTE(username, threadInfo.subject),
+                        MESSAGE_THREAD_URL(threadInfo.id)
+                    );
                 }
             }
 

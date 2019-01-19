@@ -48,7 +48,8 @@ import {
     fileDestination,
     fileRemove,
     fileFilter,
-    fileGetUnlink
+    fileGetUnlink,
+    fileClearAllUnlink
 } from "./model/attach";
 import { groupList, groupUserList, groupUser } from "./model/group";
 import {
@@ -184,10 +185,11 @@ app.post("/report/create", reportCreate);
 app.post("/report/update/:rid", reportUpdate);
 
 //Attach
-app.get("/attach/download/:aid", fileDownload);
+app.get("/attach/download/:aid/:token", fileDownload);
 app.get("/attach/unlink", fileGetUnlink);
+app.get("/attach/unlinkAll", fileClearAllUnlink);
 app.post("/attach/remove/:aid", fileRemove);
-app.post("/attach/upload", upload.array("attaches", 10), fileUpload);
+app.post("/attach/upload", upload.single("attaches"), fileUpload);
 
 server.listen(7010, () => {
     console.log(

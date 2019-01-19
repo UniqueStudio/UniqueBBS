@@ -20,7 +20,9 @@
       >登录</a-button>
     </div>
     <div>
-      <a-button icon="wechat" type="primary">使用企业微信登录</a-button>
+      <router-link to="/user/login/wx">
+        <a-button icon="wechat" type="primary">使用企业微信登录</a-button>
+      </router-link>
     </div>
   </div>
 </template>

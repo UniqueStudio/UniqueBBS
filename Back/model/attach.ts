@@ -6,6 +6,31 @@ import { filterCalculate } from "./filter";
 import * as fs from "fs";
 
 export const fileUpload = async function(req: Request, res: Response) {
+    const fileItem = req.file;
+    try {
+        const { uid } = verifyJWT(req.header("Authorization"));
+
+        const result = await prisma.createAttach({
+            user: {
+                connect: {
+                    id: uid
+                }
+            },
+            filesize: fileItem.size,
+            downloads: 0,
+            fileName: fileItem.destination + fileItem.filename,
+            originalName: fileItem.originalname,
+            createDate: new Date()
+        });
+
+        res.json({ code: 1, msg: result.id });
+    } catch (e) {
+        res.json({ code: -1, msg: e.message });
+        fileDelete(fileItem.destination + fileItem.filename);
+    }
+};
+
+export const fileUploadMultiple = async function(req: Request, res: Response) {
     const fileList = req.files as Array<Express.Multer.File>;
     try {
         const { uid, isAdmin } = verifyJWT(req.header("Authorization"));
@@ -55,26 +80,36 @@ export const fileGetUnlink = async function(req: Request, res: Response) {
     }
 };
 
-export const fileClearAllUnlink = async function() {
-    const arr = await prisma.attaches({
-        where: {
-            thread: null
+export const fileClearAllUnlink = async function(req: Request, res: Response) {
+    try {
+        const { isAdmin } = verifyJWT(req.header("Authorization"));
+        if (!isAdmin) {
+            return res.json({ code: -1, msg: "No Permission" });
         }
-    });
 
-    arr.forEach(item => {
-        fileDelete(item.fileName);
-    });
+        const arr = await prisma.attaches({
+            where: {
+                thread: null
+            }
+        });
 
-    await prisma.deleteManyAttaches({
-        thread: null
-    });
+        arr.forEach(item => {
+            fileDelete(item.fileName);
+        });
+
+        await prisma.deleteManyAttaches({
+            thread: null
+        });
+        res.json({ code: 1 });
+    } catch (e) {
+        res.json({ code: -1, msg: e.message });
+    }
 };
 
 export const fileDownload = async function(req: Request, res: Response) {
     try {
-        const { uid, isAdmin } = verifyJWT(req.header("Authorization"));
-        const { aid } = req.params;
+        const { aid, token } = req.params;
+        const { uid, isAdmin } = verifyJWT(token);
 
         const threadInfo = await prisma
             .attach({
@@ -251,6 +286,10 @@ export const fileRemove = async function(req: Request, res: Response) {
         const { uid, isAdmin } = verifyJWT(req.header("Authorization"));
         const { aid } = req.params;
 
+        const attachInfo = await prisma.attach({
+            id: aid
+        });
+
         const attachLock = await redLock.lock(`updateThread${uid}`, 800);
 
         try {
@@ -258,7 +297,6 @@ export const fileRemove = async function(req: Request, res: Response) {
                 .attach({
                     id: aid
                 })
-                .thread()
                 .user();
 
             if (!isAdmin && uid !== attachAuthorInfo.id) {
@@ -270,19 +308,27 @@ export const fileRemove = async function(req: Request, res: Response) {
                     id: aid
                 })
                 .thread();
-
-            const deleteResult = await prisma.updateThread({
-                where: {
-                    id: attachThreadInfo.id
-                },
-                data: {
-                    attach: {
-                        delete: {
-                            id: aid
+            if (attachThreadInfo === null) {
+                const deleteResult = await prisma.deleteAttach({
+                    id: aid
+                });
+            } else {
+                const deleteResult = await prisma.updateThread({
+                    where: {
+                        id: attachThreadInfo.id
+                    },
+                    data: {
+                        attach: {
+                            delete: {
+                                id: aid
+                            }
                         }
                     }
-                }
-            });
+                });
+            }
+
+            fileDelete(attachInfo.fileName);
+
             res.json({ code: 1 });
         } catch (e) {
             res.json({ code: -1, msg: e.message });

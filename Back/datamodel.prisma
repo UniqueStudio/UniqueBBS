@@ -31,11 +31,7 @@ type User {
 }
 type Report {
     id: ID! @unique
-    length: String!
-    content: String!
-    plan: String!
-    solution: String!
-    conclusion: String!
+    message: String!
     createDate: DateTime!
     isWeek: Boolean! @default(value: false)
     user: User! @relation(name: "ReportList")
