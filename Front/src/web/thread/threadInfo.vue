@@ -270,11 +270,7 @@
   </div>
 </template>
 <script>
-import marked from "marked";
 export default {
-  components: {
-    marked
-  },
   data() {
     return {
       thread: {
@@ -363,25 +359,13 @@ export default {
     renderMessage(message) {
       const regImgStr = /\!\[uniqueImg\]\(unique\:\/\/(.*?)\)/g;
       const token = localStorage.getItem("token");
-      return marked(
+      return this.$marked(
         message.replace(
           regImgStr,
           `![uniqueImg](${this.$urls.domain}attach/download/$1/${token})`
         ),
         { sanitize: true }
       );
-    },
-    markedConfig() {
-      marked.setOptions({
-        renderer: new marked.Renderer(),
-        gfm: true,
-        tables: true,
-        breaks: false,
-        pedantic: false,
-        sanitize: false,
-        smartLists: true,
-        smartypants: false
-      });
     },
     pageOnchange(page) {
       this.$router.push({
@@ -555,7 +539,6 @@ export default {
   },
   mounted() {
     this.getThreadInfo();
-    this.markedConfig();
   }
 };
 </script>
@@ -641,10 +624,6 @@ export default {
   text-align: right;
   margin-top: 12px;
 }
-.pagination {
-  text-align: center;
-  margin: 36px auto;
-}
 .thread-item-info-messages {
   position: absolute;
   right: 0;
@@ -697,7 +676,7 @@ export default {
   border-left: #e4e4e4 3px solid;
   background: #f4f4f4;
   border-radius: 0 6px 6px 0;
-  padding: 3px 8px;
+  padding: 9px 8px 9px 8px;
 }
 .thread-attach-list h5 {
   margin: 6px 2px;

@@ -26,7 +26,7 @@ export const pushMessage = async function(fromUid: string, toUid: string, msg: s
         createDate: new Date(),
         url: url
     });
-    await socketPushMessage(toUid);
+    await socketPushMessage(toUid, msg);
     return result;
 };
 
@@ -195,7 +195,18 @@ export const messageCount = async function(req: Request, res: Response) {
             })
             .aggregate()
             .count();
-        res.json({ code: 1, msg: { total, unread } });
+
+        const [last] = await prisma.messages({
+            where: {
+                toUser: {
+                    id: uid
+                }
+            },
+            orderBy: "createDate_DESC",
+            first: 1
+        });
+
+        res.json({ code: 1, msg: { total, unread, last } });
     } catch (err) {
         res.json({ code: -1, msg: err.message });
     }

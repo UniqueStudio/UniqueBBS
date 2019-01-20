@@ -8,11 +8,24 @@ import ajax from "./functions/ajax";
 import urls from "./functions/urls";
 import getHumanDate from "./functions/humanDate";
 import io from "socket.io-client";
+import marked from "marked";
+
+marked.setOptions({
+  renderer: new marked.Renderer(),
+  gfm: true,
+  tables: true,
+  breaks: true,
+  pedantic: false,
+  sanitize: false,
+  smartLists: true,
+  smartypants: false
+});
 
 Vue.prototype.$urls = urls;
 Vue.prototype.$antd = Antd;
 Vue.prototype.$ajax = ajax;
 Vue.prototype.$humanDate = getHumanDate;
+Vue.prototype.$marked = marked;
 
 Vue.config.productionTip = false;
 
@@ -27,7 +40,8 @@ const store = new Vuex.Store({
     unreadCount: 0,
     isAdmin: false,
     uid: "",
-    socket: undefined
+    socket: undefined,
+    noticeContent: ""
   },
   mutations: {
     setAvatarSrc(state, url) {
@@ -50,6 +64,9 @@ const store = new Vuex.Store({
     },
     setSocket(state, socket) {
       state.socket = socket;
+    },
+    setNotifyContent(state, content) {
+      state.noticeContent = content;
     }
   },
   actions: {
@@ -71,8 +88,9 @@ const store = new Vuex.Store({
       if (context.state.socket === undefined) {
         const socket = io(urls.socket);
         socket.emit("login", response.msg.user.id);
-        socket.on("pushMessage", count => {
+        socket.on("pushMessage", (count, content) => {
           context.commit("setUnreadCount", count);
+          context.commit("setNotifyContent", content);
         });
         context.commit("setSocket", socket);
       }

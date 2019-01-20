@@ -342,18 +342,49 @@ export const userQRLogin = async function(req: Request, res: Response) {
     }
 };
 
-export const mentorGet = async function(req: Request, res: Response) {
+export const mentorInfo = async function(req: Request, res: Response) {
     try {
-        const authObj = verifyJWT(req.header("Authorization"));
-        const uid: string = authObj.uid;
+        verifyJWT(req.header("Authorization"));
+
+        const { uid } = req.params;
+
+        const myInfo = await prisma.user({
+            id: uid
+        });
 
         const result = await prisma
             .user({
                 id: uid
             })
             .mentor();
+        if (result) {
+            res.json({ code: 1, msg: { user: filterUserInfo(myInfo), mentor: filterUserInfo(result) } });
+        } else {
+            res.json({ code: 1, msg: { user: filterUserInfo(myInfo), mentor: null } });
+        }
+    } catch (e) {
+        res.json({ code: -1, msg: e.message });
+    }
+};
 
-        res.json({ code: 1, msg: filterUserInfo(result) });
+export const mentorMyInfo = async function(req: Request, res: Response) {
+    try {
+        const { uid } = verifyJWT(req.header("Authorization"));
+
+        const myInfo = await prisma.user({
+            id: uid
+        });
+
+        const result = await prisma
+            .user({
+                id: uid
+            })
+            .mentor();
+        if (result) {
+            res.json({ code: 1, msg: { user: filterUserInfo(myInfo), mentor: filterUserInfo(result) } });
+        } else {
+            res.json({ code: 1, msg: { user: filterUserInfo(myInfo), mentor: null } });
+        }
     } catch (e) {
         res.json({ code: -1, msg: e.message });
     }

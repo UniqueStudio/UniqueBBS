@@ -3,7 +3,7 @@ import { prisma } from "../generated/prisma-client";
 import { verifyJWT, filterUserInfo } from "./check";
 import { pagesize } from "./consts";
 import { getTodayFirstTimestamp, getTodayLastTimestamp } from "./time";
-import { setLockExpire } from "./lock";
+import { setLockExpire, getLockStatus } from "./lock";
 
 export const reportCreate = async function(req: Request, res: Response) {
     try {
@@ -37,6 +37,8 @@ export const reportCreate = async function(req: Request, res: Response) {
             }
         }
 
+        const message = "";
+
         const result = await prisma.updateUser({
             where: {
                 id: uid
@@ -44,11 +46,7 @@ export const reportCreate = async function(req: Request, res: Response) {
             data: {
                 report: {
                     create: {
-                        length,
-                        content,
-                        plan,
-                        solution,
-                        conclusion,
+                        message,
                         isWeek,
                         createDate: new Date()
                     }
@@ -56,6 +54,25 @@ export const reportCreate = async function(req: Request, res: Response) {
             }
         });
         res.json({ code: 1 });
+    } catch (e) {
+        res.json({ code: -1, msg: e.message });
+    }
+};
+
+export const reportCanPost = async function(req: Request, res: Response) {
+    try {
+        const { uid } = verifyJWT(req.header("Authorization"));
+
+        const weeklyStatus = await getLockStatus(`weeklyReport:${uid}`);
+        const dailyStatus = await getLockStatus(`dailyReport:${uid}`);
+
+        res.json({
+            code: 1,
+            msg: {
+                weekly: weeklyStatus,
+                daily: dailyStatus
+            }
+        });
     } catch (e) {
         res.json({ code: -1, msg: e.message });
     }
@@ -100,7 +117,8 @@ export const reportGraph = async function(req: Request, res: Response) {
                 where: {
                     user: {
                         id: uid
-                    }
+                    },
+                    createDate_gte: new Date(new Date().getTime() - 365 * 24 * 60 * 60 * 1000)
                 },
                 orderBy: "createDate_ASC"
             })
@@ -114,10 +132,8 @@ export const reportGraph = async function(req: Request, res: Response) {
 
 export const reportList = async function(req: Request, res: Response) {
     try {
-        const authObj = verifyJWT(req.header("Authorization"));
-        const uid: string = authObj.uid;
-        const { page } = req.params;
-
+        verifyJWT(req.header("Authorization"));
+        const { uid, page } = req.params;
         const list = await prisma.reports({
             where: {
                 user: {
@@ -139,7 +155,7 @@ export const reportUpdate = async function(req: Request, res: Response) {
     try {
         const { uid, isAdmin } = verifyJWT(req.header("Authorization"));
         const { rid } = req.params;
-        const { length, content, plan, solution, conclusion } = req.body;
+        const { time, content, plan, solution, conclusion } = req.body;
 
         const reportInfo = await prisma.report({
             id: rid
@@ -160,16 +176,13 @@ export const reportUpdate = async function(req: Request, res: Response) {
             return res.json({ code: -1, msg: "您无权编辑此Report！" });
         }
 
+        const message = "";
         const result = await prisma.updateReport({
             where: {
                 id: rid
             },
             data: {
-                length,
-                content,
-                plan,
-                solution,
-                conclusion
+                message
             }
         });
 

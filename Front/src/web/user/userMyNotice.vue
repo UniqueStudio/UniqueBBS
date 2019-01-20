@@ -235,8 +235,4 @@ export default {
 .bold-message {
   font-weight: 700;
 }
-.pagination {
-  text-align: center;
-  margin: 36px auto;
-}
 </style>

@@ -52,9 +52,8 @@ import "codemirror/lib/codemirror.css";
 import "codemirror/mode/markdown/markdown.js";
 import "codemirror/theme/idea.css";
 import "./editor.css";
-import marked from "marked";
 export default {
-  components: { marked, codemirror },
+  components: { codemirror },
   data() {
     return {
       mode: 0,
@@ -87,7 +86,7 @@ export default {
       return this.$urls.fileUpload;
     },
     previewText() {
-      return marked(this.message, { sanitize: true });
+      return this.$marked(this.message, { sanitize: true });
     },
     execBtnText() {
       let result = "发表帖子";
@@ -155,18 +154,6 @@ export default {
       } else {
         this.fid = this.forumList[0].id;
       }
-    },
-    markedConfig() {
-      marked.setOptions({
-        renderer: new marked.Renderer(),
-        gfm: true,
-        tables: true,
-        breaks: false,
-        pedantic: false,
-        sanitize: false,
-        smartLists: true,
-        smartypants: false
-      });
     },
     handleBtnClick() {
       const mode = this.$route.meta.mode;
@@ -321,7 +308,6 @@ export default {
       this.getAttachList();
     }
     this.getForumList();
-    this.markedConfig();
   }
 };
 </script>

@@ -45,6 +45,11 @@ const urls = {
   attachDownload: (aid, token) => `${domain}attach/download/${aid}/${token}`,
   attachPreview: aid => `${domain}attach/preview/${aid}`,
   attachExpire: tid => `${domain}attach/expire/${tid}`,
+  reportList: (uid, page) => `${domain}report/list/${uid}/${page}`,
+  reportGraph: uid => `${domain}report/graph/${uid}`,
+  reportCan: `${domain}report/can`,
+  mentorInfo: uid => `${domain}user/mentor/info/${uid}`,
+  mentorMyInfo: `${domain}user/mentor/my`,
   socket: socket
 };
 export default urls;

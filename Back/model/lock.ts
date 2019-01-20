@@ -13,6 +13,11 @@ export const setLockExpire = async function(key: string, expireSeconds: string) 
     return true;
 };
 
+export const getLockStatus = async function(key: string) {
+    const checkResult = await redisClientGetAsync(key);
+    return checkResult !== "1";
+};
+
 export const setLockExpireIncr = async function(key: string, expireSeconds: string, maxCount: number) {
     const checkLockResult = await redisClientGetAsync(key);
     if (checkLockResult === null || Number.parseInt(checkLockResult) < maxCount) {

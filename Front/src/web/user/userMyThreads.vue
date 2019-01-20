@@ -76,8 +76,4 @@ export default {
 .thread-item-subject {
   font-size: 18px;
 }
-.pagination {
-  text-align: center;
-  margin: 36px auto;
-}
 </style>

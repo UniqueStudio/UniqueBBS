@@ -235,7 +235,7 @@ export const fileProcess = async function(
             const attachAuthor = await prisma.attach({ id: aid }).user();
             const attachThread = await prisma.attach({ id: aid }).thread();
 
-            if (attachAuthor.id !== uid && !isAdmin) {
+            if (!isAdmin && (attachAuthor.id !== uid || attachThread.id !== tid)) {
                 return undefined;
             }
 

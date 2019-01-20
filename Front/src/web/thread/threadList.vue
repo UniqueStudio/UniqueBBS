@@ -214,10 +214,6 @@ export default {
 .thread-item-author {
   text-align: right;
 }
-.pagination {
-  text-align: center;
-  margin: 36px auto;
-}
 .no-active-filter {
   opacity: 0.4;
 }

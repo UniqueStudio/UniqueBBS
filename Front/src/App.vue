@@ -25,6 +25,27 @@ export default {
         next();
       }
     });
+    this.$notification.config({
+      top: "86px",
+      placement: "topRight",
+      duration: 5
+    });
+  },
+  computed: {
+    noticeContent() {
+      return this.$store.state.noticeContent;
+    }
+  },
+  watch: {
+    noticeContent(newContent, oldContent) {
+      if (newContent !== "") {
+        this.$notification.open({
+          message: "消息通知",
+          description: newContent,
+          icon: <a-icon type="mail" style="color: #108ee9" />
+        });
+      }
+    }
   }
 };
 </script>

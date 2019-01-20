@@ -7,12 +7,12 @@
       <div class="nav-item">
         <div class="nav-item-content">
           <div></div>
-          <router-link to="/">
+          <router-link to="/report">
             <div class="nav-item-icon-container">
               <a-icon
-                type="appstore"
+                type="calendar"
                 style="font-size:24px;"
-                title="板块"
+                title="报告"
                 :theme="navActive===0?'filled':'outlined'"
               />
             </div>

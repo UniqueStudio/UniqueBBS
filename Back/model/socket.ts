@@ -6,7 +6,7 @@ export const socketLogin = (socket: Socket) => async (uid: string) => {
     socketMap.set(socket, uid);
 };
 
-export const socketPushMessage = async (toUid: string) => {
+export const socketPushMessage = async (toUid: string, content: string) => {
     for (let [k, v] of socketMap) {
         if (v === toUid) {
             const count = await prisma
@@ -20,7 +20,7 @@ export const socketPushMessage = async (toUid: string) => {
                 })
                 .aggregate()
                 .count();
-            k.emit("pushMessage", count);
+            k.emit("pushMessage", count, content);
             break;
         }
     }

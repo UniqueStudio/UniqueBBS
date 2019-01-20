@@ -19,6 +19,9 @@ import thread from "@/web/thread/thread.vue";
 import threadList from "@/web/thread/threadList.vue";
 import threadInfo from "@/web/thread/threadInfo.vue";
 import threadCreate from "@/web/thread/threadCreate.vue";
+import report from "@/web/report/report.vue";
+import reportMy from "@/web/report/reportMy.vue";
+import reportCreate from "@/web/report/reportCreate.vue";
 
 Vue.use(Router);
 
@@ -28,7 +31,56 @@ const router = new Router({
       path: "/",
       name: "main",
       component: Main,
+      redirect: "/forum",
       children: [
+        {
+          path: "report",
+          name: "report",
+          component: report,
+          redirect: "/report/my/1",
+          meta: {
+            requireLogin: true
+          },
+          children: [
+            {
+              path: "my",
+              name: "reportMyHome",
+              redirect: "/report/my/1"
+            },
+            {
+              path: "my/:page",
+              name: "reportMy",
+              component: reportMy,
+              meta: {
+                mode: "my"
+              }
+            },
+            {
+              path: "create",
+              name: "reportCreate",
+              component: reportCreate,
+              meta: {
+                mode: 0
+              }
+            },
+            {
+              path: "update",
+              name: "reportUpdate",
+              component: reportCreate,
+              meta: {
+                mode: 1
+              }
+            },
+            {
+              path: "visit/:uid/:page",
+              name: "reportVisit",
+              component: reportMy,
+              meta: {
+                mode: "visit"
+              }
+            }
+          ]
+        },
         {
           path: "forum",
           name: "forum",

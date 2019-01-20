@@ -19,7 +19,8 @@ import {
     userQRLogin,
     userScan,
     userPwdReset,
-    mentorGet,
+    mentorInfo,
+    mentorMyInfo,
     mentorSet,
     userSearch,
     userRuntime
@@ -42,7 +43,7 @@ import {
 } from "./model/thread";
 import { postDeleteHard, postDelete, postRecovery, postUpdate, postSearch, postInfo } from "./model/post";
 import { forumList, forumListSimple, forumRuntime } from "./model/forum";
-import { reportCreate, reportInfo, reportGraph, reportList, reportUpdate } from "./model/report";
+import { reportCreate, reportInfo, reportGraph, reportList, reportUpdate, reportCanPost } from "./model/report";
 import {
     fileDownload,
     fileUpload,
@@ -134,7 +135,8 @@ app.get("/user/my/info", userMyInfo);
 app.get("/user/runtime", userRuntime);
 app.get("/user/login/qrcode", userQRLogin);
 app.get("/user/login/scan/:key/status", userScan);
-app.get("/user/mentor/info", mentorGet);
+app.get("/user/mentor/info/:uid", mentorInfo);
+app.get("/user/mentor/my", mentorMyInfo);
 app.post("/user/login/pwd", userLoginByPwd);
 app.post("/user/update/normal", userInfoUpdate);
 app.post("/user/update/pwd", userPwdReset);
@@ -185,9 +187,10 @@ app.post("/message/all/read", messageReadAll);
 app.post("/message/all/delete", messageDeleteAll);
 
 //Report
+app.get("/report/can", reportCanPost);
 app.get("/report/info/:rid", reportInfo);
+app.get("/report/list/:uid/:page", reportList);
 app.get("/report/graph/:uid", reportGraph);
-app.get("/report/list/:page", reportList);
 app.post("/report/create", reportCreate);
 app.post("/report/update/:rid", reportUpdate);
 
