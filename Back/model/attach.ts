@@ -106,6 +106,29 @@ export const fileClearAllUnlink = async function(req: Request, res: Response) {
     }
 };
 
+export const filePreview = async function(req: Request, res: Response) {
+    try {
+        const { aid } = req.params;
+        const reg = /(jpg|png|gif|jpeg|bmp|webp)$/i;
+        const attachInfo = await prisma.attach({
+            id: aid
+        });
+
+        const nowDate = new Date().getTime();
+        if (!attachInfo.previewExpire || nowDate >= new Date(attachInfo.previewExpire).getTime()) {
+            return res.json({ code: -1, msg: "Access Denied" });
+        }
+
+        if (!reg.test(attachInfo.originalName)) {
+            return res.json({ code: -1, msg: "Access Denied" });
+        }
+
+        res.download(attachInfo.fileName, attachInfo.originalName);
+    } catch (e) {
+        res.json({ code: -1, msg: e.message });
+    }
+};
+
 export const fileDownload = async function(req: Request, res: Response) {
     try {
         const { aid, token } = req.params;
@@ -193,7 +216,13 @@ export const fileName = function(
     }
 };
 
-export const fileProcess = async function(files: Array<string> | string, pid: string, tid: string, uid: string) {
+export const fileProcess = async function(
+    files: Array<string> | string,
+    pid: string,
+    tid: string,
+    uid: string,
+    isAdmin: boolean
+) {
     const date = new Date();
     const dirName =
         date.getFullYear().toString() + "_" + (date.getMonth() + 1).toString() + "_" + date.getDate().toString();
@@ -206,7 +235,7 @@ export const fileProcess = async function(files: Array<string> | string, pid: st
             const attachAuthor = await prisma.attach({ id: aid }).user();
             const attachThread = await prisma.attach({ id: aid }).thread();
 
-            if (attachAuthor.id !== uid || attachThread !== null) {
+            if (attachAuthor.id !== uid && !isAdmin) {
                 return undefined;
             }
 
@@ -217,7 +246,7 @@ export const fileProcess = async function(files: Array<string> | string, pid: st
             if (!fs.existsSync(newDir)) fs.mkdirSync(newDir);
             fileMove(oldPath, newPath);
 
-            await prisma.updateAttach({
+            const updateAttach = await prisma.updateAttach({
                 where: {
                     id: aid
                 },
@@ -227,7 +256,8 @@ export const fileProcess = async function(files: Array<string> | string, pid: st
                         connect: {
                             id: tid
                         }
-                    }
+                    },
+                    previewExpire: new Date()
                 }
             });
 
@@ -335,6 +365,40 @@ export const fileRemove = async function(req: Request, res: Response) {
         } finally {
             attachLock.unlock();
         }
+    } catch (e) {
+        res.json({ code: -1, msg: e.message });
+    }
+};
+
+export const fileExpire = async function(req: Request, res: Response) {
+    try {
+        const { uid, isAdmin } = verifyJWT(req.header("Authorization"));
+        const { tid } = req.params;
+
+        const threadAuthor = await prisma
+            .thread({
+                id: tid
+            })
+            .user();
+
+        if (!isAdmin && threadAuthor.id !== uid) {
+            res.json({ code: -1, msg: "Access Denied" });
+        }
+
+        const expireDate = new Date(new Date().getTime() + 12 * 60 * 60 * 1000);
+
+        await prisma.updateManyAttaches({
+            where: {
+                thread: {
+                    id: tid
+                }
+            },
+            data: {
+                previewExpire: expireDate
+            }
+        });
+
+        res.json({ code: 1 });
     } catch (e) {
         res.json({ code: -1, msg: e.message });
     }

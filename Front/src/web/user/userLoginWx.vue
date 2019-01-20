@@ -2,7 +2,8 @@
   <div class="user-login-wx">
     <div class="title-info" style="background:#00752f;">
       <div class="title-icon">
-        <a-icon type="wechat" class="title-item-icon"></a-icon>&nbsp;使用企业微信扫码登录
+        <a-icon type="wechat" class="title-item-icon"></a-icon>
+        &nbsp;{{titleMsg}}
       </div>
     </div>
     <div class="qr-code-container">
@@ -21,11 +22,16 @@ export default {
     return {
       keySrc: "",
       key: "",
-      isFinished: false
+      doing: false,
+      onPage: false,
+      titleMsg: "使用企业微信扫码登录"
     };
   },
   methods: {
     async getKey() {
+      if (this.doing) return;
+      this.doing = true;
+
       const responseRaw = await this.$ajax.get(this.$urls.wxLoginGetKey);
       if (responseRaw.data.code !== 1) {
         const modal = this.$error();
@@ -40,9 +46,7 @@ export default {
         const statusRaw = await this.$ajax.get(
           this.$urls.wxLoginGetStatus(this.key)
         );
-        if (this.isFinished) return;
         if (statusRaw.data.code === 1) {
-          this.isFinished = true;
           const response = statusRaw.data;
           const token = response.msg.token;
           const uid = response.msg.uid;
@@ -52,26 +56,30 @@ export default {
           this.$store.dispatch("checkLoginStatus");
           this.$notification.open({
             message: "登录",
-            description: "登陆成功，欢迎回来！",
+            description: "登录成功，欢迎回来！",
             icon: <a-icon type="smile" style="color: #108ee9" />
           });
+          this.doing = false;
           this.$router.push({ path: "/user/my/info" });
-        } else if (statusRaw.data.code === -2) {
-          this.isFinished = true;
-          const modal = this.$error();
-          modal.update({
-            title: "认证错误",
-            content: statusRaw.data.msg
-          });
+        } else if (
+          statusRaw.data.code === -2 &&
+          !this.$store.state.loginStatus &&
+          this.onPage
+        ) {
           this.keySrc = "";
           this.key = "";
+          this.titleMsg = "请刷新页面后重新获取二维码";
+          this.doing = false;
         }
       }
     }
   },
   mounted() {
+    this.onPage = true;
     this.getKey();
-    this.isFinished = false;
+  },
+  beforeDestroy() {
+    this.onPage = false;
   }
 };
 </script>
@@ -79,24 +87,6 @@ export default {
 .qr-code-container {
   text-align: center;
   margin-top: 12px;
-}
-.title-info {
-  margin: -12px -12px 24px -12px;
-  border-radius: 5px 5px 0 0;
-  height: 52px;
-  user-select: none;
-}
-.title-icon {
-  text-align: center;
-  color: white;
-}
-.title-info-name {
-  text-align: center;
-  color: white;
-}
-.title-item-icon {
-  font-size: 16px;
-  margin-top: 18px;
 }
 .btn-container {
   margin-top: 36px;

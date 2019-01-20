@@ -506,6 +506,8 @@ export type AttachOrderByInput =
   | "originalName_DESC"
   | "createDate_ASC"
   | "createDate_DESC"
+  | "previewExpire_ASC"
+  | "previewExpire_DESC"
   | "createdAt_ASC"
   | "createdAt_DESC"
   | "updatedAt_ASC"
@@ -1257,6 +1259,14 @@ export interface AttachWhereInput {
   createDate_lte?: DateTimeInput;
   createDate_gt?: DateTimeInput;
   createDate_gte?: DateTimeInput;
+  previewExpire?: DateTimeInput;
+  previewExpire_not?: DateTimeInput;
+  previewExpire_in?: DateTimeInput[] | DateTimeInput;
+  previewExpire_not_in?: DateTimeInput[] | DateTimeInput;
+  previewExpire_lt?: DateTimeInput;
+  previewExpire_lte?: DateTimeInput;
+  previewExpire_gt?: DateTimeInput;
+  previewExpire_gte?: DateTimeInput;
   AND?: AttachWhereInput[] | AttachWhereInput;
   OR?: AttachWhereInput[] | AttachWhereInput;
   NOT?: AttachWhereInput[] | AttachWhereInput;
@@ -1406,6 +1416,7 @@ export interface AttachCreateInput {
   fileName: String;
   originalName: String;
   createDate: DateTimeInput;
+  previewExpire?: DateTimeInput;
 }
 
 export interface ThreadCreateOneWithoutAttachInput {
@@ -1539,6 +1550,7 @@ export interface AttachCreateWithoutThreadInput {
   fileName: String;
   originalName: String;
   createDate: DateTimeInput;
+  previewExpire?: DateTimeInput;
 }
 
 export interface FilterCreateOneInput {
@@ -1620,6 +1632,7 @@ export interface AttachUpdateInput {
   fileName?: String;
   originalName?: String;
   createDate?: DateTimeInput;
+  previewExpire?: DateTimeInput;
 }
 
 export interface ThreadUpdateOneWithoutAttachInput {
@@ -1966,6 +1979,7 @@ export interface AttachUpdateWithoutThreadDataInput {
   fileName?: String;
   originalName?: String;
   createDate?: DateTimeInput;
+  previewExpire?: DateTimeInput;
 }
 
 export interface AttachUpsertWithWhereUniqueWithoutThreadInput {
@@ -2041,6 +2055,14 @@ export interface AttachScalarWhereInput {
   createDate_lte?: DateTimeInput;
   createDate_gt?: DateTimeInput;
   createDate_gte?: DateTimeInput;
+  previewExpire?: DateTimeInput;
+  previewExpire_not?: DateTimeInput;
+  previewExpire_in?: DateTimeInput[] | DateTimeInput;
+  previewExpire_not_in?: DateTimeInput[] | DateTimeInput;
+  previewExpire_lt?: DateTimeInput;
+  previewExpire_lte?: DateTimeInput;
+  previewExpire_gt?: DateTimeInput;
+  previewExpire_gte?: DateTimeInput;
   AND?: AttachScalarWhereInput[] | AttachScalarWhereInput;
   OR?: AttachScalarWhereInput[] | AttachScalarWhereInput;
   NOT?: AttachScalarWhereInput[] | AttachScalarWhereInput;
@@ -2057,6 +2079,7 @@ export interface AttachUpdateManyDataInput {
   fileName?: String;
   originalName?: String;
   createDate?: DateTimeInput;
+  previewExpire?: DateTimeInput;
 }
 
 export interface FilterUpdateOneInput {
@@ -2578,6 +2601,7 @@ export interface AttachUpdateManyMutationInput {
   fileName?: String;
   originalName?: String;
   createDate?: DateTimeInput;
+  previewExpire?: DateTimeInput;
 }
 
 export interface FilterUpdateInput {
@@ -2944,6 +2968,7 @@ export interface Attach {
   fileName: String;
   originalName: String;
   createDate: DateTimeOutput;
+  previewExpire?: DateTimeOutput;
 }
 
 export interface AttachPromise extends Promise<Attach>, Fragmentable {
@@ -2955,6 +2980,7 @@ export interface AttachPromise extends Promise<Attach>, Fragmentable {
   fileName: () => Promise<String>;
   originalName: () => Promise<String>;
   createDate: () => Promise<DateTimeOutput>;
+  previewExpire: () => Promise<DateTimeOutput>;
 }
 
 export interface AttachSubscription
@@ -2968,6 +2994,7 @@ export interface AttachSubscription
   fileName: () => Promise<AsyncIterator<String>>;
   originalName: () => Promise<AsyncIterator<String>>;
   createDate: () => Promise<AsyncIterator<DateTimeOutput>>;
+  previewExpire: () => Promise<AsyncIterator<DateTimeOutput>>;
 }
 
 export interface Thread {
@@ -3934,6 +3961,7 @@ export interface AttachPreviousValues {
   fileName: String;
   originalName: String;
   createDate: DateTimeOutput;
+  previewExpire?: DateTimeOutput;
 }
 
 export interface AttachPreviousValuesPromise
@@ -3945,6 +3973,7 @@ export interface AttachPreviousValuesPromise
   fileName: () => Promise<String>;
   originalName: () => Promise<String>;
   createDate: () => Promise<DateTimeOutput>;
+  previewExpire: () => Promise<DateTimeOutput>;
 }
 
 export interface AttachPreviousValuesSubscription
@@ -3956,6 +3985,7 @@ export interface AttachPreviousValuesSubscription
   fileName: () => Promise<AsyncIterator<String>>;
   originalName: () => Promise<AsyncIterator<String>>;
   createDate: () => Promise<AsyncIterator<DateTimeOutput>>;
+  previewExpire: () => Promise<AsyncIterator<DateTimeOutput>>;
 }
 
 export interface FilterSubscriptionPayload {

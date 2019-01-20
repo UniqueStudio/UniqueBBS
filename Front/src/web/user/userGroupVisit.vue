@@ -1,9 +1,9 @@
 <template>
   <div class="user-group-visit">
     <router-link to="/user/grouplist">
-      <div class="group-info" style="background:rgb(99, 76, 184);">
-        <div class="group-icon">
-          <a-icon type="team" class="group-item-icon"></a-icon>
+      <div class="title-info" style="background:rgb(99, 76, 184);">
+        <div class="title-icon">
+          <a-icon type="team" class="title-item-icon"></a-icon>
           &nbsp;{{groupName}}
         </div>
       </div>
@@ -101,23 +101,5 @@ h3 {
 .group-user-mobile {
   position: absolute;
   right: 0;
-}
-.group-info {
-  margin: -12px -12px 24px -12px;
-  border-radius: 5px 5px 0 0;
-  height: 52px;
-  user-select: none;
-}
-.group-icon {
-  text-align: center;
-  color: white;
-}
-.group-info-name {
-  text-align: center;
-  color: white;
-}
-.group-item-icon {
-  font-size: 16px;
-  margin-top: 18px;
 }
 </style>

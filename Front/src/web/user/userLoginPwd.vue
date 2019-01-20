@@ -1,5 +1,10 @@
 <template>
   <div class="userLoginPwd">
+    <div class="title-info" style="background:#673ab7;">
+      <div class="title-icon">
+        <a-icon type="key" class="title-item-icon"></a-icon>&nbsp;使用账号密码登录
+      </div>
+    </div>
     <div class="team-logo-container">
       <img src="./unique.jpg" class="team-logo" alt="team-logo">
     </div>
@@ -70,7 +75,7 @@ export default {
         this.$store.dispatch("checkLoginStatus");
         this.$notification.open({
           message: "登录",
-          description: "登陆成功，欢迎回来！",
+          description: "登录成功，欢迎回来！",
           icon: <a-icon type="smile" style="color: #108ee9" />
         });
         this.$router.push({ path: "/user/my/info" });

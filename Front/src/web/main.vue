@@ -89,6 +89,7 @@
   </div>
 </template>
 <script>
+import "./css.css";
 export default {
   methods: {
     handleMenuClick(e) {

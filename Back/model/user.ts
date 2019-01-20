@@ -126,7 +126,7 @@ export const userLoginByPwd = async function(req: Request, res: Response) {
         if (!userInfo.active) {
             return res.json({
                 code: -1,
-                msg: "当前账号不活跃，无法登陆！"
+                msg: "当前账号不活跃，无法登录！"
             });
         }
 

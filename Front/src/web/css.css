@@ -1,0 +1,18 @@
+.title-info {
+  margin: -12px -12px 24px -12px;
+  border-radius: 5px 5px 0 0;
+  height: 52px;
+  user-select: none;
+}
+.title-icon {
+  text-align: center;
+  color: white;
+}
+.title-info-name {
+  text-align: center;
+  color: white;
+}
+.title-item-icon {
+  font-size: 16px;
+  margin-top: 18px;
+}

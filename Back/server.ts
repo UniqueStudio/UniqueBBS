@@ -51,7 +51,9 @@ import {
     fileRemove,
     fileFilter,
     fileGetUnlink,
-    fileClearAllUnlink
+    fileClearAllUnlink,
+    filePreview,
+    fileExpire
 } from "./model/attach";
 import { groupList, groupUserList, groupUser } from "./model/group";
 import {
@@ -191,7 +193,9 @@ app.post("/report/update/:rid", reportUpdate);
 
 //Attach
 app.get("/attach/download/:aid/:token", fileDownload);
+app.get("/attach/preview/:aid", filePreview);
 app.get("/attach/unlink", fileGetUnlink);
+app.get("/attach/expire/:tid", fileExpire);
 app.get("/attach/unlinkAll", fileClearAllUnlink);
 app.post("/attach/remove/:aid", fileRemove);
 app.post("/attach/upload", upload.single("attaches"), fileUpload);

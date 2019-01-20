@@ -1,9 +1,9 @@
 <template>
   <div class="thread-info" id="thread-info">
     <router-link :to="'/thread/list/'+forum.id+'/1'">
-      <div class="forum-info" :style="{backgroundColor:forum.color}">
-        <div class="forum-icon">
-          <a-icon :type="forum.icon" class="forum-item-icon"></a-icon>
+      <div class="title-info" :style="{backgroundColor:forum.color}">
+        <div class="title-icon">
+          <a-icon :type="forum.icon" class="title-item-icon"></a-icon>
           &nbsp;
           {{forum.name}}
         </div>
@@ -355,12 +355,21 @@ export default {
         size /= 1024;
         unit = "MB";
       }
+      size = Math.floor(size);
       return `文件:${attach.originalName}\n下载:${
         attach.downloads
       }次\n大小:${size} ${unit}`;
     },
     renderMessage(message) {
-      return marked(message, { sanitize: true });
+      const regImgStr = /\!\[uniqueImg\]\(unique\:\/\/(.*?)\)/g;
+      const token = localStorage.getItem("token");
+      return marked(
+        message.replace(
+          regImgStr,
+          `![uniqueImg](${this.$urls.domain}attach/download/$1/${token})`
+        ),
+        { sanitize: true }
+      );
     },
     markedConfig() {
       marked.setOptions({
@@ -679,24 +688,6 @@ export default {
 }
 .user-group {
   display: inline-block;
-}
-.forum-info {
-  margin: -12px -12px 24px -12px;
-  border-radius: 5px 5px 0 0;
-  height: 52px;
-  user-select: none;
-}
-.forum-icon {
-  text-align: center;
-  color: white;
-}
-.forum-info-name {
-  text-align: center;
-  color: white;
-}
-.forum-item-icon {
-  font-size: 16px;
-  margin-top: 18px;
 }
 .quote-message {
   margin-bottom: 12px;

@@ -1,7 +1,7 @@
 import { prisma, Forum, Thread, FilterCreateOneInput, FilterUpdateOneInput } from "../generated/prisma-client";
 import { Request, Response } from "express";
 import { setLockExpire } from "./lock";
-import { pagesize } from "./consts";
+import { pagesize, regPreviewURL, regImgStr, regNewStr } from "./consts";
 import { verifyJWT, filterUserInfo } from "./check";
 import { userThreadsAdd, forumThreadsAdd, forumLastPostUpdate } from "./runtime";
 import { pushMessage, MESSAGE_REPLY, MESSAGE_QUOTE, MESSAGE_DIAMOND, MESSAGE_THREAD_URL } from "./message";
@@ -134,8 +134,7 @@ export const threadInfo = async function(req: Request, res: Response) {
         const postArrRaw = await prisma.posts({
             where: {
                 thread: threadInfoObj,
-                isFirst: false,
-                active: isAdmin ? undefined : true
+                isFirst: false
             },
             skip: (page - 1) * pagesize,
             first: pagesize
@@ -151,23 +150,36 @@ export const threadInfo = async function(req: Request, res: Response) {
         });
 
         const postArr = await Promise.all(
-            postArrRaw.map(async item => ({
-                post: item,
-                user: filterUserInfo(
-                    await prisma
-                        .post({
-                            id: item.id
-                        })
-                        .user()
-                ),
-                group: await prisma
-                    .post({
-                        id: item.id
-                    })
-                    .user()
-                    .group(),
-                quote: item.quote === "-1" ? null : await prisma.post({ id: item.quote })
-            }))
+            postArrRaw.map(async item => {
+                if (!item.active && !isAdmin) {
+                    return {
+                        post: {
+                            active: false
+                        },
+                        user: null,
+                        group: null,
+                        quote: null
+                    };
+                } else {
+                    return {
+                        post: item,
+                        user: filterUserInfo(
+                            await prisma
+                                .post({
+                                    id: item.id
+                                })
+                                .user()
+                        ),
+                        group: await prisma
+                            .post({
+                                id: item.id
+                            })
+                            .user()
+                            .group(),
+                        quote: item.quote === "-1" ? null : await prisma.post({ id: item.quote })
+                    };
+                }
+            })
         );
 
         const attachArr = await prisma.attaches({
@@ -213,7 +225,7 @@ export const threadCreate = async function(req: Request, res: Response) {
             filterGroupArr,
             fileListArr
         } = req.body;
-        const { uid } = verifyJWT(req.header("Authorization"));
+        const { uid, isAdmin } = verifyJWT(req.header("Authorization"));
 
         if (!message || message.length <= 5) {
             return res.json({
@@ -268,6 +280,8 @@ export const threadCreate = async function(req: Request, res: Response) {
 
         const lockCreatThread = await redLock.lock(`updateThread:${uid}`, 2000);
         try {
+            const newMessage = message.replace(regImgStr(regPreviewURL), regNewStr);
+
             const resultThread = await prisma.createThread({
                 subject: subject,
                 forum: {
@@ -285,7 +299,7 @@ export const threadCreate = async function(req: Request, res: Response) {
                 post: {
                     create: {
                         isFirst: true,
-                        message: message,
+                        message: newMessage,
                         user: {
                             connect: {
                                 id: uid
@@ -310,7 +324,7 @@ export const threadCreate = async function(req: Request, res: Response) {
             const newPostPid = newPost.id;
 
             if (fileListArr && fileListArr.length !== 0) {
-                fileProcess(fileListArr, newPostPid, resultThread.id, uid);
+                fileProcess(fileListArr, newPostPid, resultThread.id, uid, isAdmin);
             }
 
             await forumThreadsAdd(fid, 1, newPostPid);
@@ -726,6 +740,8 @@ export const threadUpdate = async function(req: Request, res: Response) {
                 }
             });
 
+            const newMessage = message.replace(regImgStr(regPreviewURL), regNewStr);
+
             const postInfo = await prisma.updateManyPosts({
                 where: {
                     thread: {
@@ -734,7 +750,7 @@ export const threadUpdate = async function(req: Request, res: Response) {
                     isFirst: true
                 },
                 data: {
-                    message: message
+                    message: newMessage
                 }
             });
 
@@ -750,7 +766,7 @@ export const threadUpdate = async function(req: Request, res: Response) {
                         orderBy: "createDate_ASC",
                         first: 1
                     });
-                fileProcess(fileListArr, postInfo[0].id, threadInfo.id, uid);
+                fileProcess(fileListArr, postInfo[0].id, threadInfo.id, uid, isAdmin);
             }
 
             res.json({ code: 1 });

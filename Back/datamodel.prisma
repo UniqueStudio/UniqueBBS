@@ -79,6 +79,7 @@ type Attach {
     fileName: String!
     originalName: String!
     createDate: DateTime!
+    previewExpire: DateTime
 }
 type Message {
     id: ID! @unique

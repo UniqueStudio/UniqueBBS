@@ -1,6 +1,7 @@
 const domain = "http://localhost:7010/";
 const socket = "ws://localhost:7010/";
 const urls = {
+  domain: `${domain}`,
   login: `${domain}user/login/pwd`,
   myInfo: `${domain}user/my/info`,
   updateMyInfo: `${domain}user/update/normal`,
@@ -42,6 +43,8 @@ const urls = {
   attachUnlink: `${domain}attach/unlink`,
   attachRemove: aid => `${domain}attach/remove/${aid}`,
   attachDownload: (aid, token) => `${domain}attach/download/${aid}/${token}`,
+  attachPreview: aid => `${domain}attach/preview/${aid}`,
+  attachExpire: tid => `${domain}attach/expire/${tid}`,
   socket: socket
 };
 export default urls;

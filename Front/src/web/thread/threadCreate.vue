@@ -28,6 +28,7 @@
             name="attaches"
             :action="fileUploadUrl"
             @change="handleFileListChange"
+            @preview="handleFilePreview"
             :headers="uploadHeaderSet"
             :multiple="true"
             :defaultFileList="attachList"
@@ -105,6 +106,13 @@ export default {
     }
   },
   methods: {
+    handleFilePreview(file) {
+      const reg = /(jpg|png|gif|jpeg|bmp|webp)$/i;
+      if (reg.test(file.name)) {
+        const aid = file.response.msg;
+        this.message += `![uniqueImg](${this.$urls.attachPreview(aid)})`;
+      }
+    },
     async getAttachList() {
       const unlinkListRaw = await this.$ajax.get(this.$urls.attachUnlink);
       if (unlinkListRaw.data.code === 1) {
@@ -230,6 +238,7 @@ export default {
       }
     },
     async getThreadInfo(tid) {
+      await this.$ajax.get(this.$urls.attachExpire(tid));
       const threadInfoRaw = await this.$ajax.get(this.$urls.threadInfo(tid, 1));
       if (threadInfoRaw.data.code !== 1) {
         const modal = this.$error();
@@ -241,7 +250,12 @@ export default {
       }
       this.fid = threadInfoRaw.data.msg.forumInfo.id;
       this.subject = threadInfoRaw.data.msg.threadInfo.subject;
-      this.message = threadInfoRaw.data.msg.firstPost.message;
+
+      const regImgStr = /\!\[uniqueImg\]\(unique\:\/\/(.*?)\)/g;
+      this.message = threadInfoRaw.data.msg.firstPost.message.replace(
+        regImgStr,
+        `![uniqueImg](${this.$urls.domain}attach/preview/$1)`
+      );
 
       this.attachList = threadInfoRaw.data.msg.attachArr.map(item => ({
         uid: item.id,

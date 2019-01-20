@@ -78,3 +78,15 @@ export const filterUsersInfo = function(users: Array<User>) {
     }
     return users;
 };
+
+export const convertString = function(str: string): string {
+    let result = "";
+    const strLen = str.length;
+    for (let i = 0; i < strLen; i++) {
+        if (str[i] === "/" || str[i] === ":") {
+            result += "\\";
+        }
+        result += str[i];
+    }
+    return result;
+};
