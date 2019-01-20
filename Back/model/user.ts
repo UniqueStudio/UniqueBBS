@@ -417,3 +417,39 @@ export const userSearch = async function(req: Request, res: Response) {
         res.json({ code: -1, msg: e.message });
     }
 };
+
+export const userRuntime = async function(req: Request, res: Response) {
+    try {
+        const { isAdmin } = verifyJWT(req.header("Authorization"));
+        if (!isAdmin) {
+            return res.json({ code: -1, msg: "No Permission" });
+        }
+
+        const userList = await prisma.users();
+        for (const user of userList) {
+            const threads = await prisma
+                .threadsConnection({
+                    where: {
+                        user: {
+                            id: user.id
+                        }
+                    }
+                })
+                .aggregate()
+                .count();
+            if (user.threads !== threads) {
+                await prisma.updateUser({
+                    where: {
+                        id: user.id
+                    },
+                    data: {
+                        threads: threads
+                    }
+                });
+            }
+        }
+        res.json({ code: 1 });
+    } catch (e) {
+        res.json({ code: -1, msg: e.message });
+    }
+};

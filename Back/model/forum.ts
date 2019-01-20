@@ -57,3 +57,39 @@ export const forumCreate = async function(name: string, icon: string) {
     });
     return result;
 };
+
+export const forumRuntime = async function(req: Request, res: Response) {
+    try {
+        const { isAdmin } = verifyJWT(req.header("Authorization"));
+        if (!isAdmin) {
+            return res.json({ code: -1, msg: "No Permission" });
+        }
+        const forumList = await prisma.forums();
+        for (const forum of forumList) {
+            const threads = await prisma
+                .threadsConnection({
+                    where: {
+                        forum: {
+                            id: forum.id
+                        }
+                    }
+                })
+                .aggregate()
+                .count();
+            if (forum.threads !== threads) {
+                await prisma.updateForum({
+                    where: {
+                        id: forum.id
+                    },
+                    data: {
+                        threads: threads
+                    }
+                });
+            }
+        }
+
+        res.json({ code: 1 });
+    } catch (e) {
+        res.json({ code: -1, msg: e.message });
+    }
+};

@@ -850,3 +850,39 @@ export const threadSearch = async function(req: Request, res: Response) {
         res.json({ code: -1, msg: e.message });
     }
 };
+
+export const threadRuntime = async function(req: Request, res: Response) {
+    try {
+        const { isAdmin } = verifyJWT(req.header("Authorization"));
+        if (!isAdmin) {
+            return res.json({ code: -1, msg: "No Permission" });
+        }
+        const threadList = await prisma.threads();
+        for (const thread of threadList) {
+            const postCount = await prisma
+                .postsConnection({
+                    where: {
+                        thread: {
+                            id: thread.id
+                        }
+                    }
+                })
+                .aggregate()
+                .count();
+            if (thread.postCount !== postCount) {
+                await prisma.updateThread({
+                    where: {
+                        id: thread.id
+                    },
+                    data: {
+                        postCount: postCount
+                    }
+                });
+            }
+        }
+
+        res.json({ code: 1 });
+    } catch (e) {
+        res.json({ code: -1, msg: e.message });
+    }
+};

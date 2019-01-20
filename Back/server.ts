@@ -21,7 +21,8 @@ import {
     userPwdReset,
     mentorGet,
     mentorSet,
-    userSearch
+    userSearch,
+    userRuntime
 } from "./model/user";
 import {
     threadDeleteHard,
@@ -36,10 +37,11 @@ import {
     threadRecovery,
     threadUpdate,
     threadMove,
-    threadSearch
+    threadSearch,
+    threadRuntime
 } from "./model/thread";
 import { postDeleteHard, postDelete, postRecovery, postUpdate, postSearch, postInfo } from "./model/post";
-import { forumList, forumListSimple } from "./model/forum";
+import { forumList, forumListSimple, forumRuntime } from "./model/forum";
 import { reportCreate, reportInfo, reportGraph, reportList, reportUpdate } from "./model/report";
 import {
     fileDownload,
@@ -127,6 +129,7 @@ app.get("/user/info/:uid", userInfo);
 app.get("/user/threads/:uid/:page", userThreads);
 app.get("/user/posts/:uid/:page", userPosts);
 app.get("/user/my/info", userMyInfo);
+app.get("/user/runtime", userRuntime);
 app.get("/user/login/qrcode", userQRLogin);
 app.get("/user/login/scan/:key/status", userScan);
 app.get("/user/mentor/info", mentorGet);
@@ -139,11 +142,13 @@ app.post("/user/search", userSearch);
 
 //Forum
 app.get("/forum/list", forumList);
+app.get("/forum/runtime", forumRuntime);
 app.get("/forum/listSimple", forumListSimple);
 
 //Thread
 app.get("/thread/list/:fid/:page", threadList);
 app.get("/thread/info/:tid/:page", threadInfo);
+app.get("/thread/runtime", threadRuntime);
 app.post("/thread/create", threadCreate);
 app.post("/thread/update/:tid", threadUpdate);
 app.post("/thread/move/:tid", threadMove);

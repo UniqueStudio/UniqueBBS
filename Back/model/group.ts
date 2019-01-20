@@ -30,7 +30,8 @@ export const groupList = async function(req: Request, res: Response) {
                         where: {
                             group_some: {
                                 id: item.id
-                            }
+                            },
+                            active: true
                         }
                     })
                     .aggregate()
@@ -51,7 +52,8 @@ export const groupUserList = async function(req: Request, res: Response) {
             where: {
                 group_some: {
                     id: gid
-                }
+                },
+                active: true
             }
         });
         const groupInfo = await prisma.group({
