@@ -193,11 +193,10 @@
               {{(page -1) * defaultPageSize + index +1}}楼
             </a-tag>
           </div>
-          <div
-            class="post-message post-quote"
-            v-if="post.quote !== null"
-            v-html="renderMessage(post.quote.message)"
-          ></div>
+          <div class="post-message post-quote" v-if="post.quote !== null">
+            <h5>引用</h5>
+            <div v-html="renderMessage(post.quote.message)"></div>
+          </div>
           <div class="post-message" v-html="renderMessage(post.post.message)"></div>
           <div class="thread-signature">
             <div :title="getFullCreateDate(post.post.createDate)">

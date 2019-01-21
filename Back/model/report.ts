@@ -39,7 +39,7 @@ export const reportCreate = async function(req: Request, res: Response) {
             }
         }
 
-        const message = `**学习时间:**${time}\n**学习内容:**${content}\n**学习计划:**${plan}\n**已解决问题:**${solution}\n**学习总结:**${conclusion}\n${extra}`;
+        const message = `**学习时间:**${time}\n**学习内容:**${content}\n**学习计划:**${plan}\n**解决问题:**${solution}\n**学习总结:**${conclusion}\n${extra}`;
 
         const result = await prisma.createReport({
             message,
@@ -131,6 +131,7 @@ export const reportGraph = async function(req: Request, res: Response) {
 
         const fragment = `fragment ReportsGraph on Report{
             createDate
+            isWeek
         }`;
 
         const list = await prisma
@@ -139,7 +140,7 @@ export const reportGraph = async function(req: Request, res: Response) {
                     user: {
                         id: uid
                     },
-                    createDate_gte: new Date(new Date().getTime() - 365 * 24 * 60 * 60 * 1000)
+                    createDate_gte: new Date(new Date().getTime() - 366 * 24 * 60 * 60 * 1000)
                 },
                 orderBy: "createDate_ASC"
             })
@@ -203,11 +204,10 @@ export const reportUpdate = async function(req: Request, res: Response) {
             return res.json({ code: -1, msg: "您无权编辑此Report！" });
         }
 
-        const message = `**学习时间:**${time}\n**学习内容:**${content}\n**学习计划:**${plan}\n**已解决问题:**${solution}\n**学习总结:**${conclusion}\n${extra}`;
+        const message = `**学习时间:**${time}\n**学习内容:**${content}\n**学习计划:**${plan}\n**解决问题:**${solution}\n**学习总结:**${conclusion}\n${extra}`;
         const obj = { time, content, plan, solution, conclusion, extra };
         await redisClientSetAsync(
             `report:${rid}`,
-            JSON.stringify(obj),
             JSON.stringify(obj),
             "EX",
             Math.floor((getTodayLastTimestamp().getTime() - new Date().getTime()) / 1000).toString()

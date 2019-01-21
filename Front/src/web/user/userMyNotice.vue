@@ -137,7 +137,7 @@ export default {
         this.$notification.open({
           message: "消息",
           description: "消息已经全部删除！",
-          icon: <a-icon type="smile" style="color: #108ee9" />
+          icon: <a-icon type="mail" style="color: #108ee9" />
         });
         this.getMessageList();
       }
@@ -161,7 +161,7 @@ export default {
         this.$notification.open({
           message: "消息",
           description: "消息已经全部设为已读！",
-          icon: <a-icon type="smile" style="color: #108ee9" />
+          icon: <a-icon type="mail" style="color: #108ee9" />
         });
         this.getMessageList();
       }
@@ -181,7 +181,7 @@ export default {
         this.$notification.open({
           message: "消息",
           description: "消息已经清空！",
-          icon: <a-icon type="smile" style="color: #108ee9" />
+          icon: <a-icon type="mail" style="color: #108ee9" />
         });
         this.getMessageList();
       }

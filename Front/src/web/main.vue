@@ -83,7 +83,7 @@
         <a href="https://github.com/ttzztztz" target="_blank">Rabbit</a> @ 811
       </p>
       <p class="footer-right">Unique Studio
-        <br>January 30 2019
+        <br>January 24 2019
       </p>
     </footer>
   </div>

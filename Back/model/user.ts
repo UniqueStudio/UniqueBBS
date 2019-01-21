@@ -65,7 +65,7 @@ export const userPosts = async function(req: Request, res: Response) {
         let { uid, page } = req.params;
         page = Number.parseInt(page);
 
-        const result = await prisma.posts({
+        const resultRaw = await prisma.posts({
             where: {
                 user: {
                     id: uid,
@@ -77,7 +77,26 @@ export const userPosts = async function(req: Request, res: Response) {
             first: pagesize
         });
 
-        res.json({ code: 1, msg: result });
+        const result = await Promise.all(
+            resultRaw.map(async item => ({
+                post: item,
+                thread: await prisma.post({ id: item.id }).thread()
+            }))
+        );
+
+        const count = await prisma
+            .postsConnection({
+                where: {
+                    user: {
+                        id: uid,
+                        active: myUid === uid || isAdmin ? undefined : true
+                    }
+                }
+            })
+            .aggregate()
+            .count();
+
+        res.json({ code: 1, msg: { list: result, count } });
     } catch (e) {
         res.json({ code: -1, msg: e.message });
     }

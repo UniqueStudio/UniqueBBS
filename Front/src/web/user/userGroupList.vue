@@ -1,28 +1,35 @@
 <template>
-  <div class="user-group-list">
-    <div class="user-group-item" v-for="group in groupList" :key="group.id">
-      <div class="group-icon-container">
-        <div class="group-icon-bg" :style="{backgroundColor:group.group.color}">
-          <a-icon type="team" class="group-icon"></a-icon>
-        </div>
+  <div class="user-group-list-container">
+    <div class="title-info" style="background:rgb(99, 76, 184);">
+      <div class="title-icon">
+        <a-icon type="team" class="title-item-icon"></a-icon>&nbsp;组列表
       </div>
-      <div class="group-name">
-        <div>
-          <router-link :to="'/user/group/'+group.group.id">
-            <span class="group-name-title">{{group.group.name}}</span>
-          </router-link>
+    </div>
+    <div class="user-group-list">
+      <div class="user-group-item" v-for="group in groupList" :key="group.id">
+        <div class="group-icon-container">
+          <div class="group-icon-bg" :style="{backgroundColor:group.group.color}">
+            <a-icon type="team" class="group-icon"></a-icon>
+          </div>
         </div>
-        <div class="group-info">
-          <router-link :to="'/user/visit/'+group.master.id">
-            <a-tag color="orange">
-              <a-icon type="crown"/>
-              {{group.master.username}}
+        <div class="group-name">
+          <div>
+            <router-link :to="'/user/group/'+group.group.id">
+              <span class="group-name-title">{{group.group.name}}</span>
+            </router-link>
+          </div>
+          <div class="group-info">
+            <router-link :to="'/user/visit/'+group.master.id">
+              <a-tag color="orange">
+                <a-icon type="crown"/>
+                {{group.master.username}}
+              </a-tag>
+            </router-link>
+            <a-tag color="cyan" class="group-number">
+              <a-icon type="team"/>
+              {{group.count}}人
             </a-tag>
-          </router-link>
-          <a-tag color="cyan" class="group-number">
-            <a-icon type="team"/>
-            {{group.count}}人
-          </a-tag>
+          </div>
         </div>
       </div>
     </div>

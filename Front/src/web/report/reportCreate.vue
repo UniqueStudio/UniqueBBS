@@ -35,10 +35,10 @@
         <a-input placeholder="学习计划" v-model="plan"/>
       </div>
       <div class="form-left">
-        <label>解决方案</label>
+        <label>解决问题</label>
       </div>
       <div class="form-right">
-        <a-input placeholder="解决方案" v-model="solution"/>
+        <a-input placeholder="解决问题" v-model="solution"/>
       </div>
       <div class="form-left">
         <label>学习总结</label>
@@ -155,7 +155,7 @@ export default {
       if (reportInfoRaw.data.code === 1) {
         ["time", "content", "plan", "solution", "conclusion", "extra"].forEach(
           item => {
-            this[item] = reportInfoRaw.data[item];
+            this[item] = reportInfoRaw.data.msg[item];
           }
         );
       } else {

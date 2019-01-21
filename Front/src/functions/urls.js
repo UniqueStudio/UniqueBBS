@@ -4,6 +4,7 @@ const urls = {
   domain: `${domain}`,
   login: `${domain}user/login/pwd`,
   myInfo: `${domain}user/my/info`,
+  userPosts: (uid, page) => `${domain}user/posts/${uid}/${page}`,
   updateMyInfo: `${domain}user/update/normal`,
   updateMyPwd: `${domain}user/update/pwd`,
   syncWxInfo: `${domain}user/update/wx`,

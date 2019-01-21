@@ -18,16 +18,16 @@
               </div>
               <div class="user-dont-have-mentoor" v-else>
                 <a-tag color="orange">
-                  <a-icon type="fork"/>&nbsp;设定Mentor
+                  <a-icon type="fork"/>&nbsp;无Mentor
                 </a-tag>
               </div>
             </div>
           </div>
         </div>
       </div>
-      <div class="user-block"></div>
+      <report-graph :uid="user.uid" class="user-report-graph"></report-graph>
     </div>
-    <div class="user-report-create" v-if="canPostReport">
+    <div class="user-report-create" v-if="canPostReport && mode === 'my'">
       <router-link to="/report/create">
         <a-button icon="form" type="primary">发表Report</a-button>
       </router-link>
@@ -53,7 +53,6 @@
               </a-tag>
             </div>
           </div>
-
           <div class="report-content" v-html="renderMessage(report.message)"></div>
         </a-timeline-item>
       </a-timeline>
@@ -69,7 +68,9 @@
   </div>
 </template>
 <script>
+import reportGraph from "./reportGraph.vue";
 export default {
+  components: { "report-graph": reportGraph },
   data() {
     return {
       user: {
@@ -87,27 +88,32 @@ export default {
       defaultPageSize: 20,
       page: 1,
       reportList: [],
+      graphList: [],
       canPostReport: false
     };
   },
   methods: {
+    initReport() {
+      this.mode = this.$route.meta.mode;
+      if (this.mode === "visit") {
+        this.canPostReport = false;
+      }
+      this.page = Number.parseInt(this.$route.params.page);
+      this.getData();
+    },
     renderDate(dateStr) {
       const date = new Date(dateStr);
       const nowDate = new Date();
 
       if (nowDate.getFullYear() === date.getFullYear()) {
-        return `${nowDate.getMonth() +
-          1}月 ${nowDate.getDate()}日 ${nowDate.getHours()}:${
-          nowDate.getMinutes() < 10
-            ? "0" + nowDate.getMinutes()
-            : nowDate.getMinutes()
+        return `${date.getMonth() +
+          1}月 ${date.getDate()}日 ${date.getHours()}:${
+          date.getMinutes() < 10 ? "0" + date.getMinutes() : date.getMinutes()
         }`;
       } else {
-        return `${nowDate.getFullYear()}年 ${nowDate.getMonth() +
-          1}月 ${nowDate.getDate()}日 ${nowDate.getHours()}:${
-          nowDate.getMinutes() < 10
-            ? "0" + nowDate.getMinutes()
-            : nowDate.getMinutes()
+        return `${date.getFullYear()}年 ${date.getMonth() +
+          1}月 ${date.getDate()}日 ${date.getHours()}:${
+          date.getMinutes() < 10 ? "0" + date.getMinutes() : date.getMinutes()
         }`;
       }
     },
@@ -118,7 +124,7 @@ export default {
       date.setSeconds(59);
       const maxDate = date.getTime();
       const postDate = new Date(dataStr).getTime();
-      return postDate < maxDate;
+      return postDate < maxDate && this.mode === "my";
     },
     renderMessage(message) {
       return this.$marked(message, { sanitize: true });
@@ -168,13 +174,8 @@ export default {
       this.reportList = reportListRaw.data.msg;
 
       const reportCanRaw = await this.$ajax.get(this.$urls.reportCan);
-
       this.canPostReport =
         reportCanRaw.data.msg.weekly || reportCanRaw.data.msg.daily;
-
-      const reportGraphRaw = await this.$ajax.get(
-        this.$urls.reportGraph(this.user.uid)
-      );
     }
   },
   computed: {
@@ -183,33 +184,43 @@ export default {
     }
   },
   mounted() {
-    this.mode = this.$route.meta.mode;
-    if (this.mode === "visit") {
-      this.canPostReport = false;
+    this.initReport();
+  },
+  watch: {
+    $route(to, from) {
+      this.initReport();
     }
-    this.page = Number.parseInt(this.$route.params.page);
-    this.getData();
   }
 };
 </script>
 <style scoped>
-@media screen and (max-width: 1000px) {
+@media screen and (max-width: 1050px) {
   .report-my-info-container {
     grid-template-rows: 100% 100%;
   }
+  .user-report-graph {
+    margin: 20px auto;
+  }
+}
+@media screen and (min-width: 1200px) {
   .report-my {
     width: 95%;
   }
+  .user-report-graph {
+    margin: 55px auto;
+  }
 }
-@media screen and (min-width: 1000px) {
+@media screen and (min-width: 1200px) {
+  .report-my {
+    width: 60%;
+  }
+}
+@media screen and (min-width: 1050px) {
   .report-my-info-container {
     grid-template-columns: 30% 70%;
   }
-  .report-my {
-    width: 80%;
-  }
   .user-report-list {
-    padding: 0 25%;
+    padding: 0 10%;
   }
 }
 .report-my {
@@ -243,7 +254,7 @@ export default {
 }
 .report-header {
   display: grid;
-  grid-template-columns: 60% 40%;
+  grid-template-columns: 50% 50%;
 }
 .report-header-btns {
   text-align: right;

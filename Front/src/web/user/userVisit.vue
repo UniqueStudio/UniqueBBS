@@ -1,5 +1,11 @@
 <template>
   <div class="user-visit">
+    <div class="title-info" style="background:#3f51b5;">
+      <div class="title-icon">
+        <a-icon type="user" class="title-item-icon"></a-icon>&nbsp;
+        用户资料
+      </div>
+    </div>
     <div class="avatar-container">
       <a-avatar shape="circle" :src="userDatas.avatar" class="avatar-img" size="large"></a-avatar>
     </div>
@@ -16,13 +22,20 @@
           </a-tag>
         </router-link>
       </div>
-
       <a-tag color="green">
         <a-icon type="clock-circle"/>
         {{lastLoginHumanDate}}
       </a-tag>
     </div>
+    <div class="other-container">
+      <router-link :to="'/report/visit/'+uid+'/1'">
+        <a-tag color="cyan">
+          <a-icon type="calendar"/>&nbsp;Report
+        </a-tag>
+      </router-link>
+    </div>
     <h5>{{userDatas.signature}}</h5>
+    <report-graph :uid="uid" class="report-graph"></report-graph>
     <div class="user-detail-info">
       <a-input-group>
         <a-input
@@ -86,7 +99,9 @@
   </div>
 </template>
 <script>
+import reportGraph from "../report/reportGraph.vue";
 export default {
+  components: { "report-graph": reportGraph },
   data() {
     return {
       uid: "",
@@ -178,5 +193,12 @@ h5 {
 }
 .group-container {
   text-align: center;
+}
+.other-container {
+  text-align: center;
+  margin-top: 12px;
+}
+.report-graph {
+  margin: 30px auto;
 }
 </style>

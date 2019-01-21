@@ -1,0 +1,118 @@
+<template>
+  <div class="user-block">
+    <div class="user-block-flex">
+      <a-tooltip
+        class="user-block-item"
+        v-for="block in userBlock"
+        :key="block.id"
+        :style="{backgroundColor: block.color}"
+      >
+        <template slot="title">{{block.date}}</template>
+      </a-tooltip>
+    </div>
+  </div>
+</template>
+<script>
+export default {
+  data() {
+    return {
+      userBlock: []
+    };
+  },
+  props: ["uid"],
+  methods: {
+    async renderGraph() {
+      const reportGraphRaw = await this.$ajax.get(
+        this.$urls.reportGraph(this.uid)
+      );
+      this.graphList = reportGraphRaw.data.msg.map(item => ({
+        date: new Date(item.createDate).getTime(),
+        isWeek: item.isWeek
+      }));
+
+      const colorArr = ["#ebedf0", "#c6e48b", "#7bc96f", "#239a3b", "#196127"];
+      let offset = 0;
+      this.userBlock = [];
+      const nowDate = new Date();
+      const beginDate = new Date(
+        new Date().setFullYear(nowDate.getFullYear() - 1)
+      );
+      beginDate.setHours(0);
+      beginDate.setMinutes(0);
+      beginDate.setSeconds(0);
+      while (
+        this.graphList.length !== 0 &&
+        this.graphList[offset].date < beginDate.getTime()
+      ) {
+        offset++;
+      }
+      for (let i = 0; i < 366; i++) {
+        const beginTimeStamp = beginDate.getTime() + 24 * 60 * 60 * 1000 * i;
+        const endTimeStamp =
+          beginDate.getTime() + 24 * 60 * 60 * 1000 * (i + 1);
+        let numbers = 0;
+        while (
+          offset < this.graphList.length &&
+          this.graphList[offset].date < endTimeStamp
+        ) {
+          numbers += this.graphList[offset].isWeek ? 2 : 1;
+          offset++;
+        }
+        const endTime = new Date(beginTimeStamp);
+        this.userBlock.push({
+          id: endTimeStamp,
+          numbers: numbers,
+          color:
+            numbers > colorArr.length - 1
+              ? colorArr[colorArr.length - 1]
+              : colorArr[numbers],
+          date:
+            endTime.getFullYear() +
+            "年" +
+            (endTime.getMonth() + 1) +
+            "月" +
+            endTime.getDate() +
+            "日"
+        });
+      }
+    }
+  },
+  watch: {
+    uid(newUid, pldUid) {
+      if (newUid !== "") {
+        this.renderGraph();
+      }
+    }
+  }
+};
+</script>
+<style scoped>
+@media screen and (max-width: 1050px) {
+  .user-block-item {
+    width: 7.5px;
+    height: 7.5px;
+    margin: 1px;
+  }
+  .user-block-flex {
+    width: 300px;
+    height: 130px;
+  }
+}
+@media screen and (min-width: 1050px) {
+  .user-block-item {
+    width: 10px;
+    height: 10px;
+    margin: 1px;
+  }
+  .user-block-flex {
+    width: 636px;
+    height: 86px;
+  }
+}
+.user-block-flex {
+  display: flex;
+  flex-flow: column wrap;
+  align-content: space-between;
+  margin: auto;
+}
+</style>
