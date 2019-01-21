@@ -8,34 +8,40 @@
         <div class="nav-item-content">
           <div></div>
           <router-link to="/report">
-            <div class="nav-item-icon-container">
-              <a-icon
-                type="calendar"
-                style="font-size:24px;"
-                title="报告"
-                :theme="navActive===0?'filled':'outlined'"
-              />
-            </div>
+            <a-tooltip :mouseLeaveDelay="0" placement="bottom">
+              <template slot="title">报告</template>
+              <div class="nav-item-icon-container">
+                <a-icon
+                  type="calendar"
+                  style="font-size:24px;"
+                  :theme="navActive===0?'filled':'outlined'"
+                />
+              </div>
+            </a-tooltip>
           </router-link>
           <router-link to="/forum">
-            <div class="nav-item-icon-container">
-              <a-icon
-                type="pushpin"
-                style="font-size:24px;"
-                title="论坛"
-                :theme="navActive===1?'filled':'outlined'"
-              />
-            </div>
+            <a-tooltip :mouseLeaveDelay="0" placement="bottom">
+              <template slot="title">论坛</template>
+              <div class="nav-item-icon-container">
+                <a-icon
+                  type="pushpin"
+                  style="font-size:24px;"
+                  :theme="navActive===1?'filled':'outlined'"
+                />
+              </div>
+            </a-tooltip>
           </router-link>
           <router-link to="/user">
-            <div class="nav-item-icon-container">
-              <a-icon
-                type="star"
-                style="font-size:24px;"
-                title="个人"
-                :theme="navActive===2?'filled':'outlined'"
-              />
-            </div>
+            <a-tooltip :mouseLeaveDelay="0" placement="bottom">
+              <template slot="title">个人</template>
+              <div class="nav-item-icon-container">
+                <a-icon
+                  type="star"
+                  style="font-size:24px;"
+                  :theme="navActive===2?'filled':'outlined'"
+                />
+              </div>
+            </a-tooltip>
           </router-link>
         </div>
       </div>

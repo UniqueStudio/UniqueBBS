@@ -23,7 +23,8 @@ import {
     mentorMyInfo,
     mentorSet,
     userSearch,
-    userRuntime
+    userRuntime,
+    mentorMyStudents
 } from "./model/user";
 import {
     threadDeleteHard,
@@ -137,6 +138,7 @@ app.get("/user/login/qrcode", userQRLogin);
 app.get("/user/login/scan/:key/status", userScan);
 app.get("/user/mentor/info/:uid", mentorInfo);
 app.get("/user/mentor/my", mentorMyInfo);
+app.get("/user/mentor/students", mentorMyStudents);
 app.post("/user/login/pwd", userLoginByPwd);
 app.post("/user/update/normal", userInfoUpdate);
 app.post("/user/update/pwd", userPwdReset);

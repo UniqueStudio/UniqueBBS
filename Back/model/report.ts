@@ -134,13 +134,20 @@ export const reportGraph = async function(req: Request, res: Response) {
             isWeek
         }`;
 
+        const beginDateRaw = new Date();
+        beginDateRaw.setHours(0);
+        beginDateRaw.setMinutes(0);
+        beginDateRaw.setSeconds(0);
+        const extraBlockCount = new Date().getDay() + 1;
+        const beginDate = new Date(beginDateRaw.getTime() - (extraBlockCount + 363) * 24 * 60 * 60 * 1000);
+
         const list = await prisma
             .reports({
                 where: {
                     user: {
                         id: uid
                     },
-                    createDate_gte: new Date(new Date().getTime() - 366 * 24 * 60 * 60 * 1000)
+                    createDate_gte: beginDate
                 },
                 orderBy: "createDate_ASC"
             })

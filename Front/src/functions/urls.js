@@ -54,6 +54,7 @@ const urls = {
   reportInfo: rid => `${domain}report/info/${rid}`,
   mentorInfo: uid => `${domain}user/mentor/info/${uid}`,
   mentorMyInfo: `${domain}user/mentor/my`,
+  mentorMyStudents: `${domain}user/mentor/students`,
   socket: socket
 };
 export default urls;

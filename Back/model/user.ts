@@ -1,8 +1,16 @@
-import { prisma } from "../generated/prisma-client";
+import { prisma, User } from "../generated/prisma-client";
 import fetch from "node-fetch";
 import { scanningURL, userIDURL, userInfoURL, getQRCodeURL, pagesize } from "./consts";
 import { Request, Response } from "express";
-import { addSaltPasswordOnce, getAccessToken, signJWT, verifyJWT, filterMyInfo, filterUserInfo } from "./check";
+import {
+    addSaltPasswordOnce,
+    getAccessToken,
+    signJWT,
+    verifyJWT,
+    filterMyInfo,
+    filterUserInfo,
+    filterUsersInfo
+} from "./check";
 import { setLockExpireIncr } from "./lock";
 
 export const userInfo = async function(req: Request, res: Response) {
@@ -404,6 +412,30 @@ export const mentorMyInfo = async function(req: Request, res: Response) {
         } else {
             res.json({ code: 1, msg: { user: filterUserInfo(myInfo), mentor: null } });
         }
+    } catch (e) {
+        res.json({ code: -1, msg: e.message });
+    }
+};
+
+export const mentorMyStudents = async function(req: Request, res: Response) {
+    try {
+        const { uid } = verifyJWT(req.header("Authorization"));
+
+        const myMentor = await prisma
+            .user({
+                id: uid
+            })
+            .mentor();
+
+        const myStudentsInfo: Array<User> = await prisma.users({
+            where: {
+                mentor: {
+                    id: uid
+                }
+            }
+        });
+
+        res.json({ code: 1, msg: { students: filterUsersInfo(myStudentsInfo), mentor: filterUserInfo(myMentor) } });
     } catch (e) {
         res.json({ code: -1, msg: e.message });
     }

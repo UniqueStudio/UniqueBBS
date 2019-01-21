@@ -6,6 +6,7 @@
         v-for="block in userBlock"
         :key="block.id"
         :style="{backgroundColor: block.color}"
+        :mouseLeaveDelay="0"
       >
         <template slot="title">{{block.date}}</template>
       </a-tooltip>
@@ -34,22 +35,27 @@ export default {
       let offset = 0;
       this.userBlock = [];
       const nowDate = new Date();
+      const extraBlockCount = nowDate.getDay() + 1;
+
+      const beginDateRaw = new Date();
+      beginDateRaw.setHours(0);
+      beginDateRaw.setMinutes(0);
+      beginDateRaw.setSeconds(0);
       const beginDate = new Date(
-        new Date().setFullYear(nowDate.getFullYear() - 1)
+        beginDateRaw.getTime() - (extraBlockCount + 363) * 24 * 60 * 60 * 1000
       );
-      beginDate.setHours(0);
-      beginDate.setMinutes(0);
-      beginDate.setSeconds(0);
+
       while (
         this.graphList.length !== 0 &&
         this.graphList[offset].date < beginDate.getTime()
       ) {
         offset++;
       }
-      for (let i = 0; i < 366; i++) {
+      for (let i = 0; i < 364 + extraBlockCount; i++) {
         const beginTimeStamp = beginDate.getTime() + 24 * 60 * 60 * 1000 * i;
         const endTimeStamp =
           beginDate.getTime() + 24 * 60 * 60 * 1000 * (i + 1);
+
         let numbers = 0;
         while (
           offset < this.graphList.length &&

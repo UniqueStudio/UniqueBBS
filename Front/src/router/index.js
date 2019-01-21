@@ -22,6 +22,7 @@ import threadCreate from "@/web/thread/threadCreate.vue";
 import report from "@/web/report/report.vue";
 import reportMy from "@/web/report/reportMy.vue";
 import reportCreate from "@/web/report/reportCreate.vue";
+import reportMentor from "@/web/report/reportMentor.vue";
 
 Vue.use(Router);
 
@@ -78,6 +79,11 @@ const router = new Router({
               meta: {
                 mode: "visit"
               }
+            },
+            {
+              path: "mentor",
+              name: "reportMentor",
+              component: reportMentor
             }
           ]
         },
