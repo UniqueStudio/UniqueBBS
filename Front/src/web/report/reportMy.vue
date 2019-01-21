@@ -39,7 +39,21 @@
           :key="report.id"
           :color="report.isWeek? 'orange' : 'blue'"
         >
-          <h4>{{renderDate(report.createDate)}}</h4>
+          <div class="report-header">
+            <h3>{{renderDate(report.createDate)}}</h3>
+            <div class="report-header-btns">
+              <router-link :to="'/report/update/'+report.id" v-if="showEditBtn(report.createDate)">
+                <a-tag color="blue">
+                  <a-icon type="edit"/>&nbsp;编辑
+                </a-tag>
+              </router-link>
+              <a-tag :color="report.isWeek? 'orange' : 'cyan'">
+                <a-icon type="calendar"/>
+                &nbsp;{{report.isWeek? 'Weekly' : 'Daily'}}
+              </a-tag>
+            </div>
+          </div>
+
           <div class="report-content" v-html="renderMessage(report.message)"></div>
         </a-timeline-item>
       </a-timeline>
@@ -82,11 +96,29 @@ export default {
       const nowDate = new Date();
 
       if (nowDate.getFullYear() === date.getFullYear()) {
-        return `${nowDate.getMonth() + 1}月 ${nowDate.getDate()}日`;
+        return `${nowDate.getMonth() +
+          1}月 ${nowDate.getDate()}日 ${nowDate.getHours()}:${
+          nowDate.getMinutes() < 10
+            ? "0" + nowDate.getMinutes()
+            : nowDate.getMinutes()
+        }`;
       } else {
         return `${nowDate.getFullYear()}年 ${nowDate.getMonth() +
-          1}月 ${nowDate.getDate()}日`;
+          1}月 ${nowDate.getDate()}日 ${nowDate.getHours()}:${
+          nowDate.getMinutes() < 10
+            ? "0" + nowDate.getMinutes()
+            : nowDate.getMinutes()
+        }`;
       }
+    },
+    showEditBtn(dataStr) {
+      let date = new Date();
+      date.setHours(23);
+      date.setMinutes(59);
+      date.setSeconds(59);
+      const maxDate = date.getTime();
+      const postDate = new Date(dataStr).getTime();
+      return postDate < maxDate;
     },
     renderMessage(message) {
       return this.$marked(message, { sanitize: true });
@@ -177,7 +209,7 @@ export default {
     width: 80%;
   }
   .user-report-list {
-    padding: 0 10%;
+    padding: 0 25%;
   }
 }
 .report-my {
@@ -205,5 +237,15 @@ export default {
 }
 .user-report-create {
   margin: 36px auto;
+}
+.user-report-list {
+  margin: 36px 0;
+}
+.report-header {
+  display: grid;
+  grid-template-columns: 60% 40%;
+}
+.report-header-btns {
+  text-align: right;
 }
 </style>

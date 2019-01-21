@@ -1,47 +1,55 @@
 <template>
-  <div class="thread-create">
-    <div class="create-first-line" v-if="mode !== 2">
-      <div class="create-forum-list-container">
-        <a-select v-model="fid" class="forum-list-selector">
-          <a-select-option
-            v-for="forum in forumList"
-            :value="forum.id"
-            :key="forum.id"
-          >{{forum.name}}</a-select-option>
-        </a-select>
-      </div>
-      <div class="creaete-forum-subject">
-        <a-input placeholder="帖子标题" v-model="subject"/>
+  <div class="thread-create-container">
+    <div class="title-info" style="background:#3f51b5;">
+      <div class="title-icon">
+        <a-icon type="edit" class="title-item-icon"></a-icon>
+        &nbsp;{{execBtnText}}
       </div>
     </div>
-    <div class="create-input">
-      <codemirror v-model="message" :options="cmOptions"></codemirror>
-      <div class="create-preview-container">
-        <a-divider type="vertical" class="divider"></a-divider>
-        <div class="create-preview" v-html="previewText"></div>
-      </div>
-    </div>
-    <div class="bottom-controls">
-      <div>
-        <div class="thread-attach" v-if="mode !== 2">
-          <a-upload
-            name="attaches"
-            :action="fileUploadUrl"
-            @change="handleFileListChange"
-            @preview="handleFilePreview"
-            :headers="uploadHeaderSet"
-            :multiple="true"
-            :defaultFileList="attachList"
-            v-if="showAttachList"
-          >
-            <a-button>
-              <a-icon type="upload"/>附件上传
-            </a-button>
-          </a-upload>
+    <div class="thread-create">
+      <div class="create-first-line" v-if="mode !== 2">
+        <div class="create-forum-list-container">
+          <a-select v-model="fid" class="forum-list-selector">
+            <a-select-option
+              v-for="forum in forumList"
+              :value="forum.id"
+              :key="forum.id"
+            >{{forum.name}}</a-select-option>
+          </a-select>
+        </div>
+        <div class="creaete-forum-subject">
+          <a-input placeholder="帖子标题" v-model="subject"/>
         </div>
       </div>
-      <div class="create-thread-btn">
-        <a-button type="primary" icon="check" @click="handleBtnClick">{{execBtnText}}</a-button>
+      <div class="create-input">
+        <codemirror v-model="message" :options="cmOptions"></codemirror>
+        <div class="create-preview-container">
+          <a-divider type="vertical" class="divider"></a-divider>
+          <div class="create-preview" v-html="previewText"></div>
+        </div>
+      </div>
+      <div class="bottom-controls">
+        <div>
+          <div class="thread-attach" v-if="mode !== 2">
+            <a-upload
+              name="attaches"
+              :action="fileUploadUrl"
+              @change="handleFileListChange"
+              @preview="handleFilePreview"
+              :headers="uploadHeaderSet"
+              :multiple="true"
+              :defaultFileList="attachList"
+              v-if="showAttachList"
+            >
+              <a-button>
+                <a-icon type="upload"/>附件上传
+              </a-button>
+            </a-upload>
+          </div>
+        </div>
+        <div class="create-thread-btn">
+          <a-button type="primary" icon="check" @click="handleBtnClick">{{execBtnText}}</a-button>
+        </div>
       </div>
     </div>
   </div>

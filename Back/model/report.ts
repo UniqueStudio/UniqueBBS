@@ -1,16 +1,17 @@
 import { Request, Response } from "express";
 import { prisma } from "../generated/prisma-client";
-import { verifyJWT, filterUserInfo } from "./check";
+import { verifyJWT } from "./check";
 import { pagesize } from "./consts";
 import { getTodayFirstTimestamp, getTodayLastTimestamp } from "./time";
 import { setLockExpire, getLockStatus } from "./lock";
+import { redisClientSetAsync, redisClientGetAsync } from "../server";
 
 export const reportCreate = async function(req: Request, res: Response) {
     try {
         const { uid } = verifyJWT(req.header("Authorization"));
-        const { length, content, plan, solution, conclusion, isWeekRAW } = req.body;
+        const { time, content, plan, solution, conclusion, isWeekReport, extra } = req.body;
 
-        const isWeek: boolean = isWeekRAW === "1";
+        const isWeek: boolean = isWeekReport === "1";
 
         const todayDate = new Date();
         if (isWeek) {
@@ -24,10 +25,11 @@ export const reportCreate = async function(req: Request, res: Response) {
             }
         } else {
             //Daily Report
-            const lastTime = getTodayLastTimestamp(todayDate);
+            const lastTime = getTodayLastTimestamp();
+
             const resultLock = await setLockExpire(
                 `dailyReport:${uid}`,
-                ((lastTime.getTime() - todayDate.getTime()) / 1000).toString()
+                Math.floor((lastTime.getTime() - todayDate.getTime()) / 1000).toString()
             );
             if (!resultLock) {
                 return res.json({
@@ -37,22 +39,27 @@ export const reportCreate = async function(req: Request, res: Response) {
             }
         }
 
-        const message = "";
+        const message = `**学习时间:**${time}\n**学习内容:**${content}\n**学习计划:**${plan}\n**已解决问题:**${solution}\n**学习总结:**${conclusion}\n${extra}`;
 
-        const result = await prisma.updateUser({
-            where: {
-                id: uid
-            },
-            data: {
-                report: {
-                    create: {
-                        message,
-                        isWeek,
-                        createDate: new Date()
-                    }
+        const result = await prisma.createReport({
+            message,
+            isWeek,
+            createDate: new Date(),
+            user: {
+                connect: {
+                    id: uid
                 }
             }
         });
+        const lastTime = getTodayLastTimestamp();
+        const obj = { time, content, plan, solution, conclusion, extra };
+        await redisClientSetAsync(
+            `report:${result.id}`,
+            JSON.stringify(obj),
+            "EX",
+            Math.floor((lastTime.getTime() - todayDate.getTime()) / 1000).toString()
+        );
+
         res.json({ code: 1 });
     } catch (e) {
         res.json({ code: -1, msg: e.message });
@@ -80,23 +87,37 @@ export const reportCanPost = async function(req: Request, res: Response) {
 
 export const reportInfo = async function(req: Request, res: Response) {
     try {
-        verifyJWT(req.header("Authorization"));
+        const { uid, isAdmin } = verifyJWT(req.header("Authorization"));
         const { rid } = req.params;
-        const resultReport = await prisma.report({
+
+        const reportCache = await redisClientGetAsync(`report:${rid}`);
+
+        if (reportCache === null) {
+            return res.json({ code: -1, msg: "该Report无法编辑！" });
+        }
+
+        const reportInfo = await prisma.report({
             id: rid
         });
-        const resultUser = await prisma
+
+        const reportAuthor = await prisma
             .report({
                 id: rid
             })
             .user();
 
+        const todayFirstTimeStamp = getTodayFirstTimestamp().getTime();
+        if (new Date(reportInfo.createDate).getTime() < todayFirstTimeStamp && !isAdmin) {
+            return res.json({ code: 1, msg: "该Report仅限当天更改！如果您想更改，请联系管理员！" });
+        }
+
+        if (!isAdmin && uid !== reportAuthor.id) {
+            return res.json({ code: -1, msg: "您无权编辑此Report！" });
+        }
+
         res.json({
             code: 1,
-            msg: {
-                report: resultReport,
-                user: filterUserInfo(resultUser)
-            }
+            msg: JSON.parse(reportCache)
         });
     } catch (e) {
         res.json({ code: -1, msg: e.message });
@@ -155,7 +176,13 @@ export const reportUpdate = async function(req: Request, res: Response) {
     try {
         const { uid, isAdmin } = verifyJWT(req.header("Authorization"));
         const { rid } = req.params;
-        const { time, content, plan, solution, conclusion } = req.body;
+        const { time, content, plan, solution, conclusion, extra } = req.body;
+
+        const reportCache = await redisClientGetAsync(`report:${rid}`);
+
+        if (reportCache === null) {
+            return res.json({ code: -1, msg: "该Report无法编辑！" });
+        }
 
         const reportInfo = await prisma.report({
             id: rid
@@ -166,7 +193,7 @@ export const reportUpdate = async function(req: Request, res: Response) {
             })
             .user();
 
-        const todayFirstTimeStamp = getTodayFirstTimestamp(new Date()).getTime();
+        const todayFirstTimeStamp = getTodayFirstTimestamp().getTime();
 
         if (new Date(reportInfo.createDate).getTime() < todayFirstTimeStamp && !isAdmin) {
             return res.json({ code: 1, msg: "该Report仅限当天更改！如果您想更改，请联系管理员！" });
@@ -176,7 +203,16 @@ export const reportUpdate = async function(req: Request, res: Response) {
             return res.json({ code: -1, msg: "您无权编辑此Report！" });
         }
 
-        const message = "";
+        const message = `**学习时间:**${time}\n**学习内容:**${content}\n**学习计划:**${plan}\n**已解决问题:**${solution}\n**学习总结:**${conclusion}\n${extra}`;
+        const obj = { time, content, plan, solution, conclusion, extra };
+        await redisClientSetAsync(
+            `report:${rid}`,
+            JSON.stringify(obj),
+            JSON.stringify(obj),
+            "EX",
+            Math.floor((getTodayLastTimestamp().getTime() - new Date().getTime()) / 1000).toString()
+        );
+
         const result = await prisma.updateReport({
             where: {
                 id: rid

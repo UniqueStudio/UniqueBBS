@@ -64,7 +64,7 @@ const router = new Router({
               }
             },
             {
-              path: "update",
+              path: "update/:rid",
               name: "reportUpdate",
               component: reportCreate,
               meta: {

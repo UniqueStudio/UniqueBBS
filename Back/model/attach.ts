@@ -1,8 +1,9 @@
 import { verifyJWT } from "./check";
 import { Request, Response } from "express";
 import { prisma, Attach } from "../generated/prisma-client";
-import { redLock } from "../server";
+import { redLock, redisClientDelAsync } from "../server";
 import { filterCalculate } from "./filter";
+import { setLockExpire, getLockStatus } from "./lock";
 import * as fs from "fs";
 
 export const fileUpload = async function(req: Request, res: Response) {
@@ -114,8 +115,8 @@ export const filePreview = async function(req: Request, res: Response) {
             id: aid
         });
 
-        const nowDate = new Date().getTime();
-        if (!attachInfo.previewExpire || nowDate >= new Date(attachInfo.previewExpire).getTime()) {
+        const previewExpire = await getLockStatus(`attachPreview:${aid}`);
+        if (previewExpire) {
             return res.json({ code: -1, msg: "Access Denied" });
         }
 
@@ -243,6 +244,8 @@ export const fileProcess = async function(
             const newDir = `./upload/${dirName}`;
             const newPath = `${newDir}/${pid}_${new Date().getTime().toString()}_${aid}.rabbit`;
 
+            await redisClientDelAsync(`attachPreview:${aid}`);
+
             if (!fs.existsSync(newDir)) fs.mkdirSync(newDir);
             fileMove(oldPath, newPath);
 
@@ -256,8 +259,7 @@ export const fileProcess = async function(
                         connect: {
                             id: tid
                         }
-                    },
-                    previewExpire: new Date()
+                    }
                 }
             });
 
@@ -385,18 +387,17 @@ export const fileExpire = async function(req: Request, res: Response) {
             res.json({ code: -1, msg: "Access Denied" });
         }
 
-        const expireDate = new Date(new Date().getTime() + 12 * 60 * 60 * 1000);
-
-        await prisma.updateManyAttaches({
+        const attachList = await prisma.attaches({
             where: {
                 thread: {
                     id: tid
                 }
-            },
-            data: {
-                previewExpire: expireDate
             }
         });
+
+        for (const attach of attachList) {
+            await setLockExpire(`attachPreview:${attach.id}`, (12 * 60 * 60).toString());
+        }
 
         res.json({ code: 1 });
     } catch (e) {

@@ -1,7 +1,7 @@
 const FILTER_CLOSE = 0;
 const FILTER_CAN_SEE = 1;
 const FILTER_CANNOT_SEE = 2;
-const FILTER_EXPIRE_SECONDS = 12 * 60 * 60;
+const FILTER_EXPIRE_SECONDS = (12 * 60 * 60).toString();
 
 import { redisClientGetAsync, redisClientSetAsync, redisClientKeysAsync, redisClientDelAsync } from "../server";
 import { prisma, Group } from "../generated/prisma-client";

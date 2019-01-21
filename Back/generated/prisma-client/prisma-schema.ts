@@ -43,7 +43,6 @@ type Attach {
   fileName: String!
   originalName: String!
   createDate: DateTime!
-  previewExpire: DateTime
 }
 
 type AttachConnection {
@@ -60,7 +59,6 @@ input AttachCreateInput {
   fileName: String!
   originalName: String!
   createDate: DateTime!
-  previewExpire: DateTime
 }
 
 input AttachCreateManyWithoutThreadInput {
@@ -75,7 +73,6 @@ input AttachCreateWithoutThreadInput {
   fileName: String!
   originalName: String!
   createDate: DateTime!
-  previewExpire: DateTime
 }
 
 type AttachEdge {
@@ -96,8 +93,6 @@ enum AttachOrderByInput {
   originalName_DESC
   createDate_ASC
   createDate_DESC
-  previewExpire_ASC
-  previewExpire_DESC
   createdAt_ASC
   createdAt_DESC
   updatedAt_ASC
@@ -111,7 +106,6 @@ type AttachPreviousValues {
   fileName: String!
   originalName: String!
   createDate: DateTime!
-  previewExpire: DateTime
 }
 
 input AttachScalarWhereInput {
@@ -181,14 +175,6 @@ input AttachScalarWhereInput {
   createDate_lte: DateTime
   createDate_gt: DateTime
   createDate_gte: DateTime
-  previewExpire: DateTime
-  previewExpire_not: DateTime
-  previewExpire_in: [DateTime!]
-  previewExpire_not_in: [DateTime!]
-  previewExpire_lt: DateTime
-  previewExpire_lte: DateTime
-  previewExpire_gt: DateTime
-  previewExpire_gte: DateTime
   AND: [AttachScalarWhereInput!]
   OR: [AttachScalarWhereInput!]
   NOT: [AttachScalarWhereInput!]
@@ -220,7 +206,6 @@ input AttachUpdateInput {
   fileName: String
   originalName: String
   createDate: DateTime
-  previewExpire: DateTime
 }
 
 input AttachUpdateManyDataInput {
@@ -229,7 +214,6 @@ input AttachUpdateManyDataInput {
   fileName: String
   originalName: String
   createDate: DateTime
-  previewExpire: DateTime
 }
 
 input AttachUpdateManyMutationInput {
@@ -238,7 +222,6 @@ input AttachUpdateManyMutationInput {
   fileName: String
   originalName: String
   createDate: DateTime
-  previewExpire: DateTime
 }
 
 input AttachUpdateManyWithoutThreadInput {
@@ -264,7 +247,6 @@ input AttachUpdateWithoutThreadDataInput {
   fileName: String
   originalName: String
   createDate: DateTime
-  previewExpire: DateTime
 }
 
 input AttachUpdateWithWhereUniqueWithoutThreadInput {
@@ -347,14 +329,6 @@ input AttachWhereInput {
   createDate_lte: DateTime
   createDate_gt: DateTime
   createDate_gte: DateTime
-  previewExpire: DateTime
-  previewExpire_not: DateTime
-  previewExpire_in: [DateTime!]
-  previewExpire_not_in: [DateTime!]
-  previewExpire_lt: DateTime
-  previewExpire_lte: DateTime
-  previewExpire_gt: DateTime
-  previewExpire_gte: DateTime
   AND: [AttachWhereInput!]
   OR: [AttachWhereInput!]
   NOT: [AttachWhereInput!]

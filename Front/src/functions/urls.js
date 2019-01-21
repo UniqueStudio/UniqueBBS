@@ -48,6 +48,9 @@ const urls = {
   reportList: (uid, page) => `${domain}report/list/${uid}/${page}`,
   reportGraph: uid => `${domain}report/graph/${uid}`,
   reportCan: `${domain}report/can`,
+  reportCreate: `${domain}report/create`,
+  reportUpdate: rid => `${domain}report/update/${rid}`,
+  reportInfo: rid => `${domain}report/info/${rid}`,
   mentorInfo: uid => `${domain}user/mentor/info/${uid}`,
   mentorMyInfo: `${domain}user/mentor/my`,
   socket: socket
