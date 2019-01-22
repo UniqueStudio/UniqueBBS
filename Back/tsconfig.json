@@ -4,6 +4,7 @@
     "target": "ESNEXT",
     "module": "commonjs",
     "downlevelIteration": true,
-    "outDir": "./output/"
+    "outDir": "./output/",
+    "allowJs": true
   }
 }
