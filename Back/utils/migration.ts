@@ -245,7 +245,7 @@ async function execMigration() {
                 (date.getMonth() + 1).toString() +
                 "_" +
                 date.getDate().toString();
-            const newDir = `./upload/${dirName}`;
+            const newDir = `/var/bbs/upload/${dirName}`;
             const newPath = `${newDir}/migration_${new Date().getTime().toString()}_${imageOffset}.rabbit`;
             if (!fs.existsSync(newDir)) fs.mkdirSync(newDir);
 

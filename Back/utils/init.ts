@@ -268,7 +268,8 @@ async function install() {
                 (date.getMonth() + 1).toString() +
                 "_" +
                 date.getDate().toString();
-            const newDir = `./upload/${dirName}`;
+            const newDir = `/var/bbs/upload/${dirName}`;
+            if (!fs.existsSync(`/var/bbs/upload`)) fs.mkdirSync(`/var/bbs/upload`);
             const newPath = `${newDir}/migration_${new Date().getTime().toString()}_${imageOffset}.rabbit`;
             if (!fs.existsSync(newDir)) fs.mkdirSync(newDir);
 
@@ -469,11 +470,11 @@ async function install() {
             }
         });
     }
-    fs.writeFileSync("./install.lock", "1");
+    fs.writeFileSync("/var/bbs/install.lock", "1");
     //<-- Step 7 ALL OK
     console.log("Finished , thank you !");
 }
 
-if (!fs.existsSync("./install.lock")) {
+if (!fs.existsSync("/var/bbs/install.lock")) {
     install();
 }

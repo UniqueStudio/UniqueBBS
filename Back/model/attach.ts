@@ -241,7 +241,7 @@ export const fileProcess = async function(
             }
 
             const oldPath = attach.fileName;
-            const newDir = `./upload/${dirName}`;
+            const newDir = `/var/bbs/upload/${dirName}`;
             const newPath = `${newDir}/${pid}_${new Date().getTime().toString()}_${aid}.rabbit`;
 
             await redisClientDelAsync(`attachPreview:${aid}`);
@@ -295,9 +295,9 @@ export const fileDestination = function(
     const date = new Date();
     const dirName =
         date.getFullYear().toString() + "_" + (date.getMonth() + 1).toString() + "_" + date.getDate().toString();
-    const parentDir = `./upload/tmp`;
+    const parentDir = `/var/bbs/upload/tmp`;
     const childDir = `${parentDir}/${dirName}`;
-    if (!fs.existsSync("./upload")) fs.mkdirSync("./upload");
+    if (!fs.existsSync("/var/bbs/upload")) fs.mkdirSync("/var/bbs/upload");
     if (!fs.existsSync(parentDir)) fs.mkdirSync(parentDir);
     if (!fs.existsSync(childDir)) fs.mkdirSync(childDir);
     cb(null, `${childDir}/`);
