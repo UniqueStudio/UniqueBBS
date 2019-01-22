@@ -352,14 +352,16 @@ async function install() {
             first: 1
         });
 
-        await prisma.updatePost({
-            where: {
-                id: resultFirst.id
-            },
-            data: {
-                isFirst: true
-            }
-        });
+        if (resultFirst) {
+            await prisma.updatePost({
+                where: {
+                    id: resultFirst.id
+                },
+                data: {
+                    isFirst: true
+                }
+            });
+        }
 
         const postCount = await prisma
             .postsConnection({
