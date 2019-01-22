@@ -26,25 +26,25 @@
         <label>学习内容</label>
       </div>
       <div class="form-right">
-        <a-input placeholder="学习内容" v-model="content"/>
+        <a-textarea placeholder="学习内容" v-model="content"/>
       </div>
       <div class="form-left">
         <label>学习计划</label>
       </div>
       <div class="form-right">
-        <a-input placeholder="学习计划" v-model="plan"/>
+        <a-textarea placeholder="学习计划" v-model="plan"/>
       </div>
       <div class="form-left">
         <label>解决问题</label>
       </div>
       <div class="form-right">
-        <a-input placeholder="解决问题" v-model="solution"/>
+        <a-textarea placeholder="解决问题" v-model="solution"/>
       </div>
       <div class="form-left">
         <label>学习总结</label>
       </div>
       <div class="form-right">
-        <a-input placeholder="学习总结" v-model="conclusion"/>
+        <a-textarea placeholder="学习总结" v-model="conclusion"/>
       </div>
       <div class="form-left">
         <label>附加内容</label>

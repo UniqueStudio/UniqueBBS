@@ -10,7 +10,7 @@ export const MESSAGE_DIAMOND = subject => `您的帖子《${subject}》被管理
 export const MESSAGE_SET_MENTOR = fromUsername => `${fromUsername}将您设为了Mentor！`;
 
 export const MESSAGE_THREAD_URL = tid => `/thread/info/${tid}/1`;
-export const MESSAGE_REPORT_URL = `/report/my/mentor`;
+export const MESSAGE_REPORT_URL = `/report/mentor`;
 
 export const pushMessage = async function(fromUid: string, toUid: string, msg: string, url?: string) {
     const result: Message = await prisma.createMessage({

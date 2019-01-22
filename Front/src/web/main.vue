@@ -97,6 +97,11 @@
 <script>
 import "./css.css";
 export default {
+  data() {
+    return {
+      transitionName: "slide-left"
+    };
+  },
   methods: {
     handleMenuClick(e) {
       switch (e.key) {

@@ -11,6 +11,22 @@ export const reportCreate = async function(req: Request, res: Response) {
         const { uid } = verifyJWT(req.header("Authorization"));
         const { time, content, plan, solution, conclusion, isWeekReport, extra } = req.body;
 
+        if (time.length === 0 || time.length >= 50) {
+            return res.json({ code: -1, msg: "学习时间长度限制0~50字！" });
+        }
+        if (content.length === 0 || content.length >= 500) {
+            return res.json({ code: -1, msg: "学习内容长度限制0~500字！" });
+        }
+        if (content.length === 0 || content.length >= 500) {
+            return res.json({ code: -1, msg: "学习计划长度限制0~500字！" });
+        }
+        if (solution.length === 0 || solution.length >= 500) {
+            return res.json({ code: -1, msg: "解决问题长度限制0~500字！" });
+        }
+        if (conclusion.length === 0 || conclusion.length >= 500) {
+            return res.json({ code: -1, msg: "学习总结长度限制0~500字！" });
+        }
+
         const isWeek: boolean = isWeekReport === "1";
 
         const todayDate = new Date();

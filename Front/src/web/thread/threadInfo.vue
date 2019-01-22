@@ -259,7 +259,7 @@
               @close="handleCloseQuote"
             ></a-alert>
           </div>
-          <a-input type="textarea" v-model="replyInput"></a-input>
+          <a-input type="textarea" v-model="replyInput" id="replyContent"></a-input>
           <div class="thread-post-reply-btn">
             <a-button icon="message" type="primary" @click="reply" :disabled="btnDisabled">回帖</a-button>
           </div>
@@ -516,6 +516,8 @@ export default {
       } else {
         this.quote = pid;
         this.quoteUsername = username;
+        window.scrollTo(0, document.documentElement.scrollHeight);
+        document.querySelector("#replyContent").focus();
       }
     },
     async postServer(url, obj) {

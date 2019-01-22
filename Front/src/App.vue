@@ -8,6 +8,7 @@
 export default {
   name: "App",
   mounted() {
+    this.loginStatusJump();
     this.$router.beforeEach((to, from, next) => {
       const loginStatus = this.$store.state.loginStatus;
       if (to.matched.some(item => item.meta.requireLogin) && !loginStatus) {
@@ -34,6 +35,9 @@ export default {
   computed: {
     noticeContent() {
       return this.$store.state.noticeContent;
+    },
+    loginStatus() {
+      return this.$store.state.loginStatus;
     }
   },
   watch: {
@@ -43,6 +47,28 @@ export default {
           message: "消息通知",
           description: newContent,
           icon: <a-icon type="mail" style="color: #108ee9" />
+        });
+      }
+    },
+    loginStatus(newVal, oldVal) {
+      this.loginStatusJump();
+    }
+  },
+  methods: {
+    loginStatusJump() {
+      if (
+        this.$route.matched.some(item => item.meta.requireLogin) &&
+        !this.loginStatus
+      ) {
+        this.$router.push({
+          path: "/user/login/pwd"
+        });
+      } else if (
+        this.$route.matched.some(item => item.meta.requireUnLogin) &&
+        this.loginStatus
+      ) {
+        this.$router.push({
+          path: "/user/my/info"
         });
       }
     }

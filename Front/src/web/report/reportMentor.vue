@@ -44,7 +44,7 @@
         <a-button icon="tool" type="primary" @click="setMentor">设定</a-button>
       </div>
     </div>
-    <h3>我的Students</h3>
+    <h3>我的Mentee</h3>
     <div class="mentor-my-students">
       <div class="mentor-my-students-item" v-for="student in students" :key="student.id">
         <div class="student-item-avatar">

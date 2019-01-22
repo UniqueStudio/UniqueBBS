@@ -1,14 +1,14 @@
 import Vue from "vue";
 import App from "./App";
 import router from "./router";
-import Antd from "ant-design-vue";
 import "ant-design-vue/dist/antd.css";
 import Vuex from "vuex";
-import ajax from "./functions/ajax";
 import urls from "./functions/urls";
 import getHumanDate from "./functions/humanDate";
-import io from "socket.io-client";
 import marked from "marked";
+import Antd from "ant-design-vue";
+import io from "socket.io-client";
+import ajax from "./functions/ajax";
 
 marked.setOptions({
   renderer: new marked.Renderer(),

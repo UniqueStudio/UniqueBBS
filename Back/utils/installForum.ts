@@ -1,5 +1,5 @@
 import { prisma } from "../generated/prisma-client";
-import { addSaltPassword } from "../model/check";
+
 const newForum = [
     ["通知公告", "notification|#4e4bfc", "全团队公告以及信息"],
     ["新人任务", "solution|#47a189", "新人任务的发布与交付"],
@@ -18,25 +18,5 @@ async function func() {
             description: description
         });
     }
-
-    const result = await prisma.updateUser({
-        where: {
-            userid: "LiuHongXin"
-        },
-        data: {
-            nickname: "lhx",
-            password: addSaltPassword("20000301")
-        }
-    });
-
-    const result2 = await prisma.updateUser({
-        where: {
-            userid: "YangZiYue"
-        },
-        data: {
-            nickname: "ttzztztz",
-            password: addSaltPassword("20000301")
-        }
-    });
 }
 func();

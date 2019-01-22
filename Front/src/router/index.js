@@ -1,28 +1,29 @@
 import Vue from "vue";
 import Router from "vue-router";
 import Main from "@/web/main.vue";
-import forum from "@/web/forum/forum.vue";
-import user from "@/web/user/user.vue";
-import userLogin from "@/web/user/userLogin.vue";
-import userLoginPwd from "@/web/user/userLoginPwd.vue";
-import userLoginWx from "@/web/user/userLoginWx.vue";
-import userMy from "@/web/user/userMy.vue";
-import userMyInfo from "@/web/user/userMyInfo.vue";
-import userMyPwdReset from "@/web/user/userMyPwdReset.vue";
-import userVisit from "@/web/user/userVisit.vue";
-import userMyNotice from "@/web/user/userMyNotice.vue";
-import userMyGroup from "@/web/user/userMyGroup.vue";
-import userMyThreads from "@/web/user/userMyThreads.vue";
-import userGroupList from "@/web/user/userGroupList.vue";
-import userGroupVisit from "@/web/user/userGroupVisit.vue";
-import thread from "@/web/thread/thread.vue";
-import threadList from "@/web/thread/threadList.vue";
-import threadInfo from "@/web/thread/threadInfo.vue";
-import threadCreate from "@/web/thread/threadCreate.vue";
-import report from "@/web/report/report.vue";
-import reportMy from "@/web/report/reportMy.vue";
-import reportCreate from "@/web/report/reportCreate.vue";
-import reportMentor from "@/web/report/reportMentor.vue";
+
+const forum = () => import("@/web/forum/forum.vue");
+const user = () => import("@/web/user/user.vue");
+const userLogin = () => import("@/web/user/userLogin.vue");
+const userLoginPwd = () => import("@/web/user/userLoginPwd.vue");
+const userLoginWx = () => import("@/web/user/userLoginWx.vue");
+const userMy = () => import("@/web/user/userMy.vue");
+const userMyInfo = () => import("@/web/user/userMyInfo.vue");
+const userMyPwdReset = () => import("@/web/user/userMyPwdReset.vue");
+const userVisit = () => import("@/web/user/userVisit.vue");
+const userMyNotice = () => import("@/web/user/userMyNotice.vue");
+const userMyGroup = () => import("@/web/user/userMyGroup.vue");
+const userMyThreads = () => import("@/web/user/userMyThreads.vue");
+const userGroupList = () => import("@/web/user/userGroupList.vue");
+const userGroupVisit = () => import("@/web/user/userGroupVisit.vue");
+const thread = () => import("@/web/thread/thread.vue");
+const threadList = () => import("@/web/thread/threadList.vue");
+const threadInfo = () => import("@/web/thread/threadInfo.vue");
+const threadCreate = () => import("@/web/thread/threadCreate.vue");
+const report = () => import("@/web/report/report.vue");
+const reportMy = () => import("@/web/report/reportMy.vue");
+const reportCreate = () => import("@/web/report/reportCreate.vue");
+const reportMentor = () => import("@/web/report/reportMentor.vue");
 
 Vue.use(Router);
 
@@ -267,7 +268,14 @@ const router = new Router({
         }
       ]
     }
-  ]
+  ],
+  scrollBehavior(to, from, savedPosition) {
+    if (savedPosition) {
+      return savedPosition;
+    } else {
+      return { x: 0, y: 0 };
+    }
+  }
 });
 
 export default router;

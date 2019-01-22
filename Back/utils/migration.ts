@@ -1,5 +1,16 @@
-import { prisma, Group } from "../generated/prisma-client";
+import { prisma } from "../generated/prisma-client";
 import * as fs from "fs";
+import fetch from "node-fetch";
+
+const DOWNLOAD_FILE_PREFIX = "https://bbs.hustunique.com/";
+const IS_LOCAL_ATTACH_REGEX = /\!\[.+?\]\(\/(.*?)\)/gi;
+
+async function downloadImg(url, path) {
+    const result = await fetch(url);
+    const bufferImg = await result.buffer();
+    fs.writeFileSync(path, bufferImg);
+    return bufferImg.length;
+}
 
 async function execMigration() {
     console.log("Preparing Databases");
@@ -13,6 +24,7 @@ async function execMigration() {
     const threadFirstPostMap = new Map<string, string>();
     const groupMap = new Map<string, string>();
     const threadReport = new Map<string, number>();
+    const attachMap = new Map<string, string>();
 
     // <-- Step 0 Create Reflection between group name and group id
     console.log("Creating Group Reflection Maps");
@@ -100,6 +112,7 @@ async function execMigration() {
     userMap.set("1", masterAccount.id);
 
     for (const user of userDB) {
+        console.log(`Checking user ${user.username}`);
         if (userMap.get(user.uid) !== undefined) {
             // is contained
             continue;
@@ -154,6 +167,7 @@ async function execMigration() {
         DAILY_REPORT = 2;
     const exceptForumThisStep = [...reportForumArr, ...exceptForumArr];
     for (const thread of threadDB) {
+        console.log(`Processing ${thread.title}`);
         if (exceptForumThisStep.some(item => item === thread.cid)) {
             if (reportForumArr.some(item => item === thread.cid)) {
                 threadReport.set(thread.id, reg.test(thread.title) ? WEEKLY_REPORT : DAILY_REPORT);
@@ -191,13 +205,67 @@ async function execMigration() {
 
     //<-- Step 4 Migration Posts using Reflections
     console.log("Migrating Posts");
+    let imageOffset = 0;
     for (const post of postDB) {
+        console.log(`${post.pid}`);
         const authorUID = userMap.get(post.uid);
         const threadID = threadMap.get(post.tid);
         const isFirstPost = threadFirstPostMap.get(post.pid) !== undefined;
-        if (!threadID) {
+        if (!threadID || !authorUID) {
             continue;
         }
+
+        let matchResult = IS_LOCAL_ATTACH_REGEX.exec(post.content);
+        const attachArr = [];
+        const willReplace: Array<[string, string]> = [];
+        while (matchResult) {
+            console.log(`Downloading File ${matchResult[1]}`);
+            const date = new Date();
+            const dirName =
+                date.getFullYear().toString() +
+                "_" +
+                (date.getMonth() + 1).toString() +
+                "_" +
+                date.getDate().toString();
+            const newDir = `./upload/${dirName}`;
+            const newPath = `${newDir}/migration_${new Date().getTime().toString()}_${imageOffset}.rabbit`;
+            if (!fs.existsSync(newDir)) fs.mkdirSync(newDir);
+
+            const [relativeContent, relativeURL] = matchResult;
+
+            const related = attachMap.get(relativeURL);
+            if (related) {
+                willReplace.push([relativeContent, `![uniqueImg](${related})`]);
+            } else {
+                const length = await downloadImg(`${DOWNLOAD_FILE_PREFIX}${relativeURL}`, newPath);
+
+                const attach = await prisma.createAttach({
+                    user: {
+                        connect: {
+                            id: authorUID
+                        }
+                    },
+                    fileName: newPath,
+                    originalName: `${imageOffset}.jpg`,
+                    createDate: new Date(),
+                    filesize: length
+                });
+
+                attachArr.push({
+                    id: attach.id
+                });
+                attachMap.set(relativeURL, attach.id);
+                willReplace.push([relativeContent, `![uniqueImg](unique://${attach.id})`]);
+            }
+
+            imageOffset++;
+            matchResult = IS_LOCAL_ATTACH_REGEX.exec(post.content);
+        }
+
+        willReplace.forEach(item => {
+            post.content = post.content.replace(item[0], item[1]);
+        });
+
         const result = await prisma.updateThread({
             where: {
                 id: threadID
@@ -218,6 +286,17 @@ async function execMigration() {
                 }
             }
         });
+
+        if (attachArr.length !== 0) {
+            await prisma.updateThread({
+                where: { id: threadID },
+                data: {
+                    attach: {
+                        connect: attachArr
+                    }
+                }
+            });
+        }
     }
     //<-- Step 5 Update Runtimes
     console.log("Updating Runtimes");

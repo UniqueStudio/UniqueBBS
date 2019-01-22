@@ -215,6 +215,25 @@ export const userInfoUpdate = async function(req: Request, res: Response) {
                 nickname: nickname
             }
         });
+
+        if (studentID.length >= 20) {
+            return res.json({ code: -1, msg: "学号过长，请检查后再输入！" });
+        }
+        if (dormitory.length >= 20) {
+            return res.json({ code: -1, msg: "宿舍号过长，请检查后再输入！" });
+        }
+        if (qq.length >= 20) {
+            return res.json({ code: -1, msg: "QQ号过长，请检查后再输入！" });
+        }
+        if (major.length >= 20) {
+            return res.json({ code: -1, msg: "专业过长，请检查后再输入！" });
+        }
+        if (className.length >= 20) {
+            return res.json({ code: -1, msg: "班级过长，请检查后再输入！" });
+        }
+        if (signature.length >= 100) {
+            return res.json({ code: -1, msg: "个人签名最多100字符，请重新输入！" });
+        }
         if (checkUser.length !== 0 && checkUser[0].id !== uid) {
             return res.json({ code: -1, msg: "该昵称已被占用！" });
         }
