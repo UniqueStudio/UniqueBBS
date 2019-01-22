@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import * as parser from "fast-xml-parser";
 import { wxMsgToken, wxMsgAESKEY, wxAppID } from "./consts";
 import { prisma } from "../generated/prisma-client";
-import * as WXCrypto from "./module/wx.class";
+const WXCrypto = require("./module/wx.class")
 const wxCrypto = new WXCrypto(wxMsgToken, wxMsgAESKEY, wxAppID);
 
 const WX_CREATE_USER = "create_user";
