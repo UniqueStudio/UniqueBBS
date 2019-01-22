@@ -1,0 +1,65 @@
+version: '2'
+services:
+  bbs:
+    build: ./
+    ports:
+      - 7010:7010
+    command:
+      - run
+      - init
+    volumes:
+      - /Users/faraway/Desktop/UniqueBBS/tmp:/var/bbs
+    restart: always
+    depends_on:
+      - prisma
+      - redis
+  prisma:
+    image: prismagraphql/prisma:1.21
+    environment:
+      PRISMA_CONFIG: |-
+        port: 4466
+        databases:
+          default:
+            connector: mysql
+            host: mysql
+            port: 3306
+            user: root
+            password: P@ssw0rd
+            migrations: true
+    stdin_open: true
+    tty: true
+    depends_on:
+      - mysql
+    ports:
+      - 4466:4466
+  mysql:
+    image: mysql:5.7
+    environment:
+      MYSQL_ROOT_PASSWORD: P@ssw0rd
+    stdin_open: true
+    tty: true
+  # caddy:
+  #   image: registry.cn-hangzhou.aliyuncs.com/faraway/caddy
+  #   environment:
+  #     ACME_AGREE: 'true'
+  #     CLOUDFLARE_API_KEY: 8d0b0dea4c32f7d1609d5f43c4d2f1a75805c
+  #     CLOUDFLARE_EMAIL: farawayfed@gmail.com
+  #   stdin_open: true
+  #   volumes:
+  #   - /root/Caddyfile:/etc/Caddyfile
+  #   - /root/.caddy:/root/.caddy
+  #   tty: true
+  #   ports:
+  #   - 2080:80/tcp
+  #   - 2443:443/tcp
+  #   command:
+  #   - --conf=/etc/Caddyfile
+  #   - --log=stdout
+  #   - --agree=true
+  #   - --email=farawayfed@gmail.com
+  redis:
+    image: redis
+    stdin_open: true
+    tty: true
+    ports:
+    - 4003:6379/tcp
