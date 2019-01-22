@@ -382,15 +382,17 @@ async function install() {
             orderBy: "createDate_DESC",
             first: 1
         });
-        await prisma.updateThread({
-            where: {
-                id: thread.id
-            },
-            data: {
-                postCount: postCount,
-                lastDate: lastPost.createDate
-            }
-        });
+        if (lastPost) {
+            await prisma.updateThread({
+                where: {
+                    id: thread.id
+                },
+                data: {
+                    postCount: postCount,
+                    lastDate: lastPost.createDate
+                }
+            });
+        }
     }
 
     const userList = await prisma.users();
