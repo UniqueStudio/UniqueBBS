@@ -1,7 +1,9 @@
 {
-    "compilerOptions": {
-        "lib": ["es2017", "dom", "esnext.asynciterable"],
-        "target": "es5",
-        "downlevelIteration": true
-    }
+  "compilerOptions": {
+    "lib": ["es2017", "dom", "esnext.asynciterable"],
+    "target": "ESNEXT",
+    "module": "commonjs",
+    "downlevelIteration": true,
+    "outDir": "./output/"
+  }
 }

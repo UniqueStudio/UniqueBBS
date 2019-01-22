@@ -33,6 +33,9 @@
         "typescript": "^3.2.2"
     },
     "scripts": {
-        "dev": "ts-node server.ts"
+        "dev": "ts-node server.ts",
+        "compile": "tsc",
+        "init": "node ./output/utils/init.js",
+        "start": "node ./output/server.js"
     }
 }
