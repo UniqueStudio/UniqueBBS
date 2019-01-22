@@ -10,15 +10,14 @@
             </div>
             <div class="user-mentor">
               <div class="user-have-mentor" v-if="haveMentor">
-                <a-tag color="cyan">
+                <a-tag color="cyan" @click="handleMentorClick">
                   <a-icon type="fork"/>
-                  &nbsp;
                   {{mentor.name}}
                 </a-tag>
               </div>
               <div class="user-dont-have-mentoor" v-else>
-                <a-tag color="orange">
-                  <a-icon type="fork"/>&nbsp;无Mentor
+                <a-tag color="orange" @click="handleMentorClick">
+                  <a-icon type="fork"/>无Mentor
                 </a-tag>
               </div>
             </div>
@@ -93,6 +92,11 @@ export default {
     };
   },
   methods: {
+    handleMentorClick() {
+      if (this.mode === "my") {
+        this.$router.push({ path: "/report/mentor" });
+      }
+    },
     initReport() {
       this.mode = this.$route.meta.mode;
       if (this.mode === "visit") {

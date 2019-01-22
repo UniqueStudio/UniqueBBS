@@ -7,8 +7,10 @@ import { socketPushMessage } from "./socket";
 export const MESSAGE_REPLY = (username, subject) => `${username}回复了您的帖子《${subject}》！`;
 export const MESSAGE_QUOTE = (username, subject) => `${username}引用了您在帖子《${subject}》中的回复！`;
 export const MESSAGE_DIAMOND = subject => `您的帖子《${subject}》被管理员设置为精华帖子！`;
+export const MESSAGE_SET_MENTOR = fromUsername => `${fromUsername}将您设为了Mentor！`;
 
 export const MESSAGE_THREAD_URL = tid => `/thread/info/${tid}/1`;
+export const MESSAGE_REPORT_URL = `/report/my/mentor`;
 
 export const pushMessage = async function(fromUid: string, toUid: string, msg: string, url?: string) {
     const result: Message = await prisma.createMessage({

@@ -11,6 +11,7 @@ import {
     filterUserInfo,
     filterUsersInfo
 } from "./check";
+import { pushMessage, MESSAGE_SET_MENTOR, MESSAGE_REPORT_URL } from "./message";
 import { setLockExpireIncr } from "./lock";
 
 export const userInfo = async function(req: Request, res: Response) {
@@ -435,7 +436,25 @@ export const mentorMyStudents = async function(req: Request, res: Response) {
             }
         });
 
-        res.json({ code: 1, msg: { students: filterUsersInfo(myStudentsInfo), mentor: filterUserInfo(myMentor) } });
+        const myInfo = await prisma.user({
+            id: uid
+        });
+
+        if (myMentor) {
+            res.json({
+                code: 1,
+                msg: {
+                    students: filterUsersInfo(myStudentsInfo),
+                    mentor: filterUserInfo(myMentor),
+                    my: filterUserInfo(myInfo)
+                }
+            });
+        } else {
+            res.json({
+                code: 1,
+                msg: { students: filterUsersInfo(myStudentsInfo), mentor: null, my: filterUserInfo(myInfo) }
+            });
+        }
     } catch (e) {
         res.json({ code: -1, msg: e.message });
     }
@@ -443,17 +462,30 @@ export const mentorMyStudents = async function(req: Request, res: Response) {
 
 export const mentorSet = async function(req: Request, res: Response) {
     try {
-        const authObj = verifyJWT(req.header("Authorization"));
-        const uid: string = authObj.uid;
+        const { uid, username } = verifyJWT(req.header("Authorization"));
 
-        const { mentorUid } = req.body;
+        const previousMentor = await prisma
+            .user({
+                id: uid
+            })
+            .mentor();
 
-        const mentorInfo = await prisma.user({
-            id: mentorUid
+        const { mentorName } = req.body;
+
+        const mentorInfoList = await prisma.users({
+            where: {
+                username_contains: mentorName
+            }
         });
 
-        if (!mentorInfo || mentorInfo.id === uid) {
+        if (mentorInfoList.length !== 1 || mentorInfoList[0].id === uid) {
             return res.json({ code: -1, msg: "Mentor不合法！" });
+        }
+
+        const [mentorInfo] = mentorInfoList;
+
+        if (previousMentor && previousMentor.id === mentorInfo.id) {
+            return res.json({ code: 1 });
         }
 
         const result = await prisma.updateUser({
@@ -463,11 +495,13 @@ export const mentorSet = async function(req: Request, res: Response) {
             data: {
                 mentor: {
                     connect: {
-                        id: mentorUid
+                        id: mentorInfo.id
                     }
                 }
             }
         });
+
+        await pushMessage(uid, mentorInfo.id, MESSAGE_SET_MENTOR(username), MESSAGE_REPORT_URL);
 
         res.json({ code: 1 });
     } catch (e) {

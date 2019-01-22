@@ -84,10 +84,15 @@ export default {
     }
   },
   watch: {
-    uid(newUid, pldUid) {
+    uid(newUid, previousUid) {
       if (newUid !== "") {
         this.renderGraph();
       }
+    }
+  },
+  mounted() {
+    if (this.uid !== "") {
+      this.renderGraph();
     }
   }
 };
