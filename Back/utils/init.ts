@@ -440,19 +440,21 @@ async function install() {
             orderBy: "createDate_DESC",
             first: 1
         });
-        await prisma.updateForum({
-            where: {
-                id: forum.id
-            },
-            data: {
-                threads: threads,
-                lastPost: {
-                    connect: {
-                        id: lastPost.id
+        if (lastPost) {
+            await prisma.updateForum({
+                where: {
+                    id: forum.id
+                },
+                data: {
+                    threads: threads,
+                    lastPost: {
+                        connect: {
+                            id: lastPost.id
+                        }
                     }
                 }
-            }
-        });
+            });
+        }
     }
     //<-- Step 6 Migration Reports
     console.log("Migrating Reports");
