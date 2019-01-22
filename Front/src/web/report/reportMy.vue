@@ -136,7 +136,7 @@ export default {
     userLink(uid) {
       return `/user/visit/${uid}`;
     },
-    pageOnchange() {
+    pageOnchange(page) {
       if (this.mode === "my") {
         this.$router.push({
           path: `/report/my/${page}`
@@ -175,8 +175,8 @@ export default {
       const reportListRaw = await this.$ajax.get(
         this.$urls.reportList(this.user.uid, this.page)
       );
-      this.reportList = reportListRaw.data.msg;
-
+      this.reportList = reportListRaw.data.msg.list;
+      this.reportCount = Number.parseInt(reportListRaw.data.msg.count);
       const reportCanRaw = await this.$ajax.get(this.$urls.reportCan);
       this.canPostReport =
         reportCanRaw.data.msg.weekly || reportCanRaw.data.msg.daily;

@@ -6,17 +6,23 @@ const DOWNLOAD_FILE_PREFIX = "https://bbs.hustunique.com/";
 const IS_LOCAL_ATTACH_REGEX = /\!\[.+?\]\(\/(.*?)\)/gi;
 
 async function downloadImg(url, path) {
-    const result = await fetch(url);
-    const bufferImg = await result.buffer();
-    fs.writeFileSync(path, bufferImg);
-    return bufferImg.length;
+    try {
+        const result = await fetch(encodeURI(url));
+        const bufferImg = await result.buffer();
+        fs.writeFileSync(path, bufferImg);
+        return bufferImg.length;
+    } catch (e) {
+        console.log(e);
+        return 0;
+    }
 }
 
 async function execMigration() {
     console.log("Preparing Databases");
-    const userDB = fs.readFileSync("./users.json").toJSON().data;
-    const threadDB = fs.readFileSync("./topics.json").toJSON().data;
-    const postDB = fs.readFileSync("./posts.json").toJSON().data;
+    const userDB = JSON.parse(fs.readFileSync("./backup/users.json").toString());
+    const threadDB = JSON.parse(fs.readFileSync("./backup/topics.json").toString());
+    const postDB = JSON.parse(fs.readFileSync("./backup/posts.json").toString());
+    const reportDB = JSON.parse(fs.readFileSync("./backup/posts.json").toString());
 
     const threadMap = new Map<string, string>();
     const forumMap = new Map<string, string>();
@@ -24,6 +30,7 @@ async function execMigration() {
     const threadFirstPostMap = new Map<string, string>();
     const groupMap = new Map<string, string>();
     const threadReport = new Map<string, number>();
+    const threadAuthor = new Map<string, string>();
     const attachMap = new Map<string, string>();
 
     // <-- Step 0 Create Reflection between group name and group id
@@ -36,7 +43,7 @@ async function execMigration() {
     // <-- Step 1 Create Reflection between old and new forum id
     console.log("Creating Forum Reflection Maps");
     const reportForumArr = ["10", "11", "12", "13", "14", "15", "16", "28"];
-    const exceptForumArr = ["3", "26"];
+    const exceptForumArr = ["3"];
 
     const [TongZhiGongGao] = await prisma.forums({
         where: {
@@ -90,6 +97,7 @@ async function execMigration() {
 
     forumMap.set("8", XianZaTaoLun.id); // 闲杂讨论
     forumMap.set("31", XianZaTaoLun.id); // 闲杂讨论
+    forumMap.set("26", XianZaTaoLun.id); // 闲杂讨论
 
     forumMap.set("37", TuanDuiFenXiang.id); // 团队分享
     forumMap.set("5", TuanDuiFenXiang.id); // 团队分享
@@ -103,6 +111,13 @@ async function execMigration() {
     forumMap.set("18", TuanDuiZiLiao.id); // 团队资料
     forumMap.set("19", TuanDuiZiLiao.id); // 团队资料
     forumMap.set("36", TuanDuiZiLiao.id); // 团队资料
+    forumMap.set("20", TuanDuiZiLiao.id); // 团队资料
+    forumMap.set("21", TuanDuiZiLiao.id); // 团队资料
+    forumMap.set("22", TuanDuiZiLiao.id); // 团队资料
+    forumMap.set("25", TuanDuiZiLiao.id); // 团队资料
+    forumMap.set("32", TuanDuiZiLiao.id); // 团队资料
+    forumMap.set("34", TuanDuiZiLiao.id); // 团队资料
+    forumMap.set("35", TuanDuiZiLiao.id); // 团队资料
 
     // <-- Step 2 Create Reflection between old and new user id
     console.log("Creating User Reflection Maps");
@@ -170,7 +185,8 @@ async function execMigration() {
         console.log(`Processing ${thread.title}`);
         if (exceptForumThisStep.some(item => item === thread.cid)) {
             if (reportForumArr.some(item => item === thread.cid)) {
-                threadReport.set(thread.id, reg.test(thread.title) ? WEEKLY_REPORT : DAILY_REPORT);
+                threadAuthor.set(thread.tid, thread.uid);
+                threadReport.set(thread.tid, reg.test(thread.title) ? WEEKLY_REPORT : DAILY_REPORT);
             }
             continue;
         }
@@ -181,7 +197,9 @@ async function execMigration() {
             console.log(thread);
             continue;
         }
-        threadFirstPostMap.set(thread.mainPid, thread.id);
+        console.log(`${thread.mainPid} -> ${thread.tid}`);
+        threadFirstPostMap.set(thread.mainPid, thread.tid);
+        threadAuthor.set(thread.tid, thread.uid);
         const result = await prisma.createThread({
             subject: thread.title,
             createDate: new Date(Number.parseInt(thread.timestamp)),
@@ -207,10 +225,10 @@ async function execMigration() {
     console.log("Migrating Posts");
     let imageOffset = 0;
     for (const post of postDB) {
-        console.log(`${post.pid}`);
         const authorUID = userMap.get(post.uid);
         const threadID = threadMap.get(post.tid);
-        const isFirstPost = threadFirstPostMap.get(post.pid) !== undefined;
+        const isFirstPost = threadFirstPostMap.get(post.pid) === threadID;
+        console.log(`${post.pid} , ${isFirstPost}`);
         if (!threadID || !authorUID) {
             continue;
         }
@@ -238,24 +256,25 @@ async function execMigration() {
                 willReplace.push([relativeContent, `![uniqueImg](${related})`]);
             } else {
                 const length = await downloadImg(`${DOWNLOAD_FILE_PREFIX}${relativeURL}`, newPath);
+                if (length !== 0) {
+                    const attach = await prisma.createAttach({
+                        user: {
+                            connect: {
+                                id: authorUID
+                            }
+                        },
+                        fileName: newPath,
+                        originalName: `${imageOffset}.jpg`,
+                        createDate: new Date(),
+                        filesize: length
+                    });
 
-                const attach = await prisma.createAttach({
-                    user: {
-                        connect: {
-                            id: authorUID
-                        }
-                    },
-                    fileName: newPath,
-                    originalName: `${imageOffset}.jpg`,
-                    createDate: new Date(),
-                    filesize: length
-                });
-
-                attachArr.push({
-                    id: attach.id
-                });
-                attachMap.set(relativeURL, attach.id);
-                willReplace.push([relativeContent, `![uniqueImg](unique://${attach.id})`]);
+                    attachArr.push({
+                        id: attach.id
+                    });
+                    attachMap.set(relativeURL, attach.id);
+                    willReplace.push([relativeContent, `![uniqueImg](unique://${attach.id})`]);
+                }
             }
 
             imageOffset++;
@@ -266,23 +285,19 @@ async function execMigration() {
             post.content = post.content.replace(item[0], item[1]);
         });
 
-        const result = await prisma.updateThread({
-            where: {
-                id: threadID
+        const result = await prisma.createPost({
+            createDate: new Date(Number.parseInt(post.timestamp)),
+            message: post.content,
+            user: {
+                connect: {
+                    id: authorUID
+                }
             },
-            data: {
-                post: {
-                    create: {
-                        createDate: new Date(Number.parseInt(post.timestamp)),
-                        message: post.content,
-                        user: {
-                            connect: {
-                                id: authorUID
-                            }
-                        },
-                        isFirst: isFirstPost,
-                        active: post.deleted === "0"
-                    }
+            isFirst: isFirstPost,
+            active: post.deleted === "0",
+            thread: {
+                connect: {
+                    id: threadID
                 }
             }
         });
@@ -303,6 +318,25 @@ async function execMigration() {
 
     const threadList = await prisma.threads();
     for (const thread of threadList) {
+        const [resultFirst] = await prisma.posts({
+            where: {
+                thread: {
+                    id: thread.id
+                }
+            },
+            orderBy: "createDate_ASC",
+            first: 1
+        });
+
+        await prisma.updatePost({
+            where: {
+                id: resultFirst.id
+            },
+            data: {
+                isFirst: true
+            }
+        });
+
         const postCount = await prisma
             .postsConnection({
                 where: {
@@ -394,21 +428,20 @@ async function execMigration() {
     }
     //<-- Step 6 Migration Reports
     console.log("Migrating Reports");
-    for (const post of postDB) {
-        const reportStatus = threadReport.get(post.pid);
-        if (reportStatus === undefined) continue;
-        const userID = userMap.get(post.uid);
-        await prisma.updateUser({
-            where: {
-                id: userID
-            },
-            data: {
-                report: {
-                    create: {
-                        message: post.content,
-                        createDate: new Date(Number.parseInt(post.timestamp)),
-                        isWeek: reportStatus === WEEKLY_REPORT
-                    }
+    for (const post of reportDB) {
+        console.log(post.pid);
+        const reportStatus = threadReport.get(post.tid);
+        if (!reportStatus) continue;
+        const authorID = userMap.get(post.uid);
+        if (threadAuthor.get(post.tid) !== post.uid) continue;
+        if (!userMap.get(threadAuthor.get(post.tid))) continue;
+        await prisma.createReport({
+            message: post.content,
+            createDate: new Date(Number.parseInt(post.timestamp)),
+            isWeek: reportStatus === WEEKLY_REPORT,
+            user: {
+                connect: {
+                    id: authorID
                 }
             }
         });

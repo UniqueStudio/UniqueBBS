@@ -54,18 +54,18 @@
             </a-tag>
           </p>
         </div>
-        <div class="thread-item-last-reply">
-          <p class="thread-item-info-reply-message">
+        <div class="thread-item-last-reply" v-if="thread.lastReply[0]">
+          <div class="thread-item-info-reply-message">
             <router-link
               :to="'/thread/info/'+thread.thread.id+'/1'"
             >{{thread.lastReply[0].message.length > 10? (thread.lastReply[0].message.substr(0,10)+'...') : thread.lastReply[0].message}}</router-link>
-          </p>
-          <p class="thread-item-info-author">
+          </div>
+          <div class="thread-item-info-author">
             <a-tag color="green">
               <a-icon type="clock-circle"/>
               {{humanDate(new Date(thread.thread.lastDate))}}
             </a-tag>
-          </p>
+          </div>
         </div>
       </div>
       <div class="pagination" v-if="forum.threads > defaultPageSize">

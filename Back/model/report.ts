@@ -189,8 +189,18 @@ export const reportList = async function(req: Request, res: Response) {
             skip: (page - 1) * pagesize,
             first: pagesize
         });
+        const count = await prisma
+            .reportsConnection({
+                where: {
+                    user: {
+                        id: uid
+                    }
+                }
+            })
+            .aggregate()
+            .count();
 
-        res.json({ code: 1, msg: list });
+        res.json({ code: 1, msg: { list, count } });
     } catch (e) {
         res.json({ code: -1, msg: e.message });
     }
