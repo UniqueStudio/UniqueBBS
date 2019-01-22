@@ -483,4 +483,6 @@ async function install() {
 
 if (!fs.existsSync("/var/bbs/install.lock")) {
     install();
+} else {
+    require("../server");
 }
