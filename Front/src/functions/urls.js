@@ -1,5 +1,5 @@
-const domain = "http://localhost:7010/";
-const socket = "ws://localhost:7010/";
+const domain = "https://bbs.hzytql.top/";
+const socket = domain.replace(/^http/i, "ws");
 const urls = {
   domain: `${domain}`,
   login: `${domain}user/login/pwd`,

@@ -71,7 +71,7 @@ import { socketLogin, socketDisconnect } from "./model/socket";
 const SERVER_VERSION = "1.00";
 
 export const redisClient = Redis.createClient({
-    host: "localhost",
+    host: "redis",
     port: 6379
 });
 
