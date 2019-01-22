@@ -1,10 +1,12 @@
-FROM node:alpine
+FROM node:alpine AS build
+
+ADD ./Back/package.json /tmp/package.json
+RUN cd /tmp && yarn
+RUN mkdir -p /usr/src/app && cp -a /tmp/node_modules /usr/src/app
+
 WORKDIR /usr/src/app
-COPY . .
+COPY Back .
+RUN yarn compile
 
-RUN cd Front && yarn && yarn build
-RUN cd Back && yarn && yarn compile
-
-WORKDIR /usr/src/app/Back
-CMD ["yarn", "start"]
+CMD ["start"]
 ENTRYPOINT [ "yarn" ]
