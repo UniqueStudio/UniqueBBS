@@ -1,4 +1,4 @@
-const domain = "https://bbs.hzytql.top/";
+const domain = "https://api.bbs.hzytql.top/";
 const socket = domain.replace(/^http/i, "ws");
 const urls = {
   domain: `${domain}`,
