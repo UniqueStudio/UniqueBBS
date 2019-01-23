@@ -422,11 +422,11 @@ export const userScan = async function(req: Request, res: Response) {
                 }
             } else {
                 res.json({ code: -1, msg: "登录失败！" });
-                return;
+                return 1;
             }
         } else {
             res.json({ code: -2, msg: "登录超时，请重新登录！" });
-            return;
+            return 1;
         }
     } catch (err) {
         res.json({ code: -1, msg: err.message });
