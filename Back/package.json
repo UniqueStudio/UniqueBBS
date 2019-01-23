@@ -16,7 +16,7 @@
         "jsonwebtoken": "^8.4.0",
         "multer": "^1.4.1",
         "node-fetch": "^2.3.0",
-        "prisma-client-lib": "^1.23.4",
+        "prisma-client-lib": "1.23.4",
         "redis": "^2.8.0",
         "redlock": "^3.1.2",
         "socket.io": "^2.2.0"
@@ -30,7 +30,7 @@
         "@types/redis": "^2.8.10",
         "@types/redlock": "^3.0.2",
         "@types/socket.io": "^2.1.2",
-        "prisma": "^1.24.0",
+        "prisma": "1.24.0",
         "typescript": "^3.2.2"
     },
     "scripts": {
