@@ -1,3 +1,6 @@
+import * as dotenv from "dotenv";
+dotenv.config();
+
 import * as express from "express";
 import * as bodyParser from "body-parser";
 import * as Redis from "redis";
@@ -77,9 +80,9 @@ export const redisClient = Redis.createClient({
 });
 
 export const redisClientGetAsync = promisify(redisClient.get).bind(redisClient);
-export const redisClientSetAsync = promisify(redisClient.set).bind(redisClient);
+export const redisClientSetAsync: any = promisify(redisClient.set).bind(redisClient);
 export const redisClientKeysAsync = promisify(redisClient.keys).bind(redisClient);
-export const redisClientDelAsync = promisify(redisClient.del).bind(redisClient);
+export const redisClientDelAsync: any = promisify(redisClient.del).bind(redisClient);
 export const redisClientIncrAsync = promisify(redisClient.incr).bind(redisClient);
 export const redisClientExpireAsync = promisify(redisClient.expire).bind(redisClient);
 

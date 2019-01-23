@@ -92,4 +92,5 @@ export const forumRuntime = async function(req: Request, res: Response) {
     } catch (e) {
         res.json({ code: -1, msg: e.message });
     }
+    return 1;
 };

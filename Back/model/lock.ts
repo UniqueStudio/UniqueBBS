@@ -22,7 +22,7 @@ export const setLockExpireIncr = async function(key: string, expireSeconds: stri
     const checkLockResult = await redisClientGetAsync(key);
     if (checkLockResult === null || Number.parseInt(checkLockResult) < maxCount) {
         await redisClientIncrAsync(key);
-        await redisClientExpireAsync(key, expireSeconds);
+        await redisClientExpireAsync(key, Number.parseInt(expireSeconds));
         return true;
     } else {
         return false;

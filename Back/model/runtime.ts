@@ -9,7 +9,7 @@ export const userThreadsAdd = async function(uid: string, addNum: number = 1) {
             id: uid
         });
 
-        const resultUser = await prisma.updateUser({
+        await prisma.updateUser({
             where: {
                 id: uid
             },
@@ -23,12 +23,15 @@ export const userThreadsAdd = async function(uid: string, addNum: number = 1) {
     return true;
 };
 
-export const forumLastPostUpdate = async function(fid: string, lastPostID: string) {
+export const forumLastPostUpdate = async function(
+    fid: string,
+    lastPostID: string
+) {
     const redLockResourceNameUser = `forum:${fid}`;
     const lock = await redLock.lock(redLockResourceNameUser, 200);
 
     try {
-        const resultForum = await prisma.updateForum({
+        await prisma.updateForum({
             where: {
                 id: fid
             },
@@ -46,7 +49,11 @@ export const forumLastPostUpdate = async function(fid: string, lastPostID: strin
     return true;
 };
 
-export const forumThreadsAdd = async function(fid: string, addNum: number = 1, lastPostID?: string) {
+export const forumThreadsAdd = async function(
+    fid: string,
+    addNum: number = 1,
+    lastPostID?: string
+) {
     const redLockResourceNameUser = `forum:${fid}`;
     const lock = await redLock.lock(redLockResourceNameUser, 200);
 
@@ -72,7 +79,7 @@ export const forumThreadsAdd = async function(fid: string, addNum: number = 1, l
             };
         }
 
-        const resultForum = await prisma.updateForum({
+        await prisma.updateForum({
             where: {
                 id: fid
             },
@@ -84,14 +91,17 @@ export const forumThreadsAdd = async function(fid: string, addNum: number = 1, l
     return true;
 };
 
-export const threadPostCountAdd = async function(tid: string, addNum: number = 1) {
+export const threadPostCountAdd = async function(
+    tid: string,
+    addNum: number = 1
+) {
     const redLockResourceNameUser = `thread:${tid}`;
     const lock = await redLock.lock(redLockResourceNameUser, 200);
     try {
         const threadInfo = await prisma.thread({
             id: tid
         });
-        const resultThread = await prisma.updateThread({
+        await prisma.updateThread({
             where: {
                 id: tid
             },

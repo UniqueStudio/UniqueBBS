@@ -170,6 +170,7 @@ export const userLoginByPwd = async function(req: Request, res: Response) {
     } else {
         return res.json({ code: -1, msg: "密码错误！" });
     }
+    return 1;
 };
 
 export const userPwdReset = async function(req: Request, res: Response) {
@@ -188,7 +189,7 @@ export const userPwdReset = async function(req: Request, res: Response) {
                 msg: "您当前的密码输入错误，请重新输入！"
             });
         } else {
-            const result = await prisma.updateUser({
+            await prisma.updateUser({
                 where: {
                     id: uid
                 },
@@ -201,6 +202,7 @@ export const userPwdReset = async function(req: Request, res: Response) {
     } catch (e) {
         res.json({ code: -1, msg: e.message });
     }
+    return 1;
 };
 
 export const userInfoUpdate = async function(req: Request, res: Response) {
@@ -237,7 +239,7 @@ export const userInfoUpdate = async function(req: Request, res: Response) {
             return res.json({ code: -1, msg: "该昵称已被占用！" });
         }
 
-        const result = await prisma.updateUser({
+        await prisma.updateUser({
             where: {
                 id: uid
             },
@@ -256,6 +258,7 @@ export const userInfoUpdate = async function(req: Request, res: Response) {
     } catch (e) {
         res.json({ code: -1, msg: e.message });
     }
+    return 1;
 };
 
 export const userInfoUpdateFromWx = async function(req: Request, res: Response) {
@@ -282,19 +285,22 @@ export const userInfoUpdateFromWx = async function(req: Request, res: Response) 
         }
 
         const groups = await prisma.groups();
-        let groupList = {};
+        let groupList = new Map<number, string>();
         let groupKeyList: Array<[number, string]> = [];
         for (let group of groups) {
-            groupList["group_k" + group.key] = group.id;
+            groupList.set(group.key, group.id);
             groupKeyList.push([group.key, group.name]);
         }
 
         const userGroupArr = user.department;
         let userGroup: Array<{ id: string }> = [];
         for (let userGroupKey of userGroupArr) {
-            userGroup.push({
-                id: groupList["group_k" + userGroupKey]
-            });
+            const id = groupList.get(userGroupKey);
+            if (id) {
+                userGroup.push({
+                    id: id
+                });
+            }
         }
 
         const dataObj = {
@@ -310,7 +316,7 @@ export const userInfoUpdateFromWx = async function(req: Request, res: Response) 
             isAdmin: user.isleader === 1 || user.name === "杨子越"
         };
 
-        const userUpdate = await prisma.updateUser({
+        await prisma.updateUser({
             where: {
                 userid: user.userid
             },
@@ -320,6 +326,7 @@ export const userInfoUpdateFromWx = async function(req: Request, res: Response) 
     } catch (e) {
         res.json({ code: -1, msg: e.message });
     }
+    return 1;
 };
 
 export const userScan = async function(req: Request, res: Response) {
@@ -375,6 +382,7 @@ export const userScan = async function(req: Request, res: Response) {
     } catch (err) {
         res.json({ code: -1, msg: err.message });
     }
+    return 1;
 };
 
 export const userQRLogin = async function(req: Request, res: Response) {
@@ -506,7 +514,7 @@ export const mentorSet = async function(req: Request, res: Response) {
             return res.json({ code: 1 });
         }
 
-        const result = await prisma.updateUser({
+        await prisma.updateUser({
             where: {
                 id: uid
             },
@@ -525,6 +533,7 @@ export const mentorSet = async function(req: Request, res: Response) {
     } catch (e) {
         res.json({ code: -1, msg: e.message });
     }
+    return 1;
 };
 
 export const userSearch = async function(req: Request, res: Response) {
@@ -586,4 +595,5 @@ export const userRuntime = async function(req: Request, res: Response) {
     } catch (e) {
         res.json({ code: -1, msg: e.message });
     }
+    return 1;
 };

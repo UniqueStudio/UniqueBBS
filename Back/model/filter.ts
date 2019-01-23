@@ -58,7 +58,7 @@ export const filterCalculate = async function(uid: string, tid: string, isAdmin:
     if (filter === null || filter === undefined || threadAuthor.id === uid) return true;
 
     const cacheKey = `filterThread:${uid}:${tid}`;
-    const cacheResult = redisClientGetAsync(cacheKey);
+    const cacheResult = await redisClientGetAsync(cacheKey);
     if (cacheResult !== null) {
         return cacheResult === "1";
     }
@@ -122,7 +122,7 @@ export const filterCalculate = async function(uid: string, tid: string, isAdmin:
 
 export const filterClearCache = async function(tid: string) {
     const arr = await redisClientKeysAsync(`filterThread:*:${tid}`);
-    arr.forEach(item => {
-        redisClientDelAsync(item);
-    });
+    for (let item of arr) {
+        await redisClientDelAsync(item);
+    }
 };

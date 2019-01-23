@@ -1,6 +1,6 @@
 import { verifyJWT } from "./check";
 import { Request, Response } from "express";
-import { prisma, Attach } from "../generated/prisma-client";
+import { prisma } from "../generated/prisma-client";
 import { redLock, redisClientDelAsync, MODE } from "../server";
 import { filterCalculate } from "./filter";
 import { setLockExpire, getLockStatus } from "./lock";
@@ -24,7 +24,10 @@ export const fileUpload = async function(req: Request, res: Response) {
             createDate: new Date()
         });
 
-        await setLockExpire(`attachPreview:${result.id}`, (12 * 60 * 60).toString());
+        await setLockExpire(
+            `attachPreview:${result.id}`,
+            (12 * 60 * 60).toString()
+        );
 
         res.json({ code: 1, msg: result.id });
     } catch (e) {
@@ -36,7 +39,7 @@ export const fileUpload = async function(req: Request, res: Response) {
 export const fileUploadMultiple = async function(req: Request, res: Response) {
     const fileList = req.files as Array<Express.Multer.File>;
     try {
-        const { uid, isAdmin } = verifyJWT(req.header("Authorization"));
+        const { uid } = verifyJWT(req.header("Authorization"));
 
         const result = await Promise.all(
             fileList.map(async item => {
@@ -73,7 +76,7 @@ export const fileGetUnlink = async function(req: Request, res: Response) {
                 user: {
                     id: uid
                 },
-                thread: null
+                thread: undefined
             },
             orderBy: "createDate_DESC"
         });
@@ -92,7 +95,7 @@ export const fileClearAllUnlink = async function(req: Request, res: Response) {
 
         const arr = await prisma.attaches({
             where: {
-                thread: null
+                thread: undefined
             }
         });
 
@@ -101,12 +104,13 @@ export const fileClearAllUnlink = async function(req: Request, res: Response) {
         });
 
         await prisma.deleteManyAttaches({
-            thread: null
+            thread: undefined
         });
         res.json({ code: 1 });
     } catch (e) {
         res.json({ code: -1, msg: e.message });
     }
+    return 1;
 };
 
 export const filePreview = async function(req: Request, res: Response) {
@@ -130,6 +134,7 @@ export const filePreview = async function(req: Request, res: Response) {
     } catch (e) {
         res.json({ code: -1, msg: e.message });
     }
+    return 1;
 };
 
 export const fileDownload = async function(req: Request, res: Response) {
@@ -157,13 +162,15 @@ export const fileDownload = async function(req: Request, res: Response) {
             if (!isAdmin && !threadInfo.active) {
                 return res.json({ code: -1, msg: "该附件不存在！" });
             }
-            const havePermission = await filterCalculate(uid, threadInfo.id, isAdmin);
+            const havePermission = await filterCalculate(
+                uid,
+                threadInfo.id,
+                isAdmin
+            );
             if (!havePermission) {
                 return res.json({ code: -1, msg: "您无权下载此附件！" });
             }
         }
-
-        let downloadItem: Attach;
 
         const downloadLock = await redLock.lock(`downloadCount:${aid}`, 200);
         try {
@@ -171,7 +178,7 @@ export const fileDownload = async function(req: Request, res: Response) {
                 id: aid
             });
 
-            const downloadItemTemp = await prisma.updateAttach({
+            const downloadItem = await prisma.updateAttach({
                 where: {
                     id: aid
                 },
@@ -180,26 +187,25 @@ export const fileDownload = async function(req: Request, res: Response) {
                 }
             });
 
-            downloadItem = downloadItemTemp;
+            res.download(downloadItem.fileName, downloadItem.originalName);
         } catch (e) {
             res.json({ code: -1, msg: e.message });
         } finally {
             downloadLock.unlock();
         }
-
-        res.download(downloadItem.fileName, downloadItem.originalName);
     } catch (e) {
         res.json({ code: -1, msg: e.message });
     }
+    return 1;
 };
 
 export const fileFilter = function(
     req: Express.Request,
-    file: Express.Multer.File,
-    cb: (error: Error, acceptFile: boolean) => void
+    _file: Express.Multer.File,
+    cb: (error: Error | null, acceptFile: boolean) => void
 ) {
     try {
-        const authObj = verifyJWT(req["header"]("Authorization"));
+        verifyJWT((req as any)["header"]("Authorization"));
         cb(null, true);
     } catch {
         cb(null, false);
@@ -209,10 +215,10 @@ export const fileFilter = function(
 export const fileName = function(
     req: Express.Request,
     file: Express.Multer.File,
-    cb: (error: Error, filename: string) => void
+    cb: (error: Error | null, filename: string) => void
 ) {
     try {
-        const { uid } = verifyJWT(req["header"]("Authorization"));
+        const { uid } = verifyJWT((req as any)["header"]("Authorization"));
         cb(null, `${uid}_${file.originalname}_${new Date().getTime()}.rabbit`);
     } catch {
         cb(null, `ERR_${file.originalname}_${new Date().getTime()}.rabbit`);
@@ -228,7 +234,11 @@ export const fileProcess = async function(
 ) {
     const date = new Date();
     const dirName =
-        date.getFullYear().toString() + "_" + (date.getMonth() + 1).toString() + "_" + date.getDate().toString();
+        date.getFullYear().toString() +
+        "_" +
+        (date.getMonth() + 1).toString() +
+        "_" +
+        date.getDate().toString();
 
     const fileList: Array<string> = files instanceof Array ? files : [files];
 
@@ -238,20 +248,28 @@ export const fileProcess = async function(
             const attachAuthor = await prisma.attach({ id: aid }).user();
             const attachThread = await prisma.attach({ id: aid }).thread();
 
-            if (!isAdmin && (attachAuthor.id !== uid || attachThread.id !== tid)) {
+            if (
+                !isAdmin &&
+                (attachAuthor.id !== uid || attachThread.id !== tid)
+            ) {
                 return undefined;
             }
 
             const oldPath = attach.fileName;
-            const newDir = MODE === "DEV" ? `./upload/${dirName}` : `/var/bbs/upload/${dirName}`;
-            const newPath = `${newDir}/${pid}_${new Date().getTime().toString()}_${aid}.rabbit`;
+            const newDir =
+                MODE === "DEV"
+                    ? `./upload/${dirName}`
+                    : `/var/bbs/upload/${dirName}`;
+            const newPath = `${newDir}/${pid}_${new Date()
+                .getTime()
+                .toString()}_${aid}.rabbit`;
 
             await redisClientDelAsync(`attachPreview:${aid}`);
 
             if (!fs.existsSync(newDir)) fs.mkdirSync(newDir);
             fileMove(oldPath, newPath);
 
-            const updateAttach = await prisma.updateAttach({
+            await prisma.updateAttach({
                 where: {
                     id: aid
                 },
@@ -273,7 +291,7 @@ export const fileProcess = async function(
 
     const connectAttachArr = connectAttachArrRaw.filter(item => {
         return item !== undefined;
-    });
+    }) as Array<{ id: string }>;
 
     if (connectAttachArr.length !== 0) {
         await prisma.updateThread({
@@ -287,19 +305,25 @@ export const fileProcess = async function(
             }
         });
     }
+    return 1;
 };
 
 export const fileDestination = function(
-    req: Express.Request,
-    file: Express.Multer.File,
-    cb: (error: Error, destination: string) => void
+    _req: Express.Request,
+    _file: Express.Multer.File,
+    cb: (error: Error | null, destination: string) => void
 ) {
     const date = new Date();
     const dirName =
-        date.getFullYear().toString() + "_" + (date.getMonth() + 1).toString() + "_" + date.getDate().toString();
+        date.getFullYear().toString() +
+        "_" +
+        (date.getMonth() + 1).toString() +
+        "_" +
+        date.getDate().toString();
     const parentDir = MODE === "DEV" ? `./upload/tmp` : `/var/bbs/upload/tmp`;
     const childDir = `${parentDir}/${dirName}`;
-    if (!fs.existsSync(MODE === "DEV" ? `./upload` : "/var/bbs/upload")) fs.mkdirSync("/var/bbs/upload");
+    if (!fs.existsSync(MODE === "DEV" ? `./upload` : "/var/bbs/upload"))
+        fs.mkdirSync("/var/bbs/upload");
     if (!fs.existsSync(parentDir)) fs.mkdirSync(parentDir);
     if (!fs.existsSync(childDir)) fs.mkdirSync(childDir);
     cb(null, `${childDir}/`);
@@ -343,11 +367,11 @@ export const fileRemove = async function(req: Request, res: Response) {
                 })
                 .thread();
             if (attachThreadInfo === null) {
-                const deleteResult = await prisma.deleteAttach({
+                await prisma.deleteAttach({
                     id: aid
                 });
             } else {
-                const deleteResult = await prisma.updateThread({
+                await prisma.updateThread({
                     where: {
                         id: attachThreadInfo.id
                     },
@@ -372,6 +396,7 @@ export const fileRemove = async function(req: Request, res: Response) {
     } catch (e) {
         res.json({ code: -1, msg: e.message });
     }
+    return 1;
 };
 
 export const fileExpire = async function(req: Request, res: Response) {
@@ -398,7 +423,10 @@ export const fileExpire = async function(req: Request, res: Response) {
         });
 
         for (const attach of attachList) {
-            await setLockExpire(`attachPreview:${attach.id}`, (12 * 60 * 60).toString());
+            await setLockExpire(
+                `attachPreview:${attach.id}`,
+                (12 * 60 * 60).toString()
+            );
         }
 
         res.json({ code: 1 });

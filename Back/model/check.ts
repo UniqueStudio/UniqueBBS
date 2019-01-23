@@ -9,6 +9,10 @@ export interface JWTContent {
     username: string;
 }
 
+type Omit<A, B extends keyof A> = Pick<A, { [K in keyof A]: K extends B ? never : K }[keyof A]>;
+export type MyUser = Omit<User, "password" | "userid">;
+export type OtherUser = Omit<User, "nickname" | "password" | "userid">;
+
 export const signJWT = function(uid: string, isAdmin: boolean, username: string) {
     return jwt.sign(
         {
@@ -58,25 +62,25 @@ export const getAccessToken = async function() {
     return accessToken;
 };
 
-export const filterUserInfo = function(user: User) {
+export const filterUserInfo = function(user: User): OtherUser {
     for (let key of filterUserKeys) {
-        delete user[key];
+        delete (user as any)[key];
     }
     return user;
 };
 
-export const filterMyInfo = function(user: User) {
+export const filterMyInfo = function(user: User): MyUser {
     for (let key of filterMyKeys) {
-        delete user[key];
+        delete (user as any)[key];
     }
     return user;
 };
 
-export const filterUsersInfo = function(users: Array<User>) {
-    for (let user of users) {
-        user = filterUserInfo(user);
-    }
-    return users;
+export const filterUsersInfo = function(users: Array<User>): Array<OtherUser> {
+    const returnUser = users.map(item => {
+        return filterUserInfo(item) as OtherUser;
+    });
+    return returnUser;
 };
 
 export const convertString = function(str: string): string {

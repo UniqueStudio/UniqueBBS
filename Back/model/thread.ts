@@ -1,13 +1,33 @@
-import { prisma, Forum, Thread, FilterCreateOneInput, FilterUpdateOneInput } from "../generated/prisma-client";
+import {
+    prisma,
+    Thread,
+    FilterCreateOneInput,
+    FilterUpdateOneInput
+} from "../generated/prisma-client";
 import { Request, Response } from "express";
 import { setLockExpire } from "./lock";
 import { pagesize, regPreviewURL, regImgStr, regNewStr } from "./consts";
 import { verifyJWT, filterUserInfo } from "./check";
-import { userThreadsAdd, forumThreadsAdd, forumLastPostUpdate } from "./runtime";
-import { pushMessage, MESSAGE_REPLY, MESSAGE_QUOTE, MESSAGE_DIAMOND, MESSAGE_THREAD_URL } from "./message";
+import {
+    userThreadsAdd,
+    forumThreadsAdd,
+    forumLastPostUpdate
+} from "./runtime";
+import {
+    pushMessage,
+    MESSAGE_REPLY,
+    MESSAGE_QUOTE,
+    MESSAGE_DIAMOND,
+    MESSAGE_THREAD_URL
+} from "./message";
 import { redLock } from "../server";
 import { fileProcess } from "./attach";
-import { filterCalculate, filterCheckTypeAvailable, filterObjGenerate, filterClearCache } from "./filter";
+import {
+    filterCalculate,
+    filterCheckTypeAvailable,
+    filterObjGenerate,
+    filterClearCache
+} from "./filter";
 
 export const threadList = async function(req: Request, res: Response) {
     try {
@@ -23,17 +43,6 @@ export const threadList = async function(req: Request, res: Response) {
             active: authObj.isAdmin ? undefined : true,
             top: 0
         };
-
-        let resultForum: Forum;
-        if (fid !== "*") {
-            resultForum = await prisma.forum({
-                id: fid
-            });
-
-            if (!resultForum) {
-                return res.json({ code: -1, msg: "板块不存在！" });
-            }
-        }
 
         let topArr: Array<Thread> = [];
         if (page === 1) {
@@ -71,7 +80,9 @@ export const threadList = async function(req: Request, res: Response) {
             combinedArrRaw.map(async item => {
                 return {
                     thread: item,
-                    user: filterUserInfo(await prisma.thread({ id: item.id }).user()),
+                    user: filterUserInfo(
+                        await prisma.thread({ id: item.id }).user()
+                    ),
                     lastReply: await prisma.posts({
                         where: {
                             thread: {
@@ -86,17 +97,26 @@ export const threadList = async function(req: Request, res: Response) {
             })
         );
 
-        if (fid === "*") {
+        if (fid !== "*") {
+            const resultForum = await prisma.forum({
+                id: fid
+            });
+
+            if (!resultForum) {
+                return res.json({ code: -1, msg: "板块不存在！" });
+            }
+
+            res.json({ code: 1, msg: { list: resultArr, forum: resultForum } });
+        } else {
             res.json({
                 code: 1,
                 msg: { list: resultArr }
             });
-        } else {
-            res.json({ code: 1, msg: { list: resultArr, forum: resultForum } });
         }
     } catch (e) {
         res.json({ code: -1 });
     }
+    return 1;
 };
 
 export const threadInfo = async function(req: Request, res: Response) {
@@ -176,7 +196,10 @@ export const threadInfo = async function(req: Request, res: Response) {
                             })
                             .user()
                             .group(),
-                        quote: item.quote === "-1" ? null : await prisma.post({ id: item.quote })
+                        quote:
+                            item.quote === "-1"
+                                ? null
+                                : await prisma.post({ id: item.quote })
                     };
                 }
             })
@@ -210,6 +233,7 @@ export const threadInfo = async function(req: Request, res: Response) {
     } catch (e) {
         res.json({ code: -1, msg: e.message });
     }
+    return 1;
 };
 
 export const threadCreate = async function(req: Request, res: Response) {
@@ -274,13 +298,21 @@ export const threadCreate = async function(req: Request, res: Response) {
             filterCheckTypeAvailable(filterGroupType)
         ) {
             filterObj = {
-                create: filterObjGenerate(filterUserArr, filterGroupArr, filterUserType, filterGroupType)
+                create: filterObjGenerate(
+                    filterUserArr,
+                    filterGroupArr,
+                    filterUserType,
+                    filterGroupType
+                )
             };
         }
 
         const lockCreatThread = await redLock.lock(`updateThread:${uid}`, 2000);
         try {
-            const newMessage = message.replace(regImgStr(regPreviewURL), regNewStr);
+            const newMessage = message.replace(
+                regImgStr(regPreviewURL),
+                regNewStr
+            );
 
             const resultThread = await prisma.createThread({
                 subject: subject,
@@ -324,7 +356,13 @@ export const threadCreate = async function(req: Request, res: Response) {
             const newPostPid = newPost.id;
 
             if (fileListArr && fileListArr.length !== 0) {
-                fileProcess(fileListArr, newPostPid, resultThread.id, uid, isAdmin);
+                fileProcess(
+                    fileListArr,
+                    newPostPid,
+                    resultThread.id,
+                    uid,
+                    isAdmin
+                );
             }
 
             await forumThreadsAdd(fid, 1, newPostPid);
@@ -338,12 +376,15 @@ export const threadCreate = async function(req: Request, res: Response) {
     } catch (e) {
         res.json({ code: -1, msg: e.message });
     }
+    return 1;
 };
 
 export const threadReply = async function(req: Request, res: Response) {
     try {
         const { tid, message, quote } = req.body;
-        const { uid, isAdmin, username } = verifyJWT(req.header("Authorization"));
+        const { uid, isAdmin, username } = verifyJWT(
+            req.header("Authorization")
+        );
 
         if (!message || message.length <= 5) {
             return res.json({
@@ -491,6 +532,7 @@ export const threadReply = async function(req: Request, res: Response) {
     } catch (e) {
         res.json({ code: -1, msg: e.message });
     }
+    return 1;
 };
 
 export const threadDelete = async function(req: Request, res: Response) {
@@ -521,6 +563,7 @@ export const threadDelete = async function(req: Request, res: Response) {
     } catch (e) {
         res.json({ code: -1, msg: e.message });
     }
+    return 1;
 };
 
 export const threadDeleteHard = async function(req: Request, res: Response) {
@@ -541,7 +584,7 @@ export const threadDeleteHard = async function(req: Request, res: Response) {
                 })
                 .forum();
 
-            const thread = await prisma.thread({
+            await prisma.thread({
                 id: tid
             });
 
@@ -560,6 +603,7 @@ export const threadDeleteHard = async function(req: Request, res: Response) {
     } catch (e) {
         res.json({ code: -1, msg: e.message });
     }
+    return 1;
 };
 
 export const threadDiamond = async function(req: Request, res: Response) {
@@ -585,13 +629,19 @@ export const threadDiamond = async function(req: Request, res: Response) {
                 .user();
 
             if (setDiamond === "1") {
-                pushMessage(authObj.uid, threadAuthor.id, MESSAGE_DIAMOND(threadInfo.subject), MESSAGE_THREAD_URL(tid));
+                pushMessage(
+                    authObj.uid,
+                    threadAuthor.id,
+                    MESSAGE_DIAMOND(threadInfo.subject),
+                    MESSAGE_THREAD_URL(tid)
+                );
             }
             res.json({ code: 1 });
         }
     } catch (e) {
         res.json({ code: -1, msg: e.message });
     }
+    return 1;
 };
 
 export const threadTop = async function(req: Request, res: Response) {
@@ -601,7 +651,7 @@ export const threadTop = async function(req: Request, res: Response) {
             return res.json({ code: -1, msg: "您无权操作此帖子！" });
         } else {
             const { tid, setTop } = req.body;
-            const threadInfo = await prisma.updateThread({
+            await prisma.updateThread({
                 where: {
                     id: tid
                 },
@@ -614,6 +664,7 @@ export const threadTop = async function(req: Request, res: Response) {
     } catch (e) {
         res.json({ code: -1, msg: e.message });
     }
+    return 1;
 };
 
 export const threadClose = async function(req: Request, res: Response) {
@@ -623,7 +674,7 @@ export const threadClose = async function(req: Request, res: Response) {
             return res.json({ code: -1, msg: "您无权操作此帖子！" });
         } else {
             const { tid, setClose } = req.body;
-            const threadInfo = await prisma.updateThread({
+            await prisma.updateThread({
                 where: {
                     id: tid
                 },
@@ -636,6 +687,7 @@ export const threadClose = async function(req: Request, res: Response) {
     } catch (e) {
         res.json({ code: -1, msg: e.message });
     }
+    return 1;
 };
 
 export const threadRecovery = async function(req: Request, res: Response) {
@@ -645,7 +697,7 @@ export const threadRecovery = async function(req: Request, res: Response) {
             return res.json({ code: -1, msg: "您无权操作此帖子！" });
         } else {
             const { tid } = req.params;
-            const threadInfo = await prisma.updateThread({
+            await prisma.updateThread({
                 where: {
                     id: tid
                 },
@@ -672,6 +724,7 @@ export const threadRecovery = async function(req: Request, res: Response) {
     } catch (e) {
         res.json({ code: -1, msg: e.message });
     }
+    return 1;
 };
 
 export const threadUpdate = async function(req: Request, res: Response) {
@@ -728,7 +781,12 @@ export const threadUpdate = async function(req: Request, res: Response) {
                 filterCheckTypeAvailable(filterGroupType)
             ) {
                 filterObj = {
-                    update: filterObjGenerate(filterUserArr, filterGroupArr, filterUserType, filterGroupType)
+                    update: filterObjGenerate(
+                        filterUserArr,
+                        filterGroupArr,
+                        filterUserType,
+                        filterGroupType
+                    )
                 };
             }
 
@@ -747,9 +805,12 @@ export const threadUpdate = async function(req: Request, res: Response) {
                 }
             });
 
-            const newMessage = message.replace(regImgStr(regPreviewURL), regNewStr);
+            const newMessage = message.replace(
+                regImgStr(regPreviewURL),
+                regNewStr
+            );
 
-            const postInfo = await prisma.updateManyPosts({
+            await prisma.updateManyPosts({
                 where: {
                     thread: {
                         id: tid
@@ -773,7 +834,13 @@ export const threadUpdate = async function(req: Request, res: Response) {
                         orderBy: "createDate_ASC",
                         first: 1
                     });
-                fileProcess(fileListArr, postInfo[0].id, threadInfo.id, uid, isAdmin);
+                fileProcess(
+                    fileListArr,
+                    postInfo[0].id,
+                    threadInfo.id,
+                    uid,
+                    isAdmin
+                );
             }
 
             res.json({ code: 1 });
@@ -785,6 +852,7 @@ export const threadUpdate = async function(req: Request, res: Response) {
     } catch (e) {
         res.json({ code: -1, msg: e.message });
     }
+    return 1;
 };
 
 export const threadMove = async function(req: Request, res: Response) {
@@ -857,6 +925,7 @@ export const threadMove = async function(req: Request, res: Response) {
     } catch (e) {
         res.json({ code: -1, msg: e.message });
     }
+    return 1;
 };
 
 export const threadSearch = async function(req: Request, res: Response) {
@@ -908,4 +977,5 @@ export const threadRuntime = async function(req: Request, res: Response) {
     } catch (e) {
         res.json({ code: -1, msg: e.message });
     }
+    return 1;
 };
