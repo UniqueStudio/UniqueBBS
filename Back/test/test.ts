@@ -1,18 +1,10 @@
-import * as Redis from "redis";
-import { promisify } from "util";
-export const redisClient = Redis.createClient({
-    host: "127.0.0.1",
-    port: 6379
-});
+import * as dotenv from "dotenv";
+dotenv.config();
 
-export const redisClientGetAsync = promisify(redisClient.get).bind(redisClient);
-export const redisClientSetAsync: any = promisify(redisClient.set).bind(redisClient);
-export const redisClientKeysAsync = promisify(redisClient.keys).bind(redisClient);
-export const redisClientDelAsync: any = promisify(redisClient.del).bind(redisClient);
-export const redisClientIncrAsync = promisify(redisClient.incr).bind(redisClient);
-export const redisClientExpireAsync = promisify(redisClient.expire).bind(redisClient);
+import { updateGroup } from "../utils/getGroup";
+import { getUser } from "../utils/getUser";
 
 (async function() {
-    await redisClientDelAsync("hzytql", "tqltqltql");
-    console.log("ok");
+    await updateGroup();
+    await getUser();
 })();

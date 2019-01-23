@@ -45,9 +45,23 @@ import {
     threadSearch,
     threadRuntime
 } from "./model/thread";
-import { postDeleteHard, postDelete, postRecovery, postUpdate, postSearch, postInfo } from "./model/post";
+import {
+    postDeleteHard,
+    postDelete,
+    postRecovery,
+    postUpdate,
+    postSearch,
+    postInfo
+} from "./model/post";
 import { forumList, forumListSimple, forumRuntime } from "./model/forum";
-import { reportCreate, reportInfo, reportGraph, reportList, reportUpdate, reportCanPost } from "./model/report";
+import {
+    reportCreate,
+    reportInfo,
+    reportGraph,
+    reportList,
+    reportUpdate,
+    reportCanPost
+} from "./model/report";
 import {
     fileDownload,
     fileUpload,
@@ -80,11 +94,21 @@ export const redisClient = Redis.createClient({
 });
 
 export const redisClientGetAsync = promisify(redisClient.get).bind(redisClient);
-export const redisClientSetAsync: any = promisify(redisClient.set).bind(redisClient);
-export const redisClientKeysAsync = promisify(redisClient.keys).bind(redisClient);
-export const redisClientDelAsync: any = promisify(redisClient.del).bind(redisClient);
-export const redisClientIncrAsync = promisify(redisClient.incr).bind(redisClient);
-export const redisClientExpireAsync = promisify(redisClient.expire).bind(redisClient);
+export const redisClientSetAsync: any = promisify(redisClient.set).bind(
+    redisClient
+);
+export const redisClientKeysAsync = promisify(redisClient.keys).bind(
+    redisClient
+);
+export const redisClientDelAsync: any = promisify(redisClient.del).bind(
+    redisClient
+);
+export const redisClientIncrAsync = promisify(redisClient.incr).bind(
+    redisClient
+);
+export const redisClientExpireAsync = promisify(redisClient.expire).bind(
+    redisClient
+);
 
 redisClient.on("error", err => {
     console.log("Redis Error: " + err);
@@ -124,10 +148,13 @@ const upload = multer({
     fileFilter: fileFilter
 }); //20MB
 
-app.use((req, res, next) => {
+app.use((_req, res, next) => {
     res.header("Access-Control-Allow-Origin", "*");
     res.header("Access-Control-Allow-Methods", "POST, GET");
-    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
+    res.header(
+        "Access-Control-Allow-Headers",
+        "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+    );
     res.header("X-Powered-By", `Rabbit/${SERVER_VERSION}`);
     next();
 });
