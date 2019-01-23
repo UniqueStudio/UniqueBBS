@@ -4,3 +4,4 @@ Front/node_modules/*
 Back/upload/*
 tmp
 .env
+environment.ts
