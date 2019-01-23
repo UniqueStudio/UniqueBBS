@@ -22,7 +22,9 @@
         </div>
       </div>
       <div class="create-input">
-        <codemirror v-model="message" :options="cmOptions"></codemirror>
+        <div class="code-mirror-input-container">
+          <codemirror v-model="message" :options="cmOptions"></codemirror>
+        </div>
         <div class="create-preview-container">
           <a-divider type="vertical" class="divider"></a-divider>
           <div class="create-preview" v-html="previewText"></div>
@@ -393,5 +395,12 @@ export default {
 .create-preview-container,
 .create-preview {
   position: relative;
+}
+.code-mirror-input-container,
+.create-preview-container {
+  overflow-y: auto;
+  overflow-x: hidden;
+  max-height: 600px;
+  word-wrap: break-word;
 }
 </style>

@@ -2,7 +2,7 @@
   <div id="root">
     <div class="nav">
       <div class="nav-logo">
-        <img src="./logo.png" alt="Unique Studio Logo">
+        <img src="./logo.png" alt="Unique Studio Logo" @click="handleLoginClick">
       </div>
       <div class="nav-item">
         <div class="nav-item-content">
@@ -103,6 +103,9 @@ export default {
     };
   },
   methods: {
+    handleLoginClick() {
+      this.$router.push({ path: "/forum" });
+    },
     handleMenuClick(e) {
       switch (e.key) {
         case "1":

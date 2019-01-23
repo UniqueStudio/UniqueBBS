@@ -200,7 +200,7 @@ export default {
 <style scoped>
 @media screen and (max-width: 1050px) {
   .report-my-info-container {
-    grid-template-rows: 100% 100%;
+    grid-template-rows: 256px 100%;
   }
   .user-report-graph {
     margin: 20px auto;

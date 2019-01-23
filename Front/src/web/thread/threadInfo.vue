@@ -81,10 +81,10 @@
               {{postCount}}
             </a-tag>
           </div>
-          <div class="thread-content" v-html="renderMessage(content)"></div>
+          <div class="thread-content show-markdown" v-html="renderMessage(content)"></div>
           <div class="thread-attach-list post-quote" v-if="attachList.length !== 0">
             <h5>附件列表</h5>
-            <div v-for="attach in attachList" :key="attach.id">
+            <div v-for="attach in attachList" :key="attach.id" class="attach-item">
               <a :href="attachDownload(attach.id)" target="_blank">
                 <a-tag color="cyan" :title="getTitle(attach)">
                   <a-icon type="paper-clip"/>
@@ -195,9 +195,9 @@
           </div>
           <div class="post-message post-quote" v-if="post.quote !== null">
             <h5>引用</h5>
-            <div v-html="renderMessage(post.quote.message)"></div>
+            <div class="show-markdown" v-html="renderMessage(post.quote.message)"></div>
           </div>
-          <div class="post-message" v-html="renderMessage(post.post.message)"></div>
+          <div class="post-message show-markdown" v-html="renderMessage(post.post.message)"></div>
           <div class="thread-signature">
             <div :title="getFullCreateDate(post.post.createDate)">
               <a-icon type="clock-circle"/>
@@ -681,5 +681,11 @@ export default {
 }
 .thread-attach-list h5 {
   margin: 6px 2px;
+}
+.show-markdown {
+  word-break: break-all;
+}
+.attach-item {
+  display: inline-block;
 }
 </style>

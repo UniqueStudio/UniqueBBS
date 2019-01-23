@@ -1,5 +1,6 @@
 Back/node_modules/*
 Back/output/
 Front/node_modules/*
-
+Back/upload/*
 tmp
+.env

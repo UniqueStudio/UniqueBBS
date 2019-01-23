@@ -41,7 +41,8 @@ const store = new Vuex.Store({
     isAdmin: false,
     uid: "",
     socket: undefined,
-    noticeContent: ""
+    noticeContent: "",
+    wxGoPageTime: new Date().getTime()
   },
   mutations: {
     setAvatarSrc(state, url) {
@@ -67,6 +68,9 @@ const store = new Vuex.Store({
     },
     setNotifyContent(state, content) {
       state.noticeContent = content;
+    },
+    setLoginTime(state, val) {
+      state.wxGoPageTime = val;
     }
   },
   actions: {

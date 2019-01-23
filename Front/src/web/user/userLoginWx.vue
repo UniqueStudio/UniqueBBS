@@ -22,17 +22,17 @@ export default {
     return {
       keySrc: "",
       key: "",
-      doing: false,
       onPage: false,
       titleMsg: "使用企业微信扫码登录"
     };
   },
   methods: {
     async getKey() {
-      if (this.doing) return;
-      this.doing = true;
+      const pageIntoTime = this.$store.state.wxGoPageTime;
 
       const responseRaw = await this.$ajax.get(this.$urls.wxLoginGetKey);
+      this.titleMsg = "使用企业微信扫码登录";
+
       if (responseRaw.data.code !== 1) {
         const modal = this.$error();
         modal.update({
@@ -43,9 +43,14 @@ export default {
         const key = responseRaw.data.msg;
         this.key = key;
         this.keySrc = `https://open.work.weixin.qq.com/wwopen/sso/qrImg?key=${key}`;
+
         const statusRaw = await this.$ajax.get(
           this.$urls.wxLoginGetStatus(this.key)
         );
+        if (this.$store.state.wxGoPageTime !== pageIntoTime) {
+          return;
+        }
+
         if (statusRaw.data.code === 1) {
           const response = statusRaw.data;
           const token = response.msg.token;
@@ -59,7 +64,6 @@ export default {
             description: "登录成功，欢迎回来！",
             icon: <a-icon type="smile" style="color: #108ee9" />
           });
-          this.doing = false;
           this.$router.push({ path: "/user/my/info" });
         } else if (
           statusRaw.data.code === -2 &&
@@ -68,14 +72,15 @@ export default {
         ) {
           this.keySrc = "";
           this.key = "";
-          this.titleMsg = "请刷新页面后重新获取二维码";
-          this.doing = false;
+          this.titleMsg = "正在重新获取二维码";
+          this.getKey();
         }
       }
     }
   },
   mounted() {
     this.onPage = true;
+    this.$store.commit("setLoginTime", new Date().getTime());
     this.getKey();
   },
   beforeDestroy() {

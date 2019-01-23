@@ -29,11 +29,11 @@
         "@types/redis": "^2.8.10",
         "@types/redlock": "^3.0.2",
         "@types/socket.io": "^2.1.2",
-        "typescript": "^3.2.2",
-        "prisma": "1.24.0"
+        "prisma": "1.24.0",
+        "typescript": "^3.2.2"
     },
     "scripts": {
-        "dev": "ts-node server.ts",
+        "dev": "SET NODE_ENV=DEV&&ts-node server.ts",
         "compile": "tsc",
         "init": "prisma deploy && node ./output/utils/init.js",
         "start": "node ./output/server.js"

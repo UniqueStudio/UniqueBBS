@@ -70,8 +70,9 @@ import { socketLogin, socketDisconnect } from "./model/socket";
 
 const SERVER_VERSION = "1.00";
 
+export const MODE = process.env.NODE_ENV;
 export const redisClient = Redis.createClient({
-    host: "redis",
+    host: MODE === "DEV" ? "localhost" : "redis",
     port: 6379
 });
 
