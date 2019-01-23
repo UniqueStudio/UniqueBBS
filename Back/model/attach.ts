@@ -1,7 +1,7 @@
 import { verifyJWT } from "./check";
 import { Request, Response } from "express";
 import { prisma, Attach } from "../generated/prisma-client";
-import { redLock, redisClientDelAsync } from "../server";
+import { redLock, redisClientDelAsync, MODE } from "../server";
 import { filterCalculate } from "./filter";
 import { setLockExpire, getLockStatus } from "./lock";
 import * as fs from "fs";
@@ -23,6 +23,8 @@ export const fileUpload = async function(req: Request, res: Response) {
             originalName: fileItem.originalname,
             createDate: new Date()
         });
+
+        await setLockExpire(`attachPreview:${result.id}`, (12 * 60 * 60).toString());
 
         res.json({ code: 1, msg: result.id });
     } catch (e) {
@@ -241,7 +243,7 @@ export const fileProcess = async function(
             }
 
             const oldPath = attach.fileName;
-            const newDir = `/var/bbs/upload/${dirName}`;
+            const newDir = MODE === "DEV" ? `./upload/${dirName}` : `/var/bbs/upload/${dirName}`;
             const newPath = `${newDir}/${pid}_${new Date().getTime().toString()}_${aid}.rabbit`;
 
             await redisClientDelAsync(`attachPreview:${aid}`);
@@ -295,9 +297,9 @@ export const fileDestination = function(
     const date = new Date();
     const dirName =
         date.getFullYear().toString() + "_" + (date.getMonth() + 1).toString() + "_" + date.getDate().toString();
-    const parentDir = `/var/bbs/upload/tmp`;
+    const parentDir = MODE === "DEV" ? `./upload/tmp` : `/var/bbs/upload/tmp`;
     const childDir = `${parentDir}/${dirName}`;
-    if (!fs.existsSync("/var/bbs/upload")) fs.mkdirSync("/var/bbs/upload");
+    if (!fs.existsSync(MODE === "DEV" ? `./upload` : "/var/bbs/upload")) fs.mkdirSync("/var/bbs/upload");
     if (!fs.existsSync(parentDir)) fs.mkdirSync(parentDir);
     if (!fs.existsSync(childDir)) fs.mkdirSync(childDir);
     cb(null, `${childDir}/`);

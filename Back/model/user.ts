@@ -113,8 +113,7 @@ export const userPosts = async function(req: Request, res: Response) {
 
 export const userMyInfo = async function(req: Request, res: Response) {
     try {
-        const authObj = verifyJWT(req.header("Authorization"));
-        const uid = authObj.uid;
+        const { uid } = verifyJWT(req.header("Authorization"));
         const result = await prisma.user({
             id: uid
         });

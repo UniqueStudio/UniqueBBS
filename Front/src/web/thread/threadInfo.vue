@@ -431,7 +431,7 @@ export default {
         this.attachList = data.attachArr;
         this.content = data.firstPost.message;
       } else {
-        return this.$store.dispatch("setLoginStatus");
+        return this.$store.dispatch("checkLoginStatus");
       }
       const userGroupListResponseRaw = await this.$ajax.get(
         this.$urls.userGroup(this.author.id)
@@ -439,7 +439,7 @@ export default {
 
       const userGroupListResponse = userGroupListResponseRaw.data;
       if (userGroupListResponse.code !== 1) {
-        return this.$store.dispatch("setLoginStatus");
+        return this.$store.dispatch("checkLoginStatus");
       }
       this.groupList = userGroupListResponse.msg.map(item => ({
         name: item.name,
