@@ -5,12 +5,12 @@ import { getAccessToken } from "../model/check";
 
 export const getUser = async function() {
     const groups = await prisma.groups();
-    let groupList = {};
-    let setID = {};
+    let groupList = new Map<number, string>();
+    let setID = new Map<string, number>();
     let existUserID = [];
     let groupKeyList: Array<[number, string]> = [];
     for (let group of groups) {
-        groupList["group_k" + group.key] = group.id;
+        groupList.set(group.key, group.id);
         groupKeyList.push([group.key, group.name]);
     }
 
@@ -20,7 +20,9 @@ export const getUser = async function() {
         // const groupID = groupKeyList["group_k" + groupKey];
         console.log(`Fetching User Info Group ${groupName} [${groupKey}]`);
 
-        const groupMemberResponse = await fetch(getUserListURL(accessToken, groupKey));
+        const groupMemberResponse = await fetch(
+            getUserListURL(accessToken, groupKey)
+        );
         const groupMemberResult = await groupMemberResponse.json();
         if (groupMemberResult.errcode !== 0) {
             return console.log("Access Error");
@@ -30,15 +32,18 @@ export const getUser = async function() {
         for (let user of userList) {
             existUserID.push(user.userid);
 
-            if (setID["userid_" + user.userid] === 1) continue;
-            setID["userid_" + user.userid] = 1;
+            if (setID.get(user.userid) === 1) continue;
+            setID.set(user.userid, 1);
 
             const userGroupArr = user.department;
             let userGroup: Array<{ id: string }> = [];
             for (let userGroupKey of userGroupArr) {
-                userGroup.push({
-                    id: groupList["group_k" + userGroupKey]
-                });
+                const groupID = groupList.get(userGroupKey);
+                if (groupID) {
+                    userGroup.push({
+                        id: groupID
+                    });
+                }
             }
 
             const exist = await prisma.$exists.user({
@@ -76,7 +81,7 @@ export const getUser = async function() {
 
             if (user.isleader === 1) {
                 console.log(`Set Group ${groupName} Master to ${user.name}`);
-                const groupUpdate = await prisma.updateGroup({
+                await prisma.updateGroup({
                     where: {
                         key: groupKey
                     },
@@ -103,7 +108,7 @@ export const getUser = async function() {
     for (let user of nowAllUsers) {
         let userid = user.userid;
         let active = 0;
-        existUserID.some((item, index, array) => {
+        existUserID.some(item => {
             if (userid === item) active = 1;
             return userid === item;
         });
@@ -113,7 +118,7 @@ export const getUser = async function() {
         }
     }
 
-    const unactiveResult = await prisma.updateManyUsers({
+    await prisma.updateManyUsers({
         where: {
             userid_in: setToUnActiveUserList
         },

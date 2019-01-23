@@ -5,7 +5,7 @@ import fetch from "node-fetch";
 const DOWNLOAD_FILE_PREFIX = "https://bbs.hustunique.com/";
 const IS_LOCAL_ATTACH_REGEX = /\!\[.+?\]\(\/(.*?)\)/gi;
 
-async function downloadImg(url, path) {
+async function downloadImg(url: string, path: string) {
     try {
         const result = await fetch(encodeURI(url));
         const bufferImg = await result.buffer();
@@ -19,10 +19,18 @@ async function downloadImg(url, path) {
 
 async function execMigration() {
     console.log("Preparing Databases");
-    const userDB = JSON.parse(fs.readFileSync("./backup/users.json").toString());
-    const threadDB = JSON.parse(fs.readFileSync("./backup/topics.json").toString());
-    const postDB = JSON.parse(fs.readFileSync("./backup/posts.json").toString());
-    const reportDB = JSON.parse(fs.readFileSync("./backup/posts.json").toString());
+    const userDB = JSON.parse(
+        fs.readFileSync("./backup/users.json").toString()
+    );
+    const threadDB = JSON.parse(
+        fs.readFileSync("./backup/topics.json").toString()
+    );
+    const postDB = JSON.parse(
+        fs.readFileSync("./backup/posts.json").toString()
+    );
+    const reportDB = JSON.parse(
+        fs.readFileSync("./backup/posts.json").toString()
+    );
 
     const threadMap = new Map<string, string>();
     const forumMap = new Map<string, string>();
@@ -186,7 +194,10 @@ async function execMigration() {
         if (exceptForumThisStep.some(item => item === thread.cid)) {
             if (reportForumArr.some(item => item === thread.cid)) {
                 threadAuthor.set(thread.tid, thread.uid);
-                threadReport.set(thread.tid, reg.test(thread.title) ? WEEKLY_REPORT : DAILY_REPORT);
+                threadReport.set(
+                    thread.tid,
+                    reg.test(thread.title) ? WEEKLY_REPORT : DAILY_REPORT
+                );
             }
             continue;
         }
@@ -200,25 +211,27 @@ async function execMigration() {
         console.log(`${thread.mainPid} -> ${thread.tid}`);
         threadFirstPostMap.set(thread.mainPid, thread.tid);
         threadAuthor.set(thread.tid, thread.uid);
-        const result = await prisma.createThread({
-            subject: thread.title,
-            createDate: new Date(Number.parseInt(thread.timestamp)),
-            user: {
-                connect: {
-                    id: authorUID
-                }
-            },
-            forum: {
-                connect: {
-                    id: forumID
-                }
-            },
-            lastDate: new Date(Number.parseInt(thread.lastposttime)),
-            active: thread.deleted === "0",
-            closed: thread.locked === "1",
-            top: thread.pinned === "1" ? 1 : 0
-        });
-        threadMap.set(thread.tid, result.id);
+        if (forumID) {
+            const result = await prisma.createThread({
+                subject: thread.title,
+                createDate: new Date(Number.parseInt(thread.timestamp)),
+                user: {
+                    connect: {
+                        id: authorUID
+                    }
+                },
+                forum: {
+                    connect: {
+                        id: forumID
+                    }
+                },
+                lastDate: new Date(Number.parseInt(thread.lastposttime)),
+                active: thread.deleted === "0",
+                closed: thread.locked === "1",
+                top: thread.pinned === "1" ? 1 : 0
+            });
+            threadMap.set(thread.tid, result.id);
+        }
     }
 
     //<-- Step 4 Migration Posts using Reflections
@@ -246,7 +259,9 @@ async function execMigration() {
                 "_" +
                 date.getDate().toString();
             const newDir = `/var/bbs/upload/${dirName}`;
-            const newPath = `${newDir}/migration_${new Date().getTime().toString()}_${imageOffset}.rabbit`;
+            const newPath = `${newDir}/migration_${new Date()
+                .getTime()
+                .toString()}_${imageOffset}.rabbit`;
             if (!fs.existsSync(newDir)) fs.mkdirSync(newDir);
 
             const [relativeContent, relativeURL] = matchResult;
@@ -255,7 +270,10 @@ async function execMigration() {
             if (related) {
                 willReplace.push([relativeContent, `![uniqueImg](${related})`]);
             } else {
-                const length = await downloadImg(`${DOWNLOAD_FILE_PREFIX}${relativeURL}`, newPath);
+                const length = await downloadImg(
+                    `${DOWNLOAD_FILE_PREFIX}${relativeURL}`,
+                    newPath
+                );
                 if (length !== 0) {
                     const attach = await prisma.createAttach({
                         user: {
@@ -273,7 +291,10 @@ async function execMigration() {
                         id: attach.id
                     });
                     attachMap.set(relativeURL, attach.id);
-                    willReplace.push([relativeContent, `![uniqueImg](unique://${attach.id})`]);
+                    willReplace.push([
+                        relativeContent,
+                        `![uniqueImg](unique://${attach.id})`
+                    ]);
                 }
             }
 
@@ -285,7 +306,7 @@ async function execMigration() {
             post.content = post.content.replace(item[0], item[1]);
         });
 
-        const result = await prisma.createPost({
+        await prisma.createPost({
             createDate: new Date(Number.parseInt(post.timestamp)),
             message: post.content,
             user: {
@@ -433,8 +454,10 @@ async function execMigration() {
         const reportStatus = threadReport.get(post.tid);
         if (!reportStatus) continue;
         const authorID = userMap.get(post.uid);
-        if (threadAuthor.get(post.tid) !== post.uid) continue;
-        if (!userMap.get(threadAuthor.get(post.tid))) continue;
+        const threadAuthorID = threadAuthor.get(post.tid);
+
+        if (threadAuthorID !== post.uid) continue;
+        if (threadAuthorID && !userMap.get(threadAuthorID)) continue;
         await prisma.createReport({
             message: post.content,
             createDate: new Date(Number.parseInt(post.timestamp)),

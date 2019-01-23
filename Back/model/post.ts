@@ -17,6 +17,7 @@ export const postDeleteHard = async function(req: Request, res: Response) {
     } catch (e) {
         res.json({ code: -1, msg: e.message });
     }
+    return 1;
 };
 
 export const postDelete = async function(req: Request, res: Response) {
@@ -46,6 +47,7 @@ export const postDelete = async function(req: Request, res: Response) {
     } catch (e) {
         res.json({ code: -1, msg: e.message });
     }
+    return 1;
 };
 
 export const postRecovery = async function(req: Request, res: Response) {
@@ -55,7 +57,7 @@ export const postRecovery = async function(req: Request, res: Response) {
             return res.json({ code: -1, msg: "您无权操作此帖子！" });
         } else {
             const { pid } = req.params;
-            const postInfo = await prisma.updatePost({
+            await prisma.updatePost({
                 where: {
                     id: pid
                 },
@@ -68,6 +70,7 @@ export const postRecovery = async function(req: Request, res: Response) {
     } catch (e) {
         res.json({ code: -1, msg: e.message });
     }
+    return 1;
 };
 
 export const postInfo = async function(req: Request, res: Response) {
@@ -102,6 +105,7 @@ export const postInfo = async function(req: Request, res: Response) {
     } catch (e) {
         res.json({ code: -1, msg: e.message });
     }
+    return 1;
 };
 
 export const postUpdate = async function(req: Request, res: Response) {
@@ -124,7 +128,10 @@ export const postUpdate = async function(req: Request, res: Response) {
             })
             .thread();
 
-        if (!isAdmin && (postAuthor.id !== uid || !postInfo.active || !threadInfo.active)) {
+        if (
+            !isAdmin &&
+            (postAuthor.id !== uid || !postInfo.active || !threadInfo.active)
+        ) {
             return res.json({ code: -1, msg: "您无权编辑此回复！" });
         }
 
@@ -141,6 +148,7 @@ export const postUpdate = async function(req: Request, res: Response) {
     } catch (e) {
         res.json({ code: -1, msg: e.message });
     }
+    return 1;
 };
 
 export const postSearch = async function(req: Request, res: Response) {

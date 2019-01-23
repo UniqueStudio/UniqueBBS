@@ -1,4 +1,4 @@
-import { prisma } from "../generated/prisma-client";
+import { prisma, Group } from "../generated/prisma-client";
 import fetch from "node-fetch";
 import { getGroupURL } from "../model/consts";
 import { getAccessToken } from "../model/check";
@@ -12,11 +12,11 @@ export const updateGroup = async function() {
         return console.log("Access Error");
     }
 
-    const departmentArr = groupRequestResult.department;
-    const nowGroup = await prisma.groups();
+    const departmentArr: Array<any> = groupRequestResult.department;
+    const nowGroup: Array<Group> = await prisma.groups();
 
     //diff
-    let willDeleteArr = [];
+    let willDeleteArr: Array<string> = [];
 
     nowGroup.forEach(group => {
         let willDelete = 1;
@@ -42,7 +42,7 @@ export const updateGroup = async function() {
             if (group.key === key) {
                 findResult = 1;
                 if (group.name !== department.name) {
-                    const result = await prisma.updateGroup({
+                    await prisma.updateGroup({
                         where: {
                             key: key
                         },
@@ -50,23 +50,31 @@ export const updateGroup = async function() {
                             name: department.name
                         }
                     });
-                    console.log(`Updated Group.\nkey=${key}\n${group.name}=>${department.name}`);
+                    console.log(
+                        `Updated Group.\nkey=${key}\n${group.name}=>${
+                            department.name
+                        }`
+                    );
                 }
                 break;
             }
         }
 
         if (!findResult) {
-            const result = await prisma.createGroup({
+            await prisma.createGroup({
                 name: department.name,
                 key: department.id
             });
-            console.log(`create new Group! \n key=${department.id} \n ${department.name}`);
+            console.log(
+                `create new Group! \n key=${department.id} \n ${
+                    department.name
+                }`
+            );
         }
     }
 
     console.log(`exec delete action ...`);
-    const deleteResult = await prisma.deleteManyGroups({
+    await prisma.deleteManyGroups({
         id_in: willDeleteArr
     });
     console.log(`Finished !`);

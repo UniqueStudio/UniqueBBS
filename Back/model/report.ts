@@ -9,7 +9,15 @@ import { redisClientSetAsync, redisClientGetAsync } from "../server";
 export const reportCreate = async function(req: Request, res: Response) {
     try {
         const { uid } = verifyJWT(req.header("Authorization"));
-        const { time, content, plan, solution, conclusion, isWeekReport, extra } = req.body;
+        const {
+            time,
+            content,
+            plan,
+            solution,
+            conclusion,
+            isWeekReport,
+            extra
+        } = req.body;
 
         if (time.length === 0 || time.length >= 50) {
             return res.json({ code: -1, msg: "学习时间长度限制0~50字！" });
@@ -32,7 +40,10 @@ export const reportCreate = async function(req: Request, res: Response) {
         const todayDate = new Date();
         if (isWeek) {
             //Weekly Report
-            const resultLock = await setLockExpire(`weeklyReport:${uid}`, (5 * 24 * 60 * 60).toString());
+            const resultLock = await setLockExpire(
+                `weeklyReport:${uid}`,
+                (5 * 24 * 60 * 60).toString()
+            );
             if (!resultLock) {
                 return res.json({
                     code: -1,
@@ -45,7 +56,9 @@ export const reportCreate = async function(req: Request, res: Response) {
 
             const resultLock = await setLockExpire(
                 `dailyReport:${uid}`,
-                Math.floor((lastTime.getTime() - todayDate.getTime()) / 1000).toString()
+                Math.floor(
+                    (lastTime.getTime() - todayDate.getTime()) / 1000
+                ).toString()
             );
             if (!resultLock) {
                 return res.json({
@@ -73,13 +86,16 @@ export const reportCreate = async function(req: Request, res: Response) {
             `report:${result.id}`,
             JSON.stringify(obj),
             "EX",
-            Math.floor((lastTime.getTime() - todayDate.getTime()) / 1000).toString()
+            Math.floor(
+                (lastTime.getTime() - todayDate.getTime()) / 1000
+            ).toString()
         );
 
         res.json({ code: 1 });
     } catch (e) {
         res.json({ code: -1, msg: e.message });
     }
+    return 1;
 };
 
 export const reportCanPost = async function(req: Request, res: Response) {
@@ -123,8 +139,14 @@ export const reportInfo = async function(req: Request, res: Response) {
             .user();
 
         const todayFirstTimeStamp = getTodayFirstTimestamp().getTime();
-        if (new Date(reportInfo.createDate).getTime() < todayFirstTimeStamp && !isAdmin) {
-            return res.json({ code: 1, msg: "该Report仅限当天更改！如果您想更改，请联系管理员！" });
+        if (
+            new Date(reportInfo.createDate).getTime() < todayFirstTimeStamp &&
+            !isAdmin
+        ) {
+            return res.json({
+                code: 1,
+                msg: "该Report仅限当天更改！如果您想更改，请联系管理员！"
+            });
         }
 
         if (!isAdmin && uid !== reportAuthor.id) {
@@ -138,6 +160,7 @@ export const reportInfo = async function(req: Request, res: Response) {
     } catch (e) {
         res.json({ code: -1, msg: e.message });
     }
+    return 1;
 };
 
 export const reportGraph = async function(req: Request, res: Response) {
@@ -155,7 +178,10 @@ export const reportGraph = async function(req: Request, res: Response) {
         beginDateRaw.setMinutes(0);
         beginDateRaw.setSeconds(0);
         const extraBlockCount = new Date().getDay() + 1;
-        const beginDate = new Date(beginDateRaw.getTime() - (extraBlockCount + 363) * 24 * 60 * 60 * 1000);
+        const beginDate = new Date(
+            beginDateRaw.getTime() -
+                (extraBlockCount + 363) * 24 * 60 * 60 * 1000
+        );
 
         const list = await prisma
             .reports({
@@ -229,8 +255,14 @@ export const reportUpdate = async function(req: Request, res: Response) {
 
         const todayFirstTimeStamp = getTodayFirstTimestamp().getTime();
 
-        if (new Date(reportInfo.createDate).getTime() < todayFirstTimeStamp && !isAdmin) {
-            return res.json({ code: 1, msg: "该Report仅限当天更改！如果您想更改，请联系管理员！" });
+        if (
+            new Date(reportInfo.createDate).getTime() < todayFirstTimeStamp &&
+            !isAdmin
+        ) {
+            return res.json({
+                code: 1,
+                msg: "该Report仅限当天更改！如果您想更改，请联系管理员！"
+            });
         }
 
         if (!isAdmin && uid !== reportAuthor.id) {
@@ -243,10 +275,13 @@ export const reportUpdate = async function(req: Request, res: Response) {
             `report:${rid}`,
             JSON.stringify(obj),
             "EX",
-            Math.floor((getTodayLastTimestamp().getTime() - new Date().getTime()) / 1000).toString()
+            Math.floor(
+                (getTodayLastTimestamp().getTime() - new Date().getTime()) /
+                    1000
+            ).toString()
         );
 
-        const result = await prisma.updateReport({
+        await prisma.updateReport({
             where: {
                 id: rid
             },
@@ -259,4 +294,5 @@ export const reportUpdate = async function(req: Request, res: Response) {
     } catch (e) {
         res.json({ code: -1, msg: e.message });
     }
+    return 1;
 };
