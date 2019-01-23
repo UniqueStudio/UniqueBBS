@@ -28,6 +28,7 @@ type User {
     signature: String! @default(value: "")
     mentor: User
     report: [Report!]! @relation(name: "ReportList")
+    spaceQuota: Int! @default(value: 200000)
 }
 type Report {
     id: ID! @unique

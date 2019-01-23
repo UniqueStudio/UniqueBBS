@@ -1,5 +1,4 @@
-import * as dotenv from "dotenv";
-dotenv.config();
+require("dotenv").config();
 
 import * as express from "express";
 import * as bodyParser from "body-parser";
