@@ -88,7 +88,7 @@
               <a :href="attachDownload(attach.id)" target="_blank">
                 <a-tag color="cyan" :title="getTitle(attach)">
                   <a-icon type="paper-clip"/>
-                  {{attach.originalName}}
+                  {{attach.originalName.length > 12? attach.originalName.substr(0,12)+'...' :attach.originalName}}
                 </a-tag>
               </a>
             </div>
@@ -497,6 +497,9 @@ export default {
           url = this.deleteDiag.isThread
             ? this.$urls.deleteThreadHard(this.thread.id)
             : (url = this.$urls.deletePostHard(this.deleteDiag.pid));
+          if (this.deleteDiag.isThread) {
+            this.$router.push({ path: `/thread/list/${this.forum.id}/1` });
+          }
           break;
         case RECOVERY:
           url = this.deleteDiag.isThread

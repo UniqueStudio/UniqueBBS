@@ -535,19 +535,26 @@ export const threadDeleteHard = async function(req: Request, res: Response) {
                     id: tid
                 })
                 .user();
+            const forum = await prisma
+                .thread({
+                    id: tid
+                })
+                .forum();
+
             const thread = await prisma.thread({
                 id: tid
             });
-            await prisma.deleteThread({
-                id: tid
-            });
+
             await prisma.deleteManyPosts({
                 thread: {
                     id: tid
                 }
             });
+            await prisma.deleteThread({
+                id: tid
+            });
             await userThreadsAdd(author.id, -1);
-            await forumThreadsAdd(thread.id, -1);
+            await forumThreadsAdd(forum.id, -1);
             res.json({ code: 1 });
         }
     } catch (e) {

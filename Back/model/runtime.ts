@@ -8,6 +8,7 @@ export const userThreadsAdd = async function(uid: string, addNum: number = 1) {
         const userInfo = await prisma.user({
             id: uid
         });
+
         const resultUser = await prisma.updateUser({
             where: {
                 id: uid

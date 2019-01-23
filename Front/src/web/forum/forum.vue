@@ -2,9 +2,11 @@
   <div class="forum-container">
     <div class="forum-item" v-for="forum in this.forumList" :key="forum.id">
       <div class="forum-item-icon-container">
-        <div class="forum-item-icon-bg" :style="{backgroundColor:forum.backgroundColor}">
-          <a-icon :type="forum.icon" class="forum-item-icon"></a-icon>
-        </div>
+        <router-link :to="'/thread/list/'+forum.id+'/1'">
+          <div class="forum-item-icon-bg" :style="{backgroundColor:forum.backgroundColor}">
+            <a-icon :type="forum.icon" class="forum-item-icon"></a-icon>
+          </div>
+        </router-link>
       </div>
       <div class="forum-item-info">
         <router-link :to="'/thread/list/'+forum.id+'/1'">
