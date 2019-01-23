@@ -9,7 +9,6 @@ import {
   Model
 } from "prisma-client-lib";
 import { typeDefs } from "./prisma-schema";
-import {MODE} from "../../server";
 
 export type AtLeastOne<T, U = { [K in keyof T]: Pick<T, K> }> = Partial<T> &
   U[keyof U];
@@ -4511,6 +4510,6 @@ export const models: Model[] = [
 export const Prisma = makePrismaClientClass<ClientConstructor<Prisma>>({
   typeDefs,
   models,
-  endpoint: process.env.NODE_ENV === "DEV" ? `http://localhost:4466` : `http://prisma:4466`
+  endpoint: `${process.env["PRISMA_ENDPOINT"]}`
 });
 export const prisma = new Prisma();
