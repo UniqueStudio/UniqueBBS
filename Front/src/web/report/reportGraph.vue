@@ -120,13 +120,15 @@ export default {
     height: 86px;
   }
 }
+@media screen and (min-width: 1200px) {
+  .user-block-flex-left {
+    margin: auto auto auto 0 !important;
+  }
+}
 .user-block-flex {
   display: flex;
   flex-flow: column wrap;
   align-content: space-between;
   margin: auto;
-}
-.user-block-flex-left {
-  margin: auto auto auto 0 !important;
 }
 </style>
