@@ -50,7 +50,12 @@
           </div>
         </div>
         <div class="create-thread-btn">
-          <a-button type="primary" icon="check" @click="handleBtnClick">{{execBtnText}}</a-button>
+          <a-button
+            type="primary"
+            icon="check"
+            @click="handleBtnClick"
+            :disabled="btnDisabled"
+          >{{execBtnText}}</a-button>
         </div>
       </div>
     </div>
@@ -83,7 +88,8 @@ export default {
         theme: "idea"
       },
       attachList: [],
-      showAttachList: false
+      showAttachList: false,
+      btnDisabled: false
     };
   },
   computed: {
@@ -166,6 +172,7 @@ export default {
       }
     },
     handleBtnClick() {
+      this.btnDisabled = true;
       const mode = this.$route.meta.mode;
       const THREAD_CREATE = 0,
         THREAD_UPDATE = 1,
@@ -208,6 +215,7 @@ export default {
           content: responseRaw.data.msg
         });
       }
+      this.btnDisabled = false;
     },
     async createThread() {
       const responseRaw = await this.$ajax.post(this.$urls.threadCreate, {
@@ -233,6 +241,7 @@ export default {
           content: responseRaw.data.msg
         });
       }
+      this.btnDisabled = false;
     },
     async getThreadInfo(tid) {
       await this.$ajax.get(this.$urls.attachExpire(tid));
@@ -290,6 +299,7 @@ export default {
           content: updatePostInfoRaw.data.msg
         });
       }
+      this.btnDisabled = false;
     },
     async getReplyInfo(pid) {
       const replyInfoRaw = await this.$ajax.get(this.$urls.postInfo(pid));

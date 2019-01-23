@@ -145,7 +145,7 @@ export default {
 }
 @media screen and (max-width: 800px) {
   .thread-item-info-subject {
-    font-size: 18px;
+    font-size: 14px;
   }
   .thread-item {
     grid-template-columns: 20% 80%;

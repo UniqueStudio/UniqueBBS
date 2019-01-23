@@ -63,6 +63,7 @@ export default {
 <style scoped>
 .user-nav {
   text-align: center;
+  user-select: none;
 }
 @media screen and (min-width: 800px) {
   .user-view-container {
