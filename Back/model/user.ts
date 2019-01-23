@@ -301,7 +301,7 @@ export const userInfoUpdateFromWx = async function(req: Request, res: Response) 
         const dataObj = {
             username: user.name,
             mobile: user.mobile,
-            avatar: user.avatar,
+            avatar: user.avatar.replace(/^http/i, "https"),
             userid: user.userid,
             email: user.email,
             lastLogin: new Date(),

@@ -1,9 +1,9 @@
-import { prisma } from "../generated/prisma-client"
-import fetch from 'node-fetch';
-import { getUserListURL } from '../model/consts';
-import { getAccessToken } from "../model/check"
+import { prisma } from "../generated/prisma-client";
+import fetch from "node-fetch";
+import { getUserListURL } from "../model/consts";
+import { getAccessToken } from "../model/check";
 
-export const getUser = async function () {
+export const getUser = async function() {
     const groups = await prisma.groups();
     let groupList = {};
     let setID = {};
@@ -48,14 +48,14 @@ export const getUser = async function () {
             const dataObj = {
                 username: user.name,
                 mobile: user.mobile,
-                avatar: user.avatar,
+                avatar: user.avatar.replace(/^http/i, "https"),
                 userid: user.userid,
                 email: user.email,
                 lastLogin: new Date(),
                 group: {
                     connect: userGroup
                 },
-                isAdmin: user.isleader === 1 || user.name === "杨子越",
+                isAdmin: user.isleader === 1 || user.name === "杨子越"
             };
             let userID;
 
@@ -89,7 +89,6 @@ export const getUser = async function () {
                     }
                 });
             }
-
         }
     }
 
@@ -116,7 +115,7 @@ export const getUser = async function () {
 
     const unactiveResult = await prisma.updateManyUsers({
         where: {
-            userid_in: setToUnActiveUserList,
+            userid_in: setToUnActiveUserList
         },
         data: {
             active: false
