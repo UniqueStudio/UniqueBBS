@@ -68,7 +68,7 @@ import {
 } from "./model/message";
 import { socketLogin, socketDisconnect } from "./model/socket";
 
-const SERVER_VERSION = "1.00";
+const SERVER_VERSION = "1.01";
 
 export const MODE = process.env.NODE_ENV;
 export const redisClient = Redis.createClient({
