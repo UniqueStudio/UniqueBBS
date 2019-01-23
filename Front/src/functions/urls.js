@@ -1,5 +1,5 @@
-// const domain = "https://api.bbs.hzytql.top/";
-const domain = "http://localhost:7010/";
+const domain = process.env.DOMAIN;
+// const domain = "http://localhost:7010/";
 const socket = domain.replace(/^http/i, "ws");
 const urls = {
   domain: `${domain}`,
