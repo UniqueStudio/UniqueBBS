@@ -76,7 +76,7 @@ export const fileGetUnlink = async function(req: Request, res: Response) {
                 user: {
                     id: uid
                 },
-                thread: undefined
+                thread: null
             },
             orderBy: "createDate_DESC"
         });
@@ -95,7 +95,7 @@ export const fileClearAllUnlink = async function(req: Request, res: Response) {
 
         const arr = await prisma.attaches({
             where: {
-                thread: undefined
+                thread: null
             }
         });
 
@@ -104,7 +104,7 @@ export const fileClearAllUnlink = async function(req: Request, res: Response) {
         });
 
         await prisma.deleteManyAttaches({
-            thread: undefined
+            thread: null
         });
         res.json({ code: 1 });
     } catch (e) {

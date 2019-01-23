@@ -1,4 +1,5 @@
-endpoint: https://core.bbs.hzytql.top/
+# endpoint: https://core.bbs.hzytql.top/
+endpoint: ${env:PRISMA_ENDPOINT}
 datamodel: datamodel.prisma
 
 generate:

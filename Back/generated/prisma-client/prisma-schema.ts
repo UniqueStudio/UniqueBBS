@@ -2091,7 +2091,7 @@ type User {
   signature: String!
   mentor: User
   report(where: ReportWhereInput, orderBy: ReportOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Report!]
-  spaceQuota: Int!
+  spaceQuota: Int
 }
 
 type UserConnection {
@@ -2265,7 +2265,7 @@ type UserPreviousValues {
   threads: Int!
   lastLogin: DateTime!
   signature: String!
-  spaceQuota: Int!
+  spaceQuota: Int
 }
 
 input UserScalarWhereInput {
