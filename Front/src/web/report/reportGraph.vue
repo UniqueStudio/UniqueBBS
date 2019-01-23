@@ -1,6 +1,6 @@
 <template>
   <div class="user-block">
-    <div class="user-block-flex">
+    <div :class="{'user-block-flex':true,'user-block-flex-left':align === 'left'}">
       <a-tooltip
         class="user-block-item"
         v-for="block in userBlock"
@@ -20,7 +20,7 @@ export default {
       userBlock: []
     };
   },
-  props: ["uid"],
+  props: ["uid", "align"],
   methods: {
     async renderGraph() {
       const reportGraphRaw = await this.$ajax.get(
@@ -124,6 +124,9 @@ export default {
   display: flex;
   flex-flow: column wrap;
   align-content: space-between;
-  margin: auto auto auto 0;
+  margin: auto;
+}
+.user-block-flex-left {
+  margin: auto auto auto 0 !important;
 }
 </style>

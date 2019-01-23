@@ -63,7 +63,7 @@
           </div>
         </div>
         <div class="student-item-graph">
-          <report-graph :uid="student.id"></report-graph>
+          <report-graph :uid="student.id" align="left"></report-graph>
         </div>
       </div>
     </div>
