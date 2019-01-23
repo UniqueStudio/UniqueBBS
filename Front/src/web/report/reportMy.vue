@@ -123,12 +123,12 @@ export default {
     },
     showEditBtn(dataStr) {
       let date = new Date();
-      date.setHours(23);
-      date.setMinutes(59);
-      date.setSeconds(59);
+      date.setHours(0);
+      date.setMinutes(0);
+      date.setSeconds(0);
       const maxDate = date.getTime();
       const postDate = new Date(dataStr).getTime();
-      return postDate < maxDate && this.mode === "my";
+      return postDate > maxDate && this.mode === "my";
     },
     renderMessage(message) {
       return this.$marked(message, { sanitize: true });
@@ -206,7 +206,7 @@ export default {
     margin: 20px auto;
   }
 }
-@media screen and (min-width: 1200px) {
+@media screen and (max-width: 1200px) {
   .report-my {
     width: 95%;
   }
@@ -217,6 +217,9 @@ export default {
 @media screen and (min-width: 1200px) {
   .report-my {
     width: 60%;
+  }
+  .user-report-graph {
+    margin: 36px auto;
   }
 }
 @media screen and (min-width: 1050px) {

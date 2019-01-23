@@ -148,7 +148,7 @@ export default {
 <style scoped>
 @media screen and (max-width: 1150px) {
   .mentor-my-students-item {
-    grid-template-rows: 100% 100%;
+    grid-template-rows: 160px 196px;
   }
   .student-item-avatar {
     text-align: center;

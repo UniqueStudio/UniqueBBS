@@ -11,9 +11,9 @@
         <label>报告类型</label>
       </div>
       <div class="form-right">
-        <a-select :defaultValue="isWeekReport" style="width: 100%;" v-model="isWeekReport">
-          <a-select-option value="0">Daily Report</a-select-option>
-          <a-select-option value="1">Weekly Report</a-select-option>
+        <a-select style="width: 100%;" v-model="isWeekReport">
+          <a-select-option value="0" v-if="can.daily">Daily Report</a-select-option>
+          <a-select-option value="1" v-if="can.weekly">Weekly Report</a-select-option>
         </a-select>
       </div>
       <div class="form-left">
@@ -75,7 +75,11 @@ export default {
       conclusion: "",
       isWeekReport: "0",
       extra: "",
-      mode: 0
+      mode: 0,
+      can: {
+        daily: true,
+        weekly: true
+      }
     };
   },
   methods: {
@@ -118,6 +122,14 @@ export default {
           content: createReportRaw.data.msg
         });
       }
+    },
+    async getCanStatus() {
+      const canReportRaw = await this.$ajax.get(this.$urls.reportCan);
+
+      this.can.weekly = canReportRaw.data.msg.weekly;
+      this.can.daily = canReportRaw.data.msg.daily;
+
+      this.isWeekReport = this.can.daily ? "0" : "1";
     },
     async updateReport() {
       const updateReportRaw = await this.$ajax.post(
@@ -172,6 +184,8 @@ export default {
     if (this.mode === 1) {
       this.rid = this.$route.params.rid;
       this.getReportInfo();
+    } else {
+      this.getCanStatus();
     }
   }
 };

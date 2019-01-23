@@ -124,6 +124,6 @@ export default {
   display: flex;
   flex-flow: column wrap;
   align-content: space-between;
-  margin: auto;
+  margin: auto auto auto 0;
 }
 </style>
