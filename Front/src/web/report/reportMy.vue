@@ -69,201 +69,202 @@
 <script>
 import reportGraph from "./reportGraph.vue";
 export default {
-  components: { "report-graph": reportGraph },
-  data() {
-    return {
-      user: {
-        name: "",
-        uid: "",
-        avatar: ""
-      },
-      mentor: {
-        name: "",
-        uid: ""
-      },
-      haveMentor: true,
-      mode: "my",
-      reportCount: 0,
-      defaultPageSize: 20,
-      page: 1,
-      reportList: [],
-      graphList: [],
-      canPostReport: false
-    };
-  },
-  methods: {
-    handleMentorClick() {
-      if (this.mode === "my") {
-        this.$router.push({ path: "/report/mentor" });
-      }
+    components: { "report-graph": reportGraph },
+    data() {
+        return {
+            user: {
+                name: "",
+                uid: "",
+                avatar: ""
+            },
+            mentor: {
+                name: "",
+                uid: ""
+            },
+            haveMentor: true,
+            mode: "my",
+            reportCount: 0,
+            defaultPageSize: 20,
+            page: 1,
+            reportList: [],
+            graphList: [],
+            canPostReport: false
+        };
     },
-    initReport() {
-      this.mode = this.$route.meta.mode;
-      if (this.mode === "visit") {
-        this.canPostReport = false;
-      }
-      this.page = Number.parseInt(this.$route.params.page);
-      this.getData();
-    },
-    renderDate(dateStr) {
-      const date = new Date(dateStr);
-      const nowDate = new Date();
+    methods: {
+        handleMentorClick() {
+            if (this.mode === "my") {
+                this.$router.push({ path: "/report/mentor" });
+            }
+        },
+        initReport() {
+            this.mode = this.$route.meta.mode;
+            if (this.mode === "visit") {
+                this.canPostReport = false;
+            }
+            this.page = Number.parseInt(this.$route.params.page);
+            this.getData();
+        },
+        renderDate(dateStr) {
+            const date = new Date(dateStr);
+            const nowDate = new Date();
 
-      if (nowDate.getFullYear() === date.getFullYear()) {
-        return `${date.getMonth() +
-          1}月 ${date.getDate()}日 ${date.getHours()}:${
-          date.getMinutes() < 10 ? "0" + date.getMinutes() : date.getMinutes()
-        }`;
-      } else {
-        return `${date.getFullYear()}年 ${date.getMonth() +
-          1}月 ${date.getDate()}日 ${date.getHours()}:${
-          date.getMinutes() < 10 ? "0" + date.getMinutes() : date.getMinutes()
-        }`;
-      }
-    },
-    showEditBtn(dataStr) {
-      let date = new Date();
-      date.setHours(0);
-      date.setMinutes(0);
-      date.setSeconds(0);
-      const maxDate = date.getTime();
-      const postDate = new Date(dataStr).getTime();
-      return postDate > maxDate && this.mode === "my";
-    },
-    renderMessage(message) {
-      return this.$marked(message, { sanitize: true });
-    },
-    userLink(uid) {
-      return `/user/visit/${uid}`;
-    },
-    pageOnchange(page) {
-      if (this.mode === "my") {
-        this.$router.push({
-          path: `/report/my/${page}`
-        });
-      } else {
-        this.$router.push({
-          path: `/report/visit/${this.user.uid}/${page}`
-        });
-      }
-      this.getData();
-    },
-    async getData() {
-      let requestInfoUrl = "";
-      if (this.mode === "my") {
-        requestInfoUrl = this.$urls.mentorMyInfo;
-      } else {
-        this.user.uid = this.$route.params.uid;
-        requestInfoUrl = this.$urls.mentorInfo(this.user.uid);
-      }
+            if (nowDate.getFullYear() === date.getFullYear()) {
+                return `${date.getMonth() +
+                    1}月 ${date.getDate()}日 ${date.getHours()}:${
+                    date.getMinutes() < 10
+                        ? "0" + date.getMinutes()
+                        : date.getMinutes()
+                }`;
+            } else {
+                return `${date.getFullYear()}年 ${date.getMonth() +
+                    1}月 ${date.getDate()}日 ${date.getHours()}:${
+                    date.getMinutes() < 10
+                        ? "0" + date.getMinutes()
+                        : date.getMinutes()
+                }`;
+            }
+        },
+        showEditBtn(dataStr) {
+            let date = new Date();
+            date.setHours(0);
+            date.setMinutes(0);
+            date.setSeconds(0);
+            const maxDate = date.getTime();
+            const postDate = new Date(dataStr).getTime();
+            return postDate > maxDate && this.mode === "my";
+        },
+        renderMessage(message) {
+            return this.$marked(message, { sanitize: true });
+        },
+        userLink(uid) {
+            return `/user/visit/${uid}`;
+        },
+        pageOnchange(page) {
+            if (this.mode === "my") {
+                this.$router.push({
+                    path: `/report/my/${page}`
+                });
+            } else {
+                this.$router.push({
+                    path: `/report/visit/${this.user.uid}/${page}`
+                });
+            }
+            this.getData();
+        },
+        async getData() {
+            let requestInfoUrl = "";
+            if (this.mode === "my") {
+                requestInfoUrl = this.$urls.mentorMyInfo;
+            } else {
+                this.user.uid = this.$route.params.uid;
+                requestInfoUrl = this.$urls.mentorInfo(this.user.uid);
+            }
 
-      const infoRaw = await this.$ajax.get(requestInfoUrl);
-      const info = infoRaw.data.msg;
+            const infoRaw = await this.$ajax.get(requestInfoUrl);
+            const info = infoRaw.data.msg;
 
-      this.user.name = info.user.username;
-      this.user.uid = info.user.id;
-      this.user.avatar = info.user.avatar;
+            this.user.name = info.user.username;
+            this.user.uid = info.user.id;
+            this.user.avatar = info.user.avatar;
 
-      if (info.mentor === null) {
-        this.haveMentor = false;
-      } else {
-        this.haveMentor = true;
-        this.mentor.name = info.mentor.username;
-        this.mentor.uid = info.mentor.id;
-      }
+            if (info.mentor === null) {
+                this.haveMentor = false;
+            } else {
+                this.haveMentor = true;
+                this.mentor.name = info.mentor.username;
+                this.mentor.uid = info.mentor.id;
+            }
 
-      const reportListRaw = await this.$ajax.get(
-        this.$urls.reportList(this.user.uid, this.page)
-      );
-      this.reportList = reportListRaw.data.msg.list;
-      this.reportCount = Number.parseInt(reportListRaw.data.msg.count);
-      const reportCanRaw = await this.$ajax.get(this.$urls.reportCan);
-      this.canPostReport =
-        reportCanRaw.data.msg.weekly || reportCanRaw.data.msg.daily;
+            const reportListRaw = await this.$ajax.get(
+                this.$urls.reportList(this.user.uid, this.page)
+            );
+            this.reportList = reportListRaw.data.msg.list;
+            this.reportCount = Number.parseInt(reportListRaw.data.msg.count);
+            const reportCanRaw = await this.$ajax.get(this.$urls.reportCan);
+            this.canPostReport =
+                reportCanRaw.data.msg.weekly || reportCanRaw.data.msg.daily;
+        }
+    },
+    computed: {
+        userAvatarSrc() {
+            return this.$store.state.avatarSrc;
+        }
+    },
+    mounted() {
+        this.initReport();
+    },
+    watch: {
+        $route(to, from) {
+            this.initReport();
+        }
     }
-  },
-  computed: {
-    userAvatarSrc() {
-      return this.$store.state.avatarSrc;
-    }
-  },
-  mounted() {
-    this.initReport();
-  },
-  watch: {
-    $route(to, from) {
-      this.initReport();
-    }
-  }
 };
 </script>
 <style scoped>
 @media screen and (max-width: 1050px) {
-  .report-my-info-container {
-    grid-template-rows: 196px 156px;
-  }
-  .user-report-graph {
-    margin: 20px auto;
-  }
+    .report-my-info-container {
+        grid-template-rows: 196px 156px;
+    }
+    .user-report-graph {
+        margin: 20px auto;
+    }
 }
 @media screen and (max-width: 1200px) {
-  .report-my {
-    width: 95%;
-  }
-  .user-report-graph {
-    margin: 55px auto;
-  }
+    .report-my {
+        width: 95%;
+    }
 }
 @media screen and (min-width: 1200px) {
-  .report-my {
-    width: 60%;
-  }
-  .user-report-graph {
-    margin: 36px auto;
-  }
+    .report-my {
+        width: 60%;
+    }
+    .user-report-graph {
+        margin: 24px auto;
+    }
 }
 @media screen and (min-width: 1050px) {
-  .report-my-info-container {
-    grid-template-columns: 30% 70%;
-  }
-  .user-report-list {
-    padding: 0 10%;
-  }
+    .report-my-info-container {
+        grid-template-columns: 30% 70%;
+    }
+    .user-report-list {
+        padding: 0 10%;
+    }
 }
 .report-my {
-  margin: 36px auto 0 auto;
+    margin: 36px auto 0 auto;
 }
 .report-my-info-container {
-  display: grid;
+    display: grid;
 }
 .user-info {
-  text-align: center;
+    text-align: center;
 }
 .user-avatar {
-  height: 144px;
-  width: 144px;
-  border-radius: 72px;
+    height: 144px;
+    width: 144px;
+    border-radius: 72px;
 }
 .user-info-details-container {
-  margin-top: 16px;
+    margin-top: 16px;
 }
 .user-name-container {
-  font-size: 18px;
+    font-size: 18px;
 }
 .user-report-create {
-  text-align: center;
+    text-align: center;
 }
 .user-report-create {
-  margin: 36px auto;
+    margin: 36px auto;
 }
 .user-report-list {
-  margin: 36px 0;
+    margin: 36px 0;
 }
 .report-header {
-  display: grid;
-  grid-template-columns: 50% 50%;
+    display: grid;
+    grid-template-columns: 50% 50%;
 }
 .report-header-btns {
-  text-align: right;
+    text-align: right;
 }
 </style>

@@ -35,7 +35,7 @@
         "typescript": "^3.2.2"
     },
     "scripts": {
-        "dev": "SET NODE_ENV=DEV&&ts-node server.ts",
+        "dev": "ts-node server.ts",
         "compile": "tsc",
         "init": "prisma deploy && node ./output/utils/init.js",
         "start": "node ./output/server.js"

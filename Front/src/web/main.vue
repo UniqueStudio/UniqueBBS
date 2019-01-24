@@ -80,11 +80,14 @@
       </div>
     </div>
     <div class="body">
-      <router-view></router-view>
+      <keep-alive>
+        <router-view v-if="$route.meta.keepAlive"></router-view>
+      </keep-alive>
+      <router-view v-if="!$route.meta.keepAlive"></router-view>
     </div>
     <footer>
       <p class="footer-left">
-        <b>Unique BBS</b> v1.00
+        <b>Unique BBS</b> v1.03
         <br>Code By
         <a href="https://github.com/ttzztztz" target="_blank">Rabbit</a> @ 811
       </p>
@@ -97,178 +100,178 @@
 <script>
 import "./css.css";
 export default {
-  data() {
-    return {
-      transitionName: "slide-left"
-    };
-  },
-  methods: {
-    handleLoginClick() {
-      this.$router.push({ path: "/forum" });
+    data() {
+        return {
+            transitionName: "slide-left"
+        };
     },
-    handleMenuClick(e) {
-      switch (e.key) {
-        case "1":
-          this.$router.push({ path: "/user/my/info" });
-          break;
-        case "2":
-          this.$router.push({ path: "/user/my/pwdReset" });
-          break;
-        case "3":
-          this.$router.push({ path: "/user/my/notice/1" });
-          break;
-        case "4":
-          this.$router.push({ path: "/user/my/group" });
-          break;
-        case "5":
-          this.$router.push({ path: "/user/my/threads/1" });
-          break;
-        case "7":
-          if (confirm("您确定要注销吗？")) {
-            localStorage.removeItem("token");
-            localStorage.removeItem("uid");
-            this.$store.commit("setLoginStatus", false);
-            this.$store.dispatch("checkLoginStatus");
-            this.$router.push({ path: "/user/login/pwd" });
-          }
-          break;
-      }
+    methods: {
+        handleLoginClick() {
+            this.$router.push({ path: "/forum" });
+        },
+        handleMenuClick(e) {
+            switch (e.key) {
+                case "1":
+                    this.$router.push({ path: "/user/my/info" });
+                    break;
+                case "2":
+                    this.$router.push({ path: "/user/my/pwdReset" });
+                    break;
+                case "3":
+                    this.$router.push({ path: "/user/my/notice/1" });
+                    break;
+                case "4":
+                    this.$router.push({ path: "/user/my/group" });
+                    break;
+                case "5":
+                    this.$router.push({ path: "/user/my/threads/1" });
+                    break;
+                case "7":
+                    if (confirm("您确定要注销吗？")) {
+                        localStorage.removeItem("token");
+                        localStorage.removeItem("uid");
+                        this.$store.commit("setLoginStatus", false);
+                        this.$store.dispatch("checkLoginStatus");
+                        this.$router.push({ path: "/user/login/pwd" });
+                    }
+                    break;
+            }
+        }
+    },
+    mounted() {
+        this.$store.dispatch("checkLoginStatus");
+    },
+    computed: {
+        navActive() {
+            return this.$store.state.navActive;
+        }
     }
-  },
-  mounted() {
-    this.$store.dispatch("checkLoginStatus");
-  },
-  computed: {
-    navActive() {
-      return this.$store.state.navActive;
-    }
-  }
 };
 </script>
 <style scoped>
 .nav-item-ul a {
-  color: white !important;
+    color: white !important;
 }
 footer {
-  margin: 32px 6%;
-  display: grid;
-  color: white;
-  grid-template-columns: 50% 50%;
-  user-select: none;
-  cursor: default;
+    margin: 32px 6%;
+    display: grid;
+    color: white;
+    grid-template-columns: 50% 50%;
+    user-select: none;
+    cursor: default;
 }
 .footer-right {
-  text-align: right;
+    text-align: right;
 }
 
 @media screen and (max-width: 1000px) {
-  .body {
-    width: 95%;
-    margin-left: 2.5%;
-  }
-  .nav {
-    grid-template-columns: 20% 60% 20%;
-  }
+    .body {
+        width: 95%;
+        margin-left: 2.5%;
+    }
+    .nav {
+        grid-template-columns: 20% 60% 20%;
+    }
 }
 @media screen and (min-width: 1000px) {
-  .body {
-    width: 90%;
-    margin-left: 5%;
-  }
-  .nav {
-    grid-template-columns: 10% 80% 10%;
-  }
+    .body {
+        width: 90%;
+        margin-left: 5%;
+    }
+    .nav {
+        grid-template-columns: 10% 80% 10%;
+    }
 }
 .avatar-img {
-  margin: 6px 24px;
+    margin: 6px 24px;
 }
 .body {
-  min-height: 900px;
-  border-radius: 6px;
-  background: white;
-  position: relative;
-  margin-top: 96px;
-  box-shadow: rgba(0, 0, 0, 0.1) 0px 0px 12px 1px;
-  padding: 12px;
+    min-height: 900px;
+    border-radius: 6px;
+    background: white;
+    position: relative;
+    margin-top: 96px;
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 0px 12px 1px;
+    padding: 12px;
 }
 .nav {
-  height: 60px;
-  width: 100%;
-  position: fixed;
-  display: grid;
-  background: rgba(45, 45, 45, 0.85);
-  color: white;
-  top: 0;
-  z-index: 999;
-  padding: 6px;
-  transition: all 0.9s cubic-bezier(0.33, 0.63, 0.65, 0.99);
-  user-select: none;
+    height: 60px;
+    width: 100%;
+    position: fixed;
+    display: grid;
+    background: rgba(45, 45, 45, 0.85);
+    color: white;
+    top: 0;
+    z-index: 999;
+    padding: 6px;
+    transition: all 0.9s cubic-bezier(0.33, 0.63, 0.65, 0.99);
+    user-select: none;
 }
 .nav:hover {
-  background: rgb(45, 45, 45);
+    background: rgb(45, 45, 45);
 }
 .nav-logo,
 .nav-item,
 .nav-avatar {
-  display: inline-block;
-  position: relative;
+    display: inline-block;
+    position: relative;
 }
 .nav-logo > img {
-  width: 36px;
-  height: 36px;
-  margin: 6px 24px;
-  position: absolute;
-  right: 0;
+    width: 36px;
+    height: 36px;
+    margin: 6px 24px;
+    position: absolute;
+    right: 0;
 }
 .nav-avatar {
-  width: 84px;
-  height: 100%;
-  cursor: pointer;
+    width: 84px;
+    height: 100%;
+    cursor: pointer;
 }
 .nav-item {
-  width: 100%;
-  text-align: center;
-  height: 100%;
+    width: 100%;
+    text-align: center;
+    height: 100%;
 }
 .nav-item-content {
-  display: grid;
-  grid-template-columns: auto 64px 64px 64px auto;
-  height: 100%;
+    display: grid;
+    grid-template-columns: auto 64px 64px 64px auto;
+    height: 100%;
 }
 .nav-item-icon-container {
-  padding: 10px;
+    padding: 10px;
 }
 .nav-item-icon-container:hover,
 .nav-logo:hover,
 .avatar-img:hover {
-  opacity: 0.5;
+    opacity: 0.5;
 }
 .nav-item-icon-container,
 .avatar-img,
 .nav-logo {
-  transition: all 0.9s cubic-bezier(0.33, 0.63, 0.65, 0.99);
-  cursor: pointer;
+    transition: all 0.9s cubic-bezier(0.33, 0.63, 0.65, 0.99);
+    cursor: pointer;
 }
 .footer-left > a,
 .nav-item a {
-  color: white;
+    color: white;
 }
 .avatar-nologin {
-  background-color: transparent;
-  transform: scale(1.5, 1.5);
+    background-color: transparent;
+    transform: scale(1.5, 1.5);
 }
 .user-badage {
-  position: absolute;
-  left: 48px;
+    position: absolute;
+    left: 48px;
 }
 .user-avatar-box {
-  position: relative;
+    position: relative;
 }
 .user-menu-badage {
-  position: absolute;
-  left: 72px;
+    position: absolute;
+    left: 72px;
 }
 .nav-menu {
-  width: 128px;
+    width: 128px;
 }
 </style>

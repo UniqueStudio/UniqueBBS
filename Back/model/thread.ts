@@ -18,7 +18,8 @@ import {
     MESSAGE_REPLY,
     MESSAGE_QUOTE,
     MESSAGE_DIAMOND,
-    MESSAGE_THREAD_URL
+    MESSAGE_THREAD_URL,
+    MESSAGE_AT
 } from "./message";
 import { redLock } from "../server";
 import { fileProcess } from "./attach";
@@ -28,6 +29,7 @@ import {
     filterObjGenerate,
     filterClearCache
 } from "./filter";
+import { atProcess } from "./at";
 
 export const threadList = async function(req: Request, res: Response) {
     try {
@@ -249,7 +251,9 @@ export const threadCreate = async function(req: Request, res: Response) {
             filterGroupArr,
             fileListArr
         } = req.body;
-        const { uid, isAdmin } = verifyJWT(req.header("Authorization"));
+        const { uid, isAdmin, username } = verifyJWT(
+            req.header("Authorization")
+        );
 
         if (!message || message.length <= 5) {
             return res.json({
@@ -367,6 +371,13 @@ export const threadCreate = async function(req: Request, res: Response) {
 
             await forumThreadsAdd(fid, 1, newPostPid);
             await userThreadsAdd(uid, 1);
+            await atProcess(
+                message,
+                uid,
+                MESSAGE_AT(username, subject, false),
+                resultThread.id,
+                isAdmin
+            );
             res.json({ code: 1, msg: resultThread.id });
         } catch (e) {
             res.json({ code: -1, msg: e.message });
@@ -522,6 +533,14 @@ export const threadReply = async function(req: Request, res: Response) {
                     );
                 }
             }
+
+            await atProcess(
+                message,
+                uid,
+                MESSAGE_AT(username, threadInfo.subject, true),
+                threadInfo.id,
+                isAdmin
+            );
 
             res.json({ code: 1 });
         } catch (e) {

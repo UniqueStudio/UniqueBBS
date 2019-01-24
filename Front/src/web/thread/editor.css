@@ -1,8 +1,8 @@
 .CodeMirror {
-  height: 100% !important;
-  font-family: "Courier New", "Microsoft YaHei", Courier, monospace;
+    height: 100% !important;
+    font-family: "Courier New", "Microsoft YaHei", Courier, monospace;
 }
 .CodeMirror-gutters {
-  background-color: #fff;
-  border-right: 1px solid #fff;
+    background-color: #fff;
+    border-right: 1px solid #fff;
 }

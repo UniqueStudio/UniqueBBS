@@ -5,9 +5,9 @@
 </template>
 <script>
 export default {
-  mounted() {
-    this.$store.commit("setActiveNav", 0);
-  }
+    mounted() {
+        this.$store.commit("setActiveNav", 0);
+    }
 };
 </script>
 <style scoped>

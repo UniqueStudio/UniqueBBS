@@ -6,6 +6,16 @@ import { getTodayFirstTimestamp, getTodayLastTimestamp } from "./time";
 import { setLockExpire, getLockStatus } from "./lock";
 import { redisClientSetAsync, redisClientGetAsync } from "../server";
 
+export const REPORT_TEMPLATE = (
+    time: string,
+    content: string,
+    plan: string,
+    solution: string,
+    conclusion: string,
+    extra: string
+) =>
+    `- **学习时间:** ${time}\n- **学习内容:**\n${content}\n- **学习计划:**\n${plan}\n- **解决问题:**\n${solution}\n- **学习总结:**\n${conclusion}\n\n${extra}`;
+
 export const reportCreate = async function(req: Request, res: Response) {
     try {
         const { uid } = verifyJWT(req.header("Authorization"));
@@ -68,7 +78,14 @@ export const reportCreate = async function(req: Request, res: Response) {
             }
         }
 
-        const message = `**学习时间:**${time}\n**学习内容:**${content}\n**学习计划:**${plan}\n**解决问题:**${solution}\n**学习总结:**${conclusion}\n${extra}`;
+        const message = REPORT_TEMPLATE(
+            time,
+            content,
+            plan,
+            solution,
+            conclusion,
+            extra
+        );
 
         const result = await prisma.createReport({
             message,
@@ -167,17 +184,29 @@ export const reportGraph = async function(req: Request, res: Response) {
     try {
         verifyJWT(req.header("Authorization"));
         const { uid } = req.params;
+        const { year } = req.body;
 
         const fragment = `fragment ReportsGraph on Report{
             createDate
             isWeek
         }`;
-
         const beginDateRaw = new Date();
+
+        if (year) {
+            const yearNumber: number = Number.parseInt(year);
+            const nowYear = new Date().getFullYear();
+            const allowYear = [1, 2, 3];
+            if (!allowYear.some(item => item === yearNumber)) {
+                return res.json({ code: -1, msg: "Cannot Support Year" });
+            }
+            beginDateRaw.setFullYear(nowYear + yearNumber * -1, 11, 31);
+        }
+
         beginDateRaw.setHours(0);
         beginDateRaw.setMinutes(0);
         beginDateRaw.setSeconds(0);
-        const extraBlockCount = new Date().getDay() + 1;
+
+        const extraBlockCount = beginDateRaw.getDay() + 1;
         const beginDate = new Date(
             beginDateRaw.getTime() -
                 (extraBlockCount + 363) * 24 * 60 * 60 * 1000
@@ -199,6 +228,7 @@ export const reportGraph = async function(req: Request, res: Response) {
     } catch (e) {
         res.json({ code: -1, msg: e.message });
     }
+    return 1;
 };
 
 export const reportList = async function(req: Request, res: Response) {
@@ -269,7 +299,14 @@ export const reportUpdate = async function(req: Request, res: Response) {
             return res.json({ code: -1, msg: "您无权编辑此Report！" });
         }
 
-        const message = `**学习时间:**${time}\n**学习内容:**${content}\n**学习计划:**${plan}\n**解决问题:**${solution}\n**学习总结:**${conclusion}\n${extra}`;
+        const message = REPORT_TEMPLATE(
+            time,
+            content,
+            plan,
+            solution,
+            conclusion,
+            extra
+        );
         const obj = { time, content, plan, solution, conclusion, extra };
         await redisClientSetAsync(
             `report:${rid}`,

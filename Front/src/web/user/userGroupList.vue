@@ -37,80 +37,80 @@
 </template>
 <script>
 export default {
-  data() {
-    return {
-      groupList: []
-    };
-  },
-  methods: {
-    async getGroupList() {
-      const responseRaw = await this.$ajax.get(this.$urls.groupList);
-      if (responseRaw.data.code !== 1) {
-        return this.$store.dispatch("checkLoginStatus");
-      }
-      this.groupList = responseRaw.data.msg;
+    data() {
+        return {
+            groupList: []
+        };
+    },
+    methods: {
+        async getGroupList() {
+            const responseRaw = await this.$ajax.get(this.$urls.groupList);
+            if (responseRaw.data.code !== 1) {
+                return this.$store.dispatch("checkLoginStatus");
+            }
+            this.groupList = responseRaw.data.msg;
+        }
+    },
+    mounted() {
+        this.getGroupList();
     }
-  },
-  mounted() {
-    this.getGroupList();
-  }
 };
 </script>
 <style scoped>
 @media screen and (min-width: 800px) {
-  .user-group-list {
-    width: 40%;
-  }
-  .user-group-item {
-    grid-template-columns: 30% 70%;
-  }
+    .user-group-list {
+        width: 40%;
+    }
+    .user-group-item {
+        grid-template-columns: 30% 70%;
+    }
 }
 @media screen and (max-width: 800px) {
-  .user-group-list {
-    width: 80%;
-  }
-  .user-group-item {
-    grid-template-columns: 25% 75%;
-  }
+    .user-group-list {
+        width: 80%;
+    }
+    .user-group-item {
+        grid-template-columns: 25% 75%;
+    }
 }
 .user-group-list {
-  margin: 48px auto;
+    margin: 48px auto;
 }
 .user-group-item {
-  display: grid;
-  margin: 48px auto;
+    display: grid;
+    margin: 48px auto;
 }
 .group-name {
-  padding: 0 16px;
+    padding: 0 16px;
 }
 .group-icon-container {
-  text-align: right;
+    text-align: right;
 }
 .group-icon-bg {
-  height: 72px;
-  width: 72px;
-  border-radius: 36px;
-  display: inline-block;
+    height: 72px;
+    width: 72px;
+    border-radius: 36px;
+    display: inline-block;
 }
 .group-icon {
-  color: white;
-  font-size: 36px;
-  height: 72px;
-  width: 72px;
-  margin-top: 16px;
+    color: white;
+    font-size: 36px;
+    height: 72px;
+    width: 72px;
+    margin-top: 16px;
 }
 .group-name-title {
-  font-size: 20px;
+    font-size: 20px;
 }
 .group-info {
-  margin-top: 12px;
+    margin-top: 12px;
 }
 .group-number {
-  position: absolute;
-  right: 0;
+    position: absolute;
+    right: 0;
 }
 .group-info,
 .group-name {
-  position: relative;
+    position: relative;
 }
 </style>

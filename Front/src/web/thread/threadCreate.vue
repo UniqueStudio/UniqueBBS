@@ -27,7 +27,7 @@
         </div>
         <div class="create-preview-container">
           <a-divider type="vertical" class="divider"></a-divider>
-          <div class="create-preview" v-html="previewText"></div>
+          <div class="create-preview show-markdown" v-html="previewText"></div>
         </div>
       </div>
       <div class="bottom-controls">
@@ -68,349 +68,355 @@ import "codemirror/mode/markdown/markdown.js";
 import "codemirror/theme/idea.css";
 import "./editor.css";
 export default {
-  components: { codemirror },
-  data() {
-    return {
-      mode: 0,
-      tid: "",
-      pid: "",
-      fid: "",
-      subject: "",
-      message: "",
-      forumList: [],
-      cmOptions: {
-        tabSize: 4,
-        styleActiveLine: true,
-        lineNumbers: true,
-        lineWrapping: true,
-        line: true,
-        mode: "text/x-markdown",
-        theme: "idea"
-      },
-      attachList: [],
-      showAttachList: false,
-      btnDisabled: false
-    };
-  },
-  computed: {
-    uploadHeaderSet() {
-      return {
-        Authorization: localStorage.getItem("token")
-      };
-    },
-    fileUploadUrl() {
-      return this.$urls.fileUpload;
-    },
-    previewText() {
-      return this.$marked(this.message, { sanitize: true });
-    },
-    execBtnText() {
-      let result = "发表帖子";
-      switch (this.mode) {
-        case 0:
-          result = "发表帖子";
-          break;
-        case 1:
-          result = "更新帖子";
-          break;
-        case 2:
-          result = "更新回帖";
-          break;
-      }
-      return result;
-    }
-  },
-  methods: {
-    handleFilePreview(file) {
-      const reg = /(jpg|png|gif|jpeg|bmp|webp)$/i;
-      if (reg.test(file.name)) {
-        const aid = file.response.msg;
-        this.message += `![uniqueImg](${this.$urls.attachPreview(aid)})`;
-      }
-    },
-    async getAttachList() {
-      const unlinkListRaw = await this.$ajax.get(this.$urls.attachUnlink);
-      if (unlinkListRaw.data.code === 1) {
-        const unLinkList = unlinkListRaw.data.msg;
-        this.attachList = [
-          ...this.attachList,
-          ...unLinkList.map(item => ({
-            uid: item.id,
-            response: {
-              code: 1,
-              msg: item.id
+    components: { codemirror },
+    data() {
+        return {
+            mode: 0,
+            tid: "",
+            pid: "",
+            fid: "",
+            subject: "",
+            message: "",
+            forumList: [],
+            cmOptions: {
+                tabSize: 4,
+                styleActiveLine: true,
+                lineNumbers: true,
+                lineWrapping: true,
+                line: true,
+                mode: "text/x-markdown",
+                theme: "idea"
             },
-            name: item.originalName,
-            status: "done"
-          }))
-        ];
-      }
-      this.showAttachList = true;
+            attachList: [],
+            showAttachList: false,
+            btnDisabled: false
+        };
     },
-    async deleteAttach(aid) {
-      const response = await this.$ajax.post(this.$urls.attachRemove(aid));
-    },
-    handleFileListChange({ file, fileList }) {
-      if (file.status === "removed") {
-        this.deleteAttach(file.response.msg);
-      }
-      this.attachList = fileList;
-    },
-    async getForumList() {
-      const threadListReponseRaw = await this.$ajax.get(
-        this.$urls.forumListSimple
-      );
-      if (threadListReponseRaw.data.code !== 1) {
-        return this.$store.dispatch("checkLoginStatus");
-      }
-      this.forumList = threadListReponseRaw.data.msg;
-
-      if (this.$route.params.fid) {
-        this.fid = this.$route.params.fid;
-      } else {
-        this.fid = this.forumList[0].id;
-      }
-    },
-    handleBtnClick() {
-      this.btnDisabled = true;
-      const mode = this.$route.meta.mode;
-      const THREAD_CREATE = 0,
-        THREAD_UPDATE = 1,
-        POST_UPDATE = 2;
-      switch (mode) {
-        case THREAD_CREATE:
-          this.createThread();
-          break;
-        case THREAD_UPDATE:
-          this.updateThread();
-          break;
-        case POST_UPDATE:
-          this.updatePost();
-          break;
-      }
-    },
-    async updateThread() {
-      const responseRaw = await this.$ajax.post(
-        this.$urls.threadUpdate(this.tid),
-        {
-          fid: this.fid,
-          subject: this.subject,
-          message: this.message,
-          fileListArr: this.attachList.map(item => item.response.msg)
-        }
-      );
-      if (responseRaw.data.code === 1) {
-        this.$router.push({
-          path: `/thread/info/${this.tid}/1`
-        });
-        this.$notification.open({
-          message: "更新主题",
-          description: "主题更新成功！",
-          icon: <a-icon type="smile" style="color: #108ee9" />
-        });
-      } else {
-        const modal = this.$error();
-        modal.update({
-          title: "更新错误",
-          content: responseRaw.data.msg
-        });
-      }
-      this.btnDisabled = false;
-    },
-    async createThread() {
-      const responseRaw = await this.$ajax.post(this.$urls.threadCreate, {
-        fid: this.fid,
-        subject: this.subject,
-        message: this.message,
-        fileListArr: this.attachList.map(item => item.response.msg)
-      });
-      if (responseRaw.data.code === 1) {
-        const tid = responseRaw.data.msg;
-        this.$router.push({
-          path: `/thread/info/${tid}/1`
-        });
-        this.$notification.open({
-          message: "发表主题",
-          description: "发帖成功！",
-          icon: <a-icon type="smile" style="color: #108ee9" />
-        });
-      } else {
-        const modal = this.$error();
-        modal.update({
-          title: "发帖错误",
-          content: responseRaw.data.msg
-        });
-      }
-      this.btnDisabled = false;
-    },
-    async getThreadInfo(tid) {
-      await this.$ajax.get(this.$urls.attachExpire(tid));
-      const threadInfoRaw = await this.$ajax.get(this.$urls.threadInfo(tid, 1));
-      if (threadInfoRaw.data.code !== 1) {
-        const modal = this.$error();
-        modal.update({
-          title: "错误",
-          content: threadInfoRaw.data.msg
-        });
-        return;
-      }
-      this.fid = threadInfoRaw.data.msg.forumInfo.id;
-      this.subject = threadInfoRaw.data.msg.threadInfo.subject;
-
-      const regImgStr = /\!\[uniqueImg\]\(unique\:\/\/(.*?)\)/g;
-      this.message = threadInfoRaw.data.msg.firstPost.message.replace(
-        regImgStr,
-        `![uniqueImg](${this.$urls.domain}attach/preview/$1)`
-      );
-
-      this.attachList = threadInfoRaw.data.msg.attachArr.map(item => ({
-        uid: item.id,
-        response: {
-          code: 1,
-          msg: item.id
+    computed: {
+        uploadHeaderSet() {
+            return {
+                Authorization: localStorage.getItem("token")
+            };
         },
-        name: item.originalName,
-        status: "done"
-      }));
-
-      this.getAttachList();
-    },
-    async updatePost() {
-      const updatePostInfoRaw = await this.$ajax.post(
-        this.$urls.postUpdate(this.pid),
-        {
-          message: this.message
+        fileUploadUrl() {
+            return this.$urls.fileUpload;
+        },
+        previewText() {
+            return this.$marked(this.message, { sanitize: true });
+        },
+        execBtnText() {
+            let result = "发表帖子";
+            switch (this.mode) {
+                case 0:
+                    result = "发表帖子";
+                    break;
+                case 1:
+                    result = "更新帖子";
+                    break;
+                case 2:
+                    result = "更新回帖";
+                    break;
+            }
+            return result;
         }
-      );
-      if (updatePostInfoRaw.data.code === 1) {
-        const tid = updatePostInfoRaw.data.msg;
-        this.$router.push({
-          path: `/thread/info/${tid}/1`
-        });
-        this.$notification.open({
-          message: "更新回帖",
-          description: "回帖更新成功！",
-          icon: <a-icon type="smile" style="color: #108ee9" />
-        });
-      } else {
-        const modal = this.$error();
-        modal.update({
-          title: "错误",
-          content: updatePostInfoRaw.data.msg
-        });
-      }
-      this.btnDisabled = false;
     },
-    async getReplyInfo(pid) {
-      const replyInfoRaw = await this.$ajax.get(this.$urls.postInfo(pid));
-      if (replyInfoRaw.data.code !== 1) {
-        const modal = this.$error();
-        modal.update({
-          title: "错误",
-          content: replyInfoRaw.data.msg
-        });
-        return;
-      }
-      this.message = replyInfoRaw.data.msg.message;
-      this.pid = replyInfoRaw.data.msg.id;
+    methods: {
+        handleFilePreview(file) {
+            const reg = /(jpg|png|gif|jpeg|bmp|webp)$/i;
+            if (reg.test(file.name)) {
+                const aid = file.response.msg;
+                this.message += `![uniqueImg](${this.$urls.attachPreview(
+                    aid
+                )})`;
+            }
+        },
+        async getAttachList() {
+            const unlinkListRaw = await this.$ajax.get(this.$urls.attachUnlink);
+            if (unlinkListRaw.data.code === 1) {
+                const unLinkList = unlinkListRaw.data.msg;
+                this.attachList = [
+                    ...this.attachList,
+                    ...unLinkList.map(item => ({
+                        uid: item.id,
+                        response: {
+                            code: 1,
+                            msg: item.id
+                        },
+                        name: item.originalName,
+                        status: "done"
+                    }))
+                ];
+            }
+            this.showAttachList = true;
+        },
+        async deleteAttach(aid) {
+            const response = await this.$ajax.post(
+                this.$urls.attachRemove(aid)
+            );
+        },
+        handleFileListChange({ file, fileList }) {
+            if (file.status === "removed") {
+                this.deleteAttach(file.response.msg);
+            }
+            this.attachList = fileList;
+        },
+        async getForumList() {
+            const threadListReponseRaw = await this.$ajax.get(
+                this.$urls.forumListSimple
+            );
+            if (threadListReponseRaw.data.code !== 1) {
+                return this.$store.dispatch("checkLoginStatus");
+            }
+            this.forumList = threadListReponseRaw.data.msg;
+
+            if (this.$route.params.fid) {
+                this.fid = this.$route.params.fid;
+            } else {
+                this.fid = this.forumList[0].id;
+            }
+        },
+        handleBtnClick() {
+            this.btnDisabled = true;
+            const mode = this.$route.meta.mode;
+            const THREAD_CREATE = 0,
+                THREAD_UPDATE = 1,
+                POST_UPDATE = 2;
+            switch (mode) {
+                case THREAD_CREATE:
+                    this.createThread();
+                    break;
+                case THREAD_UPDATE:
+                    this.updateThread();
+                    break;
+                case POST_UPDATE:
+                    this.updatePost();
+                    break;
+            }
+        },
+        async updateThread() {
+            const responseRaw = await this.$ajax.post(
+                this.$urls.threadUpdate(this.tid),
+                {
+                    fid: this.fid,
+                    subject: this.subject,
+                    message: this.message,
+                    fileListArr: this.attachList.map(item => item.response.msg)
+                }
+            );
+            if (responseRaw.data.code === 1) {
+                this.$router.push({
+                    path: `/thread/info/${this.tid}/1`
+                });
+                this.$notification.open({
+                    message: "更新主题",
+                    description: "主题更新成功！",
+                    icon: <a-icon type="smile" style="color: #108ee9" />
+                });
+            } else {
+                const modal = this.$error();
+                modal.update({
+                    title: "更新错误",
+                    content: responseRaw.data.msg
+                });
+            }
+            this.btnDisabled = false;
+        },
+        async createThread() {
+            const responseRaw = await this.$ajax.post(this.$urls.threadCreate, {
+                fid: this.fid,
+                subject: this.subject,
+                message: this.message,
+                fileListArr: this.attachList.map(item => item.response.msg)
+            });
+            if (responseRaw.data.code === 1) {
+                const tid = responseRaw.data.msg;
+                this.$router.push({
+                    path: `/thread/info/${tid}/1`
+                });
+                this.$notification.open({
+                    message: "发表主题",
+                    description: "发帖成功！",
+                    icon: <a-icon type="smile" style="color: #108ee9" />
+                });
+            } else {
+                const modal = this.$error();
+                modal.update({
+                    title: "发帖错误",
+                    content: responseRaw.data.msg
+                });
+            }
+            this.btnDisabled = false;
+        },
+        async getThreadInfo(tid) {
+            await this.$ajax.get(this.$urls.attachExpire(tid));
+            const threadInfoRaw = await this.$ajax.get(
+                this.$urls.threadInfo(tid, 1)
+            );
+            if (threadInfoRaw.data.code !== 1) {
+                const modal = this.$error();
+                modal.update({
+                    title: "错误",
+                    content: threadInfoRaw.data.msg
+                });
+                return;
+            }
+            this.fid = threadInfoRaw.data.msg.forumInfo.id;
+            this.subject = threadInfoRaw.data.msg.threadInfo.subject;
+
+            const regImgStr = /\!\[uniqueImg\]\(unique\:\/\/(.*?)\)/g;
+            this.message = threadInfoRaw.data.msg.firstPost.message.replace(
+                regImgStr,
+                `![uniqueImg](${this.$urls.domain}attach/preview/$1)`
+            );
+
+            this.attachList = threadInfoRaw.data.msg.attachArr.map(item => ({
+                uid: item.id,
+                response: {
+                    code: 1,
+                    msg: item.id
+                },
+                name: item.originalName,
+                status: "done"
+            }));
+
+            this.getAttachList();
+        },
+        async updatePost() {
+            const updatePostInfoRaw = await this.$ajax.post(
+                this.$urls.postUpdate(this.pid),
+                {
+                    message: this.message
+                }
+            );
+            if (updatePostInfoRaw.data.code === 1) {
+                const tid = updatePostInfoRaw.data.msg;
+                this.$router.push({
+                    path: `/thread/info/${tid}/1`
+                });
+                this.$notification.open({
+                    message: "更新回帖",
+                    description: "回帖更新成功！",
+                    icon: <a-icon type="smile" style="color: #108ee9" />
+                });
+            } else {
+                const modal = this.$error();
+                modal.update({
+                    title: "错误",
+                    content: updatePostInfoRaw.data.msg
+                });
+            }
+            this.btnDisabled = false;
+        },
+        async getReplyInfo(pid) {
+            const replyInfoRaw = await this.$ajax.get(this.$urls.postInfo(pid));
+            if (replyInfoRaw.data.code !== 1) {
+                const modal = this.$error();
+                modal.update({
+                    title: "错误",
+                    content: replyInfoRaw.data.msg
+                });
+                return;
+            }
+            this.message = replyInfoRaw.data.msg.message;
+            this.pid = replyInfoRaw.data.msg.id;
+        }
+    },
+    mounted() {
+        this.mode = this.$route.meta.mode;
+        if (this.mode === 1) {
+            this.tid = this.$route.params.tid;
+            this.getThreadInfo(this.tid);
+        } else if (this.mode === 2) {
+            this.pid = this.$route.params.pid;
+            this.getReplyInfo(this.pid);
+        }
+        if (this.mode === 0) {
+            this.getAttachList();
+        }
+        this.getForumList();
     }
-  },
-  mounted() {
-    this.mode = this.$route.meta.mode;
-    if (this.mode === 1) {
-      this.tid = this.$route.params.tid;
-      this.getThreadInfo(this.tid);
-    } else if (this.mode === 2) {
-      this.pid = this.$route.params.pid;
-      this.getReplyInfo(this.pid);
-    }
-    if (this.mode === 0) {
-      this.getAttachList();
-    }
-    this.getForumList();
-  }
 };
 </script>
 <style scoped>
 @media screen and (max-width: 800px) {
-  .thread-create {
-    width: 100%;
-  }
-  .divider,
-  .create-preview {
-    display: none;
-  }
-  .create-input {
-    grid-template-columns: 100% 0;
-  }
-  .create-input {
-    height: 40vh;
-  }
-  .create-first-line {
-    grid-template-columns: 40% 60%;
-  }
-  .bottom-controls {
-    grid-template-columns: 50% 50%;
-  }
+    .thread-create {
+        width: 100%;
+    }
+    .divider,
+    .create-preview {
+        display: none;
+    }
+    .create-input {
+        grid-template-columns: 100% 0;
+    }
+    .create-input {
+        height: 40vh;
+    }
+    .create-first-line {
+        grid-template-columns: 40% 60%;
+    }
+    .bottom-controls {
+        grid-template-columns: 50% 50%;
+    }
 }
 @media screen and (min-width: 800px) {
-  .thread-create {
-    width: 80%;
-    margin: 24px auto;
-  }
-  .divider {
-    position: absolute;
-    left: 0;
-    height: 100%;
-  }
-  .create-input {
-    grid-template-columns: 50% 50%;
-  }
-  .create-input {
-    height: 55vh;
-  }
-  .create-first-line {
-    grid-template-columns: 20% 80%;
-  }
-  .bottom-controls {
-    grid-template-columns: 70% 30%;
-  }
+    .thread-create {
+        width: 80%;
+        margin: 24px auto;
+    }
+    .divider {
+        position: absolute;
+        left: 0;
+        height: 100%;
+    }
+    .create-input {
+        grid-template-columns: 50% 50%;
+    }
+    .create-input {
+        height: 55vh;
+    }
+    .create-first-line {
+        grid-template-columns: 20% 80%;
+    }
+    .bottom-controls {
+        grid-template-columns: 70% 30%;
+    }
 }
 .bottom-controls {
-  display: grid;
-  margin-top: 24px;
+    display: grid;
+    margin-top: 24px;
 }
 .create-thread-btn {
-  text-align: right;
+    text-align: right;
 }
 .create-first-line {
-  display: grid;
+    display: grid;
 }
 .forum-list-selector {
-  display: block;
+    display: block;
 }
 .creaete-forum-subject {
-  margin-left: 12px;
+    margin-left: 12px;
 }
 .create-second-line {
-  margin: 24px auto;
+    margin: 24px auto;
 }
 .create-input {
-  display: grid;
-  margin-top: 36px;
+    display: grid;
+    margin-top: 36px;
 }
 .create-preview {
-  margin-left: 18px;
+    margin-left: 18px;
 }
 .create-preview-container,
 .create-preview {
-  position: relative;
+    position: relative;
 }
 .code-mirror-input-container,
 .create-preview-container {
-  overflow-y: auto;
-  overflow-x: hidden;
-  max-height: 600px;
-  word-wrap: break-word;
+    overflow-y: auto;
+    overflow-x: hidden;
+    max-height: 600px;
+    word-wrap: break-word;
 }
 </style>

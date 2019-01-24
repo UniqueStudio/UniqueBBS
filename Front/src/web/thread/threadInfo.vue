@@ -81,7 +81,7 @@
               {{postCount}}
             </a-tag>
           </div>
-          <div class="thread-content show-markdown" v-html="renderMessage(content)"></div>
+          <div class="thread-content show-markdown" v-html="content" @click="handleAtClick"></div>
           <div class="thread-attach-list post-quote" v-if="attachList.length !== 0">
             <h5>附件列表</h5>
             <div v-for="attach in attachList" :key="attach.id" class="attach-item">
@@ -195,9 +195,9 @@
           </div>
           <div class="post-message post-quote" v-if="post.quote !== null">
             <h5>引用</h5>
-            <div class="show-markdown" v-html="renderMessage(post.quote.message)"></div>
+            <div class="show-markdown" v-html="post.quote.message"></div>
           </div>
-          <div class="post-message show-markdown" v-html="renderMessage(post.post.message)"></div>
+          <div class="post-message show-markdown" @click="handleAtClick" v-html="post.post.message"></div>
           <div class="thread-signature">
             <div :title="getFullCreateDate(post.post.createDate)">
               <a-icon type="clock-circle"/>
@@ -270,367 +270,437 @@
 </template>
 <script>
 export default {
-  data() {
-    return {
-      thread: {
-        id: "0",
-        subject: "",
-        createDate: "",
-        diamond: false,
-        top: 0,
-        closed: false,
-        active: true
-      },
-      author: {
-        id: "0",
-        username: "",
-        avatar: "",
-        signature: "",
-        isAdmin: false
-      },
-      forum: {
-        name: "",
-        icon: "",
-        color: "",
-        id: ""
-      },
-      postList: [],
-      tid: "0",
-      page: 0,
-      postCount: 0,
-      attachList: [],
-      content: "",
-      groupList: [],
-      defaultPageSize: 20,
-      replyInput: "",
-      quote: "-1",
-      quoteUsername: "",
-      btnDisabled: false,
-      visibleDiamond: false,
-      visibleClose: false,
-      visibleTop: false,
-      deleteDiag: {
-        visible: false,
-        isThread: false,
-        pid: "",
-        active: true
-      }
-    };
-  },
-  computed: {
-    createDate() {
-      return this.$humanDate(new Date(this.thread.createDate));
+    data() {
+        return {
+            thread: {
+                id: "0",
+                subject: "",
+                createDate: "",
+                diamond: false,
+                top: 0,
+                closed: false,
+                active: true
+            },
+            author: {
+                id: "0",
+                username: "",
+                avatar: "",
+                signature: "",
+                isAdmin: false
+            },
+            forum: {
+                name: "",
+                icon: "",
+                color: "",
+                id: ""
+            },
+            postList: [],
+            tid: "0",
+            page: 0,
+            postCount: 0,
+            attachList: [],
+            content: "",
+            groupList: [],
+            defaultPageSize: 20,
+            replyInput: "",
+            quote: "-1",
+            quoteUsername: "",
+            btnDisabled: false,
+            visibleDiamond: false,
+            visibleClose: false,
+            visibleTop: false,
+            deleteDiag: {
+                visible: false,
+                isThread: false,
+                pid: "",
+                active: true
+            }
+        };
     },
-    fullCreateDate() {
-      const date = new Date(this.thread.createDate);
-      return date.toLocaleDateString() + " " + date.toLocaleTimeString();
+    computed: {
+        createDate() {
+            return this.$humanDate(new Date(this.thread.createDate));
+        },
+        fullCreateDate() {
+            const date = new Date(this.thread.createDate);
+            return date.toLocaleDateString() + " " + date.toLocaleTimeString();
+        },
+        readerAvatar() {
+            return this.$store.state.avatarSrc;
+        },
+        isAdmin() {
+            return this.$store.state.isAdmin;
+        },
+        myUid() {
+            return this.$store.state.uid;
+        }
     },
-    readerAvatar() {
-      return this.$store.state.avatarSrc;
+    methods: {
+        attachDownload(aid) {
+            return this.$urls.attachDownload(
+                aid,
+                localStorage.getItem("token")
+            );
+        },
+        getTitle(attach) {
+            let size = attach.filesize;
+            let unit = "B";
+            if (size > 1024) {
+                size /= 1024;
+                unit = "KB";
+            }
+            if (size > 1024) {
+                size /= 1024;
+                unit = "MB";
+            }
+            size = Math.floor(size);
+            return `文件:${attach.originalName}\n下载:${
+                attach.downloads
+            }次\n大小:${size} ${unit}`;
+        },
+        renderMessage(message) {
+            const regImgStr = /\!\[uniqueImg\]\(unique\:\/\/(.*?)\)/g;
+            const token = localStorage.getItem("token");
+            return this.$marked(
+                message.replace(
+                    regImgStr,
+                    `![uniqueImg](${
+                        this.$urls.domain
+                    }attach/download/$1/${token})`
+                ),
+                { sanitize: true }
+            );
+        },
+        pageOnchange(page) {
+            this.$router.push({
+                path: `/thread/info/${this.tid}/${page}`
+            });
+            this.getThreadInfo();
+        },
+        async reply() {
+            this.btnDisabled = true;
+            const replyRepsonseRaw = await this.$ajax.post(
+                this.$urls.threadReply,
+                {
+                    tid: this.thread.id,
+                    quote: this.quote,
+                    message: this.replyInput
+                }
+            );
+            if (replyRepsonseRaw.data.code === 1) {
+                this.$notification.open({
+                    message: "回帖",
+                    description: "回帖成功！",
+                    icon: <a-icon type="smile" style="color: #108ee9" />
+                });
+                this.replyInput = "";
+                this.getThreadInfo();
+            } else {
+                const modal = this.$error();
+                modal.update({
+                    title: "回帖错误",
+                    content: replyRepsonseRaw.data.msg
+                });
+            }
+            this.btnDisabled = false;
+        },
+        getHumanDate(str) {
+            return this.$humanDate(new Date(str));
+        },
+        getFullCreateDate(str) {
+            const date = new Date(str);
+            return date.toLocaleDateString() + " " + date.toLocaleTimeString();
+        },
+        async getThreadInfo() {
+            this.tid = this.$route.params.tid;
+            this.page = Number.parseInt(this.$route.params.page);
+            const threadInfoResponseRaw = await this.$ajax.get(
+                this.$urls.threadInfo(this.tid, this.page)
+            );
+            const threadInfoResponse = threadInfoResponseRaw.data;
+            let rawPostContent = [];
+            if (threadInfoResponse.code === 1) {
+                const data = threadInfoResponse.msg;
+                Object.keys(this.thread).forEach(item => {
+                    this.thread[item] = data.threadInfo[item];
+                });
+                Object.keys(this.author).forEach(item => {
+                    this.author[item] = data.threadAuthor[item];
+                });
+
+                ["name", "id"].forEach(item => {
+                    this.forum[item] = data.forumInfo[item];
+                });
+                const iconCollection = data.forumInfo.icon.split("|");
+                this.forum.icon = iconCollection[0];
+                this.forum.color = iconCollection[1];
+
+                this.postCount = data.threadInfo.postCount;
+
+                rawPostContent = data.postArr.map(item => item.post.message);
+
+                data.postArr = data.postArr.map(item => {
+                    item.post.message = this.renderMessage(item.post.message);
+                    if (item.quote) {
+                        item.quote.message = this.renderMessage(
+                            item.quote.message
+                        );
+                    }
+
+                    return item;
+                });
+                this.postList = data.postArr;
+                this.attachList = data.attachArr;
+
+                this.content = this.renderMessage(data.firstPost.message);
+            } else {
+                return this.$store.dispatch("checkLoginStatus");
+            }
+            const userGroupListResponseRaw = await this.$ajax.get(
+                this.$urls.userGroup(this.author.id)
+            );
+
+            const userGroupListResponse = userGroupListResponseRaw.data;
+            if (userGroupListResponse.code !== 1) {
+                return this.$store.dispatch("checkLoginStatus");
+            }
+            this.groupList = userGroupListResponse.msg.map(item => ({
+                name: item.name,
+                color: item.color,
+                id: item.id
+            }));
+
+            const atList = new Set();
+            const atReg = /(?<=@)(.+?)(?=\s)/gi;
+            const contentMatchArr = threadInfoResponse.msg.firstPost.message.match(
+                atReg
+            );
+            contentMatchArr &&
+                contentMatchArr.forEach(item => atList.add(item));
+            for (const post of rawPostContent) {
+                const postMatchArr = post.match(atReg);
+                postMatchArr && postMatchArr.forEach(item => atList.add(item));
+            }
+            const atResponseRaw = await this.$ajax.post(this.$urls.atResult, {
+                keywords: [...atList]
+            });
+
+            if (atResponseRaw.data.code === 1) {
+                const atResponse = atResponseRaw.data.msg;
+                atResponse.forEach(item => {
+                    const itemPrefix =
+                        item.type === "user" ? "/user/visit/" : "/user/group/";
+                    const replaceStr = `<a href="${itemPrefix}${
+                        item.id
+                    }" data-router="1" data-href="${itemPrefix}${item.id}">${
+                        item.at
+                    }</a>`;
+                    this.content = this.content.replace(item.at, replaceStr);
+                    this.postList.forEach(post => {
+                        post.post.message = post.post.message.replace(
+                            item.at,
+                            replaceStr
+                        );
+                    });
+                });
+            }
+        },
+        handleTopThread(val) {
+            this.visibleTop = false;
+            this.postServer(this.$urls.topThread, {
+                tid: this.thread.id,
+                setTop: val
+            });
+        },
+        handleDiamondThread(val) {
+            this.visibleDiamond = false;
+            this.postServer(this.$urls.diamondThread, {
+                tid: this.thread.id,
+                setDiamond: val
+            });
+        },
+        handleCloseThread(val) {
+            this.visibleClose = false;
+            this.postServer(this.$urls.closeThread, {
+                tid: this.thread.id,
+                setClose: val
+            });
+        },
+        handleAtClick(e) {
+            if (e.target.dataset.router === "1") {
+                e.preventDefault();
+                this.$router.push({
+                    path: e.target.dataset.href
+                });
+            }
+        },
+        handlePostDelete(pid, active) {
+            this.deleteDiag.isThread = false;
+            this.deleteDiag.pid = pid;
+            this.deleteDiag.active = active;
+            this.deleteDiag.visible = true;
+        },
+        handleThreadDelete() {
+            this.deleteDiag.isThread = true;
+            this.deleteDiag.active = this.thread.active;
+            this.deleteDiag.visible = true;
+        },
+        handleDelete(mode) {
+            this.deleteDiag.visible = false;
+            let url = "";
+
+            const SOFT_DELETE = 0,
+                HARD_DELETE = 1,
+                RECOVERY = 2;
+
+            switch (mode) {
+                case SOFT_DELETE:
+                    url = this.deleteDiag.isThread
+                        ? this.$urls.deleteThread(this.thread.id)
+                        : (url = this.$urls.deletePost(this.deleteDiag.pid));
+                    break;
+                case HARD_DELETE:
+                    url = this.deleteDiag.isThread
+                        ? this.$urls.deleteThreadHard(this.thread.id)
+                        : (url = this.$urls.deletePostHard(
+                              this.deleteDiag.pid
+                          ));
+                    if (this.deleteDiag.isThread) {
+                        this.$router.push({
+                            path: `/thread/list/${this.forum.id}/1`
+                        });
+                    }
+                    break;
+                case RECOVERY:
+                    url = this.deleteDiag.isThread
+                        ? this.$urls.recoveryThread(this.thread.id)
+                        : (url = this.$urls.recoveryPost(this.deleteDiag.pid));
+                    break;
+            }
+
+            this.postServer(url);
+        },
+        handleCloseQuote() {
+            this.quote = "-1";
+        },
+        handleQuote(pid, username) {
+            if (this.quote === pid) {
+                this.quote = "-1";
+            } else {
+                this.quote = pid;
+                this.quoteUsername = username;
+                window.scrollTo(0, document.documentElement.scrollHeight);
+                document.querySelector("#replyContent").focus();
+            }
+        },
+        async postServer(url, obj) {
+            const result = await this.$ajax.post(url, obj);
+            if (result.data.code === 1) {
+                this.$notification.open({
+                    message: "主题操作",
+                    description: "操作成功！",
+                    icon: <a-icon type="smile" style="color: #108ee9" />
+                });
+                this.getThreadInfo();
+            } else {
+                const modal = this.$error();
+                modal.update({
+                    title: "操作错误",
+                    content: result.data.msg
+                });
+            }
+        }
     },
-    isAdmin() {
-      return this.$store.state.isAdmin;
-    },
-    myUid() {
-      return this.$store.state.uid;
-    }
-  },
-  methods: {
-    attachDownload(aid) {
-      return this.$urls.attachDownload(aid, localStorage.getItem("token"));
-    },
-    getTitle(attach) {
-      let size = attach.filesize;
-      let unit = "B";
-      if (size > 1024) {
-        size /= 1024;
-        unit = "KB";
-      }
-      if (size > 1024) {
-        size /= 1024;
-        unit = "MB";
-      }
-      size = Math.floor(size);
-      return `文件:${attach.originalName}\n下载:${
-        attach.downloads
-      }次\n大小:${size} ${unit}`;
-    },
-    renderMessage(message) {
-      const regImgStr = /\!\[uniqueImg\]\(unique\:\/\/(.*?)\)/g;
-      const token = localStorage.getItem("token");
-      return this.$marked(
-        message.replace(
-          regImgStr,
-          `![uniqueImg](${this.$urls.domain}attach/download/$1/${token})`
-        ),
-        { sanitize: true }
-      );
-    },
-    pageOnchange(page) {
-      this.$router.push({
-        path: `/thread/info/${this.tid}/${page}`
-      });
-      this.getThreadInfo();
-    },
-    async reply() {
-      this.btnDisabled = true;
-      const replyRepsonseRaw = await this.$ajax.post(this.$urls.threadReply, {
-        tid: this.thread.id,
-        quote: this.quote,
-        message: this.replyInput
-      });
-      if (replyRepsonseRaw.data.code === 1) {
-        this.$notification.open({
-          message: "回帖",
-          description: "回帖成功！",
-          icon: <a-icon type="smile" style="color: #108ee9" />
-        });
-        this.replyInput = "";
+    mounted() {
         this.getThreadInfo();
-      } else {
-        const modal = this.$error();
-        modal.update({
-          title: "回帖错误",
-          content: replyRepsonseRaw.data.msg
-        });
-      }
-      this.btnDisabled = false;
-    },
-    getHumanDate(str) {
-      return this.$humanDate(new Date(str));
-    },
-    getFullCreateDate(str) {
-      const date = new Date(str);
-      return date.toLocaleDateString() + " " + date.toLocaleTimeString();
-    },
-    async getThreadInfo() {
-      this.tid = this.$route.params.tid;
-      this.page = Number.parseInt(this.$route.params.page);
-      const threadInfoResponseRaw = await this.$ajax.get(
-        this.$urls.threadInfo(this.tid, this.page)
-      );
-      const threadInfoResponse = threadInfoResponseRaw.data;
-      if (threadInfoResponse.code === 1) {
-        const data = threadInfoResponse.msg;
-        Object.keys(this.thread).forEach(item => {
-          this.thread[item] = data.threadInfo[item];
-        });
-        Object.keys(this.author).forEach(item => {
-          this.author[item] = data.threadAuthor[item];
-        });
-
-        ["name", "id"].forEach(item => {
-          this.forum[item] = data.forumInfo[item];
-        });
-        const iconCollection = data.forumInfo.icon.split("|");
-        this.forum.icon = iconCollection[0];
-        this.forum.color = iconCollection[1];
-
-        this.postCount = data.threadInfo.postCount;
-        this.postList = data.postArr;
-        this.attachList = data.attachArr;
-        this.content = data.firstPost.message;
-      } else {
-        return this.$store.dispatch("checkLoginStatus");
-      }
-      const userGroupListResponseRaw = await this.$ajax.get(
-        this.$urls.userGroup(this.author.id)
-      );
-
-      const userGroupListResponse = userGroupListResponseRaw.data;
-      if (userGroupListResponse.code !== 1) {
-        return this.$store.dispatch("checkLoginStatus");
-      }
-      this.groupList = userGroupListResponse.msg.map(item => ({
-        name: item.name,
-        color: item.color,
-        id: item.id
-      }));
-    },
-    handleTopThread(val) {
-      this.visibleTop = false;
-      this.postServer(this.$urls.topThread, {
-        tid: this.thread.id,
-        setTop: val
-      });
-    },
-    handleDiamondThread(val) {
-      this.visibleDiamond = false;
-      this.postServer(this.$urls.diamondThread, {
-        tid: this.thread.id,
-        setDiamond: val
-      });
-    },
-    handleCloseThread(val) {
-      this.visibleClose = false;
-      this.postServer(this.$urls.closeThread, {
-        tid: this.thread.id,
-        setClose: val
-      });
-    },
-    handlePostDelete(pid, active) {
-      this.deleteDiag.isThread = false;
-      this.deleteDiag.pid = pid;
-      this.deleteDiag.active = active;
-      this.deleteDiag.visible = true;
-    },
-    handleThreadDelete() {
-      this.deleteDiag.isThread = true;
-      this.deleteDiag.active = this.thread.active;
-      this.deleteDiag.visible = true;
-    },
-    handleDelete(mode) {
-      this.deleteDiag.visible = false;
-      let url = "";
-
-      const SOFT_DELETE = 0,
-        HARD_DELETE = 1,
-        RECOVERY = 2;
-
-      switch (mode) {
-        case SOFT_DELETE:
-          url = this.deleteDiag.isThread
-            ? this.$urls.deleteThread(this.thread.id)
-            : (url = this.$urls.deletePost(this.deleteDiag.pid));
-          break;
-        case HARD_DELETE:
-          url = this.deleteDiag.isThread
-            ? this.$urls.deleteThreadHard(this.thread.id)
-            : (url = this.$urls.deletePostHard(this.deleteDiag.pid));
-          if (this.deleteDiag.isThread) {
-            this.$router.push({ path: `/thread/list/${this.forum.id}/1` });
-          }
-          break;
-        case RECOVERY:
-          url = this.deleteDiag.isThread
-            ? this.$urls.recoveryThread(this.thread.id)
-            : (url = this.$urls.recoveryPost(this.deleteDiag.pid));
-          break;
-      }
-
-      this.postServer(url);
-    },
-    handleCloseQuote() {
-      this.quote = "-1";
-    },
-    handleQuote(pid, username) {
-      if (this.quote === pid) {
-        this.quote = "-1";
-      } else {
-        this.quote = pid;
-        this.quoteUsername = username;
-        window.scrollTo(0, document.documentElement.scrollHeight);
-        document.querySelector("#replyContent").focus();
-      }
-    },
-    async postServer(url, obj) {
-      const result = await this.$ajax.post(url, obj);
-      if (result.data.code === 1) {
-        this.$notification.open({
-          message: "主题操作",
-          description: "操作成功！",
-          icon: <a-icon type="smile" style="color: #108ee9" />
-        });
-        this.getThreadInfo();
-      } else {
-        const modal = this.$error();
-        modal.update({
-          title: "操作错误",
-          content: result.data.msg
-        });
-      }
     }
-  },
-  mounted() {
-    this.getThreadInfo();
-  }
 };
 </script>
 <style scoped>
 @media screen and (min-width: 800px) {
-  .thread-main-content,
-  .thread-post-list-item {
-    grid-template-columns: 20% 60% 20%;
-  }
-  .thread-admin {
-    width: 60%;
-    margin: 0 auto;
-  }
-  .user-avatar {
-    height: 72px;
-    width: 72px;
-  }
-  .user-avatar-small {
-    height: 48px;
-    width: 48px;
-  }
-  .thread-main-info,
-  .thread-post-list-item-content {
-    padding: 0 0 0 18px;
-  }
+    .thread-main-content,
+    .thread-post-list-item {
+        grid-template-columns: 20% 60% 20%;
+    }
+    .thread-admin {
+        width: 60%;
+        margin: 0 auto;
+    }
+    .user-avatar {
+        height: 72px;
+        width: 72px;
+    }
+    .user-avatar-small {
+        height: 48px;
+        width: 48px;
+    }
+    .thread-main-info,
+    .thread-post-list-item-content {
+        padding: 0 0 0 18px;
+    }
 }
 @media screen and (max-width: 800px) {
-  .thread-main-content,
-  .thread-post-list-item {
-    grid-template-columns: 15% 85%;
-  }
-  .user-avatar {
-    height: 48px;
-    width: 48px;
-  }
-  .user-avatar-small {
-    height: 36px;
-    width: 36px;
-  }
-  .user-group,
-  .mobile-hidden-text {
-    display: none;
-  }
-  .thread-main-info,
-  .thread-post-list-item-content {
-    padding: 0 0 0 12px;
-  }
+    .thread-main-content,
+    .thread-post-list-item {
+        grid-template-columns: 15% 85%;
+    }
+    .user-avatar {
+        height: 48px;
+        width: 48px;
+    }
+    .user-avatar-small {
+        height: 36px;
+        width: 36px;
+    }
+    .user-group,
+    .mobile-hidden-text {
+        display: none;
+    }
+    .thread-main-info,
+    .thread-post-list-item-content {
+        padding: 0 0 0 12px;
+    }
 }
 .thread-main-content {
-  display: grid;
+    display: grid;
 }
 .user-avatar-container,
 .thread-post-list-item-avatar-container {
-  text-align: right;
+    text-align: right;
 }
 .thread-subject {
-  font-size: 20px;
+    font-size: 20px;
 }
 .thread-main-info p,
 .thread-post-list-item-content p {
-  padding: 0;
-  margin: 0;
+    padding: 0;
+    margin: 0;
 }
 .thread-sub-info {
-  margin-top: 6px !important;
+    margin-top: 6px !important;
 }
 .thread-content {
-  margin-top: 12px;
+    margin-top: 12px;
 }
 .thread-post-list-item {
-  display: grid;
-  margin-bottom: 32px;
+    display: grid;
+    margin-bottom: 32px;
 }
 .thread-post-list {
-  margin-top: 48px;
+    margin-top: 48px;
 }
 .thread-post-list-item-author-info,
 .thread-sub-info {
-  color: #777;
-  font-size: 14px;
+    color: #777;
+    font-size: 14px;
 }
 .thread-post-reply-btn {
-  text-align: right;
-  margin-top: 12px;
+    text-align: right;
+    margin-top: 12px;
 }
 .thread-item-info-messages {
-  position: absolute;
-  right: 0;
+    position: absolute;
+    right: 0;
 }
 .thread-sub-info,
 .thread-sub,
@@ -638,57 +708,54 @@ export default {
 .thread-post-list,
 .thread-post-list-item,
 .thread-post-list-item-content {
-  position: relative;
+    position: relative;
 }
 .thread-divider {
-  margin: 12px 0 6px 0;
+    margin: 12px 0 6px 0;
 }
 .thread-signature {
-  font-size: 12px;
-  color: #777;
-  margin-top: 16px;
-  user-select: none;
-  cursor: default;
+    font-size: 12px;
+    color: #777;
+    margin-top: 16px;
+    user-select: none;
+    cursor: default;
 }
 .post-message {
-  margin-top: 12px;
+    margin-top: 12px;
 }
 .thread-admin,
 .post-admin {
-  text-align: right;
+    text-align: right;
 }
 .drawer-content {
-  text-align: center;
+    text-align: center;
 }
 .drawer-btn-container {
-  margin-top: 36px;
+    margin-top: 36px;
 }
 .no-active-filter {
-  opacity: 0.4;
+    opacity: 0.4;
 }
 .active-quote {
-  transform: scale(1.2, 1.2);
+    transform: scale(1.2, 1.2);
 }
 .user-group {
-  display: inline-block;
+    display: inline-block;
 }
 .quote-message {
-  margin-bottom: 12px;
+    margin-bottom: 12px;
 }
 .post-quote {
-  color: #565656;
-  border-left: #e4e4e4 3px solid;
-  background: #f4f4f4;
-  border-radius: 0 6px 6px 0;
-  padding: 9px 8px 9px 8px;
+    color: #565656;
+    border-left: #e4e4e4 3px solid;
+    background: #f4f4f4;
+    border-radius: 0 6px 6px 0;
+    padding: 9px 8px 9px 8px;
 }
 .thread-attach-list h5 {
-  margin: 6px 2px;
-}
-.show-markdown {
-  word-break: break-all;
+    margin: 6px 2px;
 }
 .attach-item {
-  display: inline-block;
+    display: inline-block;
 }
 </style>

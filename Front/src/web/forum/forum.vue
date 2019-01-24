@@ -47,95 +47,95 @@
 </template>
 <script>
 export default {
-  data() {
-    return {
-      forumList: []
-    };
-  },
-  methods: {
-    getHumanDate(createDate) {
-      return this.$humanDate(new Date(createDate));
+    data() {
+        return {
+            forumList: []
+        };
     },
-    async getForumList() {
-      const responseRaw = await this.$ajax.get(this.$urls.forumList);
-      const response = responseRaw.data;
-      if (response.code === 1) {
-        const tmpList = response.msg.map(item => {
-          const iconCollection = item.icon.split("|");
-          item.icon = iconCollection[0];
-          item.backgroundColor = iconCollection[1];
-          return item;
-        });
+    methods: {
+        getHumanDate(createDate) {
+            return this.$humanDate(new Date(createDate));
+        },
+        async getForumList() {
+            const responseRaw = await this.$ajax.get(this.$urls.forumList);
+            const response = responseRaw.data;
+            if (response.code === 1) {
+                const tmpList = response.msg.map(item => {
+                    const iconCollection = item.icon.split("|");
+                    item.icon = iconCollection[0];
+                    item.backgroundColor = iconCollection[1];
+                    return item;
+                });
 
-        this.forumList = tmpList;
-      } else {
-        this.$store.dispatch("checkLoginStatus");
-      }
+                this.forumList = tmpList;
+            } else {
+                this.$store.dispatch("checkLoginStatus");
+            }
+        }
+    },
+    mounted() {
+        this.$store.commit("setActiveNav", 1);
+        this.getForumList();
     }
-  },
-  mounted() {
-    this.$store.commit("setActiveNav", 1);
-    this.getForumList();
-  }
 };
 </script>
 <style scoped>
 @media screen and (min-width: 800px) {
-  .forum-container {
-    width: 90%;
-    margin: 36px auto;
-  }
-  .forum-item {
-    grid-template-columns: 20% 50% 30%;
-  }
+    .forum-container {
+        width: 90%;
+        margin: 36px auto;
+    }
+    .forum-item {
+        grid-template-columns: 20% 50% 30%;
+    }
 }
 @media screen and (max-width: 800px) {
-  .forum-container {
-    width: 90%;
-    margin: 36px auto;
-  }
-  .forum-item {
-    grid-template-columns: 20% 80%;
-  }
-  .forum-item-last {
-    display: none;
-  }
+    .forum-container {
+        width: 90%;
+        margin: 36px auto;
+    }
+    .forum-item {
+        grid-template-columns: 20% 80%;
+    }
+    .forum-item-last {
+        display: none;
+    }
 }
 .forum-item {
-  display: grid;
-  margin: 64px auto;
-  height: 72px;
+    display: grid;
+    margin: 64px auto;
+    height: 72px;
 }
 .forum-item-icon-container {
-  text-align: right;
+    text-align: right;
 }
 .forum-item-icon-bg {
-  display: inline-block;
-  height: 72px;
-  width: 72px;
-  border-radius: 36px;
+    display: inline-block;
+    height: 72px;
+    width: 72px;
+    border-radius: 36px;
 }
 .forum-item-icon {
-  color: white;
-  font-size: 36px;
-  height: 72px;
-  width: 72px;
-  margin-top: 18px;
+    color: white;
+    font-size: 36px;
+    height: 72px;
+    width: 72px;
+    margin-top: 18px;
 }
 .forum-item-title {
-  font-size: 20px;
+    font-size: 20px;
 }
 .forum-item-info p,
 .forum-item-last p {
-  margin: 0;
+    margin: 0;
 }
 .forum-item-info {
-  padding: 0 32px;
+    padding: 0 32px;
 }
 .forum-item-description {
-  color: #777;
+    color: #777;
 }
 .forum-last-post {
-  font-size: 14px;
+    font-size: 14px;
 }
 </style>

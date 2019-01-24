@@ -72,154 +72,154 @@
 <script>
 import reportGraph from "./reportGraph.vue";
 export default {
-  components: {
-    "report-graph": reportGraph
-  },
-  data() {
-    return {
-      mentor: {
-        have: false,
-        id: "",
-        avatar: "",
-        username: ""
-      },
-      students: [],
-      myUserName: "",
-      setMentorName: ""
-    };
-  },
-  computed: {
-    myAvatar() {
-      return this.$store.state.avatarSrc;
-    }
-  },
-  methods: {
-    async getInfo() {
-      const mentorResponseRaw = await this.$ajax.get(
-        this.$urls.mentorMyStudents
-      );
-      if (mentorResponseRaw.data.code === 1) {
-        const mentorResponse = mentorResponseRaw.data.msg;
-        if (mentorResponse.mentor === null) {
-          this.mentor.have = false;
-          this.setMentorName = "";
-        } else {
-          this.mentor.have = true;
-          ["id", "avatar", "username"].forEach(item => {
-            this.mentor[item] = mentorResponse.mentor[item];
-          });
-          this.setMentorName = this.mentor.username;
-        }
-        this.students = mentorResponse.students;
-        this.myUserName = mentorResponse.my.username;
-      } else {
-        const modal = this.$error();
-        modal.update({
-          title: "Mentor资料获取错误",
-          content: mentorResponseRaw.data.msg
-        });
-      }
+    components: {
+        "report-graph": reportGraph
     },
-    async setMentor() {
-      const setResult = await this.$ajax.post(this.$urls.mentorSet, {
-        mentorName: this.setMentorName
-      });
-      if (setResult.data.code === 1) {
-        this.$notification.open({
-          message: "Mentor设置",
-          description: "Mentor设置成功！",
-          icon: <a-icon type="fork" style="color: #108ee9" />
-        });
+    data() {
+        return {
+            mentor: {
+                have: false,
+                id: "",
+                avatar: "",
+                username: ""
+            },
+            students: [],
+            myUserName: "",
+            setMentorName: ""
+        };
+    },
+    computed: {
+        myAvatar() {
+            return this.$store.state.avatarSrc;
+        }
+    },
+    methods: {
+        async getInfo() {
+            const mentorResponseRaw = await this.$ajax.get(
+                this.$urls.mentorMyStudents
+            );
+            if (mentorResponseRaw.data.code === 1) {
+                const mentorResponse = mentorResponseRaw.data.msg;
+                if (mentorResponse.mentor === null) {
+                    this.mentor.have = false;
+                    this.setMentorName = "";
+                } else {
+                    this.mentor.have = true;
+                    ["id", "avatar", "username"].forEach(item => {
+                        this.mentor[item] = mentorResponse.mentor[item];
+                    });
+                    this.setMentorName = this.mentor.username;
+                }
+                this.students = mentorResponse.students;
+                this.myUserName = mentorResponse.my.username;
+            } else {
+                const modal = this.$error();
+                modal.update({
+                    title: "Mentor资料获取错误",
+                    content: mentorResponseRaw.data.msg
+                });
+            }
+        },
+        async setMentor() {
+            const setResult = await this.$ajax.post(this.$urls.mentorSet, {
+                mentorName: this.setMentorName
+            });
+            if (setResult.data.code === 1) {
+                this.$notification.open({
+                    message: "Mentor设置",
+                    description: "Mentor设置成功！",
+                    icon: <a-icon type="fork" style="color: #108ee9" />
+                });
+                this.getInfo();
+            } else {
+                const modal = this.$error();
+                modal.update({
+                    title: "Mentor设置错误",
+                    content: setResult.data.msg
+                });
+            }
+        }
+    },
+    mounted() {
         this.getInfo();
-      } else {
-        const modal = this.$error();
-        modal.update({
-          title: "Mentor设置错误",
-          content: setResult.data.msg
-        });
-      }
     }
-  },
-  mounted() {
-    this.getInfo();
-  }
 };
 </script>
 <style scoped>
 @media screen and (max-width: 1150px) {
-  .mentor-my-students-item {
-    grid-template-rows: 160px 196px;
-  }
-  .student-item-avatar {
-    text-align: center;
-  }
+    .mentor-my-students-item {
+        grid-template-rows: 160px 196px;
+    }
+    .student-item-avatar {
+        text-align: center;
+    }
 }
 @media screen and (min-width: 1150px) {
-  .mentor-my-students-item {
-    grid-template-columns: 30% 70%;
-  }
-  .student-item-avatar {
-    text-align: right;
-  }
+    .mentor-my-students-item {
+        grid-template-columns: 30% 70%;
+    }
+    .student-item-avatar {
+        text-align: right;
+    }
 }
 @media screen and (max-width: 800px) {
-  .mentor-set,
-  .mentor-my-students {
-    width: 95%;
-    margin: 0 auto;
-  }
+    .mentor-set,
+    .mentor-my-students {
+        width: 95%;
+        margin: 0 auto;
+    }
 }
 @media screen and (min-width: 800px) {
-  .mentor-set {
-    width: 60%;
-    margin: 0 auto;
-  }
-  .mentor-my-students {
-    width: 80%;
-    margin: 0 auto;
-  }
-  .mentor-set-container {
-    width: 60%;
-    margin: 0 auto;
-  }
+    .mentor-set {
+        width: 60%;
+        margin: 0 auto;
+    }
+    .mentor-my-students {
+        width: 80%;
+        margin: 0 auto;
+    }
+    .mentor-set-container {
+        width: 60%;
+        margin: 0 auto;
+    }
 }
 .student-item-graph {
-  padding: 12px;
+    padding: 12px;
 }
 .user-info-container {
-  display: inline-block;
+    display: inline-block;
 }
 .mentor-my-students-item {
-  display: grid;
+    display: grid;
 }
 .user-avatar {
-  height: 128px;
-  width: 128px;
-  border-radius: 64px;
-  margin: 0 16px;
+    height: 128px;
+    width: 128px;
+    border-radius: 64px;
+    margin: 0 16px;
 }
 .user-avatar-small {
-  height: 96px;
-  width: 96px;
-  border-radius: 48px;
+    height: 96px;
+    width: 96px;
+    border-radius: 48px;
 }
 .avatar-container {
-  margin: 36px auto;
-  text-align: center;
+    margin: 36px auto;
+    text-align: center;
 }
 .user-name-container {
-  margin-top: 12px;
+    margin-top: 12px;
 }
 h3 {
-  text-align: center;
-  user-select: none;
-  margin: 36px auto;
+    text-align: center;
+    user-select: none;
+    margin: 36px auto;
 }
 .mentor-set-btn-container {
-  text-align: center;
-  margin: 12px auto;
+    text-align: center;
+    margin: 12px auto;
 }
 .student-item-name-container {
-  margin: 8px 8px 0 0;
+    margin: 8px 8px 0 0;
 }
 </style>

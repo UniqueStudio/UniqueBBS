@@ -1,41 +1,44 @@
 .title-info {
-  margin: -12px -12px 24px -12px;
-  border-radius: 5px 5px 0 0;
-  height: 52px;
-  user-select: none;
+    margin: -12px -12px 24px -12px;
+    border-radius: 5px 5px 0 0;
+    height: 52px;
+    user-select: none;
 }
 .title-icon {
-  text-align: center;
-  color: white;
+    text-align: center;
+    color: white;
 }
 .title-info-name {
-  text-align: center;
-  color: white;
+    text-align: center;
+    color: white;
 }
 .title-item-icon {
-  font-size: 16px;
-  margin-top: 18px;
+    font-size: 16px;
+    margin-top: 18px;
 }
 .pagination {
-  text-align: center;
-  margin: 36px auto;
+    text-align: center;
+    margin: 36px auto;
 }
 .show-markdown img {
-  width: auto;
-  height: auto;
-  max-width: 100%;
-  max-height: 100%;
+    width: auto;
+    height: auto;
+    max-width: 100%;
+    max-height: 100%;
 }
 .show-markdown table {
-  border: 1px solid #eeeeee;
-  width: 100%;
-  margin: 12px 0;
+    border: 1px solid #eeeeee;
+    width: 100%;
+    margin: 12px 0;
 }
 .show-markdown table tr:nth-of-type(odd) {
-  background-color: #f9f9f9;
+    background-color: #f9f9f9;
 }
 .show-markdown table td,
 .show-markdown table th {
-  text-align: left;
-  border: 1px solid #dddddd;
+    text-align: left;
+    border: 1px solid #dddddd;
+}
+.show-markdown {
+    word-break: break-all;
 }

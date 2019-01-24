@@ -83,6 +83,7 @@ import {
     messageCount
 } from "./model/message";
 import { socketLogin, socketDisconnect } from "./model/socket";
+import { atResult } from "./model/at";
 
 const SERVER_VERSION = "1.01";
 
@@ -222,7 +223,7 @@ app.post("/message/all/delete", messageDeleteAll);
 app.get("/report/can", reportCanPost);
 app.get("/report/info/:rid", reportInfo);
 app.get("/report/list/:uid/:page", reportList);
-app.get("/report/graph/:uid", reportGraph);
+app.post("/report/graph/:uid", reportGraph);
 app.post("/report/create", reportCreate);
 app.post("/report/update/:rid", reportUpdate);
 
@@ -234,6 +235,9 @@ app.get("/attach/expire/:tid", fileExpire);
 app.get("/attach/unlinkAll", fileClearAllUnlink);
 app.post("/attach/remove/:aid", fileRemove);
 app.post("/attach/upload", upload.single("attaches"), fileUpload);
+
+//At
+app.post("/at", atResult);
 
 server.listen(7010, () => {
     console.log(

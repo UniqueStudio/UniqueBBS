@@ -26,8 +26,6 @@
         <a-icon type="clock-circle"/>
         {{lastLoginHumanDate}}
       </a-tag>
-    </div>
-    <div class="other-container">
       <router-link :to="'/report/visit/'+uid+'/1'">
         <a-tag color="cyan">
           <a-icon type="calendar"/>&nbsp;Report
@@ -101,104 +99,103 @@
 <script>
 import reportGraph from "../report/reportGraph.vue";
 export default {
-  components: { "report-graph": reportGraph },
-  data() {
-    return {
-      uid: "",
-      userDatas: {
-        avatar: "",
-        username: "",
-        email: "",
-        mobile: "",
-        studentID: "",
-        dormitory: "",
-        qq: "",
-        wechat: "",
-        major: "",
-        className: "",
-        signature: "",
-        lastLogin: "",
-        threads: 0,
-        isAdmin: false
-      },
-      groupList: []
-    };
-  },
-  computed: {
-    lastLoginHumanDate() {
-      return this.$humanDate(new Date(this.userDatas.lastLogin));
-    }
-  },
-  methods: {
-    async getUserInfo() {
-      this.uid = this.$route.params.uid;
-      const userInfo = await this.$ajax.get(this.$urls.userInfo(this.uid));
+    components: { "report-graph": reportGraph },
+    data() {
+        return {
+            uid: "",
+            userDatas: {
+                avatar: "",
+                username: "",
+                email: "",
+                mobile: "",
+                studentID: "",
+                dormitory: "",
+                qq: "",
+                wechat: "",
+                major: "",
+                className: "",
+                signature: "",
+                lastLogin: "",
+                threads: 0,
+                isAdmin: false
+            },
+            groupList: []
+        };
+    },
+    computed: {
+        lastLoginHumanDate() {
+            return this.$humanDate(new Date(this.userDatas.lastLogin));
+        }
+    },
+    methods: {
+        async getUserInfo() {
+            this.uid = this.$route.params.uid;
+            const userInfo = await this.$ajax.get(
+                this.$urls.userInfo(this.uid)
+            );
 
-      if (userInfo.data.code !== 1) {
-        return this.$store.dispatch("checkLoginStatus");
-      }
-      Object.keys(this.userDatas).forEach(item => {
-        this.userDatas[item] = userInfo.data.msg.user[item];
-      });
-      this.groupList = userInfo.data.msg.group.map(item => ({
-        name: item.name,
-        color: item.color,
-        id: item.id
-      }));
+            if (userInfo.data.code !== 1) {
+                return this.$store.dispatch("checkLoginStatus");
+            }
+            Object.keys(this.userDatas).forEach(item => {
+                this.userDatas[item] = userInfo.data.msg.user[item];
+            });
+            this.groupList = userInfo.data.msg.group.map(item => ({
+                name: item.name,
+                color: item.color,
+                id: item.id
+            }));
+        }
+    },
+    mounted() {
+        this.getUserInfo();
     }
-  },
-  mounted() {
-    this.getUserInfo();
-  }
 };
 </script>
 <style scoped>
 @media screen and (min-width: 800px) {
-  .user-detail-info {
-    width: 40%;
-  }
+    .user-detail-info {
+        width: 40%;
+    }
 }
 @media screen and (max-width: 800px) {
-  .user-detail-info {
-    width: 80%;
-  }
+    .user-detail-info {
+        width: 80%;
+    }
 }
 .user-detail-info {
-  margin: 0 auto;
+    margin: 0 auto;
 }
 .avatar-container {
-  text-align: center;
-  margin: 72px;
+    text-align: center;
+    margin: 72px;
 }
 .avatar-img {
-  transform: scale(3, 3);
+    transform: scale(3, 3);
 }
 h2,
 h5 {
-  text-align: center;
-  user-select: none;
-  margin: 0;
+    text-align: center;
+    user-select: none;
+    margin: 0;
 }
 .group-item {
-  display: inline-block;
+    display: inline-block;
 }
 .user-detail-info {
-  margin-top: 36px;
+    margin-top: 36px;
 }
 .user-detail-info span {
-  margin: 6px auto;
+    margin: 6px auto;
 }
 .last-login {
-  color: gray;
+    color: gray;
 }
 .group-container {
-  text-align: center;
-}
-.other-container {
-  text-align: center;
-  margin-top: 12px;
+    text-align: center;
+    margin: 12px auto;
 }
 .report-graph {
-  margin: 30px auto;
+    margin: 30px auto;
 }
 </style>
