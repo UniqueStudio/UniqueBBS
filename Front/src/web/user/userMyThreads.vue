@@ -81,10 +81,13 @@ export default {
             });
 
             const atList = new Set();
-            const atReg = /(?<=@)(.+?)(?=\s)/gi;
+            const atReg = /@(.+?)(?=\s)/gi;
             for (const post of rawPostList) {
                 const postMatchArr = post.match(atReg);
-                postMatchArr && postMatchArr.forEach(item => atList.add(item));
+                postMatchArr &&
+                    postMatchArr.forEach(item =>
+                        atList.add(item.substr(1, item.length - 1))
+                    );
             }
             const atResponseRaw = await this.$ajax.post(this.$urls.atResult, {
                 keywords: [...atList]

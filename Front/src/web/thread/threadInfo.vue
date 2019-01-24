@@ -471,15 +471,20 @@ export default {
             }));
 
             const atList = new Set();
-            const atReg = /(?<=@)(.+?)(?=\s)/gi;
+            const atReg = /@(.+?)(?=\s)/gi;
             const contentMatchArr = threadInfoResponse.msg.firstPost.message.match(
                 atReg
             );
             contentMatchArr &&
-                contentMatchArr.forEach(item => atList.add(item));
+                contentMatchArr.forEach(item =>
+                    atList.add(item.substr(1, item.length - 1))
+                );
             for (const post of rawPostContent) {
                 const postMatchArr = post.match(atReg);
-                postMatchArr && postMatchArr.forEach(item => atList.add(item));
+                postMatchArr &&
+                    postMatchArr.forEach(item =>
+                        atList.add(item.substr(1, item.length - 1))
+                    );
             }
             const atResponseRaw = await this.$ajax.post(this.$urls.atResult, {
                 keywords: [...atList]
