@@ -9,9 +9,12 @@ async function install() {
         output: process.stdout
     });
 
-    input.question("Are you Sure to exec install script?\nPress any key to start install process.", async answer => {
-        await updateGroup();
-        await getUser();
-    });
+    input.question(
+        "Are you Sure to exec install script?\nPress any key to start install process.",
+        async _ => {
+            await updateGroup();
+            await getUser();
+        }
+    );
 }
 install();
