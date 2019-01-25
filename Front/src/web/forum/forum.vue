@@ -73,7 +73,7 @@ export default {
             }
         }
     },
-    mounted() {
+    activated() {
         this.$store.commit("setActiveNav", 1);
         this.getForumList();
     }

@@ -94,7 +94,8 @@ const router = new Router({
                     name: "forum",
                     component: forum,
                     meta: {
-                        requireLogin: true
+                        requireLogin: true,
+                        keepAlive: true
                     }
                 },
                 {

@@ -13,8 +13,13 @@ export const REPORT_TEMPLATE = (
     solution: string,
     conclusion: string,
     extra: string
-) =>
-    `- **学习时间:** ${time}\n- **学习内容:**\n${content}\n- **学习计划:**\n${plan}\n- **解决问题:**\n${solution}\n- **学习总结:**\n${conclusion}\n\n${extra}`;
+) => {
+    if (extra.length > 0) {
+        return `- **学习时间:** ${time}\n- **学习内容:**\n${content}\n- **学习计划:**\n${plan}\n- **解决问题:**\n${solution}\n- **学习总结:**\n${conclusion}\n\n- ${extra}`;
+    } else {
+        return `- **学习时间:** ${time}\n- **学习内容:**\n${content}\n- **学习计划:**\n${plan}\n- **解决问题:**\n${solution}\n- **学习总结:**\n${conclusion}`;
+    }
+};
 
 export const reportCreate = async function(req: Request, res: Response) {
     try {

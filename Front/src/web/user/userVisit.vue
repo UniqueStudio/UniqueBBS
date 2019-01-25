@@ -22,15 +22,15 @@
           </a-tag>
         </router-link>
       </div>
-      <a-tag color="green">
-        <a-icon type="clock-circle"/>
-        {{lastLoginHumanDate}}
-      </a-tag>
       <router-link :to="'/report/visit/'+uid+'/1'">
         <a-tag color="cyan">
           <a-icon type="calendar"/>&nbsp;Report
         </a-tag>
       </router-link>
+      <a-tag color="green">
+        <a-icon type="clock-circle"/>
+        {{lastLoginHumanDate}}
+      </a-tag>
     </div>
     <h5>{{userDatas.signature}}</h5>
     <report-graph :uid="uid" class="report-graph"></report-graph>

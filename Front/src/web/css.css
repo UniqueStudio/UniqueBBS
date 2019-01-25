@@ -29,7 +29,7 @@
 .show-markdown table {
     border: 1px solid #eeeeee;
     width: 100%;
-    margin: 12px 0;
+    margin: 24px 0;
 }
 .show-markdown table tr:nth-of-type(odd) {
     background-color: #f9f9f9;
