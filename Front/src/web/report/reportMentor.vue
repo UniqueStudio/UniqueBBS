@@ -153,6 +153,9 @@ export default {
     .student-item-avatar {
         text-align: center;
     }
+    .student-item-graph {
+        margin: auto;
+    }
 }
 @media screen and (min-width: 1150px) {
     .mentor-my-students-item {
@@ -185,6 +188,8 @@ export default {
 }
 .student-item-graph {
     padding: 12px;
+    width: auto;
+    max-width: 650px;
 }
 .user-info-container {
     display: inline-block;

@@ -197,9 +197,6 @@ export default {
     .user-block-flex {
         width: 636px;
     }
-    .block-year-select {
-        margin: 8px auto 8px 0 !important;
-    }
 }
 @media screen and (min-width: 1200px) {
     .user-block-flex-left {
