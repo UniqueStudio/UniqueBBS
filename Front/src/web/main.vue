@@ -87,12 +87,12 @@
     </div>
     <footer>
       <p class="footer-left">
-        <b>Unique BBS</b> v1.03
+        <b>Unique BBS</b> v1.05
         <br>Code By
         <a href="https://github.com/ttzztztz" target="_blank">Rabbit</a> @ 811
       </p>
       <p class="footer-right">Unique Studio
-        <br>January 24 2019
+        <br>January 30 2019
       </p>
     </footer>
   </div>
