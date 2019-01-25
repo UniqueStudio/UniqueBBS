@@ -177,8 +177,11 @@ export default {
         margin: 1px;
     }
     .user-block-flex {
-        width: 300px;
         height: 130px;
+    }
+    .block-year-select,
+    .user-block-flex {
+        width: 300px;
     }
 }
 @media screen and (min-width: 1050px) {
@@ -188,8 +191,14 @@ export default {
         margin: 1px;
     }
     .user-block-flex {
-        width: 636px;
         height: 86px;
+    }
+    .block-year-select,
+    .user-block-flex {
+        width: 636px;
+    }
+    .block-year-select {
+        margin: 8px auto 8px 0 !important;
     }
 }
 @media screen and (min-width: 1200px) {
@@ -205,6 +214,6 @@ export default {
 }
 .block-year-select {
     text-align: center;
-    margin-bottom: 12px;
+    margin: 8px auto;
 }
 </style>

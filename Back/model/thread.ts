@@ -369,9 +369,9 @@ export const threadCreate = async function(req: Request, res: Response) {
                 );
             }
 
-            await forumThreadsAdd(fid, 1, newPostPid);
-            await userThreadsAdd(uid, 1);
-            await atProcess(
+            forumThreadsAdd(fid, 1, newPostPid);
+            userThreadsAdd(uid, 1);
+            atProcess(
                 message,
                 uid,
                 MESSAGE_AT(username, subject, false),
@@ -432,7 +432,7 @@ export const threadReply = async function(req: Request, res: Response) {
             }
 
             if (quote !== "-1") {
-                const quotePostInfo = await prisma.post({
+                const quotePostInfo = await prisma.$exists.post({
                     id: quote
                 });
 
@@ -503,10 +503,10 @@ export const threadReply = async function(req: Request, res: Response) {
                     last: 1
                 });
 
-            await forumLastPostUpdate(forumInfo.id, resultThread[0].id);
+            forumLastPostUpdate(forumInfo.id, resultThread[0].id);
             let havePushMessage = 0;
             if (uid !== authorInfo.id) {
-                await pushMessage(
+                pushMessage(
                     uid,
                     authorInfo.id,
                     MESSAGE_REPLY(username, threadInfo.subject),
@@ -525,7 +525,7 @@ export const threadReply = async function(req: Request, res: Response) {
                     })
                     .user();
                 if (quotePost && quotePostAuthor.id !== uid) {
-                    await pushMessage(
+                    pushMessage(
                         uid,
                         quotePostAuthor.id,
                         MESSAGE_QUOTE(username, threadInfo.subject),
@@ -534,7 +534,7 @@ export const threadReply = async function(req: Request, res: Response) {
                 }
             }
 
-            await atProcess(
+            atProcess(
                 message,
                 uid,
                 MESSAGE_AT(username, threadInfo.subject, true),
@@ -615,8 +615,8 @@ export const threadDeleteHard = async function(req: Request, res: Response) {
             await prisma.deleteThread({
                 id: tid
             });
-            await userThreadsAdd(author.id, -1);
-            await forumThreadsAdd(forum.id, -1);
+            userThreadsAdd(author.id, -1);
+            forumThreadsAdd(forum.id, -1);
             res.json({ code: 1 });
         }
     } catch (e) {
@@ -810,8 +810,8 @@ export const threadUpdate = async function(req: Request, res: Response) {
             }
 
             if (previousForum.id !== fid) {
-                await forumThreadsAdd(previousForum.id, -1);
-                await forumThreadsAdd(fid, 1);
+                forumThreadsAdd(previousForum.id, -1);
+                forumThreadsAdd(fid, 1);
             }
 
             const threadInfo = await prisma.updateThread({
@@ -820,7 +820,12 @@ export const threadUpdate = async function(req: Request, res: Response) {
                 },
                 data: {
                     subject: subject,
-                    filter: filterObj
+                    filter: filterObj,
+                    forum: {
+                        connect: {
+                            id: fid
+                        }
+                    }
                 }
             });
 

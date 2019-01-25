@@ -155,4 +155,17 @@ export default {
     max-height: 200px;
     overflow: hidden;
 }
+.user-post-message:before {
+    position: absolute;
+    width: 100%;
+    background: linear-gradient(
+        to bottom,
+        rgba(255, 255, 255, 0) 0%,
+        rgba(255, 255, 255, 1) 100%
+    );
+    content: " ";
+    top: 160px;
+    height: 70px;
+    pointer-events: none;
+}
 </style>

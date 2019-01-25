@@ -62,14 +62,14 @@ export const atProcess = async function(
     for (const keyword of keywordsArr) {
         const atResult = await atFind(keyword);
         if (atResult.type === "user") {
-            await pushMessage(
+            pushMessage(
                 fromUid,
                 atResult.id,
                 sendMessage,
                 MESSAGE_THREAD_URL(tid)
             );
         } else if (atResult.type === "group" && isAdmin) {
-            await pushMessageGroup(
+            pushMessageGroup(
                 fromUid,
                 atResult.id,
                 sendMessage,

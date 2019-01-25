@@ -87,7 +87,7 @@
     </div>
     <footer>
       <p class="footer-left">
-        <b>Unique BBS</b> v1.03
+        <b>Unique BBS</b> v1.05
         <br>Code By
         <a href="https://github.com/ttzztztz" target="_blank">Rabbit</a> @ 811
       </p>
