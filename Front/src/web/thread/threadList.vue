@@ -133,13 +133,16 @@ export default {
     },
     mounted() {
         this.getData();
+    },
+    activated() {
+        this.getData();
     }
 };
 </script>
 <style scoped>
 @media screen and (min-width: 800px) {
     .thread-item-info-subject {
-        font-size: 20px;
+        font-size: 18px;
     }
     .thread-item {
         grid-template-columns: 20% 45% 35%;
