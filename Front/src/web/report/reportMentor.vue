@@ -70,7 +70,7 @@
   </div>
 </template>
 <script>
-import reportGraph from "./reportGraph.vue";
+const reportGraph = () => import("./reportGraph.vue");
 export default {
     components: {
         "report-graph": reportGraph

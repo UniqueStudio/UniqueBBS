@@ -6,7 +6,10 @@
         <div class="user-info-details-container">
           <div class="user-info-container">
             <div class="user-name">
-              <router-link :to="userLink(user.uid)">{{user.name}}</router-link>
+              <router-link
+                :to="userLink(user.uid)"
+                style="color:#363E51;font-weight:600;"
+              >{{user.name}}</router-link>
             </div>
             <div class="user-mentor">
               <div class="user-have-mentor" v-if="haveMentor">
@@ -28,7 +31,7 @@
     </div>
     <div class="user-report-create" v-if="canPostReport && mode === 'my'">
       <router-link to="/report/create">
-        <a-button icon="form" type="primary">发表Report</a-button>
+        <a-button icon="form" type="primary" style="font-weight:600;">发表Report</a-button>
       </router-link>
     </div>
     <div class="user-report-list">
@@ -46,10 +49,9 @@
                   <a-icon type="edit"/>&nbsp;编辑
                 </a-tag>
               </router-link>
-              <a-tag :color="report.isWeek? 'orange' : 'cyan'">
-                <a-icon type="calendar"/>
-                &nbsp;{{report.isWeek? 'Weekly' : 'Daily'}}
-              </a-tag>
+              <rabbit-tag
+                :background="report.isWeek? '#FFCD52' : '#88AAFF'"
+              >{{report.isWeek? 'Weekly' : 'Daily'}}</rabbit-tag>
             </div>
           </div>
           <div class="report-content" v-html="renderMessage(report.message)"></div>
@@ -67,9 +69,10 @@
   </div>
 </template>
 <script>
-import reportGraph from "./reportGraph.vue";
+const reportGraph = () => import("./reportGraph.vue");
+const rabbitTag = () => import("../components/rabbitTag.vue");
 export default {
-    components: { "report-graph": reportGraph },
+    components: { "report-graph": reportGraph, "rabbit-tag": rabbitTag },
     data() {
         return {
             user: {

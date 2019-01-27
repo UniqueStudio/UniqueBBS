@@ -1,6 +1,6 @@
 <template>
   <div class="user-group-list-container">
-    <div class="title-info" style="background:rgb(99, 76, 184);">
+    <div class="title-info" style="background:#3F47C5;">
       <div class="title-icon">
         <a-icon type="team" class="title-item-icon"></a-icon>&nbsp;组列表
       </div>
@@ -8,9 +8,11 @@
     <div class="user-group-list">
       <div class="user-group-item" v-for="group in groupList" :key="group.id">
         <div class="group-icon-container">
-          <div class="group-icon-bg" :style="{backgroundColor:group.group.color}">
-            <a-icon type="team" class="group-icon"></a-icon>
-          </div>
+          <router-link :to="'/user/group/'+group.group.id">
+            <div class="group-icon-bg" :style="{backgroundColor:group.group.color}">
+              <a-icon type="team" class="group-icon"></a-icon>
+            </div>
+          </router-link>
         </div>
         <div class="group-name">
           <div>

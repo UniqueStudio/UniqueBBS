@@ -100,11 +100,6 @@
 <script>
 import "./css.css";
 export default {
-    data() {
-        return {
-            transitionName: "slide-left"
-        };
-    },
     methods: {
         handleLoginClick() {
             this.$router.push({ path: "/forum" });

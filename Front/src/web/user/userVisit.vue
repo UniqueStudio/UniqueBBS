@@ -1,6 +1,6 @@
 <template>
   <div class="user-visit">
-    <div class="title-info" style="background:#3f51b5;">
+    <div class="title-info" style="background:#3F47C5;">
       <div class="title-icon">
         <a-icon type="user" class="title-item-icon"></a-icon>&nbsp;
         用户资料
@@ -11,26 +11,16 @@
     </div>
     <h2 :style="{color: userDatas.isAdmin? 'orange': 'black'}">{{userDatas.username}}</h2>
     <div class="group-container">
-      <a-tag color="orange" v-if="userDatas.isAdmin">
-        <a-icon type="crown"/>&nbsp;管理员
-      </a-tag>
+      <rabbit-tag v-if="userDatas.isAdmin" background="#EDABAB">管理员</rabbit-tag>
       <div v-for="group in groupList" :key="group.id" class="group-item">
         <router-link :to="'/user/group/'+ group.id">
-          <a-tag :color="group.color">
-            <a-icon type="team"/>
-            {{group.name}}
-          </a-tag>
+          <rabbit-tag :background="group.color" cursor="pointer">{{group.name}}</rabbit-tag>
         </router-link>
       </div>
       <router-link :to="'/report/visit/'+uid+'/1'">
-        <a-tag color="cyan">
-          <a-icon type="calendar"/>&nbsp;Report
-        </a-tag>
+        <rabbit-tag background="#396BEA" cursor="pointer">Report</rabbit-tag>
       </router-link>
-      <a-tag color="green">
-        <a-icon type="clock-circle"/>
-        {{lastLoginHumanDate}}
-      </a-tag>
+      <rabbit-tag background="#FFCD52" v-if="lastLoginHumanDate">{{lastLoginHumanDate}}</rabbit-tag>
     </div>
     <h5>{{userDatas.signature}}</h5>
     <report-graph :uid="uid" class="report-graph"></report-graph>
@@ -97,9 +87,10 @@
   </div>
 </template>
 <script>
-import reportGraph from "../report/reportGraph.vue";
+const reportGraph = () => import("../report/reportGraph.vue");
+const rabbitTag = () => import("../components/rabbitTag.vue");
 export default {
-    components: { "report-graph": reportGraph },
+    components: { "report-graph": reportGraph, "rabbit-tag": rabbitTag },
     data() {
         return {
             uid: "",
@@ -194,6 +185,7 @@ h5 {
 .group-container {
     text-align: center;
     margin: 12px auto;
+    user-select: none;
 }
 .report-graph {
     margin: 30px auto;

@@ -1,10 +1,26 @@
 <template>
   <div class="user-block">
     <div class="block-year-select">
-      <a-tag :color="yearColor.year3" data-year="3" @click="changeYear(3)">{{yearText.year3}}</a-tag>
-      <a-tag :color="yearColor.year2" data-year="2" @click="changeYear(2)">{{yearText.year2}}</a-tag>
-      <a-tag :color="yearColor.year1" data-year="1" @click="changeYear(1)">{{yearText.year1}}</a-tag>
-      <a-tag :color="yearColor.year0" data-year="0" @click="changeYear(0)">{{yearText.year0}}</a-tag>
+      <year-select
+        :active="yearActive.year3"
+        data-year="3"
+        @click="changeYear(3)"
+      >{{yearText.year3}}</year-select>
+      <year-select
+        :active="yearActive.year2"
+        data-year="2"
+        @click="changeYear(2)"
+      >{{yearText.year2}}</year-select>
+      <year-select
+        :active="yearActive.year1"
+        data-year="1"
+        @click="changeYear(1)"
+      >{{yearText.year1}}</year-select>
+      <year-select
+        :active="yearActive.year0"
+        data-year="0"
+        @click="changeYear(0)"
+      >{{yearText.year0}}</year-select>
     </div>
     <div :class="{'user-block-flex':true,'user-block-flex-left':align === 'left'}">
       <a-tooltip
@@ -20,17 +36,21 @@
   </div>
 </template>
 <script>
+const yearSelect = () => import("../components/yearSelect.vue");
 export default {
+    components: {
+        "year-select": yearSelect
+    },
     data() {
         return {
             userBlock: [],
             year: 0,
             doing: false,
-            yearColor: {
-                year3: "cyan",
-                year2: "cyan",
-                year1: "cyan",
-                year0: "dodgerblue"
+            yearActive: {
+                year3: false,
+                year2: false,
+                year1: false,
+                year0: true
             },
             yearText: {
                 year3: "2016",
@@ -49,9 +69,9 @@ export default {
             this.year = year;
             [3, 2, 1, 0].forEach(item => {
                 if (item === lastActiveYear) {
-                    this.yearColor["year" + item.toString()] = "cyan";
+                    this.yearActive["year" + item.toString()] = false;
                 } else if (item === year) {
-                    this.yearColor["year" + item.toString()] = "dodgerblue";
+                    this.yearActive["year" + item.toString()] = true;
                 }
             });
 
