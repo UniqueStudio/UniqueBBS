@@ -85,7 +85,7 @@ import {
 import { socketLogin, socketDisconnect } from "./model/socket";
 import { atResult } from "./model/at";
 
-const SERVER_VERSION = "1.01";
+const SERVER_VERSION = "1.02";
 
 export const MODE = process.env.NODE_ENV;
 export const redisClient = Redis.createClient({

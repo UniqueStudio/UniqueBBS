@@ -182,7 +182,16 @@ export const userLoginByPwd = async function(req: Request, res: Response) {
                 lastLogin: new Date()
             }
         });
-        res.json({ code: 1, msg: { uid: userInfo.id, token } });
+        res.json({
+            code: 1,
+            msg: {
+                uid: userInfo.id,
+                token,
+                isAdmin: userInfo.isAdmin,
+                avatar: userInfo.avatar,
+                username: userInfo.username
+            }
+        });
     } else {
         return res.json({ code: -1, msg: "密码错误！" });
     }
@@ -418,7 +427,16 @@ export const userScan = async function(req: Request, res: Response) {
                             lastLogin: new Date()
                         }
                     });
-                    res.json({ code: 1, msg: { uid: _user.id, token } });
+                    res.json({
+                        code: 1,
+                        msg: {
+                            uid: _user.id,
+                            token,
+                            isAdmin: _user.isAdmin,
+                            avatar: _user.avatar,
+                            username: _user.username
+                        }
+                    });
                 }
             } else {
                 res.json({ code: -1, msg: "登录失败！" });
