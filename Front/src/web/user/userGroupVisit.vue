@@ -100,5 +100,6 @@ h3 {
 .group-user-mobile {
     position: absolute;
     right: 0;
+    user-select: text !important;
 }
 </style>

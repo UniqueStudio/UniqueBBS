@@ -63,7 +63,7 @@
               <span class="mobile-hidden-text">&nbsp;锁定</span>
             </a-tag>
             <router-link :to="'/user/visit/'+author.id">
-              <a-tag :color="author.isAdmin?'orange':'blue'">
+              <a-tag :color="author.isAdmin?'orange':'cyan'">
                 <a-icon :type="author.isAdmin?'crown': 'user'"/>
                 {{author.username}}
               </a-tag>
@@ -175,7 +175,7 @@
         <div class="thread-post-list-item-content" v-if="isAdmin || post.post.active">
           <div class="thread-post-list-item-author-info">
             <router-link :to="'/user/visit/'+post.user.id">
-              <a-tag :color="post.user.isAdmin?'orange':'blue'">
+              <a-tag :color="post.user.isAdmin?'orange':'cyan'">
                 <a-icon :type="post.user.isAdmin?'crown': 'user'"/>
                 {{post.user.username}}
               </a-tag>

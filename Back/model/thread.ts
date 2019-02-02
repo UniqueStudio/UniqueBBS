@@ -105,7 +105,8 @@ export const threadList = async function(req: Request, res: Response) {
             });
 
             if (!resultForum) {
-                return res.json({ code: -1, msg: "板块不存在！" });
+                res.json({ code: -1, msg: "板块不存在！" });
+                return;
             }
 
             res.json({ code: 1, msg: { list: resultArr, forum: resultForum } });
@@ -118,7 +119,6 @@ export const threadList = async function(req: Request, res: Response) {
     } catch (e) {
         res.json({ code: -1 });
     }
-    return 1;
 };
 
 export const threadInfo = async function(req: Request, res: Response) {
@@ -137,12 +137,14 @@ export const threadInfo = async function(req: Request, res: Response) {
         });
 
         if (!threadInfo || (!threadInfo.active && !isAdmin)) {
-            return res.json({ code: -1, msg: "主题不存在！" });
+            res.json({ code: -1, msg: "主题不存在！" });
+            return;
         }
 
         const havePermission = await filterCalculate(uid, tid, isAdmin);
         if (!havePermission) {
-            return res.json({ code: -1, msg: "您无权查看此帖子！" });
+            res.json({ code: -1, msg: "您无权查看此帖子！" });
+            return;
         }
 
         const threadAuthor = filterUserInfo(
@@ -235,7 +237,6 @@ export const threadInfo = async function(req: Request, res: Response) {
     } catch (e) {
         res.json({ code: -1, msg: e.message });
     }
-    return 1;
 };
 
 export const threadCreate = async function(req: Request, res: Response) {
@@ -256,24 +257,27 @@ export const threadCreate = async function(req: Request, res: Response) {
         );
 
         if (!message || message.length <= 5) {
-            return res.json({
+            res.json({
                 code: -1,
                 msg: "每次发言至少5个字！"
             });
+            return;
         }
 
         if (!subject || subject.length < 3 || subject.length > 50) {
-            return res.json({
+            res.json({
                 code: -1,
                 msg: "标题长度限制在3~50字！"
             });
+            return;
         }
 
         if (!fid) {
-            return res.json({
+            res.json({
                 code: -1,
                 msg: "缺少板块信息！"
             });
+            return;
         }
 
         const newForum = await prisma.forum({
@@ -281,18 +285,20 @@ export const threadCreate = async function(req: Request, res: Response) {
         });
 
         if (!newForum) {
-            return res.json({
+            res.json({
                 code: -1,
                 msg: "目标板块不存在！"
             });
+            return;
         }
 
         const lockFrequentReply = await setLockExpire(`postUser:${uid}`, "10");
         if (!lockFrequentReply) {
-            return res.json({
+            res.json({
                 code: -1,
                 msg: "每10秒只能发言一次，您的请求过快！"
             });
+            return;
         }
 
         let filterObj: undefined | FilterCreateOneInput = undefined;
@@ -387,7 +393,6 @@ export const threadCreate = async function(req: Request, res: Response) {
     } catch (e) {
         res.json({ code: -1, msg: e.message });
     }
-    return 1;
 };
 
 export const threadReply = async function(req: Request, res: Response) {
@@ -398,23 +403,26 @@ export const threadReply = async function(req: Request, res: Response) {
         );
 
         if (!message || message.length <= 5) {
-            return res.json({
+            res.json({
                 code: -1,
                 msg: "每次发言至少5个字以上！"
             });
+            return;
         }
 
         const lockFrequentReply = await setLockExpire(`postUser:${uid}`, "10");
         if (!lockFrequentReply) {
-            return res.json({
+            res.json({
                 code: -1,
                 msg: "每10秒只能发言一次，您的请求过快！"
             });
+            return;
         }
 
         const havePermission = await filterCalculate(uid, tid, isAdmin);
         if (!havePermission) {
-            return res.json({ code: -1, msg: "您无权回复此帖子！" });
+            res.json({ code: -1, msg: "您无权回复此帖子！" });
+            return;
         }
 
         const lock = await redLock.lock(`updateThread:${tid}`, 200);
@@ -425,10 +433,11 @@ export const threadReply = async function(req: Request, res: Response) {
             });
 
             if (threadInfo.closed && !isAdmin) {
-                return res.json({
+                res.json({
                     code: -1,
                     msg: "该帖子已被关闭，您无权回复！"
                 });
+                return;
             }
 
             if (quote !== "-1") {
@@ -437,10 +446,11 @@ export const threadReply = async function(req: Request, res: Response) {
                 });
 
                 if (!quotePostInfo) {
-                    return res.json({
+                    res.json({
                         code: -1,
                         msg: "引用不存在！"
                     });
+                    return;
                 }
 
                 const quoteParentThreadInfo = await prisma
@@ -450,10 +460,11 @@ export const threadReply = async function(req: Request, res: Response) {
                     .thread();
 
                 if (quoteParentThreadInfo.id !== tid) {
-                    return res.json({
+                    res.json({
                         code: -1,
                         msg: "只能引用本帖内的回复！"
                     });
+                    return;
                 }
             }
 
@@ -469,10 +480,11 @@ export const threadReply = async function(req: Request, res: Response) {
                 .forum();
 
             if (!authorInfo || !forumInfo) {
-                return res.json({
+                res.json({
                     code: -1,
                     msg: "主题不存在！"
                 });
+                return;
             }
 
             const resultThread = await prisma
@@ -551,7 +563,6 @@ export const threadReply = async function(req: Request, res: Response) {
     } catch (e) {
         res.json({ code: -1, msg: e.message });
     }
-    return 1;
 };
 
 export const threadDelete = async function(req: Request, res: Response) {
@@ -566,7 +577,8 @@ export const threadDelete = async function(req: Request, res: Response) {
             .user();
 
         if (threadAuthInfo.id !== uid && !authObj.isAdmin) {
-            return res.json({ code: -1, msg: "您无权操作此帖子！" });
+            res.json({ code: -1, msg: "您无权操作此帖子！" });
+            return;
         } else {
             await prisma.updateThread({
                 where: {
@@ -582,14 +594,14 @@ export const threadDelete = async function(req: Request, res: Response) {
     } catch (e) {
         res.json({ code: -1, msg: e.message });
     }
-    return 1;
 };
 
 export const threadDeleteHard = async function(req: Request, res: Response) {
     try {
         const authObj = verifyJWT(req.header("Authorization"));
         if (!authObj.isAdmin) {
-            return res.json({ code: -1, msg: "您无权操作此帖子！" });
+            res.json({ code: -1, msg: "您无权操作此帖子！" });
+            return;
         } else {
             const { tid } = req.params;
             const author = await prisma
@@ -606,12 +618,11 @@ export const threadDeleteHard = async function(req: Request, res: Response) {
             await prisma.thread({
                 id: tid
             });
-
-            await prisma.deleteManyPosts({
-                thread: {
-                    id: tid
-                }
-            });
+            // await prisma.deleteManyPosts({
+            //     thread: {
+            //         id: tid
+            //     }
+            // });
             await prisma.deleteThread({
                 id: tid
             });
@@ -622,14 +633,14 @@ export const threadDeleteHard = async function(req: Request, res: Response) {
     } catch (e) {
         res.json({ code: -1, msg: e.message });
     }
-    return 1;
 };
 
 export const threadDiamond = async function(req: Request, res: Response) {
     try {
         const authObj = verifyJWT(req.header("Authorization"));
         if (!authObj.isAdmin) {
-            return res.json({ code: -1, msg: "您无权操作此帖子！" });
+            res.json({ code: -1, msg: "您无权操作此帖子！" });
+            return;
         } else {
             const { tid, setDiamond } = req.body;
             const threadInfo = await prisma.updateThread({
@@ -660,14 +671,14 @@ export const threadDiamond = async function(req: Request, res: Response) {
     } catch (e) {
         res.json({ code: -1, msg: e.message });
     }
-    return 1;
 };
 
 export const threadTop = async function(req: Request, res: Response) {
     try {
         const authObj = verifyJWT(req.header("Authorization"));
         if (!authObj.isAdmin) {
-            return res.json({ code: -1, msg: "您无权操作此帖子！" });
+            res.json({ code: -1, msg: "您无权操作此帖子！" });
+            return;
         } else {
             const { tid, setTop } = req.body;
             await prisma.updateThread({
@@ -683,14 +694,14 @@ export const threadTop = async function(req: Request, res: Response) {
     } catch (e) {
         res.json({ code: -1, msg: e.message });
     }
-    return 1;
 };
 
 export const threadClose = async function(req: Request, res: Response) {
     try {
         const authObj = verifyJWT(req.header("Authorization"));
         if (!authObj.isAdmin) {
-            return res.json({ code: -1, msg: "您无权操作此帖子！" });
+            res.json({ code: -1, msg: "您无权操作此帖子！" });
+            return;
         } else {
             const { tid, setClose } = req.body;
             await prisma.updateThread({
@@ -706,14 +717,14 @@ export const threadClose = async function(req: Request, res: Response) {
     } catch (e) {
         res.json({ code: -1, msg: e.message });
     }
-    return 1;
 };
 
 export const threadRecovery = async function(req: Request, res: Response) {
     try {
         const authObj = verifyJWT(req.header("Authorization"));
         if (!authObj.isAdmin) {
-            return res.json({ code: -1, msg: "您无权操作此帖子！" });
+            res.json({ code: -1, msg: "您无权操作此帖子！" });
+            return;
         } else {
             const { tid } = req.params;
             await prisma.updateThread({
@@ -743,7 +754,6 @@ export const threadRecovery = async function(req: Request, res: Response) {
     } catch (e) {
         res.json({ code: -1, msg: e.message });
     }
-    return 1;
 };
 
 export const threadUpdate = async function(req: Request, res: Response) {
@@ -773,7 +783,8 @@ export const threadUpdate = async function(req: Request, res: Response) {
         });
 
         if (!isAdmin && (threadAuthor.id !== uid || !threadInfo.active)) {
-            return res.json({ code: -1, msg: "您无权编辑此帖子！" });
+            res.json({ code: -1, msg: "您无权编辑此帖子！" });
+            return;
         }
 
         const previousForum = await prisma
@@ -787,7 +798,8 @@ export const threadUpdate = async function(req: Request, res: Response) {
         });
 
         if (!newForum) {
-            return res.json({ code: -1, msg: "目标板块不存在！" });
+            res.json({ code: -1, msg: "目标板块不存在！" });
+            return;
         }
 
         const updateLock = await redLock.lock(`updateThread:${tid}`, 1000);
@@ -876,7 +888,6 @@ export const threadUpdate = async function(req: Request, res: Response) {
     } catch (e) {
         res.json({ code: -1, msg: e.message });
     }
-    return 1;
 };
 
 export const threadMove = async function(req: Request, res: Response) {
@@ -896,7 +907,8 @@ export const threadMove = async function(req: Request, res: Response) {
         });
 
         if (!isAdmin && (threadAuthor.id !== uid || !threadInfo.active)) {
-            return res.json({ code: -1, msg: "您无权移动该帖子！" });
+            res.json({ code: -1, msg: "您无权移动该帖子！" });
+            return;
         }
 
         const moveLock = await redLock.lock(`moveThread`, 500);
@@ -949,7 +961,6 @@ export const threadMove = async function(req: Request, res: Response) {
     } catch (e) {
         res.json({ code: -1, msg: e.message });
     }
-    return 1;
 };
 
 export const threadSearch = async function(req: Request, res: Response) {
@@ -971,7 +982,8 @@ export const threadRuntime = async function(req: Request, res: Response) {
     try {
         const { isAdmin } = verifyJWT(req.header("Authorization"));
         if (!isAdmin) {
-            return res.json({ code: -1, msg: "No Permission" });
+            res.json({ code: -1, msg: "No Permission" });
+            return;
         }
         const threadList = await prisma.threads();
         for (const thread of threadList) {
@@ -1001,5 +1013,4 @@ export const threadRuntime = async function(req: Request, res: Response) {
     } catch (e) {
         res.json({ code: -1, msg: e.message });
     }
-    return 1;
 };

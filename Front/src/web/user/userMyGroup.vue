@@ -14,10 +14,7 @@
           <router-link :to="'/user/visit/'+user.id">
             <span :style="{color: user.isAdmin? 'orange' : 'black'}">{{user.username}}</span>
           </router-link>
-          <a-tag color="cyan" class="group-user-mobile">
-            <a-icon type="mobile"/>
-            {{user.mobile}}
-          </a-tag>
+          <rabbit-tag class="group-user-mobile" background="#CACAE5" color="#42427A">{{user.mobile}}</rabbit-tag>
           <p>{{user.signature}}</p>
         </div>
       </div>
@@ -25,64 +22,67 @@
   </div>
 </template>
 <script>
+const rabbitTag = () => import("../components/rabbitTag.vue");
 export default {
-  data() {
-    return {
-      groupList: []
-    };
-  },
-  methods: {
-    async getGroupList() {
-      const responseMyInfoRaw = await this.$ajax.get(this.$urls.myInfo);
-      const responseMyInfo = responseMyInfoRaw.data;
-      if (responseMyInfo.code !== 1) {
-        return this.$store.dispatch("checkLoginStatus");
-      }
-      const userGroupList = responseMyInfo.msg.group;
-      this.groupList = await Promise.all(
-        userGroupList.map(async item => {
-          const groupInfo = { id: item.id, name: item.name };
-          const memberList = await this.$ajax.get(
-            this.$urls.groupMemberList(item.id)
-          );
-          return { info: groupInfo, list: memberList.data.msg.list };
-        })
-      );
+    components: { "rabbit-tag": rabbitTag },
+    data() {
+        return {
+            groupList: []
+        };
+    },
+    methods: {
+        async getGroupList() {
+            const responseMyInfoRaw = await this.$ajax.get(this.$urls.myInfo);
+            const responseMyInfo = responseMyInfoRaw.data;
+            if (responseMyInfo.code !== 1) {
+                return this.$store.dispatch("checkLoginStatus");
+            }
+            const userGroupList = responseMyInfo.msg.group;
+            this.groupList = await Promise.all(
+                userGroupList.map(async item => {
+                    const groupInfo = { id: item.id, name: item.name };
+                    const memberList = await this.$ajax.get(
+                        this.$urls.groupMemberList(item.id)
+                    );
+                    return { info: groupInfo, list: memberList.data.msg.list };
+                })
+            );
+        }
+    },
+    mounted() {
+        this.getGroupList();
     }
-  },
-  mounted() {
-    this.getGroupList();
-  }
 };
 </script>
 <style scoped>
 .user-group,
 .user-group-collections {
-  position: relative;
+    position: relative;
 }
 .user-group-collections {
-  margin-top: 64px;
+    margin-top: 64px;
 }
 .group-user-container {
-  display: grid;
-  grid-template-columns: 20% 80%;
-  margin: 24px 0;
+    display: grid;
+    grid-template-columns: 20% 80%;
+    margin: 24px 0;
 }
 .group-user-avatar {
-  text-align: right;
+    text-align: right;
 }
 .avatar-img {
-  height: 48px;
-  width: 48px;
+    height: 48px;
+    width: 48px;
 }
 .group-user-info {
-  padding: 0 18px;
+    padding: 0 18px;
 }
 h3 {
-  text-align: center;
+    text-align: center;
 }
 .group-user-mobile {
-  position: absolute;
-  right: 0;
+    position: absolute;
+    right: 0;
+    user-select: text !important;
 }
 </style>

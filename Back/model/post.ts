@@ -6,7 +6,8 @@ export const postDeleteHard = async function(req: Request, res: Response) {
     try {
         const authObj = verifyJWT(req.header("Authorization"));
         if (!authObj.isAdmin) {
-            return res.json({ code: -1, msg: "您无权操作此帖子！" });
+            res.json({ code: -1, msg: "您无权操作此帖子！" });
+            return;
         } else {
             const { pid } = req.params;
             await prisma.deletePost({
@@ -17,7 +18,6 @@ export const postDeleteHard = async function(req: Request, res: Response) {
     } catch (e) {
         res.json({ code: -1, msg: e.message });
     }
-    return 1;
 };
 
 export const postDelete = async function(req: Request, res: Response) {
@@ -32,7 +32,8 @@ export const postDelete = async function(req: Request, res: Response) {
             .user();
 
         if (postAuthInfo.id !== uid && !authObj.isAdmin) {
-            return res.json({ code: -1, msg: "您无权操作此帖子！" });
+            res.json({ code: -1, msg: "您无权操作此帖子！" });
+            return;
         } else {
             await prisma.updatePost({
                 where: {
@@ -47,14 +48,14 @@ export const postDelete = async function(req: Request, res: Response) {
     } catch (e) {
         res.json({ code: -1, msg: e.message });
     }
-    return 1;
 };
 
 export const postRecovery = async function(req: Request, res: Response) {
     try {
         const authObj = verifyJWT(req.header("Authorization"));
         if (!authObj.isAdmin) {
-            return res.json({ code: -1, msg: "您无权操作此帖子！" });
+            res.json({ code: -1, msg: "您无权操作此帖子！" });
+            return;
         } else {
             const { pid } = req.params;
             await prisma.updatePost({
@@ -70,7 +71,6 @@ export const postRecovery = async function(req: Request, res: Response) {
     } catch (e) {
         res.json({ code: -1, msg: e.message });
     }
-    return 1;
 };
 
 export const postInfo = async function(req: Request, res: Response) {
@@ -94,18 +94,19 @@ export const postInfo = async function(req: Request, res: Response) {
             .thread();
 
         if (!isAdmin && (!postThread.active || !postResult.active)) {
-            return res.json({ code: -1, msg: "回帖不存在！" });
+            res.json({ code: -1, msg: "回帖不存在！" });
+            return;
         }
 
         if (!isAdmin && postAuthor.id !== uid) {
-            return res.json({ code: -1, msg: "您无权编辑此回帖！" });
+            res.json({ code: -1, msg: "您无权编辑此回帖！" });
+            return;
         }
 
         res.json({ code: 1, msg: postResult });
     } catch (e) {
         res.json({ code: -1, msg: e.message });
     }
-    return 1;
 };
 
 export const postUpdate = async function(req: Request, res: Response) {
@@ -132,7 +133,8 @@ export const postUpdate = async function(req: Request, res: Response) {
             !isAdmin &&
             (postAuthor.id !== uid || !postInfo.active || !threadInfo.active)
         ) {
-            return res.json({ code: -1, msg: "您无权编辑此回复！" });
+            res.json({ code: -1, msg: "您无权编辑此回复！" });
+            return;
         }
 
         await prisma.updateManyPosts({
@@ -148,7 +150,6 @@ export const postUpdate = async function(req: Request, res: Response) {
     } catch (e) {
         res.json({ code: -1, msg: e.message });
     }
-    return 1;
 };
 
 export const postSearch = async function(req: Request, res: Response) {

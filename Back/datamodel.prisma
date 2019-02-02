@@ -2,7 +2,7 @@ type Group {
     id: ID! @unique
     key: Int! @unique
     name: String!
-    color: String! @default(value: "#364970")
+    color: String! @default(value: "cyan")
     master: User @relation(name: "GroupMaster")
 }
 type User {
@@ -27,15 +27,16 @@ type User {
     lastLogin: DateTime!
     signature: String! @default(value: "")
     mentor: User
-    report: [Report!]! @relation(name: "ReportList")
+    report: [Report!]! @relation(name: "ReportList", onDelete: CASCADE)
     spaceQuota: Int! @default(value: 200000)
+    joinTime: Int! @default(value: 20190)
 }
 type Report {
     id: ID! @unique
     message: String!
     createDate: DateTime!
     isWeek: Boolean! @default(value: false)
-    user: User! @relation(name: "ReportList")
+    user: User! @relation(name: "ReportList", onDelete: SET_NULL)
 }
 type Forum {
     id: ID! @unique
@@ -48,7 +49,7 @@ type Forum {
 type Post {
     id: ID! @unique
     user: User!
-    thread: Thread!
+    thread: Thread! @relation(name: "PostList", onDelete: SET_NULL)
     isFirst: Boolean! @default(value: false)
     quote: String! @default(value: "-1")
     message: String!
@@ -62,7 +63,7 @@ type Thread {
     subject: String!
     active: Boolean! @default(value: true)
     postCount: Int! @default(value: 0)
-    post: [Post!]!
+    post: [Post!]! @relation(name: "PostList", onDelete: CASCADE)
     top: Int! @default(value: 0)
     closed: Boolean! @default(value: false)
     diamond: Boolean! @default(value: false)

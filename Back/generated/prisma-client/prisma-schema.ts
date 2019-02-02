@@ -2091,7 +2091,8 @@ type User {
   signature: String!
   mentor: User
   report(where: ReportWhereInput, orderBy: ReportOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Report!]
-  spaceQuota: Int
+  spaceQuota: Int!
+  joinTime: Int!
 }
 
 type UserConnection {
@@ -2123,6 +2124,7 @@ input UserCreateInput {
   mentor: UserCreateOneInput
   report: ReportCreateManyWithoutUserInput
   spaceQuota: Int
+  joinTime: Int
 }
 
 input UserCreateManyInput {
@@ -2167,6 +2169,7 @@ input UserCreateWithoutGroupInput {
   mentor: UserCreateOneInput
   report: ReportCreateManyWithoutUserInput
   spaceQuota: Int
+  joinTime: Int
 }
 
 input UserCreateWithoutReportInput {
@@ -2191,6 +2194,7 @@ input UserCreateWithoutReportInput {
   signature: String
   mentor: UserCreateOneInput
   spaceQuota: Int
+  joinTime: Int
 }
 
 type UserEdge {
@@ -2239,6 +2243,8 @@ enum UserOrderByInput {
   signature_DESC
   spaceQuota_ASC
   spaceQuota_DESC
+  joinTime_ASC
+  joinTime_DESC
   createdAt_ASC
   createdAt_DESC
   updatedAt_ASC
@@ -2265,7 +2271,8 @@ type UserPreviousValues {
   threads: Int!
   lastLogin: DateTime!
   signature: String!
-  spaceQuota: Int
+  spaceQuota: Int!
+  joinTime: Int!
 }
 
 input UserScalarWhereInput {
@@ -2507,6 +2514,14 @@ input UserScalarWhereInput {
   spaceQuota_lte: Int
   spaceQuota_gt: Int
   spaceQuota_gte: Int
+  joinTime: Int
+  joinTime_not: Int
+  joinTime_in: [Int!]
+  joinTime_not_in: [Int!]
+  joinTime_lt: Int
+  joinTime_lte: Int
+  joinTime_gt: Int
+  joinTime_gte: Int
   AND: [UserScalarWhereInput!]
   OR: [UserScalarWhereInput!]
   NOT: [UserScalarWhereInput!]
@@ -2553,6 +2568,7 @@ input UserUpdateDataInput {
   mentor: UserUpdateOneInput
   report: ReportUpdateManyWithoutUserInput
   spaceQuota: Int
+  joinTime: Int
 }
 
 input UserUpdateInput {
@@ -2578,6 +2594,7 @@ input UserUpdateInput {
   mentor: UserUpdateOneInput
   report: ReportUpdateManyWithoutUserInput
   spaceQuota: Int
+  joinTime: Int
 }
 
 input UserUpdateManyDataInput {
@@ -2600,6 +2617,7 @@ input UserUpdateManyDataInput {
   lastLogin: DateTime
   signature: String
   spaceQuota: Int
+  joinTime: Int
 }
 
 input UserUpdateManyInput {
@@ -2633,6 +2651,7 @@ input UserUpdateManyMutationInput {
   lastLogin: DateTime
   signature: String
   spaceQuota: Int
+  joinTime: Int
 }
 
 input UserUpdateManyWithWhereNestedInput {
@@ -2694,6 +2713,7 @@ input UserUpdateWithoutGroupDataInput {
   mentor: UserUpdateOneInput
   report: ReportUpdateManyWithoutUserInput
   spaceQuota: Int
+  joinTime: Int
 }
 
 input UserUpdateWithoutReportDataInput {
@@ -2718,6 +2738,7 @@ input UserUpdateWithoutReportDataInput {
   signature: String
   mentor: UserUpdateOneInput
   spaceQuota: Int
+  joinTime: Int
 }
 
 input UserUpdateWithWhereUniqueNestedInput {
@@ -2992,6 +3013,14 @@ input UserWhereInput {
   spaceQuota_lte: Int
   spaceQuota_gt: Int
   spaceQuota_gte: Int
+  joinTime: Int
+  joinTime_not: Int
+  joinTime_in: [Int!]
+  joinTime_not_in: [Int!]
+  joinTime_lt: Int
+  joinTime_lte: Int
+  joinTime_gt: Int
+  joinTime_gte: Int
   AND: [UserWhereInput!]
   OR: [UserWhereInput!]
   NOT: [UserWhereInput!]

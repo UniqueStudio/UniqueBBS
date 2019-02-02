@@ -19,6 +19,11 @@ import {
 } from "./check";
 import { pushMessage, MESSAGE_SET_MENTOR, MESSAGE_REPORT_URL } from "./message";
 import { setLockExpireIncr } from "./lock";
+import { filterUserAvatar } from "./check";
+import * as fs from "fs";
+import { MODE } from "../server";
+import downloadImg from "../utils/downloadImg";
+import processJoinTime from "../utils/processJoinTime";
 
 export const userInfo = async function(req: Request, res: Response) {
     try {
@@ -149,10 +154,11 @@ export const userLoginByPwd = async function(req: Request, res: Response) {
     });
 
     if (userInfoArr.length !== 1) {
-        return res.json({
+        res.json({
             code: -1,
             msg: `昵称${nickname}不存在！请设置昵称后再登录！`
         });
+        return;
     }
 
     const userInfo = userInfoArr[0];
@@ -161,16 +167,18 @@ export const userLoginByPwd = async function(req: Request, res: Response) {
         userInfo.password === null ||
         userInfo.password === undefined
     ) {
-        return res.json({ code: -1, msg: "未设置密码，请通过扫码登录！" });
+        res.json({ code: -1, msg: "未设置密码，请通过扫码登录！" });
+        return;
     }
 
     const pwd_salt = addSaltPasswordOnce(pwd);
     if (pwd_salt === userInfo.password) {
         if (!userInfo.active) {
-            return res.json({
+            res.json({
                 code: -1,
                 msg: "当前账号不活跃，无法登录！"
             });
+            return;
         }
 
         const token = signJWT(userInfo.id, userInfo.isAdmin, userInfo.username);
@@ -188,14 +196,15 @@ export const userLoginByPwd = async function(req: Request, res: Response) {
                 uid: userInfo.id,
                 token,
                 isAdmin: userInfo.isAdmin,
-                avatar: userInfo.avatar,
-                username: userInfo.username
+                avatar: filterUserAvatar(userInfo.avatar),
+                username: userInfo.username,
+                userid: userInfo.userid
             }
         });
     } else {
-        return res.json({ code: -1, msg: "密码错误！" });
+        res.json({ code: -1, msg: "密码错误！" });
+        return;
     }
-    return 1;
 };
 
 export const userPwdReset = async function(req: Request, res: Response) {
@@ -213,10 +222,11 @@ export const userPwdReset = async function(req: Request, res: Response) {
             nowUser.password !== null &&
             nowUser.password !== undefined
         ) {
-            return res.json({
+            res.json({
                 code: -1,
                 msg: "您当前的密码输入错误，请重新输入！"
             });
+            return;
         } else {
             await prisma.updateUser({
                 where: {
@@ -231,7 +241,6 @@ export const userPwdReset = async function(req: Request, res: Response) {
     } catch (e) {
         res.json({ code: -1, msg: e.message });
     }
-    return 1;
 };
 
 export const userInfoUpdate = async function(req: Request, res: Response) {
@@ -256,28 +265,35 @@ export const userInfoUpdate = async function(req: Request, res: Response) {
         });
 
         if (studentID.length >= 20) {
-            return res.json({ code: -1, msg: "学号过长，请检查后再输入！" });
+            res.json({ code: -1, msg: "学号过长，请检查后再输入！" });
+            return;
         }
         if (dormitory.length >= 20) {
-            return res.json({ code: -1, msg: "宿舍号过长，请检查后再输入！" });
+            res.json({ code: -1, msg: "宿舍号过长，请检查后再输入！" });
+            return;
         }
         if (qq.length >= 20) {
-            return res.json({ code: -1, msg: "QQ号过长，请检查后再输入！" });
+            res.json({ code: -1, msg: "QQ号过长，请检查后再输入！" });
+            return;
         }
         if (major.length >= 20) {
-            return res.json({ code: -1, msg: "专业过长，请检查后再输入！" });
+            res.json({ code: -1, msg: "专业过长，请检查后再输入！" });
+            return;
         }
         if (className.length >= 20) {
-            return res.json({ code: -1, msg: "班级过长，请检查后再输入！" });
+            res.json({ code: -1, msg: "班级过长，请检查后再输入！" });
+            return;
         }
         if (signature.length >= 100) {
-            return res.json({
+            res.json({
                 code: -1,
                 msg: "个人签名最多100字符，请重新输入！"
             });
+            return;
         }
         if (checkUser.length !== 0 && checkUser[0].id !== uid) {
-            return res.json({ code: -1, msg: "该昵称已被占用！" });
+            res.json({ code: -1, msg: "该昵称已被占用！" });
+            return;
         }
 
         await prisma.updateUser({
@@ -299,7 +315,6 @@ export const userInfoUpdate = async function(req: Request, res: Response) {
     } catch (e) {
         res.json({ code: -1, msg: e.message });
     }
-    return 1;
 };
 
 export const userInfoUpdateFromWx = async function(
@@ -315,68 +330,82 @@ export const userInfoUpdateFromWx = async function(
             2
         );
         if (!wxUpdateLock) {
-            return res.json({
+            res.json({
                 code: -1,
                 msg: "每5分钟只能同步2次微信个人信息，请稍后重试！"
             });
+            return;
         }
 
-        const userInfo = await prisma.user({
-            id: authObj.uid
-        });
+        (async function() {
+            const userInfo = await prisma.user({
+                id: authObj.uid
+            });
 
-        const accessToken = await getAccessToken();
-        const userInfoResponse = await fetch(
-            userInfoURL(accessToken, userInfo.userid)
-        );
-        const user = await userInfoResponse.json();
-        if (user.errcode !== 0) {
-            return res.json({ code: -1, msg: user.errcode });
-        }
-
-        const groups = await prisma.groups();
-        let groupList = new Map<number, string>();
-        let groupKeyList: Array<[number, string]> = [];
-        for (let group of groups) {
-            groupList.set(group.key, group.id);
-            groupKeyList.push([group.key, group.name]);
-        }
-
-        const userGroupArr = user.department;
-        let userGroup: Array<{ id: string }> = [];
-        for (let userGroupKey of userGroupArr) {
-            const id = groupList.get(userGroupKey);
-            if (id) {
-                userGroup.push({
-                    id: id
-                });
+            const accessToken = await getAccessToken();
+            const userInfoResponse = await fetch(
+                userInfoURL(accessToken, userInfo.userid)
+            );
+            const user = await userInfoResponse.json();
+            if (user.errcode !== 0) {
+                res.json({ code: -1, msg: user.errcode });
+                return;
             }
-        }
 
-        const dataObj = {
-            username: user.name,
-            mobile: user.mobile,
-            avatar: user.avatar.replace(/^http/i, "https"),
-            userid: user.userid,
-            email: user.email,
-            lastLogin: new Date(),
-            group: {
-                connect: userGroup
-            },
-            isAdmin: user.isleader === 1 || user.name === "杨子越"
-        };
+            const groups = await prisma.groups();
+            let groupList = new Map<number, string>();
+            let groupKeyList: Array<[number, string]> = [];
+            for (let group of groups) {
+                groupList.set(group.key, group.id);
+                groupKeyList.push([group.key, group.name]);
+            }
 
-        await prisma.updateUser({
-            where: {
-                userid: user.userid
-            },
-            data: dataObj
-        });
+            const userGroupArr = user.department;
+            let userGroup: Array<{ id: string }> = [];
+            for (let userGroupKey of userGroupArr) {
+                const id = groupList.get(userGroupKey);
+                if (id) {
+                    userGroup.push({
+                        id: id
+                    });
+                }
+            }
+
+            const avatarPath =
+                process.env.MODE === "DEV"
+                    ? `./upload/avatar`
+                    : `/var/bbs/upload/avatar`;
+            await downloadImg(
+                user.avatar,
+                `${avatarPath}/${user.userid}.avatar`
+            );
+
+            const dataObj = {
+                username: user.name,
+                mobile: user.mobile,
+                avatar: `unique://${user.userid}`,
+                userid: user.userid,
+                email: user.email,
+                lastLogin: new Date(),
+                joinTime: processJoinTime(user),
+                group: {
+                    connect: userGroup
+                },
+                isAdmin: user.isleader === 1 || user.name === "杨子越"
+            };
+
+            await prisma.updateUser({
+                where: {
+                    userid: user.userid
+                },
+                data: dataObj
+            });
+        })();
+
         res.json({ code: 1 });
     } catch (e) {
         res.json({ code: -1, msg: e.message });
     }
-    return 1;
 };
 
 export const userScan = async function(req: Request, res: Response) {
@@ -409,10 +438,11 @@ export const userScan = async function(req: Request, res: Response) {
                 } else {
                     let _user = user[0];
                     if (!_user.active) {
-                        return res.json({
+                        res.json({
                             code: -2,
                             msg: "当前账号不活跃，请联系管理员！"
                         });
+                        return;
                     }
                     const token = signJWT(
                         _user.id,
@@ -433,23 +463,20 @@ export const userScan = async function(req: Request, res: Response) {
                             uid: _user.id,
                             token,
                             isAdmin: _user.isAdmin,
-                            avatar: _user.avatar,
+                            avatar: filterUserAvatar(_user.avatar),
                             username: _user.username
                         }
                     });
                 }
             } else {
                 res.json({ code: -1, msg: "登录失败！" });
-                return 1;
             }
         } else {
             res.json({ code: -2, msg: "登录超时，请重新登录！" });
-            return 1;
         }
     } catch (err) {
         res.json({ code: -1, msg: err.message });
     }
-    return 1;
 };
 
 export const userQRLogin = async function(_req: Request, res: Response) {
@@ -529,7 +556,7 @@ export const mentorMyInfo = async function(req: Request, res: Response) {
     }
 };
 
-export const mentorMyStudents = async function(req: Request, res: Response) {
+export const mentorMyMentees = async function(req: Request, res: Response) {
     try {
         const { uid } = verifyJWT(req.header("Authorization"));
 
@@ -594,13 +621,15 @@ export const mentorSet = async function(req: Request, res: Response) {
         });
 
         if (mentorInfoList.length !== 1 || mentorInfoList[0].id === uid) {
-            return res.json({ code: -1, msg: "Mentor不合法！" });
+            res.json({ code: -1, msg: "Mentor不合法！" });
+            return;
         }
 
         const [mentorInfo] = mentorInfoList;
 
         if (previousMentor && previousMentor.id === mentorInfo.id) {
-            return res.json({ code: 1 });
+            res.json({ code: 1 });
+            return;
         }
 
         await prisma.updateUser({
@@ -627,7 +656,6 @@ export const mentorSet = async function(req: Request, res: Response) {
     } catch (e) {
         res.json({ code: -1, msg: e.message });
     }
-    return 1;
 };
 
 export const userSearch = async function(req: Request, res: Response) {
@@ -649,7 +677,7 @@ export const userSearch = async function(req: Request, res: Response) {
                 ]
             }
         });
-        res.json({ code: 1, msg: result });
+        res.json({ code: 1, msg: filterUsersInfo(result) });
     } catch (e) {
         res.json({ code: -1, msg: e.message });
     }
@@ -659,7 +687,8 @@ export const userRuntime = async function(req: Request, res: Response) {
     try {
         const { isAdmin } = verifyJWT(req.header("Authorization"));
         if (!isAdmin) {
-            return res.json({ code: -1, msg: "No Permission" });
+            res.json({ code: -1, msg: "No Permission" });
+            return;
         }
 
         const userList = await prisma.users();
@@ -689,5 +718,26 @@ export const userRuntime = async function(req: Request, res: Response) {
     } catch (e) {
         res.json({ code: -1, msg: e.message });
     }
-    return 1;
+};
+
+export const userAvatar = async function(req: Request, res: Response) {
+    const { uid } = req.params;
+    try {
+        const fileExistence = fs.existsSync(
+            MODE === "DEV"
+                ? `./upload/avatar/${uid}.avatar`
+                : `/var/bbs/upload/avatar/${uid}.avatar`
+        );
+        if (fileExistence) {
+            res.download(
+                MODE === "DEV"
+                    ? `./upload/avatar/${uid}.avatar`
+                    : `/var/bbs/upload/avatar/${uid}.avatar`
+            );
+        } else {
+            res.download(`./utils/defaultAvatar.png`);
+        }
+    } catch (e) {
+        res.json({ code: -1, msg: e.message });
+    }
 };

@@ -90,7 +90,8 @@ export const fileClearAllUnlink = async function(req: Request, res: Response) {
     try {
         const { isAdmin } = verifyJWT(req.header("Authorization"));
         if (!isAdmin) {
-            return res.json({ code: -1, msg: "No Permission" });
+            res.json({ code: -1, msg: "No Permission" });
+            return;
         }
 
         const arr = await prisma.attaches({
@@ -110,7 +111,6 @@ export const fileClearAllUnlink = async function(req: Request, res: Response) {
     } catch (e) {
         res.json({ code: -1, msg: e.message });
     }
-    return 1;
 };
 
 export const filePreview = async function(req: Request, res: Response) {
@@ -123,18 +123,19 @@ export const filePreview = async function(req: Request, res: Response) {
 
         const previewExpire = await getLockStatus(`attachPreview:${aid}`);
         if (previewExpire) {
-            return res.json({ code: -1, msg: "Access Denied" });
+            res.json({ code: -1, msg: "Access Denied" });
+            return;
         }
 
         if (!reg.test(attachInfo.originalName)) {
-            return res.json({ code: -1, msg: "Access Denied" });
+            res.json({ code: -1, msg: "Access Denied" });
+            return;
         }
 
         res.download(attachInfo.fileName, attachInfo.originalName);
     } catch (e) {
         res.json({ code: -1, msg: e.message });
     }
-    return 1;
 };
 
 export const fileDownload = async function(req: Request, res: Response) {
@@ -156,11 +157,13 @@ export const fileDownload = async function(req: Request, res: Response) {
 
         if (threadInfo === null) {
             if (!isAdmin && uid !== attachAuthorInfo.id) {
-                return res.json({ code: -1, msg: "该附件不存在！" });
+                res.json({ code: -1, msg: "该附件不存在！" });
+                return;
             }
         } else {
             if (!isAdmin && !threadInfo.active) {
-                return res.json({ code: -1, msg: "该附件不存在！" });
+                res.json({ code: -1, msg: "该附件不存在！" });
+                return;
             }
             const havePermission = await filterCalculate(
                 uid,
@@ -168,7 +171,8 @@ export const fileDownload = async function(req: Request, res: Response) {
                 isAdmin
             );
             if (!havePermission) {
-                return res.json({ code: -1, msg: "您无权下载此附件！" });
+                res.json({ code: -1, msg: "您无权下载此附件！" });
+                return;
             }
         }
 
@@ -196,7 +200,6 @@ export const fileDownload = async function(req: Request, res: Response) {
     } catch (e) {
         res.json({ code: -1, msg: e.message });
     }
-    return 1;
 };
 
 export const fileFilter = function(
@@ -305,7 +308,6 @@ export const fileProcess = async function(
             }
         });
     }
-    return 1;
 };
 
 export const fileDestination = function(
@@ -358,7 +360,8 @@ export const fileRemove = async function(req: Request, res: Response) {
                 .user();
 
             if (!isAdmin && uid !== attachAuthorInfo.id) {
-                return res.json({ code: -1, msg: "您无权删除此附件！" });
+                res.json({ code: -1, msg: "您无权删除此附件！" });
+                return;
             }
 
             const attachThreadInfo = await prisma
@@ -396,7 +399,6 @@ export const fileRemove = async function(req: Request, res: Response) {
     } catch (e) {
         res.json({ code: -1, msg: e.message });
     }
-    return 1;
 };
 
 export const fileExpire = async function(req: Request, res: Response) {

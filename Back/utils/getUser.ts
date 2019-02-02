@@ -1,9 +1,21 @@
+require("dotenv").config();
+
 import { prisma } from "../generated/prisma-client";
 import fetch from "node-fetch";
 import { getUserListURL } from "../model/consts";
 import { getAccessToken } from "../model/check";
+import downloadImg from "../utils/downloadImg";
+import processJoinTime from "../utils/processJoinTime";
+import * as fs from "fs";
 
 export const getUser = async function() {
+    const avatarPath =
+        process.env.MODE === "DEV"
+            ? `./upload/avatar`
+            : `/var/bbs/upload/avatar`;
+
+    if (!fs.existsSync(avatarPath)) fs.mkdirSync(avatarPath);
+
     const groups = await prisma.groups();
     let groupList = new Map<number, string>();
     let setID = new Map<string, number>();
@@ -50,13 +62,19 @@ export const getUser = async function() {
                 userid: user.userid
             });
 
+            await downloadImg(
+                user.avatar,
+                `${avatarPath}/${user.userid}.avatar`
+            );
+
             const dataObj = {
                 username: user.name,
                 mobile: user.mobile,
-                avatar: user.avatar.replace(/^http/i, "https"),
+                avatar: `unique://${user.userid}`,
                 userid: user.userid,
                 email: user.email,
                 lastLogin: new Date(),
+                joinTime: processJoinTime(user),
                 group: {
                     connect: userGroup
                 },

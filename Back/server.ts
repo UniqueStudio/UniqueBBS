@@ -26,7 +26,8 @@ import {
     mentorSet,
     userSearch,
     userRuntime,
-    mentorMyStudents
+    mentorMyMentees,
+    userAvatar
 } from "./model/user";
 import {
     threadDeleteHard,
@@ -88,6 +89,7 @@ import { atResult } from "./model/at";
 const SERVER_VERSION = "1.02";
 
 export const MODE = process.env.NODE_ENV;
+
 export const redisClient = Redis.createClient({
     host: MODE === "DEV" ? "localhost" : "redis",
     port: 6379
@@ -161,6 +163,7 @@ app.use((_req, res, next) => {
 
 //User & Mentor
 app.get("/user/info/:uid", userInfo);
+app.get("/user/avatar/:uid", userAvatar);
 app.get("/user/threads/:uid/:page", userThreads);
 app.get("/user/posts/:uid/:page", userPosts);
 app.get("/user/my/info", userMyInfo);
@@ -169,7 +172,7 @@ app.get("/user/login/qrcode", userQRLogin);
 app.get("/user/login/scan/:key/status", userScan);
 app.get("/user/mentor/info/:uid", mentorInfo);
 app.get("/user/mentor/my", mentorMyInfo);
-app.get("/user/mentor/students", mentorMyStudents);
+app.get("/user/mentor/students", mentorMyMentees);
 app.post("/user/login/pwd", userLoginByPwd);
 app.post("/user/update/normal", userInfoUpdate);
 app.post("/user/update/pwd", userPwdReset);

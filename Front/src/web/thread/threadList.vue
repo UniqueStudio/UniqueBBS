@@ -39,7 +39,7 @@
               <span class="diamond-text">&nbsp;锁定</span>
             </a-tag>
             <router-link :to="'/user/visit/'+thread.user.id">
-              <a-tag :color="thread.user.isAdmin? 'orange': 'blue'">
+              <a-tag :color="thread.user.isAdmin? 'orange':'cyan'">
                 <a-icon :type="thread.user.isAdmin? 'crown' : 'user'"/>
                 {{thread.user.username}}
               </a-tag>

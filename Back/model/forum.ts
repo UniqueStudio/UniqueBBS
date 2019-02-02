@@ -1,6 +1,7 @@
 import { prisma } from "../generated/prisma-client";
 import { verifyJWT } from "./check";
 import { Request, Response } from "express";
+import { filterUserInfo } from "./check";
 
 export const forumList = async function(req: Request, res: Response) {
     try {
@@ -19,12 +20,14 @@ export const forumList = async function(req: Request, res: Response) {
                     })
                     .lastPost(),
                 lastPostInfo: {
-                    user: await prisma
-                        .forum({
-                            id: item.id
-                        })
-                        .lastPost()
-                        .user(),
+                    user: filterUserInfo(
+                        await prisma
+                            .forum({
+                                id: item.id
+                            })
+                            .lastPost()
+                            .user()
+                    ),
                     thread: await prisma
                         .forum({
                             id: item.id
@@ -62,7 +65,8 @@ export const forumRuntime = async function(req: Request, res: Response) {
     try {
         const { isAdmin } = verifyJWT(req.header("Authorization"));
         if (!isAdmin) {
-            return res.json({ code: -1, msg: "No Permission" });
+            res.json({ code: -1, msg: "No Permission" });
+            return;
         }
         const forumList = await prisma.forums();
         for (const forum of forumList) {
@@ -92,5 +96,4 @@ export const forumRuntime = async function(req: Request, res: Response) {
     } catch (e) {
         res.json({ code: -1, msg: e.message });
     }
-    return 1;
 };

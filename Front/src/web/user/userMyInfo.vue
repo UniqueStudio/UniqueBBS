@@ -5,6 +5,7 @@
       <a-input addonBefore="姓名" readonly :value="wxInfo.username" size="large"/>
       <a-input addonBefore="邮箱" readonly :value="wxInfo.email" size="large"/>
       <a-input addonBefore="手机" readonly :value="wxInfo.mobile" size="large"/>
+      <a-input addonBefore="加入" readonly :value="renderJoinTime" size="large"/>
     </a-input-group>
     <div class="submit-container">
       <a-button icon="wechat" type="primary" @click="syncWxInfo" :disabled="syncBtnDisabled">同步</a-button>
@@ -27,106 +28,111 @@
 </template>
 <script>
 export default {
-  data() {
-    return {
-      wxInfo: {
-        username: "",
-        email: "",
-        mobile: ""
-      },
-      detailInfo: {
-        nickname: "",
-        studentID: "",
-        dormitory: "",
-        qq: "",
-        wechat: "",
-        major: "",
-        className: "",
-        signature: ""
-      },
-      updateBtnDisabled: false,
-      syncBtnDisabled: false
-    };
-  },
-  computed: {
-    keys1() {
-      return Object.keys(this.wxInfo);
+    data() {
+        return {
+            wxInfo: {
+                username: "",
+                email: "",
+                mobile: "",
+                joinTime: ""
+            },
+            detailInfo: {
+                nickname: "",
+                studentID: "",
+                dormitory: "",
+                qq: "",
+                wechat: "",
+                major: "",
+                className: "",
+                signature: ""
+            },
+            updateBtnDisabled: false,
+            syncBtnDisabled: false
+        };
     },
-    keys2() {
-      return Object.keys(this.detailInfo);
-    }
-  },
-  methods: {
-    async syncWxInfo() {
-      this.syncBtnDisabled = true;
-      const responseRaw = await this.$ajax.post(this.$urls.syncWxInfo);
-      const response = responseRaw.data;
-      if (response.code === 1) {
+    computed: {
+        keys1() {
+            return Object.keys(this.wxInfo);
+        },
+        keys2() {
+            return Object.keys(this.detailInfo);
+        },
+        renderJoinTime() {
+            return this.$joinTime(this.wxInfo.joinTime);
+        }
+    },
+    methods: {
+        async syncWxInfo() {
+            this.syncBtnDisabled = true;
+            const responseRaw = await this.$ajax.post(this.$urls.syncWxInfo);
+            const response = responseRaw.data;
+            if (response.code === 1) {
+                this.renderInfo();
+                this.$notification.open({
+                    message: "资料同步请求已发送",
+                    description:
+                        "请耐心等待片刻，系统正在异步与微信服务器进行信息同步……",
+                    icon: <a-icon type="smile" style="color: #108ee9" />
+                });
+            } else {
+                const modal = this.$error();
+                modal.update({
+                    title: "同步错误",
+                    content: response.msg
+                });
+            }
+            this.syncBtnDisabled = false;
+        },
+        async renderInfo() {
+            const responseRaw = await this.$ajax.get(this.$urls.myInfo);
+            if (responseRaw.data.code !== 1) {
+                return this.$store.dispatch("checkLoginStatus");
+            }
+
+            const response = responseRaw.data.msg.user;
+
+            this.keys1.forEach(item => {
+                this.wxInfo[item] = response[item];
+            });
+
+            this.keys2.forEach(item => {
+                this.detailInfo[item] = response[item];
+            });
+        },
+        async updateInfo() {
+            this.updateBtnDisabled = true;
+            const responseRaw = await this.$ajax.post(
+                this.$urls.updateMyInfo,
+                this.detailInfo
+            );
+            const response = responseRaw.data;
+            if (response.code === 1) {
+                this.$notification.open({
+                    message: "资料设定",
+                    description: "资料设定成功！",
+                    icon: <a-icon type="smile" style="color: #108ee9" />
+                });
+            } else {
+                const modal = this.$error();
+                modal.update({
+                    title: "设置错误",
+                    content: response.msg
+                });
+            }
+            this.updateBtnDisabled = false;
+        }
+    },
+    mounted() {
         this.renderInfo();
-        this.$notification.open({
-          message: "资料同步",
-          description: "资料同步成功！",
-          icon: <a-icon type="smile" style="color: #108ee9" />
-        });
-      } else {
-        const modal = this.$error();
-        modal.update({
-          title: "同步错误",
-          content: response.msg
-        });
-      }
-      this.syncBtnDisabled = false;
-    },
-    async renderInfo() {
-      const responseRaw = await this.$ajax.get(this.$urls.myInfo);
-      if (responseRaw.data.code !== 1) {
-        return this.$store.dispatch("checkLoginStatus");
-      }
-
-      const response = responseRaw.data.msg.user;
-
-      this.keys1.forEach(item => {
-        this.wxInfo[item] = response[item];
-      });
-
-      this.keys2.forEach(item => {
-        this.detailInfo[item] = response[item];
-      });
-    },
-    async updateInfo() {
-      this.updateBtnDisabled = true;
-      const responseRaw = await this.$ajax.post(
-        this.$urls.updateMyInfo,
-        this.detailInfo
-      );
-      const response = responseRaw.data;
-      if (response.code === 1) {
-        this.$notification.open({
-          message: "资料设定",
-          description: "资料设定成功！",
-          icon: <a-icon type="smile" style="color: #108ee9" />
-        });
-      } else {
-        const modal = this.$error();
-        modal.update({
-          title: "设置错误",
-          content: response.msg
-        });
-      }
-      this.updateBtnDisabled = false;
     }
-  },
-  mounted() {
-    this.renderInfo();
-  }
 };
 </script>
 <style scoped>
 .userMyWx span {
-  margin: 6px auto;
+    margin: 6px auto;
 }
 .submit-container {
-  text-align: center;
-  margin: 18px;
+    text-align: center;
+    margin: 18px;
 }
 </style>

@@ -1,6 +1,6 @@
 import { prisma, Message } from "../generated/prisma-client";
 import { Request, Response } from "express";
-import { verifyJWT } from "./check";
+import { verifyJWT, filterUserInfo } from "./check";
 import { pagesize } from "./consts";
 import { socketPushMessage } from "./socket";
 
@@ -82,11 +82,13 @@ export const messageIsRead = async function(req: Request, res: Response) {
         });
 
         if (!messageInfo) {
-            return res.json({ code: -1, msg: "此条消息不存在！" });
+            res.json({ code: -1, msg: "此条消息不存在！" });
+            return;
         }
 
         if (messageInfo.isRead) {
-            return res.json({ code: 1 });
+            res.json({ code: 1 });
+            return;
         }
 
         const messageToUserInfo = await prisma
@@ -96,7 +98,8 @@ export const messageIsRead = async function(req: Request, res: Response) {
             .toUser();
 
         if (!isAdmin && uid !== messageToUserInfo.id) {
-            return res.json({ code: -1, msg: "您无权操作此条消息。" });
+            res.json({ code: -1, msg: "您无权操作此条消息。" });
+            return;
         }
 
         await prisma.updateMessage({
@@ -112,7 +115,6 @@ export const messageIsRead = async function(req: Request, res: Response) {
     } catch (err) {
         res.json({ code: -1, msg: err.message });
     }
-    return 1;
 };
 
 export const messageList = async function(req: Request, res: Response) {
@@ -135,11 +137,13 @@ export const messageList = async function(req: Request, res: Response) {
         const result = await Promise.all(
             resultRAW.map(async item => ({
                 messageItem: item,
-                fromUser: await prisma
-                    .message({
-                        id: item.id
-                    })
-                    .fromUser()
+                fromUser: filterUserInfo(
+                    await prisma
+                        .message({
+                            id: item.id
+                        })
+                        .fromUser()
+                )
             }))
         );
         res.json({ code: 1, msg: result });
@@ -157,7 +161,8 @@ export const messageDelete = async function(req: Request, res: Response) {
         });
 
         if (!messageInfo) {
-            return res.json({ code: -1, msg: "此条消息不存在！" });
+            res.json({ code: -1, msg: "此条消息不存在！" });
+            return;
         }
 
         const messageToUserInfo = await prisma
@@ -167,7 +172,8 @@ export const messageDelete = async function(req: Request, res: Response) {
             .toUser();
 
         if (!isAdmin && uid !== messageToUserInfo.id) {
-            return res.json({ code: -1, msg: "您无权操作此条消息。" });
+            res.json({ code: -1, msg: "您无权操作此条消息。" });
+            return;
         }
 
         await prisma.deleteMessage({
@@ -178,7 +184,6 @@ export const messageDelete = async function(req: Request, res: Response) {
     } catch (err) {
         res.json({ code: -1, msg: err.message });
     }
-    return 1;
 };
 
 export const messageReadAll = async function(req: Request, res: Response) {

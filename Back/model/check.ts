@@ -3,17 +3,26 @@ import { secret, accessTokenURL, filterUserKeys, filterMyKeys } from "./consts";
 import * as crypto from "crypto";
 import { User } from "../generated/prisma-client";
 
+export const BACKEND_URL = process.env.BACKEND_URL;
+
 export interface JWTContent {
     uid: string;
     isAdmin: boolean;
     username: string;
 }
 
-type Omit<A, B extends keyof A> = Pick<A, { [K in keyof A]: K extends B ? never : K }[keyof A]>;
+type Omit<A, B extends keyof A> = Pick<
+    A,
+    { [K in keyof A]: K extends B ? never : K }[keyof A]
+>;
 export type MyUser = Omit<User, "password" | "userid">;
 export type OtherUser = Omit<User, "nickname" | "password" | "userid">;
 
-export const signJWT = function(uid: string, isAdmin: boolean, username: string) {
+export const signJWT = function(
+    uid: string,
+    isAdmin: boolean,
+    username: string
+) {
     return jwt.sign(
         {
             uid: uid,
@@ -59,12 +68,15 @@ export const getAccessToken = async function() {
     const accessTokenResponse = await fetch(accessTokenURL);
     const accessTokenResult = await accessTokenResponse.json();
     const accessToken = accessTokenResult.access_token;
-    return accessToken;
+    return accessToken as string;
 };
 
 export const filterUserInfo = function(user: User): OtherUser {
-    for (let key of filterUserKeys) {
-        delete (user as any)[key];
+    if (user) {
+        for (let key of filterUserKeys) {
+            delete (user as any)[key];
+        }
+        user.avatar = filterUserAvatar(user.avatar);
     }
     return user;
 };
@@ -73,6 +85,7 @@ export const filterMyInfo = function(user: User): MyUser {
     for (let key of filterMyKeys) {
         delete (user as any)[key];
     }
+    user.avatar = filterUserAvatar(user.avatar);
     return user;
 };
 
@@ -93,4 +106,12 @@ export const convertString = function(str: string): string {
         result += str[i];
     }
     return result;
+};
+
+export const filterUserAvatar = function(avatar: string) {
+    const UNIQUE_PREFIX = "unique://";
+    const prefix = avatar.substr(0, UNIQUE_PREFIX.length);
+    return prefix === UNIQUE_PREFIX
+        ? avatar.replace(/^unique\:\/\//g, `${BACKEND_URL}user/avatar/`)
+        : avatar.replace(/^http\:\/\//g, "https://");
 };

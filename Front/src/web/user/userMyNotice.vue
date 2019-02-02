@@ -15,23 +15,13 @@
     >
       <div slot="author" class="message-sender">
         <a-tag
-          :color="message.fromUser.isAdmin?'orange':'blue'"
+          :color="message.fromUser.isAdmin?'orange':'cyan'"
           @click="jumpToUser(message.fromUser.id)"
         >
           <a-icon :type="message.fromUser.isAdmin?'crown': 'user'"/>
           {{message.fromUser.username}}
         </a-tag>
-        <a-tag color="green">
-          <a-icon type="clock-circle"/>
-          {{getMessageHumandate(message.messageItem.createDate)}}
-        </a-tag>
         <div class="right-message">
-          <a-tag color="orange" class="message-read-status" v-if="message.messageItem.isRead">
-            <a-icon type="smile"/>&nbsp;已读
-          </a-tag>
-          <a-tag color="orange" class="message-read-status" v-else>
-            <a-icon type="eye"/>&nbsp;未读
-          </a-tag>
           <a-tag color="red" @click="deleteMessage(message.messageItem.id)">
             <a-icon type="scissor"/>&nbsp;删除
           </a-tag>
@@ -47,6 +37,14 @@
         @click="clickMessage(message.messageItem.id,message.messageItem.url)"
         :class="{'bold-message': !message.messageItem.isRead}"
       >{{message.messageItem.message}}</div>
+      <div class="message-status">
+        <div class="message-time">{{getMessageHumandate(message.messageItem.createDate)}}</div>
+        <div class="messasge-read-status">
+          <a-icon type="smile"/>
+          &nbsp;{{message.messageItem.isRead ? '已读':'未读'}}
+        </div>
+      </div>
+      <a-divider class="notice-divider"></a-divider>
     </a-comment>
     <div class="pagination" v-if="totalMessages > defaultPageSize">
       <a-pagination
@@ -60,179 +58,200 @@
 </template>
 <script>
 export default {
-  data() {
-    return {
-      messageList: [],
-      isReadDisabled: false,
-      deleteAllDisabled: false,
-      defaultPageSize: 20,
-      totalMessages: 0,
-      page: 1
-    };
-  },
-  methods: {
-    jumpToUser(uid) {
-      this.$router.push({
-        path: `/user/visit/${uid}`
-      });
+    data() {
+        return {
+            messageList: [],
+            isReadDisabled: false,
+            deleteAllDisabled: false,
+            defaultPageSize: 20,
+            totalMessages: 0,
+            page: 1
+        };
     },
-    pageOnchange(page) {
-      this.page = Number.parseInt(page);
-      this.$router.push({
-        path: `/user/my/notice/${page}`
-      });
-      this.getMessageList();
-    },
-    readAllMessagesHandle() {
-      if (confirm("是否要将全部消息设置为已读？")) {
-        this.readAllMessages();
-      }
-    },
-    deleteAllMessagesHandle() {
-      if (confirm("是否要将全部消息删除？")) {
-        this.deleteAllMessages();
-      }
-    },
-    getMessageHumandate(str) {
-      const date = new Date(str);
-      return this.$humanDate(date);
-    },
-    clickMessage(id, url) {
-      this.readMessage(id);
-      if (url !== null) {
-        this.$router.push({ path: url });
-      }
-    },
-    async getMessageList() {
-      this.$store.dispatch("updateUnreadMessage");
-      const messageCountResponseRaw = await this.$ajax.get(
-        this.$urls.messageCount
-      );
+    methods: {
+        jumpToUser(uid) {
+            this.$router.push({
+                path: `/user/visit/${uid}`
+            });
+        },
+        pageOnchange(page) {
+            this.page = Number.parseInt(page);
+            this.$router.push({
+                path: `/user/my/notice/${page}`
+            });
+            this.getMessageList();
+        },
+        readAllMessagesHandle() {
+            if (confirm("是否要将全部消息设置为已读？")) {
+                this.readAllMessages();
+            }
+        },
+        deleteAllMessagesHandle() {
+            if (confirm("是否要将全部消息删除？")) {
+                this.deleteAllMessages();
+            }
+        },
+        getMessageHumandate(str) {
+            const date = new Date(str);
+            return this.$humanDate(date);
+        },
+        clickMessage(id, url) {
+            this.readMessage(id);
+            if (url !== null) {
+                this.$router.push({ path: url });
+            }
+        },
+        async getMessageList() {
+            this.$store.dispatch("updateUnreadMessage");
+            const messageCountResponseRaw = await this.$ajax.get(
+                this.$urls.messageCount
+            );
 
-      if (messageCountResponseRaw.data.code !== 1) {
-        return this.$store.dispatch("checkLoginStatus");
-      }
-      this.totalMessages = Number.parseInt(
-        messageCountResponseRaw.data.msg.total
-      );
+            if (messageCountResponseRaw.data.code !== 1) {
+                return this.$store.dispatch("checkLoginStatus");
+            }
+            this.totalMessages = Number.parseInt(
+                messageCountResponseRaw.data.msg.total
+            );
 
-      const messageListResponseRaw = await this.$ajax.get(
-        this.$urls.messageList(this.page)
-      );
+            const messageListResponseRaw = await this.$ajax.get(
+                this.$urls.messageList(this.page)
+            );
 
-      if (messageListResponseRaw.data.code !== 1) {
-        return this.$store.dispatch("checkLoginStatus");
-      }
-      this.messageList = messageListResponseRaw.data.msg;
+            if (messageListResponseRaw.data.code !== 1) {
+                return this.$store.dispatch("checkLoginStatus");
+            }
+            this.messageList = messageListResponseRaw.data.msg;
+        },
+        async deleteMessage(mid) {
+            const responseRaw = await this.$ajax.post(
+                this.$urls.messageDelete(mid)
+            );
+            if (responseRaw.data.code !== 1) {
+                const modal = this.$error();
+                modal.update({
+                    title: "消息错误",
+                    content: responseRaw.data.msg
+                });
+            } else {
+                this.$notification.open({
+                    message: "消息",
+                    description: "消息已经全部删除！",
+                    icon: <a-icon type="mail" style="color: #108ee9" />
+                });
+                this.getMessageList();
+            }
+            this.$store.dispatch("updateUnreadMessage");
+        },
+        async readMessage(mid) {
+            await this.$ajax.post(this.$urls.messageRead(mid));
+            this.getMessageList();
+            this.$store.dispatch("updateUnreadMessage");
+        },
+        async readAllMessages(e) {
+            this.isReadDisabled = true;
+            const responseRaw = await this.$ajax.post(
+                this.$urls.messageReadAll
+            );
+            if (responseRaw.data.code !== 1) {
+                const modal = this.$error();
+                modal.update({
+                    title: "消息错误",
+                    content: responseRaw.data.msg
+                });
+            } else {
+                this.$notification.open({
+                    message: "消息",
+                    description: "消息已经全部设为已读！",
+                    icon: <a-icon type="mail" style="color: #108ee9" />
+                });
+                this.getMessageList();
+            }
+            this.$store.dispatch("updateUnreadMessage");
+            this.isReadDisabled = false;
+        },
+        async deleteAllMessages(e) {
+            this.deleteAllDisabled = true;
+            const responseRaw = await this.$ajax.post(
+                this.$urls.messageDeleteAll
+            );
+            if (responseRaw.data.code !== 1) {
+                const modal = this.$error();
+                modal.update({
+                    title: "消息错误",
+                    content: responseRaw.data.msg
+                });
+            } else {
+                this.$notification.open({
+                    message: "消息",
+                    description: "消息已经清空！",
+                    icon: <a-icon type="mail" style="color: #108ee9" />
+                });
+                this.getMessageList();
+            }
+            this.$store.dispatch("updateUnreadMessage");
+            this.deleteAllDisabled = false;
+        }
     },
-    async deleteMessage(mid) {
-      const responseRaw = await this.$ajax.post(this.$urls.messageDelete(mid));
-      if (responseRaw.data.code !== 1) {
-        const modal = this.$error();
-        modal.update({
-          title: "消息错误",
-          content: responseRaw.data.msg
-        });
-      } else {
-        this.$notification.open({
-          message: "消息",
-          description: "消息已经全部删除！",
-          icon: <a-icon type="mail" style="color: #108ee9" />
-        });
+    mounted() {
+        this.page = Number.parseInt(this.$route.params.page);
         this.getMessageList();
-      }
-      this.$store.dispatch("updateUnreadMessage");
-    },
-    async readMessage(mid) {
-      await this.$ajax.post(this.$urls.messageRead(mid));
-      this.getMessageList();
-      this.$store.dispatch("updateUnreadMessage");
-    },
-    async readAllMessages(e) {
-      this.isReadDisabled = true;
-      const responseRaw = await this.$ajax.post(this.$urls.messageReadAll);
-      if (responseRaw.data.code !== 1) {
-        const modal = this.$error();
-        modal.update({
-          title: "消息错误",
-          content: responseRaw.data.msg
-        });
-      } else {
-        this.$notification.open({
-          message: "消息",
-          description: "消息已经全部设为已读！",
-          icon: <a-icon type="mail" style="color: #108ee9" />
-        });
-        this.getMessageList();
-      }
-      this.$store.dispatch("updateUnreadMessage");
-      this.isReadDisabled = false;
-    },
-    async deleteAllMessages(e) {
-      this.deleteAllDisabled = true;
-      const responseRaw = await this.$ajax.post(this.$urls.messageDeleteAll);
-      if (responseRaw.data.code !== 1) {
-        const modal = this.$error();
-        modal.update({
-          title: "消息错误",
-          content: responseRaw.data.msg
-        });
-      } else {
-        this.$notification.open({
-          message: "消息",
-          description: "消息已经清空！",
-          icon: <a-icon type="mail" style="color: #108ee9" />
-        });
-        this.getMessageList();
-      }
-      this.$store.dispatch("updateUnreadMessage");
-      this.deleteAllDisabled = false;
     }
-  },
-  mounted() {
-    this.page = Number.parseInt(this.$route.params.page);
-    this.getMessageList();
-  }
 };
 </script>
 <style scoped>
 .message-item {
-  cursor: pointer;
+    cursor: pointer;
 }
 .message-sender {
-  font-size: 14px;
+    font-size: 14px;
 }
 .user-my-notice-control {
-  margin-top: 18px;
-  position: relative;
+    margin-top: 18px;
+    position: relative;
 }
 .user-my-notice-btn-container {
-  text-align: right;
-  position: absolute;
-  display: inline-block;
-  right: 0;
+    text-align: right;
+    position: absolute;
+    display: inline-block;
+    right: 0;
 }
 .user-my-notice-control h3 {
-  display: inline-block;
+    display: inline-block;
 }
 .user-my-notice {
-  position: relative;
+    position: relative;
 }
 .user-my-notice-control {
-  user-select: none;
+    user-select: none;
 }
 .right-message {
-  display: inline-block;
-  position: absolute;
-  right: 0;
-  top: 0;
+    display: inline-block;
+    position: absolute;
+    right: 0;
+    top: 0;
 }
 @media screen and (max-width: 800px) {
-  .message-read-status {
-    display: none;
-  }
+    .message-read-status {
+        display: none;
+    }
 }
 .bold-message {
-  font-weight: 700;
+    font-weight: 700;
+}
+.notice-divider {
+    margin: 0 0 6px 0;
+}
+.message-status {
+    font-size: 12px;
+    color: #999;
+    user-select: none;
+    cursor: default;
+    position: relative;
+}
+.messasge-read-status {
+    top: 0;
+    right: 12px;
+    position: absolute;
 }
 </style>

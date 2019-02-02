@@ -1,5 +1,5 @@
 import { prisma, Group, User } from "../generated/prisma-client";
-import { verifyJWT } from "./check";
+import { verifyJWT, filterUsersInfo } from "./check";
 import { Request, Response } from "express";
 
 export const groupUser = async function(req: Request, res: Response) {
@@ -59,7 +59,10 @@ export const groupUserList = async function(req: Request, res: Response) {
         const groupInfo = await prisma.group({
             id: gid
         });
-        res.json({ code: 1, msg: { list: groupUserList, info: groupInfo } });
+        res.json({
+            code: 1,
+            msg: { list: filterUsersInfo(groupUserList), info: groupInfo }
+        });
     } catch (err) {
         res.json({ code: -1, msg: err.message });
     }

@@ -35,19 +35,24 @@ export const reportCreate = async function(req: Request, res: Response) {
         } = req.body;
 
         if (time.length === 0 || time.length >= 50) {
-            return res.json({ code: -1, msg: "学习时间长度限制0~50字！" });
+            res.json({ code: -1, msg: "学习时间长度限制0~50字！" });
+            return ;
         }
         if (content.length === 0 || content.length >= 500) {
-            return res.json({ code: -1, msg: "学习内容长度限制0~500字！" });
+            res.json({ code: -1, msg: "学习内容长度限制0~500字！" });
+            return ;
         }
         if (content.length === 0 || content.length >= 500) {
-            return res.json({ code: -1, msg: "学习计划长度限制0~500字！" });
+            res.json({ code: -1, msg: "学习计划长度限制0~500字！" });
+            return ;
         }
         if (solution.length === 0 || solution.length >= 500) {
-            return res.json({ code: -1, msg: "解决问题长度限制0~500字！" });
+            res.json({ code: -1, msg: "解决问题长度限制0~500字！" });
+            return ;
         }
         if (conclusion.length === 0 || conclusion.length >= 500) {
-            return res.json({ code: -1, msg: "学习总结长度限制0~500字！" });
+            res.json({ code: -1, msg: "学习总结长度限制0~500字！" });
+            return ;
         }
 
         const isWeek: boolean = isWeekReport === "1";
@@ -60,10 +65,11 @@ export const reportCreate = async function(req: Request, res: Response) {
                 (5 * 24 * 60 * 60).toString()
             );
             if (!resultLock) {
-                return res.json({
+                res.json({
                     code: -1,
                     msg: "每5天只能发表一篇Weekly Report！"
                 });
+                return ;
             }
         } else {
             //Daily Report
@@ -76,10 +82,11 @@ export const reportCreate = async function(req: Request, res: Response) {
                 ).toString()
             );
             if (!resultLock) {
-                return res.json({
+                res.json({
                     code: -1,
                     msg: "每天只能发表一篇Daily Report！"
                 });
+                return ;
             }
         }
 
@@ -117,7 +124,6 @@ export const reportCreate = async function(req: Request, res: Response) {
     } catch (e) {
         res.json({ code: -1, msg: e.message });
     }
-    return 1;
 };
 
 export const reportCanPost = async function(req: Request, res: Response) {
@@ -147,7 +153,8 @@ export const reportInfo = async function(req: Request, res: Response) {
         const reportCache = await redisClientGetAsync(`report:${rid}`);
 
         if (reportCache === null) {
-            return res.json({ code: -1, msg: "该Report无法编辑！" });
+            res.json({ code: -1, msg: "该Report无法编辑！" });
+            return ;
         }
 
         const reportInfo = await prisma.report({
@@ -165,14 +172,16 @@ export const reportInfo = async function(req: Request, res: Response) {
             new Date(reportInfo.createDate).getTime() < todayFirstTimeStamp &&
             !isAdmin
         ) {
-            return res.json({
+           res.json({
                 code: 1,
                 msg: "该Report仅限当天更改！如果您想更改，请联系管理员！"
             });
+            return ;
         }
 
         if (!isAdmin && uid !== reportAuthor.id) {
-            return res.json({ code: -1, msg: "您无权编辑此Report！" });
+           res.json({ code: -1, msg: "您无权编辑此Report！" });
+           return ;
         }
 
         res.json({
@@ -182,7 +191,6 @@ export const reportInfo = async function(req: Request, res: Response) {
     } catch (e) {
         res.json({ code: -1, msg: e.message });
     }
-    return 1;
 };
 
 export const reportGraph = async function(req: Request, res: Response) {
@@ -202,7 +210,8 @@ export const reportGraph = async function(req: Request, res: Response) {
             const nowYear = new Date().getFullYear();
             const allowYear = [1, 2, 3];
             if (!allowYear.some(item => item === yearNumber)) {
-                return res.json({ code: -1, msg: "Cannot Support Year" });
+                res.json({ code: -1, msg: "年份过早！" });
+                return ;
             }
             beginDateRaw.setFullYear(nowYear + yearNumber * -1, 11, 31);
         }
@@ -233,7 +242,6 @@ export const reportGraph = async function(req: Request, res: Response) {
     } catch (e) {
         res.json({ code: -1, msg: e.message });
     }
-    return 1;
 };
 
 export const reportList = async function(req: Request, res: Response) {
@@ -276,7 +284,8 @@ export const reportUpdate = async function(req: Request, res: Response) {
         const reportCache = await redisClientGetAsync(`report:${rid}`);
 
         if (reportCache === null) {
-            return res.json({ code: -1, msg: "该Report无法编辑！" });
+            res.json({ code: -1, msg: "该Report无法编辑！" });
+            return ;
         }
 
         const reportInfo = await prisma.report({
@@ -294,14 +303,16 @@ export const reportUpdate = async function(req: Request, res: Response) {
             new Date(reportInfo.createDate).getTime() < todayFirstTimeStamp &&
             !isAdmin
         ) {
-            return res.json({
+            res.json({
                 code: 1,
                 msg: "该Report仅限当天更改！如果您想更改，请联系管理员！"
             });
+            return ;
         }
 
         if (!isAdmin && uid !== reportAuthor.id) {
-            return res.json({ code: -1, msg: "您无权编辑此Report！" });
+            res.json({ code: -1, msg: "您无权编辑此Report！" });
+            return ;
         }
 
         const message = REPORT_TEMPLATE(
@@ -336,5 +347,4 @@ export const reportUpdate = async function(req: Request, res: Response) {
     } catch (e) {
         res.json({ code: -1, msg: e.message });
     }
-    return 1;
 };

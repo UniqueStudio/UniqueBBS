@@ -1,15 +1,20 @@
 import { Request, Response } from "express";
 import * as parser from "fast-xml-parser";
-import { wxMsgToken, wxMsgAESKEY, wxAppID } from "./consts";
+import { wxMsgToken, wxMsgAESKEY, wxAppID, userInfoURL } from "./consts";
 import { prisma } from "../generated/prisma-client";
-const WXCrypto = require("./module/wx.class")
+import downloadImg from "../utils/downloadImg";
+import processJoinTime from "../utils/processJoinTime";
+import * as fs from "fs";
+import { getAccessToken } from "./check";
+
+const WXCrypto = require("./module/wx.class");
 const wxCrypto = new WXCrypto(wxMsgToken, wxMsgAESKEY, wxAppID);
 
 const WX_CREATE_USER = "create_user";
 const WX_UPDATE_USER = "update_user";
 const WX_DELETE_USER = "delete_user";
 
-interface userInfo {
+interface UserInfo {
     Name: string;
     Department: Array<string>;
     IsLeaderInDept: Array<string>;
@@ -19,13 +24,20 @@ interface userInfo {
     UserID: string;
 }
 
+const avatarPath =
+    process.env.MODE === "DEV" ? `./upload/avatar` : `/var/bbs/upload/avatar`;
+
 export const wechatHandleMessage = async function(req: Request, res: Response) {
     try {
         const { msg_signature, timestamp, nonce } = req.query;
         const receiveJSON = parser.parse(req.body);
         const encrypt_msg = receiveJSON.xml.Encrypt;
 
-        const check_msg_signature = wxCrypto.encrypt(timestamp, nonce, encrypt_msg);
+        const check_msg_signature = wxCrypto.encrypt(
+            timestamp,
+            nonce,
+            encrypt_msg
+        );
         if (msg_signature === check_msg_signature) {
             const decrypt_msg = wxCrypto.decrypt(encrypt_msg);
 
@@ -33,7 +45,7 @@ export const wechatHandleMessage = async function(req: Request, res: Response) {
             const changeType = decryptJSON.xml.ChangeType;
             const data = decryptJSON.xml;
 
-            const userInfo: userInfo = {
+            const userInfo: UserInfo = {
                 Name: data.Name,
                 Department: data.Department.split(","),
                 IsLeaderInDept: data.IsLeaderInDept.split(","),
@@ -45,13 +57,13 @@ export const wechatHandleMessage = async function(req: Request, res: Response) {
 
             switch (changeType) {
                 case WX_CREATE_USER:
-                    await createUser(userInfo);
+                    createUser(userInfo);
                     break;
                 case WX_UPDATE_USER:
-                    await updateUser(userInfo);
+                    updateUser(userInfo);
                     break;
                 case WX_DELETE_USER:
-                    await deleteUser(decryptJSON.xml.UserID);
+                    deleteUser(decryptJSON.xml.UserID);
                     break;
             }
 
@@ -79,21 +91,29 @@ export const wechatHandleCheck = async function(req: Request, res: Response) {
     }
 };
 
-const createUser = async function(userInfo: userInfo) {
+const createUser = async function(userInfo: UserInfo) {
     const groupList = userInfo.Department.map(item => ({
         key: Number.parseInt(item)
     }));
+
+    await downloadImg(
+        userInfo.Avatar,
+        `${avatarPath}/${userInfo.UserID}.avatar`
+    );
     const user = await prisma.createUser({
         userid: userInfo.UserID,
         username: userInfo.Name,
         lastLogin: new Date(),
         email: userInfo.Email,
         mobile: userInfo.Mobile,
-        avatar: userInfo.Avatar,
+        avatar: `unique://${userInfo.UserID}`,
         group: {
             connect: groupList
         }
     });
+
+    await getUserJoinTime(user.id, userInfo.UserID);
+
     userInfo.IsLeaderInDept.forEach(async (item, index) => {
         if (item === "1") {
             const key = groupList[index].key;
@@ -111,7 +131,12 @@ const createUser = async function(userInfo: userInfo) {
     });
 };
 
-const updateUser = async function(userInfo: userInfo) {
+const updateUser = async function(userInfo: UserInfo) {
+    await downloadImg(
+        userInfo.Avatar,
+        `${avatarPath}/${userInfo.UserID}.avatar`
+    );
+
     const groupList = userInfo.Department.map(item => ({
         key: Number.parseInt(item)
     }));
@@ -124,12 +149,15 @@ const updateUser = async function(userInfo: userInfo) {
             lastLogin: new Date(),
             email: userInfo.Email,
             mobile: userInfo.Mobile,
-            avatar: userInfo.Avatar,
+            avatar: `unique://${userInfo.UserID}`,
             group: {
                 connect: groupList
             }
         }
     });
+
+    await getUserJoinTime(user.id, userInfo.UserID);
+
     userInfo.IsLeaderInDept.forEach(async (item, index) => {
         if (item === "1") {
             const key = groupList[index].key;
@@ -148,6 +176,14 @@ const updateUser = async function(userInfo: userInfo) {
 };
 
 const deleteUser = async function(UserID: string) {
+    try {
+        if (fs.existsSync(`${avatarPath}/${UserID}.avatar`)) {
+            fs.unlinkSync(`${avatarPath}/${UserID}.avatar`);
+        }
+    } catch (e) {
+        console.log(e.message);
+    }
+
     await prisma.updateUser({
         where: {
             userid: UserID
@@ -156,4 +192,24 @@ const deleteUser = async function(UserID: string) {
             active: false
         }
     });
+};
+
+const getUserJoinTime = async function(id: string, userid: string) {
+    try {
+        const accessToken = await getAccessToken();
+        const userInfoResponse = await fetch(userInfoURL(accessToken, userid));
+        const userInfo = await userInfoResponse.json();
+        if (userInfo) {
+            await prisma.updateUser({
+                where: {
+                    id: id
+                },
+                data: {
+                    joinTime: processJoinTime(userInfo)
+                }
+            });
+        }
+    } catch (e) {
+        console.log(e);
+    }
 };

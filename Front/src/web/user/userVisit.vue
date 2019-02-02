@@ -9,7 +9,7 @@
     <div class="avatar-container">
       <a-avatar shape="circle" :src="userDatas.avatar" class="avatar-img" size="large"></a-avatar>
     </div>
-    <h2 :style="{color: userDatas.isAdmin? 'orange': 'black'}">{{userDatas.username}}</h2>
+    <h2 :style="{color: userDatas.isAdmin? '#ff9800':'dodgerblue'}">{{userDatas.username}}</h2>
     <div class="group-container">
       <rabbit-tag v-if="userDatas.isAdmin" background="#EDABAB">管理员</rabbit-tag>
       <div v-for="group in groupList" :key="group.id" class="group-item">
@@ -26,6 +26,13 @@
     <report-graph :uid="uid" class="report-graph"></report-graph>
     <div class="user-detail-info">
       <a-input-group>
+        <a-input
+          addonBefore="加入"
+          readonly
+          :value="renderJoinTime"
+          size="large"
+          v-if="renderJoinTime !== ''"
+        />
         <a-input
           addonBefore="邮箱"
           readonly
@@ -108,7 +115,8 @@ export default {
                 signature: "",
                 lastLogin: "",
                 threads: 0,
-                isAdmin: false
+                isAdmin: false,
+                joinTime: ""
             },
             groupList: []
         };
@@ -116,6 +124,9 @@ export default {
     computed: {
         lastLoginHumanDate() {
             return this.$humanDate(new Date(this.userDatas.lastLogin));
+        },
+        renderJoinTime() {
+            return this.$joinTime(this.userDatas.joinTime);
         }
     },
     methods: {
