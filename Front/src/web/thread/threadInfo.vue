@@ -240,7 +240,7 @@
         :current="page"
         :defaultPageSize="defaultPageSize"
         :total="postCount"
-        @change="pageOnchange"
+        @change="handlePageOnchange"
       ></a-pagination>
     </div>
     <div class="thread-send-post">
@@ -342,6 +342,33 @@ export default {
                 localStorage.getItem("token")
             );
         },
+        async reply() {
+          this.btnDisabled = true;
+          const replyRepsonseRaw = await this.$ajax.post(
+                  this.$urls.threadReply,
+                  {
+                    tid: this.thread.id,
+                    quote: this.quote,
+                    message: this.replyInput
+                  }
+          );
+          if (replyRepsonseRaw.data.code === 1) {
+            this.$notification.open({
+              message: "回帖",
+              description: "回帖成功！",
+              icon: <a-icon type="smile" style="color: #108ee9" />
+          });
+            this.replyInput = "";
+            this.getThreadInfo();
+          } else {
+            const modal = this.$error();
+            modal.update({
+              title: "回帖错误",
+              content: replyRepsonseRaw.data.msg
+            });
+          }
+          this.btnDisabled = false;
+        },
         getTitle(attach) {
             let size = attach.filesize;
             let unit = "B";
@@ -358,7 +385,7 @@ export default {
                 attach.downloads
             }次\n大小:${size} ${unit}`;
         },
-        renderMessage(message) {
+        getMessage(message) {
             const regImgStr = /\!\[uniqueImg\]\(unique\:\/\/(.*?)\)/g;
             const token = localStorage.getItem("token");
             return this.$marked(
@@ -370,39 +397,6 @@ export default {
                 ),
                 { sanitize: true }
             );
-        },
-        pageOnchange(page) {
-            this.$router.push({
-                path: `/thread/info/${this.tid}/${page}`
-            });
-            this.getThreadInfo();
-        },
-        async reply() {
-            this.btnDisabled = true;
-            const replyRepsonseRaw = await this.$ajax.post(
-                this.$urls.threadReply,
-                {
-                    tid: this.thread.id,
-                    quote: this.quote,
-                    message: this.replyInput
-                }
-            );
-            if (replyRepsonseRaw.data.code === 1) {
-                this.$notification.open({
-                    message: "回帖",
-                    description: "回帖成功！",
-                    icon: <a-icon type="smile" style="color: #108ee9" />
-                });
-                this.replyInput = "";
-                this.getThreadInfo();
-            } else {
-                const modal = this.$error();
-                modal.update({
-                    title: "回帖错误",
-                    content: replyRepsonseRaw.data.msg
-                });
-            }
-            this.btnDisabled = false;
         },
         getHumanDate(str) {
             return this.$humanDate(new Date(str));
@@ -440,9 +434,9 @@ export default {
                 rawPostContent = data.postArr.map(item => item.post.message);
 
                 data.postArr = data.postArr.map(item => {
-                    item.post.message = this.renderMessage(item.post.message);
+                    item.post.message = this.getMessage(item.post.message);
                     if (item.quote) {
-                        item.quote.message = this.renderMessage(
+                        item.quote.message = this.getMessage(
                             item.quote.message
                         );
                     }
@@ -452,7 +446,7 @@ export default {
                 this.postList = data.postArr;
                 this.attachList = data.attachArr;
 
-                this.content = this.renderMessage(data.firstPost.message);
+                this.content = this.getMessage(data.firstPost.message);
             } else {
                 return this.$store.dispatch("checkLoginStatus");
             }
@@ -597,6 +591,12 @@ export default {
                 window.scrollTo(0, document.documentElement.scrollHeight);
                 document.querySelector("#replyContent").focus();
             }
+        },
+        handlePageOnchange(page) {
+          this.$router.push({
+            path: `/thread/info/${this.tid}/${page}`
+          });
+          this.getThreadInfo();
         },
         async postServer(url, obj) {
             const result = await this.$ajax.post(url, obj);

@@ -29,9 +29,9 @@
         <a-input
           addonBefore="加入"
           readonly
-          :value="renderJoinTime"
+          :value="getJoinTime"
           size="large"
-          v-if="renderJoinTime !== ''"
+          v-if="getJoinTime !== ''"
         />
         <a-input
           addonBefore="邮箱"
@@ -125,7 +125,7 @@ export default {
         lastLoginHumanDate() {
             return this.$humanDate(new Date(this.userDatas.lastLogin));
         },
-        renderJoinTime() {
+        getJoinTime() {
             return this.$joinTime(this.userDatas.joinTime);
         }
     },

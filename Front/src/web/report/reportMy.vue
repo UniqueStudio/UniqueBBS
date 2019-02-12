@@ -42,7 +42,7 @@
           :color="report.isWeek? 'orange' : 'blue'"
         >
           <div class="report-header">
-            <h3>{{renderDate(report.createDate)}}</h3>
+            <h3>{{getDate(report.createDate)}}</h3>
             <div class="report-header-btns">
               <router-link :to="'/report/update/'+report.id" v-if="showEditBtn(report.createDate)">
                 <a-tag color="blue">
@@ -54,7 +54,7 @@
               >{{report.isWeek? 'Weekly' : 'Daily'}}</rabbit-tag>
             </div>
           </div>
-          <div class="report-content" v-html="renderMessage(report.message)"></div>
+          <div class="report-content" v-html="getMessage(report.message)"></div>
         </a-timeline-item>
       </a-timeline>
     </div>
@@ -63,7 +63,7 @@
         :current="page"
         :defaultPageSize="defaultPageSize"
         :total="reportCount"
-        @change="pageOnchange"
+        @change="handlePageOnchange"
       ></a-pagination>
     </div>
   </div>
@@ -108,7 +108,7 @@ export default {
             this.page = Number.parseInt(this.$route.params.page);
             this.getData();
         },
-        renderDate(dateStr) {
+        getDate(dateStr) {
             const date = new Date(dateStr);
             const nowDate = new Date();
 
@@ -137,13 +137,13 @@ export default {
             const postDate = new Date(dataStr).getTime();
             return postDate > maxDate && this.mode === "my";
         },
-        renderMessage(message) {
+        getMessage(message) {
             return this.$marked(message, { sanitize: true });
         },
         userLink(uid) {
             return `/user/visit/${uid}`;
         },
-        pageOnchange(page) {
+        handlePageOnchange(page) {
             if (this.mode === "my") {
                 this.$router.push({
                     path: `/report/my/${page}`

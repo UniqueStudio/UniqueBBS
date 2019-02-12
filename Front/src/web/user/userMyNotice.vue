@@ -3,8 +3,8 @@
     <div class="user-my-notice-control">
       <h3>消息列表</h3>
       <div class="user-my-notice-btn-container" v-if="messageList.length > 0">
-        <a-button type="primary" @click="readAllMessagesHandle" :disabled="isReadDisabled">全部已读</a-button>
-        <a-button type="primary" @click="deleteAllMessagesHandle" :disabled="deleteAllDisabled">全部删除</a-button>
+        <a-button type="primary" @click="handleReadAllMessages" :disabled="isReadDisabled">全部已读</a-button>
+        <a-button type="primary" @click="handleDeleteAllMessages" :disabled="deleteAllDisabled">全部删除</a-button>
       </div>
     </div>
     <a-comment
@@ -34,7 +34,7 @@
       />
       <div
         slot="content"
-        @click="clickMessage(message.messageItem.id,message.messageItem.url)"
+        @click="handleClickMessage(message.messageItem.id,message.messageItem.url)"
         :class="{'bold-message': !message.messageItem.isRead}"
       >{{message.messageItem.message}}</div>
       <div class="message-status">
@@ -51,7 +51,7 @@
         :current="page"
         :defaultPageSize="defaultPageSize"
         :total="totalMessages"
-        @change="pageOnchange"
+        @change="handlePageOnChange"
       ></a-pagination>
     </div>
   </div>
@@ -74,32 +74,31 @@ export default {
                 path: `/user/visit/${uid}`
             });
         },
-        pageOnchange(page) {
+        handlePageOnChange(page) {
             this.page = Number.parseInt(page);
             this.$router.push({
                 path: `/user/my/notice/${page}`
             });
             this.getMessageList();
         },
-        readAllMessagesHandle() {
+        handleReadAllMessages() {
             if (confirm("是否要将全部消息设置为已读？")) {
                 this.readAllMessages();
             }
         },
-        deleteAllMessagesHandle() {
+        handleDeleteAllMessages() {
             if (confirm("是否要将全部消息删除？")) {
                 this.deleteAllMessages();
             }
         },
-        getMessageHumandate(str) {
-            const date = new Date(str);
-            return this.$humanDate(date);
-        },
-        clickMessage(id, url) {
+        handleClickMessage(id, url) {
             this.readMessage(id);
             if (url !== null) {
                 this.$router.push({ path: url });
             }
+        },
+        getMessageHumandate(str) {
+            return this.$humanDate(new Date(str));
         },
         async getMessageList() {
             this.$store.dispatch("updateUnreadMessage");

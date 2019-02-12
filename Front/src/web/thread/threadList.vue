@@ -73,7 +73,7 @@
           :current="page"
           :defaultPageSize="defaultPageSize"
           :total="forum.threads"
-          @change="pageOnchange"
+          @change="handlePageOnchange"
         ></a-pagination>
       </div>
     </div>
@@ -98,12 +98,6 @@ export default {
         };
     },
     methods: {
-        pageOnchange(page) {
-            this.$router.push({
-                path: `/thread/list/${this.fid}/${page}`
-            });
-            this.getData();
-        },
         humanDate(date) {
             return this.$humanDate(date);
         },
@@ -129,6 +123,12 @@ export default {
             } else {
                 this.$store.dispatch("checkLoginStatus");
             }
+        },
+        handlePageOnchange(page) {
+          this.$router.push({
+            path: `/thread/list/${this.fid}/${page}`
+          });
+          this.getData();
         }
     },
     activated() {

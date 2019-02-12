@@ -134,6 +134,29 @@ export default {
 
             this.isWeekReport = this.can.daily ? "0" : "1";
         },
+        async getReportInfo() {
+            const reportInfoRaw = await this.$ajax.get(
+                this.$urls.reportInfo(this.rid)
+            );
+            if (reportInfoRaw.data.code === 1) {
+                [
+                    "time",
+                    "content",
+                    "plan",
+                    "solution",
+                    "conclusion",
+                    "extra"
+                ].forEach(item => {
+                    this[item] = reportInfoRaw.data.msg[item];
+                });
+            } else {
+                const modal = this.$error();
+                modal.update({
+                    title: "Report错误",
+                    content: reportInfoRaw.data.msg
+                });
+            }
+        },
         async updateReport() {
             const updateReportRaw = await this.$ajax.post(
                 this.$urls.reportUpdate(this.rid),
@@ -160,29 +183,6 @@ export default {
                 modal.update({
                     title: "Report更新错误",
                     content: updateReportRaw.data.msg
-                });
-            }
-        },
-        async getReportInfo() {
-            const reportInfoRaw = await this.$ajax.get(
-                this.$urls.reportInfo(this.rid)
-            );
-            if (reportInfoRaw.data.code === 1) {
-                [
-                    "time",
-                    "content",
-                    "plan",
-                    "solution",
-                    "conclusion",
-                    "extra"
-                ].forEach(item => {
-                    this[item] = reportInfoRaw.data.msg[item];
-                });
-            } else {
-                const modal = this.$error();
-                modal.update({
-                    title: "Report错误",
-                    content: reportInfoRaw.data.msg
                 });
             }
         }

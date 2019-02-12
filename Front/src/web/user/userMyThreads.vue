@@ -27,7 +27,7 @@
         :current="page"
         :defaultPageSize="defaultPageSize"
         :total="all"
-        @change="pageOnchange"
+        @change="handlePageOnchange"
       ></a-pagination>
     </div>
   </div>
@@ -43,13 +43,21 @@ export default {
         };
     },
     methods: {
-        pageOnchange(page) {
+        handlePageOnchange(page) {
             this.$router.push({
                 path: `/user/my/threads/${page}`
             });
             this.getMyThreadList();
         },
-        renderMessage(message) {
+        handleAtClick(e) {
+            if (e.target.dataset.router === "1") {
+                e.preventDefault();
+                this.$router.push({
+                    path: e.target.dataset.href
+                });
+            }
+        },
+        getMessage(message) {
             const regImgStr = /\!\[uniqueImg\]\(unique\:\/\/(.*?)\)/g;
             const token = localStorage.getItem("token");
             return this.$marked(
@@ -76,7 +84,7 @@ export default {
             const rawPostList = list.map(item => item.post.message);
 
             this.postList = list.map(item => {
-                item.post.message = this.renderMessage(item.post.message);
+                item.post.message = this.getMessage(item.post.message);
                 return item;
             });
 
@@ -117,14 +125,6 @@ export default {
         getHumanDate(str) {
             const date = new Date(str);
             return this.$humanDate(date);
-        },
-        handleAtClick(e) {
-            if (e.target.dataset.router === "1") {
-                e.preventDefault();
-                this.$router.push({
-                    path: e.target.dataset.href
-                });
-            }
         }
     },
     mounted() {

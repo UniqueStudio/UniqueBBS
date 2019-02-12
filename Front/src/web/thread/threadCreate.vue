@@ -149,6 +149,68 @@ export default {
             }
             this.showAttachList = true;
         },
+        async getForumList() {
+          const threadListReponseRaw = await this.$ajax.get(
+                  this.$urls.forumListSimple
+          );
+          if (threadListReponseRaw.data.code !== 1) {
+            return this.$store.dispatch("checkLoginStatus");
+          }
+          this.forumList = threadListReponseRaw.data.msg;
+
+          if (this.$route.params.fid) {
+            this.fid = this.$route.params.fid;
+          } else {
+            this.fid = this.forumList[0].id;
+          }
+        },
+        async getThreadInfo(tid) {
+          await this.$ajax.get(this.$urls.attachExpire(tid));
+          const threadInfoRaw = await this.$ajax.get(
+                  this.$urls.threadInfo(tid, 1)
+          );
+          if (threadInfoRaw.data.code !== 1) {
+            const modal = this.$error();
+            modal.update({
+              title: "错误",
+              content: threadInfoRaw.data.msg
+            });
+            return;
+          }
+          this.fid = threadInfoRaw.data.msg.forumInfo.id;
+          this.subject = threadInfoRaw.data.msg.threadInfo.subject;
+
+          const regImgStr = /\!\[uniqueImg\]\(unique\:\/\/(.*?)\)/g;
+          this.message = threadInfoRaw.data.msg.firstPost.message.replace(
+                  regImgStr,
+                  `![uniqueImg](${this.$urls.domain}attach/preview/$1)`
+          );
+
+          this.attachList = threadInfoRaw.data.msg.attachArr.map(item => ({
+            uid: item.id,
+            response: {
+              code: 1,
+              msg: item.id
+            },
+            name: item.originalName,
+            status: "done"
+          }));
+
+          this.getAttachList();
+        },
+        async getReplyInfo(pid) {
+          const replyInfoRaw = await this.$ajax.get(this.$urls.postInfo(pid));
+          if (replyInfoRaw.data.code !== 1) {
+            const modal = this.$error();
+            modal.update({
+              title: "错误",
+              content: replyInfoRaw.data.msg
+            });
+            return;
+          }
+          this.message = replyInfoRaw.data.msg.message;
+          this.pid = replyInfoRaw.data.msg.id;
+        },
         async deleteAttach(aid) {
             const response = await this.$ajax.post(
                 this.$urls.attachRemove(aid)
@@ -159,21 +221,6 @@ export default {
                 this.deleteAttach(file.response.msg);
             }
             this.attachList = fileList;
-        },
-        async getForumList() {
-            const threadListReponseRaw = await this.$ajax.get(
-                this.$urls.forumListSimple
-            );
-            if (threadListReponseRaw.data.code !== 1) {
-                return this.$store.dispatch("checkLoginStatus");
-            }
-            this.forumList = threadListReponseRaw.data.msg;
-
-            if (this.$route.params.fid) {
-                this.fid = this.$route.params.fid;
-            } else {
-                this.fid = this.forumList[0].id;
-            }
         },
         handleBtnClick() {
             this.btnDisabled = true;
@@ -247,40 +294,6 @@ export default {
             }
             this.btnDisabled = false;
         },
-        async getThreadInfo(tid) {
-            await this.$ajax.get(this.$urls.attachExpire(tid));
-            const threadInfoRaw = await this.$ajax.get(
-                this.$urls.threadInfo(tid, 1)
-            );
-            if (threadInfoRaw.data.code !== 1) {
-                const modal = this.$error();
-                modal.update({
-                    title: "错误",
-                    content: threadInfoRaw.data.msg
-                });
-                return;
-            }
-            this.fid = threadInfoRaw.data.msg.forumInfo.id;
-            this.subject = threadInfoRaw.data.msg.threadInfo.subject;
-
-            const regImgStr = /\!\[uniqueImg\]\(unique\:\/\/(.*?)\)/g;
-            this.message = threadInfoRaw.data.msg.firstPost.message.replace(
-                regImgStr,
-                `![uniqueImg](${this.$urls.domain}attach/preview/$1)`
-            );
-
-            this.attachList = threadInfoRaw.data.msg.attachArr.map(item => ({
-                uid: item.id,
-                response: {
-                    code: 1,
-                    msg: item.id
-                },
-                name: item.originalName,
-                status: "done"
-            }));
-
-            this.getAttachList();
-        },
         async updatePost() {
             const updatePostInfoRaw = await this.$ajax.post(
                 this.$urls.postUpdate(this.pid),
@@ -306,19 +319,6 @@ export default {
                 });
             }
             this.btnDisabled = false;
-        },
-        async getReplyInfo(pid) {
-            const replyInfoRaw = await this.$ajax.get(this.$urls.postInfo(pid));
-            if (replyInfoRaw.data.code !== 1) {
-                const modal = this.$error();
-                modal.update({
-                    title: "错误",
-                    content: replyInfoRaw.data.msg
-                });
-                return;
-            }
-            this.message = replyInfoRaw.data.msg.message;
-            this.pid = replyInfoRaw.data.msg.id;
         }
     },
     mounted() {

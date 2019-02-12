@@ -67,7 +67,7 @@ export default {
             const responseRaw = await this.$ajax.post(this.$urls.syncWxInfo);
             const response = responseRaw.data;
             if (response.code === 1) {
-                this.renderInfo();
+                this.getInfo();
                 this.$notification.open({
                     message: "资料同步请求已发送",
                     description:
@@ -83,7 +83,7 @@ export default {
             }
             this.syncBtnDisabled = false;
         },
-        async renderInfo() {
+        async getInfo() {
             const responseRaw = await this.$ajax.get(this.$urls.myInfo);
             if (responseRaw.data.code !== 1) {
                 return this.$store.dispatch("checkLoginStatus");
@@ -123,7 +123,7 @@ export default {
         }
     },
     mounted() {
-        this.renderInfo();
+        this.getInfo();
     }
 };
 </script>
