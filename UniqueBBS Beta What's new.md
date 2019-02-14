@@ -1,5 +1,10 @@
 # Unique BBS What's new
 
+### 20190212 Beta 2
+
+-   重构部分前端 VUE 组件的 命名，更加统一规范
+-   更改 docker-compose
+
 ### 20190202 Beta version
 
 -   取缔 return 1 这种写法
