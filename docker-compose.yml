@@ -1,4 +1,4 @@
-version: "2"
+version: "3"
 services:
     bbs_front:
         build:
@@ -25,7 +25,7 @@ services:
             - prisma
             - redis
     prisma:
-        image: prismagraphql/prisma:1.21
+        image: prismagraphql/prisma:1.24
         environment:
             PRISMA_CONFIG: |-
                 port: 4466
@@ -35,7 +35,7 @@ services:
                     host: mysql
                     port: 3306
                     user: root
-                    password: P@ssw0rd
+                    password: prisma
                     migrations: true
         stdin_open: true
         tty: true
@@ -44,7 +44,7 @@ services:
     mysql:
         image: mysql:5.7
         environment:
-            MYSQL_ROOT_PASSWORD: P@ssw0rd
+            MYSQL_ROOT_PASSWORD: prisma
         stdin_open: true
         tty: true
     redis:
