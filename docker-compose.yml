@@ -22,8 +22,8 @@ services:
       - WXSECRET
       - AGENTID
       - PRISMA_ENDPOINT
-      - NODE_ENV
-      - MODE
+      - NODE_ENV=production
+      - MODE=production
       - BACKEND_URL
 
       # ⚠️: The value of the these variables in the container
