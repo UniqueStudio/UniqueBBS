@@ -5,11 +5,31 @@ services:
             context: ./Front
             dockerfile: Dockerfile
             args:
-                domain: https://hustunique.com:7010/
+                domain: https://newbbs.hustunique.com/
+            # ⚠️: This is build arg, this value will be request
+            # endpoint of front part of UniqueBBS
         ports:
             - 7080:80
     bbs:
         build: ./
+        env_file:
+          - .env
+        environment:
+          - SECRET
+          - WXMSGTOKEN
+          - WXMSGAESKEY
+          - APPID
+          - WXSECRET
+          - AGENTID
+          - PRISMA_ENDPOINT
+          - NODE_ENV
+          - MODE
+          - BACKEND_URL
+
+          # ⚠️: The value of the these variables in the container
+          # are taken from the value for the same variables in the
+          # shell in which docker-compose is run.
+
         ports:
             - 7010:7010
             - 7011:7011
@@ -17,9 +37,7 @@ services:
             - run
             - init
         volumes:
-            - ../files:/var/bbs
-            - ./server.key:/usr/src/app/server.key
-            - ./server.crt:/usr/src/app/server.crt
+            - bbs:/var/bbs
         restart: always
         depends_on:
             - prisma
@@ -39,15 +57,16 @@ services:
                     migrations: true
         stdin_open: true
         tty: true
-        depends_on:
-            - mysql
     mysql:
         image: mysql:5.7
         environment:
             MYSQL_ROOT_PASSWORD: prisma
         stdin_open: true
         tty: true
+        volumes:
+            - mysql:/var/lib/mysql
     redis:
         image: redis
         stdin_open: true
         tty: true
+volumes:
