@@ -22,6 +22,15 @@ async function downloadImg(url: string, path: string) {
 }
 
 async function install() {
+    if (
+        !fs.existsSync(
+             process.env.mode === "DEV" ? `./upload` : `/var/bbs/upload`
+        )
+    )
+        fs.mkdirSync(
+             process.env.mode === "DEV" ? `./upload` : `/var/bbs/upload`
+        );
+    
     await updateGroup();
     await getUser();
 
@@ -287,14 +296,7 @@ async function install() {
                 process.env.mode === "DEV"
                     ? `./upload/${dirName}`
                     : `/var/bbs/upload/${dirName}`;
-            if (
-                !fs.existsSync(
-                    process.env.mode === "DEV" ? `./upload` : `/var/bbs/upload`
-                )
-            )
-                fs.mkdirSync(
-                    process.env.mode === "DEV" ? `./upload` : `/var/bbs/upload`
-                );
+            
             const newPath = `${newDir}/migration_${new Date()
                 .getTime()
                 .toString()}_${imageOffset}.rabbit`;
