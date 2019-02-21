@@ -1,5 +1,5 @@
 import { prisma } from "../generated/prisma-client";
-import * as fs from "fs";
+import fs from "fs";
 import fetch from "node-fetch";
 
 const DOWNLOAD_FILE_PREFIX = "https://bbs.hustunique.com/";

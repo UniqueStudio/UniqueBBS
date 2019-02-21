@@ -1,4 +1,4 @@
-import * as fs from "fs";
+import fs from "fs";
 import fetch from "node-fetch";
 
 export default async function downloadImg(url: string, path: string) {

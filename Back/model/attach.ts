@@ -4,7 +4,7 @@ import { prisma } from "../generated/prisma-client";
 import { redLock, redisClientDelAsync, MODE } from "../server";
 import { filterCalculate } from "./filter";
 import { setLockExpire, getLockStatus } from "./lock";
-import * as fs from "fs";
+import fs from "fs";
 
 export const fileUpload = async function(req: Request, res: Response) {
     const fileItem = req.file;

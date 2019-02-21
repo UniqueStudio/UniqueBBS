@@ -5,9 +5,9 @@ services:
             context: ./Front
             dockerfile: Dockerfile
             args:
-                domain: http://localhost:7010/
+                domain: https://hustunique.com:7010/
         ports:
-            - 8080:80
+            - 7080:80
     bbs:
         build: ./
         ports:
@@ -17,7 +17,9 @@ services:
             - run
             - init
         volumes:
-            - /Users/faraway/Desktop/UniqueBBS/tmp:/var/bbs
+            - ../files:/var/bbs
+            - ./server.key:/usr/src/app/server.key
+            - ./server.crt:/usr/src/app/server.crt
         restart: always
         depends_on:
             - prisma

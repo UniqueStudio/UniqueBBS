@@ -1,7 +1,7 @@
 // import { prisma, User, Group, Forum } from "./generated/prisma-client"
 import { updateGroup } from "./utils/getGroup";
 import { getUser } from "./utils/getUser";
-import * as readline from "readline";
+import readline from "readline";
 
 async function install() {
     const input = readline.createInterface({
