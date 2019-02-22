@@ -1,13 +1,14 @@
 require("dotenv").config();
 
-import * as express from "express";
-import * as bodyParser from "body-parser";
-import * as Redis from "redis";
-import * as Redlock from "redlock";
+import express from "express";
+import bodyParser from "body-parser";
+import Redis from "redis";
+import Redlock from "redlock";
 import { promisify } from "util";
-import * as multer from "multer";
-import * as socket from "socket.io";
-import * as http from "http";
+import multer from "multer";
+import socket from "socket.io";
+import http from "http";
+// import fs from "fs";
 import { wxServer } from "./wxserver";
 
 import {
@@ -124,6 +125,10 @@ export const redLock = new Redlock([redisClient], {
 });
 
 const app = express();
+// const server = https.createServer({
+//     key: fs.readFileSync('server.key'),
+//     cert: fs.readFileSync('server.crt')
+// }, app);
 const server = http.createServer(app);
 export const io = socket(server);
 

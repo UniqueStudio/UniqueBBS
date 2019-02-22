@@ -1,6 +1,6 @@
-import * as jwt from "jsonwebtoken";
+import jwt from "jsonwebtoken";
 import { secret, accessTokenURL, filterUserKeys, filterMyKeys } from "./consts";
-import * as crypto from "crypto";
+import crypto from "crypto";
 import { User } from "../generated/prisma-client";
 
 export const BACKEND_URL = process.env.BACKEND_URL;

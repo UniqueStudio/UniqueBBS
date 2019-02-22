@@ -1,13 +1,20 @@
+import https from "https";
+
 require("dotenv").config();
 
-import * as express from "express";
-import * as bodyParser from "body-parser";
+import express from "express";
+import bodyParser from "body-parser";
 import { wechatHandleMessage, wechatHandleCheck } from "./model/wx";
+import fs from "fs";
 
-export const wxServer = express();
+const app = express();
+export const wxServer = https.createServer({
+    key: fs.readFileSync('server.key'),
+    cert: fs.readFileSync('server.crt')
+}, app);
 
-wxServer.use(bodyParser.urlencoded({ extended: true }));
-wxServer.use(bodyParser.text());
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.text());
 
-wxServer.post("/wx", wechatHandleMessage);
-wxServer.get("/wx", wechatHandleCheck);
+app.post("/wx", wechatHandleMessage);
+app.get("/wx", wechatHandleCheck);

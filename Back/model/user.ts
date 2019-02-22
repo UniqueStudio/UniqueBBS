@@ -20,7 +20,7 @@ import {
 import { pushMessage, MESSAGE_SET_MENTOR, MESSAGE_REPORT_URL } from "./message";
 import { setLockExpireIncr } from "./lock";
 import { filterUserAvatar } from "./check";
-import * as fs from "fs";
+import fs from "fs";
 import { MODE } from "../server";
 import downloadImg from "../utils/downloadImg";
 import processJoinTime from "../utils/processJoinTime";

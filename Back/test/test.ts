@@ -1,4 +1,4 @@
-import * as parser from "fast-xml-parser";
+import parser from "fast-xml-parser";
 
 const str = `<xml>
 <ToUserName><![CDATA[toUser]]></ToUserName>

@@ -1,4 +1,4 @@
-import * as fs from "fs";
+import fs from "fs";
 
 if (!fs.existsSync("/var/bbs/install.lock")) {
     require("./install");

@@ -5,3 +5,4 @@ Back/upload/*
 tmp
 .env
 environment.ts
+.idea

@@ -1,10 +1,10 @@
 import { Request, Response } from "express";
-import * as parser from "fast-xml-parser";
+import parser from "fast-xml-parser";
 import { wxMsgToken, wxMsgAESKEY, wxAppID, userInfoURL } from "./consts";
 import { prisma } from "../generated/prisma-client";
 import downloadImg from "../utils/downloadImg";
 import processJoinTime from "../utils/processJoinTime";
-import * as fs from "fs";
+import fs from "fs";
 import { getAccessToken } from "./check";
 
 const WXCrypto = require("./module/wx.class");

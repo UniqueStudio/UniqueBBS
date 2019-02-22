@@ -6,7 +6,7 @@ import { getUserListURL } from "../model/consts";
 import { getAccessToken } from "../model/check";
 import downloadImg from "../utils/downloadImg";
 import processJoinTime from "../utils/processJoinTime";
-import * as fs from "fs";
+import fs from "fs";
 
 export const getUser = async function() {
     const avatarPath =
