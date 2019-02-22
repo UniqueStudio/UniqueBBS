@@ -17,7 +17,7 @@ services:
             - run
             - init
         volumes:
-            - /Users/faraway/Desktop/UniqueBBS/tmp:/var/bbs
+            - D:/bbs:/var/bbs
         restart: always
         depends_on:
             - prisma

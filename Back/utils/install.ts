@@ -66,6 +66,15 @@ async function install() {
     const threadAuthor = new Map<string, string>();
     const attachMap = new Map<string, string>();
 
+    if (
+        !fs.existsSync(
+            process.env.mode === "DEV" ? `./upload` : `/var/bbs/upload`
+        )
+    )
+        fs.mkdirSync(
+            process.env.mode === "DEV" ? `./upload` : `/var/bbs/upload`
+        );
+
     // <-- Step 0 Create Reflection between group name and group id
     console.log("Creating Group Reflection Maps");
     const groupList = await prisma.groups();
