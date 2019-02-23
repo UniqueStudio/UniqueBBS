@@ -54,6 +54,7 @@ services:
                     password: P@ssw0rd
                     migrations: true
         stdin_open: true
+        restart: always
         tty: true
     mysql:
         image: mysql:5.7
