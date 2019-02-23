@@ -1,6 +1,7 @@
 require("dotenv").config();
 
-import express from "express";
+import express, { Router } from "express";
+import proxy from "http-proxy-middleware";
 import bodyParser from "body-parser";
 import Redis from "redis";
 import Redlock from "redlock";
@@ -8,8 +9,7 @@ import { promisify } from "util";
 import multer from "multer";
 import socket from "socket.io";
 import http from "http";
-// import fs from "fs";
-import { wxServer } from "./wxserver";
+import wxServer from "./wxserver";
 
 import {
     userMyInfo,
@@ -124,18 +124,16 @@ export const redLock = new Redlock([redisClient], {
     retryJitter: 200
 });
 
-const app = express();
-// const server = https.createServer({
-//     key: fs.readFileSync('server.key'),
-//     cert: fs.readFileSync('server.crt')
-// }, app);
-const server = http.createServer(app);
+const root = express();
+const server = http.createServer(root);
 export const io = socket(server);
 
 io.on("connection", socket => {
     socket.on("login", socketLogin(socket));
     socket.on("disconnect", socketDisconnect(socket));
 });
+
+const app = Router();
 
 app.use(bodyParser.json({ limit: "1mb" }));
 
@@ -247,12 +245,15 @@ app.post("/attach/upload", upload.single("attaches"), fileUpload);
 //At
 app.post("/at", atResult);
 
+root.use("/api", app);
+root.use("/wxapi", wxServer);
+
+// only for docker-compose
+if (typeof process.env.COMPOSE_PROJECT_NAME === "string")
+    root.use("/", proxy("/", { target: "http://bbs_front/" }));
+
 server.listen(7010, () => {
     console.log(
         `Rabbit WebServer / ${SERVER_VERSION} is running on port 7010.\nRedis:6379 , MySQL:3306 , graphQL:4466`
     );
-});
-
-wxServer.listen(7011, () => {
-    console.log(`WeChat:7011`);
 });

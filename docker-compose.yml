@@ -22,6 +22,8 @@ services:
             - WXSECRET
             - AGENTID
             - PRISMA_ENDPOINT
+            - NODE_ENV=production
+            - MODE=production
             - BACKEND_URL
 
             # ⚠️: The value of the these variables in the container
@@ -30,7 +32,6 @@ services:
 
         ports:
             - 7010:7010
-            - 7011:7011
         command:
             - run
             - init
