@@ -1,3 +1,5 @@
+require("dotenv").config();
+
 import { prisma } from "../generated/prisma-client";
 
 const newForum = [
@@ -10,7 +12,7 @@ const newForum = [
     ["团队资料", "paper-clip|#a67fe0", "团队各种流程，资源留存"]
 ];
 
-async function func() {
+(async function() {
     for (let [forum, icon, description] of newForum) {
         await prisma.createForum({
             name: forum,
@@ -18,5 +20,4 @@ async function func() {
             description: description
         });
     }
-}
-func();
+})();

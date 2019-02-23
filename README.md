@@ -14,7 +14,7 @@
 
     -   AGENTID=
 
-    -   PRISMA_ENDPOINT=http://localhost:4466
+    -   PRISMA_ENDPOINT=http://prisma:4466/
 
     -   NODE_ENV=DEV
 

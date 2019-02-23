@@ -21,7 +21,7 @@ export default {
     text-align: center;
     display: inline-block;
     transition: all 0.9s cubic-bezier(0.33, 0.63, 0.65, 0.99);
-    padding: 0 8px;
+    padding: 1px 8px 0 8px;
     margin: 0 4px;
 }
 .tag-container:hover {
