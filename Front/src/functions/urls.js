@@ -1,4 +1,5 @@
-const domain = process.env.DOMAIN;
+const url = new URL(window.location.href);
+const domain = `${url.protocol}//${url.hostname}/`;
 // const domain = "http://localhost:7010/";
 const socket = domain.replace(/^http/i, "ws");
 const urls = {
