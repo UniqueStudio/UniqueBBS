@@ -1,74 +1,73 @@
 version: "3"
 services:
-  bbs_front:
-    build:
-      context: ./Front
-      dockerfile: Dockerfile
-      args:
-        domain: https://newbbs.hustunique.com/
-      # ⚠️: This is build arg, this value will be request
-      # endpoint of front part of UniqueBBS
-    ports:
-      - 7080:80
-  bbs:
-    build: ./
-    env_file:
-      - .env
-    environment:
-      - SECRET
-      - WXMSGTOKEN
-      - WXMSGAESKEY
-      - APPID
-      - WXSECRET
-      - AGENTID
-      - PRISMA_ENDPOINT
-      - NODE_ENV=production
-      - MODE=production
-      - BACKEND_URL
+    bbs_front:
+        build:
+            context: ./Front
+            dockerfile: Dockerfile
+            args:
+                domain: https://newbbs.hustunique.com/
+            # ⚠️: This is build arg, this value will be request
+            # endpoint of front part of UniqueBBS
+        ports:
+            - 7080:80
+    bbs:
+        build: ./
+        env_file:
+            - .env
+        environment:
+            - SECRET
+            - WXMSGTOKEN
+            - WXMSGAESKEY
+            - APPID
+            - WXSECRET
+            - AGENTID
+            - PRISMA_ENDPOINT
+            - NODE_ENV=production
+            - MODE=production
+            - BACKEND_URL
 
-      # ⚠️: The value of the these variables in the container
-      # are taken from the value for the same variables in the
-      # shell in which docker-compose is run.
+            # ⚠️: The value of the these variables in the container
+            # are taken from the value for the same variables in the
+            # shell in which docker-compose is run.
 
-    ports:
-      - 7010:7010
-      - 7011:7011
-    command:
-      - run
-      - init
-    volumes:
-      - bbs:/var/bbs
-    restart: always
-    depends_on:
-      - prisma
-      - redis
-  prisma:
-    image: prismagraphql/prisma:1.24
-    environment:
-      PRISMA_CONFIG: |-
-        port: 4466
-        databases:
-          default:
-            connector: mysql
-            host: mysql
-            port: 3306
-            user: root
-            password: prisma
-            migrations: true
-    stdin_open: true
-    tty: true
-  mysql:
-    image: mysql:5.7
-    environment:
-      MYSQL_ROOT_PASSWORD: prisma
-    stdin_open: true
-    tty: true
-    volumes:
-      - mysql:/var/lib/mysql
-  redis:
-    image: redis
-    stdin_open: true
-    tty: true
+        ports:
+            - 7010:7010
+        command:
+            - run
+            - init
+        volumes:
+            - bbs:/var/bbs
+        restart: always
+        depends_on:
+            - prisma
+            - redis
+    prisma:
+        image: prismagraphql/prisma:1.24
+        environment:
+            PRISMA_CONFIG: |-
+                port: 4466
+                databases:
+                  default:
+                    connector: mysql
+                    host: mysql
+                    port: 3306
+                    user: root
+                    password: prisma
+                    migrations: true
+        stdin_open: true
+        tty: true
+    mysql:
+        image: mysql:5.7
+        environment:
+            MYSQL_ROOT_PASSWORD: prisma
+        stdin_open: true
+        tty: true
+        volumes:
+            - mysql:/var/lib/mysql
+    redis:
+        image: redis
+        stdin_open: true
+        tty: true
 volumes:
-  mysql:
-  bbs:
+    mysql:
+    bbs:
