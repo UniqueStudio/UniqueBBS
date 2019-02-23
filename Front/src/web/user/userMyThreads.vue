@@ -10,17 +10,16 @@
         v-html="post.post.message"
       ></div>
       <div class="thread-item-content">
-        <a-tag color="purple">
+        <span>
           <a-icon type="message"/>
           {{post.thread.postCount}}
-        </a-tag>
+        </span>
         <span class="time-span">
-          <a-tag color="green">
-            <a-icon type="clock-circle"/>
-            {{getHumanDate(post.thread.createDate)}}
-          </a-tag>
+          <a-icon type="clock-circle"/>
+          {{getHumanDate(post.thread.createDate)}}
         </span>
       </div>
+      <a-divider class="thread-divider"></a-divider>
     </div>
     <div class="pagination" v-if="all > defaultPageSize">
       <a-pagination
@@ -147,6 +146,12 @@ export default {
 .user-my-thread-item {
     position: relative;
 }
+.thread-item-content {
+    font-size: 12px;
+    color: #999;
+    user-select: none;
+    cursor: default;
+}
 .time-span {
     position: absolute;
     right: 0;
@@ -167,5 +172,8 @@ export default {
     top: 160px;
     height: 70px;
     pointer-events: none;
+}
+.thread-divider {
+    margin: 2px 0 6px 0;
 }
 </style>

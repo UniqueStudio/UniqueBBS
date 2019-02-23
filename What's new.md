@@ -1,5 +1,14 @@
 # Unique BBS What's new
 
+### TODOS
+
+-   上面的栏自动隐藏，防止影响阅读
+-   更多菜单
+
+### 20190223 Release Candidate 1
+
+-   修改部分布局、更加完善
+
 ### 20190212 Beta 2
 
 -   重构部分前端 VUE 组件的 命名，更加统一规范

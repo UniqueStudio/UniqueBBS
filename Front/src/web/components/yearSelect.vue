@@ -27,6 +27,7 @@ export default {
     cursor: pointer;
     border-radius: 11px;
     transition: all 0.9s cubic-bezier(0.33, 0.63, 0.65, 0.99);
+    padding-top: 1px;
 }
 .tag-active {
     background: #396bea;

@@ -24,13 +24,13 @@ async function downloadImg(url: string, path: string) {
 async function install() {
     if (
         !fs.existsSync(
-             process.env.mode === "DEV" ? `./upload` : `/var/bbs/upload`
+            process.env.mode === "DEV" ? `./upload` : `/var/bbs/upload`
         )
     )
         fs.mkdirSync(
-             process.env.mode === "DEV" ? `./upload` : `/var/bbs/upload`
+            process.env.mode === "DEV" ? `./upload` : `/var/bbs/upload`
         );
-    
+
     await updateGroup();
     await getUser();
 
@@ -43,6 +43,8 @@ async function install() {
         ["联创市场", "shopping-cart|#184b54", "内部二手交易信息交流"],
         ["团队资料", "paper-clip|#a67fe0", "团队各种流程，资源留存"]
     ];
+
+    // const newForum = [] as Array<[string, string, string]>;
 
     for (let [forum, icon, description] of newForum) {
         await prisma.createForum({
@@ -305,7 +307,7 @@ async function install() {
                 process.env.mode === "DEV"
                     ? `./upload/${dirName}`
                     : `/var/bbs/upload/${dirName}`;
-            
+
             const newPath = `${newDir}/migration_${new Date()
                 .getTime()
                 .toString()}_${imageOffset}.rabbit`;
