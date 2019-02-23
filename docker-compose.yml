@@ -25,6 +25,7 @@ services:
             - NODE_ENV=production
             - MODE=production
             - BACKEND_URL
+            - DOCKER_COMPOSE=true
 
             # ⚠️: The value of the these variables in the container
             # are taken from the value for the same variables in the

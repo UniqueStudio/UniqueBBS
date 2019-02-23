@@ -249,8 +249,7 @@ root.use("/api", app);
 root.use("/wxapi", wxServer);
 
 // only for docker-compose
-if (typeof process.env.COMPOSE_PROJECT_NAME === "string") {
-    console.log(process.env.COMPOSE_PROJECT_NAME);
+if (typeof process.env.DOCKER_COMPOSE === "string") {
     root.use("/", proxy("/", { target: "http://bbs_front/" }));
 }
 
