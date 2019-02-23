@@ -126,14 +126,6 @@ export const redLock = new Redlock([redisClient], {
 
 const root = express();
 
-// only for docker-compose
-if (typeof process.env.DOCKER_COMPOSE === "string") {
-    root.use(
-        /\/((?!api|wxapi).)*/,
-        proxy("/", { target: "http://bbs_front/" })
-    );
-}
-
 const server = http.createServer(root);
 export const io = socket(server);
 
@@ -256,6 +248,10 @@ app.post("/at", atResult);
 
 root.use("/api", app);
 root.use("/wxapi", wxServer);
+// only for docker-compose
+if (typeof process.env.DOCKER_COMPOSE === "string") {
+    root.use("*", proxy("/", { target: "http://bbs_front/" }));
+}
 
 server.listen(7010, () => {
     console.log(

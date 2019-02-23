@@ -8,8 +8,6 @@ services:
                 domain: https://newbbs.hustunique.com/
             # ⚠️: This is build arg, this value will be request
             # endpoint of front part of UniqueBBS
-        ports:
-            - 7080:80
     bbs:
         build: ./
         env_file:
@@ -32,7 +30,7 @@ services:
             # shell in which docker-compose is run.
 
         ports:
-            - 7010:7010
+            - 7010:7010 # hzy's birthday 0701
         command:
             - run
             - init
