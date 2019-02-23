@@ -1,5 +1,5 @@
 const url = new URL(window.location.href);
-const domain = url.origin + "/";
+const domain = url.origin + "/api/";
 // const domain = "http://localhost:7010/";
 const socket = domain.replace(/^http/i, "ws");
 const urls = {
