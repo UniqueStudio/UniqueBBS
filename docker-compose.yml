@@ -52,14 +52,14 @@ services:
                     host: mysql
                     port: 3306
                     user: root
-                    password: prisma
+                    password: P@ssw0rd
                     migrations: true
         stdin_open: true
         tty: true
     mysql:
         image: mysql:5.7
         environment:
-            MYSQL_ROOT_PASSWORD: prisma
+            MYSQL_ROOT_PASSWORD: P@ssw0rd
         stdin_open: true
         tty: true
         volumes:

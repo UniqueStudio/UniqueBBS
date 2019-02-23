@@ -8,7 +8,12 @@ import { promisify } from "util";
 import multer from "multer";
 import socket from "socket.io";
 import http from "http";
+<<<<<<< HEAD
 import wxServer from "./wxserver";
+=======
+// import fs from "fs";
+import { wxServer } from "./wxserver";
+>>>>>>> a831f7509b49943b84682de7de0e70ee865d01de
 
 import {
     userMyInfo,
@@ -123,8 +128,17 @@ export const redLock = new Redlock([redisClient], {
     retryJitter: 200
 });
 
+<<<<<<< HEAD
 const root = express();
 const server = http.createServer(root);
+=======
+const app = express();
+// const server = https.createServer({
+//     key: fs.readFileSync('server.key'),
+//     cert: fs.readFileSync('server.crt')
+// }, app);
+const server = http.createServer(app);
+>>>>>>> a831f7509b49943b84682de7de0e70ee865d01de
 export const io = socket(server);
 
 io.on("connection", socket => {
