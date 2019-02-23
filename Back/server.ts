@@ -128,7 +128,10 @@ const root = express();
 
 // only for docker-compose
 if (typeof process.env.DOCKER_COMPOSE === "string") {
-    root.use("/", proxy("/", { target: "http://bbs_front/" }));
+    root.use(
+        /\/((?!api|wxapi).)*/,
+        proxy("/", { target: "http://bbs_front/" })
+    );
 }
 
 const server = http.createServer(root);
