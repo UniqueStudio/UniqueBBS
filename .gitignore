@@ -2,6 +2,7 @@ Back/node_modules/*
 Back/output/
 Front/node_modules/*
 Back/upload/*
+Back/backup/*
 tmp
 .env
 environment.ts
