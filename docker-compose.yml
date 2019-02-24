@@ -21,7 +21,7 @@ services:
             - AGENTID
             - PRISMA_ENDPOINT
             - NODE_ENV=production
-            - MODE=production
+            # - MODE=production
             - BACKEND_URL=/api/
             - DOCKER_COMPOSE=true
 

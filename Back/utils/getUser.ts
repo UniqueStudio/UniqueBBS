@@ -10,7 +10,7 @@ import fs from "fs";
 
 export const getUser = async function() {
     const avatarPath =
-        process.env.MODE === "DEV"
+        process.env.NODE_ENV === "DEV"
             ? `./upload/avatar`
             : `/var/bbs/upload/avatar`;
 

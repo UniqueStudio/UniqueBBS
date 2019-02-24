@@ -372,7 +372,7 @@ export const userInfoUpdateFromWx = async function(
             }
 
             const avatarPath =
-                process.env.MODE === "DEV"
+                process.env.NODE_ENV === "DEV"
                     ? `./upload/avatar`
                     : `/var/bbs/upload/avatar`;
             await downloadImg(

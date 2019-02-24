@@ -25,7 +25,9 @@ interface UserInfo {
 }
 
 const avatarPath =
-    process.env.MODE === "DEV" ? `./upload/avatar` : `/var/bbs/upload/avatar`;
+    process.env.NODE_ENV === "DEV"
+        ? `./upload/avatar`
+        : `/var/bbs/upload/avatar`;
 
 export const wechatHandleMessage = async function(req: Request, res: Response) {
     try {
