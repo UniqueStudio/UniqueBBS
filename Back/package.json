@@ -40,7 +40,7 @@
     "scripts": {
         "dev": "ts-node server.ts",
         "compile": "tsc",
-        "init": "prisma deploy && node ./output/utils/init.js",
+        "init": "prisma delete --force && prisma deploy && node ./output/utils/init.js",
         "start": "node ./output/server.js"
     }
 }
