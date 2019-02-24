@@ -1,21 +1,33 @@
 # UniqueBBS
 
--   有关环境变量
+## What is this?
 
-    -   SECRET=密码加盐
+UniqueBBS is a modern BBS writen with `vue suite` and `prisma`.
 
-    -   WXMSGTOKEN=
+This is going to be used in HUST UniqueStudio as internal tool to improve experience of writing daily / weekly report, wiki, document and in-studio discusion.
 
-    -   WXMSGAESKEY=
+## How to deploy?
 
-    -   APPID=
+1.  You will need docker-compose to do this deployemnt.
+2.  use git to clone this project into you local disk.
+3.  touch a `.env` file in the root dir of this project.
+4.  Fill this `.env` file with content like below.
 
-    -   WXSECRET=
+    ```
+    SECRET=XXXXXXXX
+    WXMSGTOKEN=XXXXXXXX
+    WXMSGAESKEY=XXXXXXXX
+    APPID=XXXXXXXX
+    WXSECRET=XXXXXXXX
+    AGENTID=XXXXXXXX
+    ```
 
-    -   AGENTID=
+    SECRET is the salt of password, you should pick a complex one.
 
-    -   PRISMA_ENDPOINT=http://prisma:4466/
+    WXMSGTOKEN, WXMSGAESKEY are token and key of Work Wechat push.
 
-    -   NODE_ENV=DEV
+    APPID, WXSECRET, AGENTID are token and key of Work Wechat login.
 
-    -   BACKEND_URL=后端的外网访问地址
+5.  run `docker-compose build` to build images.
+6.  run `docker-compose up -d` to run this BBS in daemon.
+7.  You will get this BBS exposed at port **7010** on you machine, then you can reverse proxy this port use Nginx or Caddy to serve it.

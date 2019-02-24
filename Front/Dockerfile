@@ -1,6 +1,6 @@
 FROM node:alpine AS build
 
-ARG domain=https://api.bbs.hzytql.top/
+# ARG domain=https://api.bbs.hzytql.top/
 
 ADD package.json /tmp/package.json
 ADD yarn.lock /tmp/yarn.lock
@@ -9,7 +9,7 @@ RUN mkdir -p /usr/src/app && cp -a /tmp/node_modules /usr/src/app
 
 WORKDIR /usr/src/app
 COPY . .
-ENV DOMAIN=${domain}
+# ENV DOMAIN=${domain}
 RUN yarn build
 
 FROM nginx:stable

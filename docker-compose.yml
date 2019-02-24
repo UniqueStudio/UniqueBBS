@@ -4,10 +4,6 @@ services:
         build:
             context: ./Front
             dockerfile: Dockerfile
-            args:
-                domain: https://newbbs.hustunique.com/
-            # ⚠️: This is build arg, this value will be request
-            # endpoint of front part of UniqueBBS
     bbs:
         build: ./
         env_file:
@@ -19,9 +15,9 @@ services:
             - APPID
             - WXSECRET
             - AGENTID
-            - PRISMA_ENDPOINT
+            - PRISMA_ENDPOINT=http://prisma:4466/
             - NODE_ENV=production
-            # - MODE=production
+            - MODE=production
             - BACKEND_URL=/api/
             - DOCKER_COMPOSE=true
 
