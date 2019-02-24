@@ -46,7 +46,7 @@ const urls = {
     attachUnlink: `${domain}attach/unlink`,
     attachRemove: aid => `${domain}attach/remove/${aid}`,
     attachDownload: (aid, token) => `${domain}attach/download/${aid}/${token}`,
-    attachPreview: aid => `${domain}attach/preview/${aid}`,
+    attachPreview: aid => `/api/attach/preview/${aid}`,
     attachExpire: tid => `${domain}attach/expire/${tid}`,
     reportList: (uid, page) => `${domain}report/list/${uid}/${page}`,
     reportGraph: uid => `${domain}report/graph/${uid}`,
