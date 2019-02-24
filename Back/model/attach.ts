@@ -332,8 +332,12 @@ export const fileDestination = function(
 };
 
 export const fileDelete = function(filename: string) {
-    if (filename && fs.existsSync(filename)) {
-        fs.unlinkSync(filename);
+    try {
+        if (filename && fs.existsSync(filename)) {
+            fs.unlinkSync(filename);
+        }
+    } catch (e) {
+        console.log(e);
     }
 };
 
