@@ -24,11 +24,11 @@ async function downloadImg(url: string, path: string) {
 async function install() {
     if (
         !fs.existsSync(
-            process.env.mode === "DEV" ? `./upload` : `/var/bbs/upload`
+            process.env.NODE_ENV === "DEV" ? `./upload` : `/var/bbs/upload`
         )
     )
         fs.mkdirSync(
-            process.env.mode === "DEV" ? `./upload` : `/var/bbs/upload`
+            process.env.NODE_ENV === "DEV" ? `./upload` : `/var/bbs/upload`
         );
 
     await updateGroup();
@@ -79,11 +79,11 @@ async function install() {
 
     if (
         !fs.existsSync(
-            process.env.mode === "DEV" ? `./upload` : `/var/bbs/upload`
+            process.env.NODE_ENV === "DEV" ? `./upload` : `/var/bbs/upload`
         )
     )
         fs.mkdirSync(
-            process.env.mode === "DEV" ? `./upload` : `/var/bbs/upload`
+            process.env.NODE_ENV === "DEV" ? `./upload` : `/var/bbs/upload`
         );
 
     // <-- Step 0 Create Reflection between group name and group id
@@ -304,7 +304,7 @@ async function install() {
                 "_" +
                 date.getDate().toString();
             const newDir =
-                process.env.mode === "DEV"
+                process.env.NODE_ENV === "DEV"
                     ? `./upload/${dirName}`
                     : `/var/bbs/upload/${dirName}`;
 
