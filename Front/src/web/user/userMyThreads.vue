@@ -1,34 +1,36 @@
 <template>
   <div class="user-my-threads-list">
-    <div class="user-my-thread-item" v-for="post in postList" :key="post.id">
-      <div class="thread-item-subject">
-        <router-link :to="'/thread/info/'+post.thread.id+'/1'">{{post.thread.subject}}</router-link>
+    <a-spin :spinning="showLoading" size="large">
+      <div class="user-my-thread-item" v-for="post in postList" :key="post.id">
+        <div class="thread-item-subject">
+          <router-link :to="'/thread/info/'+post.thread.id+'/1'">{{post.thread.subject}}</router-link>
+        </div>
+        <div
+          class="show-markdown user-post-message"
+          @click="handleAtClick"
+          v-html="post.post.message"
+        ></div>
+        <div class="thread-item-content">
+          <span>
+            <a-icon type="message"/>
+            {{post.thread.postCount}}
+          </span>
+          <span class="time-span">
+            <a-icon type="clock-circle"/>
+            {{getHumanDate(post.thread.createDate)}}
+          </span>
+        </div>
+        <a-divider class="thread-divider"></a-divider>
       </div>
-      <div
-        class="show-markdown user-post-message"
-        @click="handleAtClick"
-        v-html="post.post.message"
-      ></div>
-      <div class="thread-item-content">
-        <span>
-          <a-icon type="message"/>
-          {{post.thread.postCount}}
-        </span>
-        <span class="time-span">
-          <a-icon type="clock-circle"/>
-          {{getHumanDate(post.thread.createDate)}}
-        </span>
+      <div class="pagination" v-if="all > defaultPageSize">
+        <a-pagination
+          :current="page"
+          :defaultPageSize="defaultPageSize"
+          :total="all"
+          @change="handlePageOnchange"
+        ></a-pagination>
       </div>
-      <a-divider class="thread-divider"></a-divider>
-    </div>
-    <div class="pagination" v-if="all > defaultPageSize">
-      <a-pagination
-        :current="page"
-        :defaultPageSize="defaultPageSize"
-        :total="all"
-        @change="handlePageOnchange"
-      ></a-pagination>
-    </div>
+    </a-spin>
   </div>
 </template>
 <script>
@@ -38,7 +40,8 @@ export default {
             postList: [],
             all: 0,
             page: 0,
-            defaultPageSize: 20
+            defaultPageSize: 20,
+            showLoading: true
         };
     },
     methods: {
@@ -70,6 +73,7 @@ export default {
             );
         },
         async getMyThreadList() {
+            this.showLoading = true;
             const uid = localStorage.getItem("uid");
             this.page = Number.parseInt(this.$route.params.page);
             const myThreadListRaw = await this.$ajax.get(
@@ -118,7 +122,7 @@ export default {
                     });
                 });
             }
-
+            this.showLoading = false;
             this.all = count;
         },
         getHumanDate(str) {

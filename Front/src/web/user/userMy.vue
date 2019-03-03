@@ -47,48 +47,47 @@
 </template>
 <script>
 export default {
-  computed: {
-    userAvatarSrc() {
-      return this.$store.state.avatarSrc;
+    computed: {
+        userAvatarSrc() {
+            return this.$store.state.avatarSrc;
+        }
+    },
+    methods: {
+        getSelectedKeys() {
+            return [this.$route.meta.key];
+        }
     }
-  },
-  methods: {
-    getSelectedKeys() {
-      const arr = [this.$route.meta.key];
-      return arr;
-    }
-  }
 };
 </script>
 <style scoped>
 .user-nav {
-  text-align: center;
-  user-select: none;
+    text-align: center;
+    user-select: none;
 }
 @media screen and (min-width: 800px) {
-  .user-view-container {
-    width: 40%;
-  }
+    .user-view-container {
+        width: 40%;
+    }
 }
 @media screen and (max-width: 800px) {
-  .user-view-container {
-    width: 90%;
-  }
-  .user-nav-text {
-    display: none;
-  }
+    .user-view-container {
+        width: 90%;
+    }
+    .user-nav-text {
+        display: none;
+    }
 }
 .user-view-container {
-  margin: auto;
+    margin: auto;
 }
 .user-view-container-margin {
-  margin: 72px auto;
+    margin: 72px auto;
 }
 .avatar-container {
-  text-align: center;
-  margin: 72px;
+    text-align: center;
+    margin: 72px;
 }
 .avatar-img {
-  transform: scale(3, 3);
+    transform: scale(3, 3);
 }
 </style>

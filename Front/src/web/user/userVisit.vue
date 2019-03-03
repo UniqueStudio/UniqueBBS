@@ -6,91 +6,93 @@
         用户资料
       </div>
     </div>
-    <div class="avatar-container">
-      <a-avatar shape="circle" :src="userDatas.avatar" class="avatar-img" size="large"></a-avatar>
-    </div>
-    <h2 :style="{color: userDatas.isAdmin? '#ff9800':'dodgerblue'}">{{userDatas.username}}</h2>
-    <div class="group-container">
-      <rabbit-tag v-if="userDatas.isAdmin" background="#EDABAB">管理员</rabbit-tag>
-      <div v-for="group in groupList" :key="group.id" class="group-item">
-        <router-link :to="'/user/group/'+ group.id">
-          <rabbit-tag :background="group.color" cursor="pointer">{{group.name}}</rabbit-tag>
-        </router-link>
+    <a-spin :spinning="showLoading" size="large">
+      <div class="avatar-container">
+        <a-avatar shape="circle" :src="userDatas.avatar" class="avatar-img" size="large"></a-avatar>
       </div>
-      <router-link :to="'/report/visit/'+uid+'/1'">
-        <rabbit-tag background="#396BEA" cursor="pointer">Report</rabbit-tag>
-      </router-link>
-      <rabbit-tag background="#FFCD52" v-if="lastLoginHumanDate">{{lastLoginHumanDate}}</rabbit-tag>
-    </div>
-    <h5>{{userDatas.signature}}</h5>
-    <report-graph :uid="uid" class="report-graph"></report-graph>
-    <div class="user-detail-info">
-      <a-input-group>
-        <a-input
-          addonBefore="加入"
-          readonly
-          :value="getJoinTime"
-          size="large"
-          v-if="getJoinTime !== ''"
-        />
-        <a-input
-          addonBefore="邮箱"
-          readonly
-          :value="userDatas.email"
-          size="large"
-          v-if="userDatas.email !== ''"
-        />
-        <a-input
-          addonBefore="手机"
-          readonly
-          :value="userDatas.mobile"
-          size="large"
-          v-if="userDatas.mobile !== ''"
-        />
-        <a-input
-          addonBefore="学号"
-          readonly
-          v-model="userDatas.studentID"
-          size="large"
-          v-if="userDatas.studentID !== ''"
-        />
-        <a-input
-          addonBefore="宿舍"
-          readonly
-          v-model="userDatas.dormitory"
-          size="large"
-          v-if="userDatas.dormitory !== ''"
-        />
-        <a-input
-          addonBefore=" Q Q "
-          readonly
-          v-model="userDatas.qq"
-          size="large"
-          v-if="userDatas.qq !== ''"
-        />
-        <a-input
-          addonBefore="微信"
-          readonly
-          v-model="userDatas.wechat"
-          size="large"
-          v-if="userDatas.wechat !== ''"
-        />
-        <a-input
-          addonBefore="专业"
-          readonly
-          v-model="userDatas.major"
-          size="large"
-          v-if="userDatas.major !== ''"
-        />
-        <a-input
-          addonBefore="班级"
-          readonly
-          v-model="userDatas.className"
-          size="large"
-          v-if="userDatas.className !== ''"
-        />
-      </a-input-group>
-    </div>
+      <h2 :style="{color: userDatas.isAdmin? '#ff9800':'dodgerblue'}">{{userDatas.username}}</h2>
+      <div class="group-container">
+        <rabbit-tag v-if="userDatas.isAdmin" background="#EDABAB">管理员</rabbit-tag>
+        <div v-for="group in groupList" :key="group.id" class="group-item">
+          <router-link :to="'/user/group/'+ group.id">
+            <rabbit-tag :background="group.color" cursor="pointer">{{group.name}}</rabbit-tag>
+          </router-link>
+        </div>
+        <router-link :to="'/report/visit/'+uid+'/1'">
+          <rabbit-tag background="#396BEA" cursor="pointer">Report</rabbit-tag>
+        </router-link>
+        <rabbit-tag background="#FFCD52" v-if="lastLoginHumanDate">{{lastLoginHumanDate}}</rabbit-tag>
+      </div>
+      <h5>{{userDatas.signature}}</h5>
+      <report-graph :uid="uid" class="report-graph"></report-graph>
+      <div class="user-detail-info">
+        <a-input-group>
+          <a-input
+            addonBefore="加入"
+            readonly
+            :value="getJoinTime"
+            size="large"
+            v-if="getJoinTime !== ''"
+          />
+          <a-input
+            addonBefore="邮箱"
+            readonly
+            :value="userDatas.email"
+            size="large"
+            v-if="userDatas.email !== ''"
+          />
+          <a-input
+            addonBefore="手机"
+            readonly
+            :value="userDatas.mobile"
+            size="large"
+            v-if="userDatas.mobile !== ''"
+          />
+          <a-input
+            addonBefore="学号"
+            readonly
+            v-model="userDatas.studentID"
+            size="large"
+            v-if="userDatas.studentID !== ''"
+          />
+          <a-input
+            addonBefore="宿舍"
+            readonly
+            v-model="userDatas.dormitory"
+            size="large"
+            v-if="userDatas.dormitory !== ''"
+          />
+          <a-input
+            addonBefore=" Q Q "
+            readonly
+            v-model="userDatas.qq"
+            size="large"
+            v-if="userDatas.qq !== ''"
+          />
+          <a-input
+            addonBefore="微信"
+            readonly
+            v-model="userDatas.wechat"
+            size="large"
+            v-if="userDatas.wechat !== ''"
+          />
+          <a-input
+            addonBefore="专业"
+            readonly
+            v-model="userDatas.major"
+            size="large"
+            v-if="userDatas.major !== ''"
+          />
+          <a-input
+            addonBefore="班级"
+            readonly
+            v-model="userDatas.className"
+            size="large"
+            v-if="userDatas.className !== ''"
+          />
+        </a-input-group>
+      </div>
+    </a-spin>
   </div>
 </template>
 <script>
@@ -118,7 +120,8 @@ export default {
                 isAdmin: false,
                 joinTime: ""
             },
-            groupList: []
+            groupList: [],
+            showLoading: true
         };
     },
     computed: {
@@ -131,6 +134,7 @@ export default {
     },
     methods: {
         async getUserInfo() {
+            this.showLoading = true;
             this.uid = this.$route.params.uid;
             const userInfo = await this.$ajax.get(
                 this.$urls.userInfo(this.uid)
@@ -147,6 +151,7 @@ export default {
                 color: item.color,
                 id: item.id
             }));
+            this.showLoading = false;
         }
     },
     mounted() {

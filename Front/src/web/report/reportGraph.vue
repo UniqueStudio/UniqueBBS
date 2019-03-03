@@ -1,38 +1,40 @@
 <template>
   <div class="user-block">
-    <div class="block-year-select">
-      <year-select
-        :active="yearActive.year3"
-        data-year="3"
-        @click="changeYear(3)"
-      >{{yearText.year3}}</year-select>
-      <year-select
-        :active="yearActive.year2"
-        data-year="2"
-        @click="changeYear(2)"
-      >{{yearText.year2}}</year-select>
-      <year-select
-        :active="yearActive.year1"
-        data-year="1"
-        @click="changeYear(1)"
-      >{{yearText.year1}}</year-select>
-      <year-select
-        :active="yearActive.year0"
-        data-year="0"
-        @click="changeYear(0)"
-      >{{yearText.year0}}</year-select>
-    </div>
-    <div :class="{'user-block-flex':true,'user-block-flex-left':align === 'left'}">
-      <a-tooltip
-        class="user-block-item"
-        v-for="block in userBlock"
-        :key="block.id"
-        :style="{backgroundColor: block.color}"
-        :mouseLeaveDelay="0"
-      >
-        <template slot="title">{{block.date}}</template>
-      </a-tooltip>
-    </div>
+    <a-spin :spinning="showLoading" size="large">
+      <div class="block-year-select">
+        <year-select
+          :active="yearActive.year3"
+          data-year="3"
+          @click="changeYear(3)"
+        >{{yearText.year3}}</year-select>
+        <year-select
+          :active="yearActive.year2"
+          data-year="2"
+          @click="changeYear(2)"
+        >{{yearText.year2}}</year-select>
+        <year-select
+          :active="yearActive.year1"
+          data-year="1"
+          @click="changeYear(1)"
+        >{{yearText.year1}}</year-select>
+        <year-select
+          :active="yearActive.year0"
+          data-year="0"
+          @click="changeYear(0)"
+        >{{yearText.year0}}</year-select>
+      </div>
+      <div :class="{'user-block-flex':true,'user-block-flex-left':align === 'left'}">
+        <a-tooltip
+          class="user-block-item"
+          v-for="block in userBlock"
+          :key="block.id"
+          :style="{backgroundColor: block.color}"
+          :mouseLeaveDelay="0"
+        >
+          <template slot="title">{{block.date}}</template>
+        </a-tooltip>
+      </div>
+    </a-spin>
   </div>
 </template>
 <script>
@@ -57,7 +59,8 @@ export default {
                 year2: "2017",
                 year1: "2018",
                 year0: "2019"
-            }
+            },
+            showLoading: true
         };
     },
     props: ["uid", "align"],
@@ -66,6 +69,7 @@ export default {
             if (this.doing) return;
             const lastActiveYear = this.year;
             if (this.year === year) return;
+
             this.year = year;
             [3, 2, 1, 0].forEach(item => {
                 if (item === lastActiveYear) {
@@ -79,6 +83,8 @@ export default {
         },
         async renderGraph() {
             if (this.doing) return;
+
+            this.showLoading = true;
             this.doing = true;
             let year = this.year;
 
@@ -168,6 +174,7 @@ export default {
                 });
             }
             this.doing = false;
+            this.showLoading = false;
         }
     },
     watch: {

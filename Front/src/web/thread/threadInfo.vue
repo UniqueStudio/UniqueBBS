@@ -9,263 +9,274 @@
         </div>
       </div>
     </router-link>
-    <div :class="{'thread-main-content':true,'no-active-filter':!thread.active}">
-      <div class="user-avatar-container">
-        <router-link :to="'/user/visit/'+author.id">
-          <a-avatar :src="author.avatar" class="user-avatar"></a-avatar>
-        </router-link>
+    <a-spin :spinning="showLoading" size="large">
+      <div :class="{'thread-main-content':true,'no-active-filter':!thread.active}">
+        <div class="user-avatar-container">
+          <router-link :to="'/user/visit/'+author.id">
+            <a-avatar :src="author.avatar" class="user-avatar"></a-avatar>
+          </router-link>
+        </div>
+        <div class="thread-main-info">
+          <p class="thread-subject">
+            <span v-if="thread.top" :title="thread.top===1 ? '本版置顶':'全局置顶'">
+              <a-icon type="arrow-up" :style="{color: thread.top===1 ? 'orange' : 'red'}"/>
+            </span>
+            {{thread.subject}}
+          </p>
+          <div class="thread-sub">
+            <a-drawer
+              title="帖子删除"
+              placement="top"
+              :visible="deleteDiag.visible"
+              @close="deleteDiag.visible=false;"
+            >
+              <div class="drawer-content">
+                <div>帖子删除不可逆，请谨慎操作！</div>
+                <div class="drawer-btn-container">
+                  <a-button
+                    type="primary"
+                    @click="handleDelete(0)"
+                    title="软删除后，帖子仍在数据库中，仅管理员可见。"
+                    v-if="!(isAdmin && !deleteDiag.active)"
+                  >{{isAdmin? '软删除' : '删除'}}</a-button>
+                  <a-button
+                    type="primary"
+                    @click="handleDelete(1)"
+                    title="硬删除不可逆，删除后将无法恢复，请谨慎操作！"
+                    v-if="isAdmin"
+                  >硬删除</a-button>
+                  <a-button
+                    type="primary"
+                    @click="handleDelete(2)"
+                    title="用于恢复被软删除的帖子，仅管理员可操作！"
+                    v-if="isAdmin"
+                  >恢复</a-button>
+                </div>
+              </div>
+            </a-drawer>
+            <div class="thread-sub-info">
+              <a-tag color="cyan" v-if="thread.diamond">
+                <a-icon type="star"/>
+                <span class="mobile-hidden-text">&nbsp;精华</span>
+              </a-tag>
+              <a-tag color="red" v-if="thread.closed">
+                <a-icon type="lock"/>
+                <span class="mobile-hidden-text">&nbsp;锁定</span>
+              </a-tag>
+              <router-link :to="'/user/visit/'+author.id">
+                <a-tag :color="author.isAdmin?'orange':'cyan'">
+                  <a-icon :type="author.isAdmin?'crown': 'user'"/>
+                  {{author.username}}
+                </a-tag>
+              </router-link>&nbsp;
+              <div class="user-group" v-for="group in groupList" :key="group.id">
+                <router-link :to="'/user/group/'+group.id">
+                  <a-tag :color="group.color" class="user-group">
+                    <a-icon type="team"/>
+                    {{group.name}}
+                  </a-tag>
+                </router-link>
+              </div>
+              <a-tag color="purple" class="thread-item-info-messages">
+                <a-icon type="message"/>
+                {{postCount}}
+              </a-tag>
+            </div>
+            <div class="thread-content show-markdown" v-html="content" @click="handleAtClick"></div>
+            <div class="thread-attach-list post-quote" v-if="attachList.length !== 0">
+              <h5>附件列表</h5>
+              <div v-for="attach in attachList" :key="attach.id" class="attach-item">
+                <a :href="attachDownload(attach.id)" target="_blank">
+                  <a-tag color="cyan" :title="getTitle(attach)">
+                    <a-icon type="paper-clip"/>
+                    {{attach.originalName.length > 12? attach.originalName.substr(0,12)+'...' :attach.originalName}}
+                  </a-tag>
+                </a>
+              </div>
+            </div>
+            <div class="thread-signature">
+              <div :title="fullCreateDate">
+                <a-icon type="clock-circle"/>
+                {{createDate}}
+              </div>
+              <div v-if="author.signature !== ''">
+                <a-icon type="pushpin"/>
+                {{author.signature}}
+              </div>
+            </div>
+            <a-divider class="thread-divider"></a-divider>
+          </div>
+        </div>
       </div>
-      <div class="thread-main-info">
-        <p class="thread-subject">
-          <span v-if="thread.top" :title="thread.top===1 ? '本版置顶':'全局置顶'">
-            <a-icon type="arrow-up" :style="{color: thread.top===1 ? 'orange' : 'red'}"/>
-          </span>
-          {{thread.subject}}
-        </p>
-        <div class="thread-sub">
-          <a-drawer
-            title="帖子删除"
-            placement="top"
-            :visible="deleteDiag.visible"
-            @close="deleteDiag.visible=false;"
-          >
+      <div class="thread-admin">
+        <router-link :to="'/thread/update/'+thread.id">
+          <a-tag color="blue" v-if="isAdmin || myUid===author.id">
+            <a-icon type="edit"/>&nbsp;编辑
+          </a-tag>
+        </router-link>
+        <a-tag color="red" v-if="isAdmin || myUid===author.id" @click="handleThreadDelete">
+          <a-icon type="delete"/>
+          &nbsp;{{thread.active? '删除' : '恢复'}}
+        </a-tag>
+        <a-tag color="orange" v-if="isAdmin" @click="visibleTop = true;">
+          <a-drawer title="帖子置顶" placement="top" :visible="visibleTop" @close="visibleTop=false;">
             <div class="drawer-content">
-              <div>帖子删除不可逆，请谨慎操作！</div>
+              <div>置顶帖子后，帖子将展示到板块的最前面。</div>
               <div class="drawer-btn-container">
-                <a-button
-                  type="primary"
-                  @click="handleDelete(0)"
-                  title="软删除后，帖子仍在数据库中，仅管理员可见。"
-                  v-if="!(isAdmin && !deleteDiag.active)"
-                >{{isAdmin? '软删除' : '删除'}}</a-button>
-                <a-button
-                  type="primary"
-                  @click="handleDelete(1)"
-                  title="硬删除不可逆，删除后将无法恢复，请谨慎操作！"
-                  v-if="isAdmin"
-                >硬删除</a-button>
-                <a-button
-                  type="primary"
-                  @click="handleDelete(2)"
-                  title="用于恢复被软删除的帖子，仅管理员可操作！"
-                  v-if="isAdmin"
-                >恢复</a-button>
+                <a-button type="primary" @click="handleTopThread('2')">全局置顶</a-button>
+                <a-button type="primary" @click="handleTopThread('1')">本版置顶</a-button>
+                <a-button type="primary" @click="handleTopThread('0')">解除置顶</a-button>
               </div>
             </div>
           </a-drawer>
-          <div class="thread-sub-info">
-            <a-tag color="cyan" v-if="thread.diamond">
-              <a-icon type="star"/>
-              <span class="mobile-hidden-text">&nbsp;精华</span>
-            </a-tag>
-            <a-tag color="red" v-if="thread.closed">
-              <a-icon type="lock"/>
-              <span class="mobile-hidden-text">&nbsp;锁定</span>
-            </a-tag>
-            <router-link :to="'/user/visit/'+author.id">
-              <a-tag :color="author.isAdmin?'orange':'cyan'">
-                <a-icon :type="author.isAdmin?'crown': 'user'"/>
-                {{author.username}}
-              </a-tag>
-            </router-link>&nbsp;
-            <div class="user-group" v-for="group in groupList" :key="group.id">
-              <router-link :to="'/user/group/'+group.id">
-                <a-tag :color="group.color" class="user-group">
-                  <a-icon type="team"/>
-                  {{group.name}}
-                </a-tag>
-              </router-link>
-            </div>
-            <a-tag color="purple" class="thread-item-info-messages">
-              <a-icon type="message"/>
-              {{postCount}}
-            </a-tag>
-          </div>
-          <div class="thread-content show-markdown" v-html="content" @click="handleAtClick"></div>
-          <div class="thread-attach-list post-quote" v-if="attachList.length !== 0">
-            <h5>附件列表</h5>
-            <div v-for="attach in attachList" :key="attach.id" class="attach-item">
-              <a :href="attachDownload(attach.id)" target="_blank">
-                <a-tag color="cyan" :title="getTitle(attach)">
-                  <a-icon type="paper-clip"/>
-                  {{attach.originalName.length > 12? attach.originalName.substr(0,12)+'...' :attach.originalName}}
-                </a-tag>
-              </a>
-            </div>
-          </div>
-          <div class="thread-signature">
-            <div :title="fullCreateDate">
-              <a-icon type="clock-circle"/>
-              {{createDate}}
-            </div>
-            <div v-if="author.signature !== ''">
-              <a-icon type="pushpin"/>
-              {{author.signature}}
-            </div>
-          </div>
-          <a-divider class="thread-divider"></a-divider>
-        </div>
-      </div>
-    </div>
-    <div class="thread-admin">
-      <router-link :to="'/thread/update/'+thread.id">
-        <a-tag color="blue" v-if="isAdmin || myUid===author.id">
-          <a-icon type="edit"/>&nbsp;编辑
+          <a-icon type="arrow-up"/>&nbsp;置顶
         </a-tag>
-      </router-link>
-      <a-tag color="red" v-if="isAdmin || myUid===author.id" @click="handleThreadDelete">
-        <a-icon type="delete"/>
-        &nbsp;{{thread.active? '删除' : '恢复'}}
-      </a-tag>
-      <a-tag color="orange" v-if="isAdmin" @click="visibleTop = true;">
-        <a-drawer title="帖子置顶" placement="top" :visible="visibleTop" @close="visibleTop=false;">
-          <div class="drawer-content">
-            <div>置顶帖子后，帖子将展示到板块的最前面。</div>
-            <div class="drawer-btn-container">
-              <a-button type="primary" @click="handleTopThread('2')">全局置顶</a-button>
-              <a-button type="primary" @click="handleTopThread('1')">本版置顶</a-button>
-              <a-button type="primary" @click="handleTopThread('0')">解除置顶</a-button>
+        <a-tag color="cyan" v-if="isAdmin" @click="visibleDiamond = true;">
+          <a-drawer
+            title="精华设置"
+            placement="top"
+            :visible="visibleDiamond"
+            @close="visibleDiamond=false;"
+          >
+            <div class="drawer-content">
+              <div>设置精华后，帖子将以特殊的形式展示。</div>
+              <div class="drawer-btn-container">
+                <a-button type="primary" @click="handleDiamondThread('1')">设置精华</a-button>
+                <a-button type="primary" @click="handleDiamondThread('0')">取消精华</a-button>
+              </div>
             </div>
-          </div>
-        </a-drawer>
-        <a-icon type="arrow-up"/>&nbsp;置顶
-      </a-tag>
-      <a-tag color="cyan" v-if="isAdmin" @click="visibleDiamond = true;">
-        <a-drawer
-          title="精华设置"
-          placement="top"
-          :visible="visibleDiamond"
-          @close="visibleDiamond=false;"
+          </a-drawer>
+          <a-icon type="star"/>&nbsp;精华
+        </a-tag>
+        <a-tag color="purple" v-if="isAdmin" @click="visibleClose = true;">
+          <a-drawer
+            title="帖子锁定"
+            placement="top"
+            :visible="visibleClose"
+            @close="visibleClose=false;"
+          >
+            <div class="drawer-content">
+              <div>帖子锁定后，只有管理员才可以发表评论。</div>
+              <div class="drawer-btn-container">
+                <a-button type="primary" @click="handleCloseThread('1')">锁定帖子</a-button>
+                <a-button type="primary" @click="handleCloseThread('0')">解除锁定</a-button>
+              </div>
+            </div>
+          </a-drawer>
+          <a-icon type="lock"/>&nbsp;锁帖
+        </a-tag>
+      </div>
+      <div class="thread-post-list">
+        <div
+          class="thread-post-list-item"
+          v-for="(post,index) in postList"
+          :key="post.id"
+          :class="{'no-active-filter':!post.post.active}"
         >
-          <div class="drawer-content">
-            <div>设置精华后，帖子将以特殊的形式展示。</div>
-            <div class="drawer-btn-container">
-              <a-button type="primary" @click="handleDiamondThread('1')">设置精华</a-button>
-              <a-button type="primary" @click="handleDiamondThread('0')">取消精华</a-button>
-            </div>
-          </div>
-        </a-drawer>
-        <a-icon type="star"/>&nbsp;精华
-      </a-tag>
-      <a-tag color="purple" v-if="isAdmin" @click="visibleClose = true;">
-        <a-drawer title="帖子锁定" placement="top" :visible="visibleClose" @close="visibleClose=false;">
-          <div class="drawer-content">
-            <div>帖子锁定后，只有管理员才可以发表评论。</div>
-            <div class="drawer-btn-container">
-              <a-button type="primary" @click="handleCloseThread('1')">锁定帖子</a-button>
-              <a-button type="primary" @click="handleCloseThread('0')">解除锁定</a-button>
-            </div>
-          </div>
-        </a-drawer>
-        <a-icon type="lock"/>&nbsp;锁帖
-      </a-tag>
-    </div>
-    <div class="thread-post-list">
-      <div
-        class="thread-post-list-item"
-        v-for="(post,index) in postList"
-        :key="post.id"
-        :class="{'no-active-filter':!post.post.active}"
-      >
-        <div class="thread-post-list-item-avatar-container" v-if="isAdmin || post.post.active">
-          <router-link :to="'/user/visit/'+post.user.id">
-            <a-avatar :src="post.user.avatar" class="user-avatar-small"></a-avatar>
-          </router-link>
-        </div>
-        <div class="thread-post-list-item-content" v-if="isAdmin || post.post.active">
-          <div class="thread-post-list-item-author-info">
+          <div class="thread-post-list-item-avatar-container" v-if="isAdmin || post.post.active">
             <router-link :to="'/user/visit/'+post.user.id">
-              <a-tag :color="post.user.isAdmin?'orange':'cyan'">
-                <a-icon :type="post.user.isAdmin?'crown': 'user'"/>
-                {{post.user.username}}
+              <a-avatar :src="post.user.avatar" class="user-avatar-small"></a-avatar>
+            </router-link>
+          </div>
+          <div class="thread-post-list-item-content" v-if="isAdmin || post.post.active">
+            <div class="thread-post-list-item-author-info">
+              <router-link :to="'/user/visit/'+post.user.id">
+                <a-tag :color="post.user.isAdmin?'orange':'cyan'">
+                  <a-icon :type="post.user.isAdmin?'crown': 'user'"/>
+                  {{post.user.username}}
+                </a-tag>
+              </router-link>&nbsp;
+              <div class="user-group" v-for="group in post.group" :key="group.id">
+                <router-link :to="'/user/group/'+group.id">
+                  <a-tag :color="group.color" class="user-group">
+                    <a-icon type="team"/>
+                    {{group.name}}
+                  </a-tag>
+                </router-link>
+              </div>
+              <a-tag color="pink" class="thread-item-info-messages">
+                <a-icon type="trophy"/>
+                {{(page -1) * defaultPageSize + index +1}}楼
               </a-tag>
-            </router-link>&nbsp;
-            <div class="user-group" v-for="group in post.group" :key="group.id">
-              <router-link :to="'/user/group/'+group.id">
-                <a-tag :color="group.color" class="user-group">
-                  <a-icon type="team"/>
-                  {{group.name}}
+            </div>
+            <div class="post-message post-quote" v-if="post.quote !== null">
+              <h5>引用</h5>
+              <div class="show-markdown" v-html="post.quote.message"></div>
+            </div>
+            <div
+              class="post-message show-markdown"
+              @click="handleAtClick"
+              v-html="post.post.message"
+            ></div>
+            <div class="thread-signature">
+              <div :title="getFullCreateDate(post.post.createDate)">
+                <a-icon type="clock-circle"/>
+                {{getHumanDate(post.post.createDate)}}&nbsp;
+              </div>
+              <div v-if="post.user.signature !== ''">
+                <a-icon type="pushpin"/>
+                {{post.user.signature}}
+              </div>
+            </div>
+            <a-divider class="thread-divider"></a-divider>
+            <div class="post-admin">
+              <router-link :to="'/post/update/'+post.post.id">
+                <a-tag color="blue" v-if="isAdmin || myUid===post.user.id">
+                  <a-icon type="edit"/>&nbsp;编辑
                 </a-tag>
               </router-link>
-            </div>
-            <a-tag color="pink" class="thread-item-info-messages">
-              <a-icon type="trophy"/>
-              {{(page -1) * defaultPageSize + index +1}}楼
-            </a-tag>
-          </div>
-          <div class="post-message post-quote" v-if="post.quote !== null">
-            <h5>引用</h5>
-            <div class="show-markdown" v-html="post.quote.message"></div>
-          </div>
-          <div class="post-message show-markdown" @click="handleAtClick" v-html="post.post.message"></div>
-          <div class="thread-signature">
-            <div :title="getFullCreateDate(post.post.createDate)">
-              <a-icon type="clock-circle"/>
-              {{getHumanDate(post.post.createDate)}}&nbsp;
-            </div>
-            <div v-if="post.user.signature !== ''">
-              <a-icon type="pushpin"/>
-              {{post.user.signature}}
-            </div>
-          </div>
-          <a-divider class="thread-divider"></a-divider>
-          <div class="post-admin">
-            <router-link :to="'/post/update/'+post.post.id">
-              <a-tag color="blue" v-if="isAdmin || myUid===post.user.id">
-                <a-icon type="edit"/>&nbsp;编辑
+              <a-tag
+                color="red"
+                v-if="isAdmin || myUid===post.user.id"
+                @click="handlePostDelete(post.post.id,post.post.active)"
+              >
+                <a-icon type="delete"/>
+                &nbsp;{{post.post.active? '删除' : '恢复'}}
               </a-tag>
-            </router-link>
-            <a-tag
-              color="red"
-              v-if="isAdmin || myUid===post.user.id"
-              @click="handlePostDelete(post.post.id,post.post.active)"
-            >
-              <a-icon type="delete"/>
-              &nbsp;{{post.post.active? '删除' : '恢复'}}
-            </a-tag>
-            <a-tag
-              color="orange"
-              v-if="(isAdmin || !thread.closed) && post.post.active"
-              :class="{'active-quote':quote === post.post.id}"
-              @click="handleQuote(post.post.id , post.user.username)"
-            >
-              <a-icon type="environment"/>&nbsp;引用
-            </a-tag>
+              <a-tag
+                color="orange"
+                v-if="(isAdmin || !thread.closed) && post.post.active"
+                :class="{'active-quote':quote === post.post.id}"
+                @click="handleQuote(post.post.id , post.user.username)"
+              >
+                <a-icon type="environment"/>&nbsp;引用
+              </a-tag>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-    <div class="pagination" v-if="postCount > defaultPageSize">
-      <a-pagination
-        :current="page"
-        :defaultPageSize="defaultPageSize"
-        :total="postCount"
-        @change="handlePageOnchange"
-      ></a-pagination>
-    </div>
-    <div class="thread-send-post">
-      <div class="thread-post-list-item" v-if="isAdmin || !thread.closed">
-        <div class="thread-post-list-item-avatar-container">
-          <a-avatar :src="readerAvatar" class="user-avatar-small"></a-avatar>
-        </div>
-        <div class="thread-post-list-item-content">
-          <div class="quote-message">
-            <a-alert
-              type="info"
-              :message="'您正在引用'+quoteUsername+'的回复'"
-              :showIcon="true"
-              :closable="true"
-              v-if="quote !== '-1'"
-              @close="handleCloseQuote"
-            ></a-alert>
+      <div class="pagination" v-if="postCount > defaultPageSize">
+        <a-pagination
+          :current="page"
+          :defaultPageSize="defaultPageSize"
+          :total="postCount"
+          @change="handlePageOnchange"
+        ></a-pagination>
+      </div>
+      <div class="thread-send-post">
+        <div class="thread-post-list-item" v-if="isAdmin || !thread.closed">
+          <div class="thread-post-list-item-avatar-container">
+            <a-avatar :src="readerAvatar" class="user-avatar-small"></a-avatar>
           </div>
-          <a-input type="textarea" v-model="replyInput" id="replyContent"></a-input>
-          <div class="thread-post-reply-btn">
-            <a-button icon="message" type="primary" @click="reply" :disabled="btnDisabled">回帖</a-button>
+          <div class="thread-post-list-item-content">
+            <div class="quote-message">
+              <a-alert
+                type="info"
+                :message="'您正在引用'+quoteUsername+'的回复'"
+                :showIcon="true"
+                :closable="true"
+                v-if="quote !== '-1'"
+                @close="handleCloseQuote"
+              ></a-alert>
+            </div>
+            <a-input type="textarea" v-model="replyInput" id="replyContent"></a-input>
+            <div class="thread-post-reply-btn">
+              <a-button icon="message" type="primary" @click="reply" :disabled="btnDisabled">回帖</a-button>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </a-spin>
   </div>
 </template>
 <script>
@@ -314,7 +325,8 @@ export default {
                 isThread: false,
                 pid: "",
                 active: true
-            }
+            },
+            showLoading: true
         };
     },
     computed: {
@@ -343,31 +355,31 @@ export default {
             );
         },
         async reply() {
-          this.btnDisabled = true;
-          const replyRepsonseRaw = await this.$ajax.post(
-                  this.$urls.threadReply,
-                  {
+            this.btnDisabled = true;
+            const replyRepsonseRaw = await this.$ajax.post(
+                this.$urls.threadReply,
+                {
                     tid: this.thread.id,
                     quote: this.quote,
                     message: this.replyInput
-                  }
-          );
-          if (replyRepsonseRaw.data.code === 1) {
-            this.$notification.open({
-              message: "回帖",
-              description: "回帖成功！",
-              icon: <a-icon type="smile" style="color: #108ee9" />
-          });
-            this.replyInput = "";
-            this.getThreadInfo();
-          } else {
-            const modal = this.$error();
-            modal.update({
-              title: "回帖错误",
-              content: replyRepsonseRaw.data.msg
-            });
-          }
-          this.btnDisabled = false;
+                }
+            );
+            if (replyRepsonseRaw.data.code === 1) {
+                this.$notification.open({
+                    message: "回帖",
+                    description: "回帖成功！",
+                    icon: <a-icon type="smile" style="color: #108ee9" />
+                });
+                this.replyInput = "";
+                this.getThreadInfo();
+            } else {
+                const modal = this.$error();
+                modal.update({
+                    title: "回帖错误",
+                    content: replyRepsonseRaw.data.msg
+                });
+            }
+            this.btnDisabled = false;
         },
         getTitle(attach) {
             let size = attach.filesize;
@@ -406,6 +418,7 @@ export default {
             return date.toLocaleDateString() + " " + date.toLocaleTimeString();
         },
         async getThreadInfo() {
+            this.showLoading = true;
             this.tid = this.$route.params.tid;
             this.page = Number.parseInt(this.$route.params.page);
             const threadInfoResponseRaw = await this.$ajax.get(
@@ -503,6 +516,7 @@ export default {
                     });
                 });
             }
+            this.showLoading = false;
         },
         handleTopThread(val) {
             this.visibleTop = false;
@@ -593,10 +607,10 @@ export default {
             }
         },
         handlePageOnchange(page) {
-          this.$router.push({
-            path: `/thread/info/${this.tid}/${page}`
-          });
-          this.getThreadInfo();
+            this.$router.push({
+                path: `/thread/info/${this.tid}/${page}`
+            });
+            this.getThreadInfo();
         },
         async postServer(url, obj) {
             const result = await this.$ajax.post(url, obj);

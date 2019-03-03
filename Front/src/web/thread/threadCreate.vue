@@ -6,59 +6,61 @@
         &nbsp;{{execBtnText}}
       </div>
     </div>
-    <div class="thread-create">
-      <div class="create-first-line" v-if="mode !== 2">
-        <div class="create-forum-list-container">
-          <a-select v-model="fid" class="forum-list-selector">
-            <a-select-option
-              v-for="forum in forumList"
-              :value="forum.id"
-              :key="forum.id"
-            >{{forum.name}}</a-select-option>
-          </a-select>
-        </div>
-        <div class="creaete-forum-subject">
-          <a-input placeholder="帖子标题" v-model="subject"/>
-        </div>
-      </div>
-      <div class="create-input">
-        <div class="code-mirror-input-container">
-          <codemirror v-model="message" :options="cmOptions"></codemirror>
-        </div>
-        <div class="create-preview-container">
-          <a-divider type="vertical" class="divider"></a-divider>
-          <div class="create-preview show-markdown" v-html="previewText"></div>
-        </div>
-      </div>
-      <div class="bottom-controls">
-        <div>
-          <div class="thread-attach" v-if="mode !== 2">
-            <a-upload
-              name="attaches"
-              :action="fileUploadUrl"
-              @change="handleFileListChange"
-              @preview="handleFilePreview"
-              :headers="uploadHeaderSet"
-              :multiple="true"
-              :defaultFileList="attachList"
-              v-if="showAttachList"
-            >
-              <a-button>
-                <a-icon type="upload"/>附件上传
-              </a-button>
-            </a-upload>
+    <a-spin :spinning="showLoading" size="large">
+      <div class="thread-create">
+        <div class="create-first-line" v-if="mode !== 2">
+          <div class="create-forum-list-container">
+            <a-select v-model="fid" class="forum-list-selector">
+              <a-select-option
+                v-for="forum in forumList"
+                :value="forum.id"
+                :key="forum.id"
+              >{{forum.name}}</a-select-option>
+            </a-select>
+          </div>
+          <div class="creaete-forum-subject">
+            <a-input placeholder="帖子标题" v-model="subject"/>
           </div>
         </div>
-        <div class="create-thread-btn">
-          <a-button
-            type="primary"
-            icon="check"
-            @click="handleBtnClick"
-            :disabled="btnDisabled"
-          >{{execBtnText}}</a-button>
+        <div class="create-input">
+          <div class="code-mirror-input-container">
+            <codemirror v-model="message" :options="cmOptions"></codemirror>
+          </div>
+          <div class="create-preview-container">
+            <a-divider type="vertical" class="divider"></a-divider>
+            <div class="create-preview show-markdown" v-html="previewText"></div>
+          </div>
+        </div>
+        <div class="bottom-controls">
+          <div>
+            <div class="thread-attach" v-if="mode !== 2">
+              <a-upload
+                name="attaches"
+                :action="fileUploadUrl"
+                @change="handleFileListChange"
+                @preview="handleFilePreview"
+                :headers="uploadHeaderSet"
+                :multiple="true"
+                :defaultFileList="attachList"
+                v-if="showAttachList"
+              >
+                <a-button>
+                  <a-icon type="upload"/>附件上传
+                </a-button>
+              </a-upload>
+            </div>
+          </div>
+          <div class="create-thread-btn">
+            <a-button
+              type="primary"
+              icon="check"
+              @click="handleBtnClick"
+              :disabled="btnDisabled"
+            >{{execBtnText}}</a-button>
+          </div>
         </div>
       </div>
-    </div>
+    </a-spin>
   </div>
 </template>
 <script>
@@ -89,7 +91,8 @@ export default {
             },
             attachList: [],
             showAttachList: false,
-            btnDisabled: false
+            btnDisabled: false,
+            showLoading: true
         };
     },
     computed: {
@@ -150,66 +153,66 @@ export default {
             this.showAttachList = true;
         },
         async getForumList() {
-          const threadListReponseRaw = await this.$ajax.get(
-                  this.$urls.forumListSimple
-          );
-          if (threadListReponseRaw.data.code !== 1) {
-            return this.$store.dispatch("checkLoginStatus");
-          }
-          this.forumList = threadListReponseRaw.data.msg;
+            const threadListReponseRaw = await this.$ajax.get(
+                this.$urls.forumListSimple
+            );
+            if (threadListReponseRaw.data.code !== 1) {
+                return this.$store.dispatch("checkLoginStatus");
+            }
+            this.forumList = threadListReponseRaw.data.msg;
 
-          if (this.$route.params.fid) {
-            this.fid = this.$route.params.fid;
-          } else {
-            this.fid = this.forumList[0].id;
-          }
+            if (this.$route.params.fid) {
+                this.fid = this.$route.params.fid;
+            } else {
+                this.fid = this.forumList[0].id;
+            }
         },
         async getThreadInfo(tid) {
-          await this.$ajax.get(this.$urls.attachExpire(tid));
-          const threadInfoRaw = await this.$ajax.get(
-                  this.$urls.threadInfo(tid, 1)
-          );
-          if (threadInfoRaw.data.code !== 1) {
-            const modal = this.$error();
-            modal.update({
-              title: "错误",
-              content: threadInfoRaw.data.msg
-            });
-            return;
-          }
-          this.fid = threadInfoRaw.data.msg.forumInfo.id;
-          this.subject = threadInfoRaw.data.msg.threadInfo.subject;
+            await this.$ajax.get(this.$urls.attachExpire(tid));
+            const threadInfoRaw = await this.$ajax.get(
+                this.$urls.threadInfo(tid, 1)
+            );
+            if (threadInfoRaw.data.code !== 1) {
+                const modal = this.$error();
+                modal.update({
+                    title: "错误",
+                    content: threadInfoRaw.data.msg
+                });
+                return;
+            }
+            this.fid = threadInfoRaw.data.msg.forumInfo.id;
+            this.subject = threadInfoRaw.data.msg.threadInfo.subject;
 
-          const regImgStr = /\!\[uniqueImg\]\(unique\:\/\/(.*?)\)/g;
-          this.message = threadInfoRaw.data.msg.firstPost.message.replace(
-                  regImgStr,
-                  `![uniqueImg](/api/attach/preview/$1)`
-          );
+            const regImgStr = /\!\[uniqueImg\]\(unique\:\/\/(.*?)\)/g;
+            this.message = threadInfoRaw.data.msg.firstPost.message.replace(
+                regImgStr,
+                `![uniqueImg](/api/attach/preview/$1)`
+            );
 
-          this.attachList = threadInfoRaw.data.msg.attachArr.map(item => ({
-            uid: item.id,
-            response: {
-              code: 1,
-              msg: item.id
-            },
-            name: item.originalName,
-            status: "done"
-          }));
+            this.attachList = threadInfoRaw.data.msg.attachArr.map(item => ({
+                uid: item.id,
+                response: {
+                    code: 1,
+                    msg: item.id
+                },
+                name: item.originalName,
+                status: "done"
+            }));
 
-          this.getAttachList();
+            this.getAttachList();
         },
         async getReplyInfo(pid) {
-          const replyInfoRaw = await this.$ajax.get(this.$urls.postInfo(pid));
-          if (replyInfoRaw.data.code !== 1) {
-            const modal = this.$error();
-            modal.update({
-              title: "错误",
-              content: replyInfoRaw.data.msg
-            });
-            return;
-          }
-          this.message = replyInfoRaw.data.msg.message;
-          this.pid = replyInfoRaw.data.msg.id;
+            const replyInfoRaw = await this.$ajax.get(this.$urls.postInfo(pid));
+            if (replyInfoRaw.data.code !== 1) {
+                const modal = this.$error();
+                modal.update({
+                    title: "错误",
+                    content: replyInfoRaw.data.msg
+                });
+                return;
+            }
+            this.message = replyInfoRaw.data.msg.message;
+            this.pid = replyInfoRaw.data.msg.id;
         },
         async deleteAttach(aid) {
             const response = await this.$ajax.post(
@@ -321,19 +324,20 @@ export default {
             this.btnDisabled = false;
         }
     },
-    mounted() {
+    async mounted() {
         this.mode = this.$route.meta.mode;
         if (this.mode === 1) {
             this.tid = this.$route.params.tid;
-            this.getThreadInfo(this.tid);
+            await this.getThreadInfo(this.tid);
         } else if (this.mode === 2) {
             this.pid = this.$route.params.pid;
-            this.getReplyInfo(this.pid);
+            await this.getReplyInfo(this.pid);
         }
         if (this.mode === 0) {
-            this.getAttachList();
+            await this.getAttachList();
         }
-        this.getForumList();
+        await this.getForumList();
+        this.showLoading = false;
     }
 };
 </script>

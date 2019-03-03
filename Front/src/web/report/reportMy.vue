@@ -1,71 +1,76 @@
 <template>
   <div class="report-my">
-    <div class="report-my-info-container">
-      <div class="user-info">
-        <img :src="user.avatar" class="user-avatar">
-        <div class="user-info-details-container">
-          <div class="user-info-container">
-            <div class="user-name">
-              <router-link
-                :to="userLink(user.uid)"
-                style="color:#363E51;font-weight:600;"
-              >{{user.name}}</router-link>
-            </div>
-            <div class="user-mentor">
-              <div class="user-have-mentor" v-if="haveMentor">
-                <a-tag color="cyan" @click="handleMentorClick">
-                  <a-icon type="fork"/>
-                  {{mentor.name}}
-                </a-tag>
+    <a-spin :spinning="showLoading" size="large">
+      <div class="report-my-info-container">
+        <div class="user-info">
+          <img :src="user.avatar" class="user-avatar">
+          <div class="user-info-details-container">
+            <div class="user-info-container">
+              <div class="user-name">
+                <router-link
+                  :to="userLink(user.uid)"
+                  style="color:#363E51;font-weight:600;"
+                >{{user.name}}</router-link>
               </div>
-              <div class="user-dont-have-mentoor" v-else>
-                <a-tag color="orange" @click="handleMentorClick">
-                  <a-icon type="fork"/>无Mentor
-                </a-tag>
+              <div class="user-mentor">
+                <div class="user-have-mentor" v-if="haveMentor">
+                  <a-tag color="cyan" @click="handleMentorClick">
+                    <a-icon type="fork"/>
+                    {{mentor.name}}
+                  </a-tag>
+                </div>
+                <div class="user-dont-have-mentoor" v-else>
+                  <a-tag color="orange" @click="handleMentorClick">
+                    <a-icon type="fork"/>无Mentor
+                  </a-tag>
+                </div>
               </div>
             </div>
           </div>
         </div>
+        <report-graph :uid="user.uid" class="user-report-graph"></report-graph>
       </div>
-      <report-graph :uid="user.uid" class="user-report-graph"></report-graph>
-    </div>
-    <div class="user-report-create" v-if="canPostReport && mode === 'my'">
-      <router-link to="/report/create">
-        <a-button icon="form" type="primary" style="font-weight:600;">发表Report</a-button>
-      </router-link>
-    </div>
-    <div class="user-report-list">
-      <a-timeline>
-        <a-timeline-item
-          v-for="report in reportList"
-          :key="report.id"
-          :color="report.isWeek? 'orange' : 'blue'"
-        >
-          <div class="report-header">
-            <h3>{{getDate(report.createDate)}}</h3>
-            <div class="report-header-btns">
-              <router-link :to="'/report/update/'+report.id" v-if="showEditBtn(report.createDate)">
-                <a-tag color="blue">
-                  <a-icon type="edit"/>&nbsp;编辑
-                </a-tag>
-              </router-link>
-              <rabbit-tag
-                :background="report.isWeek? '#FFCD52' : '#88AAFF'"
-              >{{report.isWeek? 'Weekly' : 'Daily'}}</rabbit-tag>
+      <div class="user-report-create" v-if="canPostReport && mode === 'my'">
+        <router-link to="/report/create">
+          <a-button icon="form" type="primary" style="font-weight:600;">发表Report</a-button>
+        </router-link>
+      </div>
+      <div class="user-report-list">
+        <a-timeline>
+          <a-timeline-item
+            v-for="report in reportList"
+            :key="report.id"
+            :color="report.isWeek? 'orange' : 'blue'"
+          >
+            <div class="report-header">
+              <h3>{{getDate(report.createDate)}}</h3>
+              <div class="report-header-btns">
+                <router-link
+                  :to="'/report/update/'+report.id"
+                  v-if="showEditBtn(report.createDate)"
+                >
+                  <a-tag color="blue">
+                    <a-icon type="edit"/>&nbsp;编辑
+                  </a-tag>
+                </router-link>
+                <rabbit-tag
+                  :background="report.isWeek? '#FFCD52' : '#88AAFF'"
+                >{{report.isWeek? 'Weekly' : 'Daily'}}</rabbit-tag>
+              </div>
             </div>
-          </div>
-          <div class="report-content" v-html="getMessage(report.message)"></div>
-        </a-timeline-item>
-      </a-timeline>
-    </div>
-    <div class="pagination" v-if="reportCount > defaultPageSize">
-      <a-pagination
-        :current="page"
-        :defaultPageSize="defaultPageSize"
-        :total="reportCount"
-        @change="handlePageOnchange"
-      ></a-pagination>
-    </div>
+            <div class="report-content" v-html="getMessage(report.message)"></div>
+          </a-timeline-item>
+        </a-timeline>
+      </div>
+      <div class="pagination" v-if="reportCount > defaultPageSize">
+        <a-pagination
+          :current="page"
+          :defaultPageSize="defaultPageSize"
+          :total="reportCount"
+          @change="handlePageOnchange"
+        ></a-pagination>
+      </div>
+    </a-spin>
   </div>
 </template>
 <script>
@@ -91,7 +96,8 @@ export default {
             page: 1,
             reportList: [],
             graphList: [],
-            canPostReport: false
+            canPostReport: false,
+            showLoading: true
         };
     },
     methods: {
@@ -156,6 +162,7 @@ export default {
             this.getData();
         },
         async getData() {
+            this.showLoading = true;
             let requestInfoUrl = "";
             if (this.mode === "my") {
                 requestInfoUrl = this.$urls.mentorMyInfo;
@@ -187,6 +194,7 @@ export default {
             const reportCanRaw = await this.$ajax.get(this.$urls.reportCan);
             this.canPostReport =
                 reportCanRaw.data.msg.weekly || reportCanRaw.data.msg.daily;
+            this.showLoading = false;
         }
     },
     computed: {
