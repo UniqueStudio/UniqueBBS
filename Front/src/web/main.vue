@@ -131,17 +131,21 @@ export default {
                     break;
             }
         },
-        loginStatusJump() {
+        async loginStatusJump() {
+            const responseRaw = await ajax.get(urls.myInfo);
+            const response = responseRaw.data;
+            const isLogin = response.code === 1;
+
             if (
                 this.$route.matched.some(item => item.meta.requireLogin) &&
-                !this.loginStatus
+                !isLogin
             ) {
                 this.$router.push({
                     path: "/user/login/pwd"
                 });
             } else if (
                 this.$route.matched.some(item => item.meta.requireUnLogin) &&
-                this.loginStatus
+                isLogin
             ) {
                 this.$router.push({
                     path: "/user/my/info"
