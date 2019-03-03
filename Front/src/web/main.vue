@@ -79,14 +79,12 @@
         </router-link>
       </div>
     </div>
-    <a-spin :spinning="showLoading" size="large">
-      <div class="body">
-        <keep-alive>
-          <router-view v-if="$route.meta.keepAlive"></router-view>
-        </keep-alive>
-        <router-view v-if="!$route.meta.keepAlive"></router-view>
-      </div>
-    </a-spin>
+    <div class="body">
+      <keep-alive>
+        <router-view v-if="$route.meta.keepAlive"></router-view>
+      </keep-alive>
+      <router-view v-if="!$route.meta.keepAlive"></router-view>
+    </div>
     <footer>
       <p class="footer-left">
         <b>Unique BBS</b> v1.10
@@ -102,11 +100,6 @@
 <script>
 import "./css.css";
 export default {
-    data() {
-        return {
-            showLoading: false
-        };
-    },
     methods: {
         handleLoginClick() {
             this.$router.push({ path: "/forum" });
@@ -139,7 +132,6 @@ export default {
             }
         },
         async loginStatusJump() {
-            this.showLoading = true;
             const responseRaw = await this.$ajax.get(this.$urls.myInfo);
             const response = responseRaw.data;
             const isLogin = response.code === 1;
@@ -159,7 +151,6 @@ export default {
                     path: "/user/my/info"
                 });
             }
-            this.showLoading = false;
         }
     },
     mounted() {

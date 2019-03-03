@@ -60,7 +60,7 @@ export default {
                 year1: "2018",
                 year0: "2019"
             },
-            showLoading: true
+            showLoading: false
         };
     },
     props: ["uid", "align"],
