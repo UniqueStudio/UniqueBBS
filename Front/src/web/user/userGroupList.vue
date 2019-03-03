@@ -1,11 +1,11 @@
 <template>
   <div class="user-group-list-container">
-    <a-spin :spinning="showLoading" size="large">
-      <div class="title-info" style="background:#3F47C5;">
-        <div class="title-icon">
-          <a-icon type="team" class="title-item-icon"></a-icon>&nbsp;组列表
-        </div>
+    <div class="title-info" style="background:#3F47C5;">
+      <div class="title-icon">
+        <a-icon type="team" class="title-item-icon"></a-icon>&nbsp;组列表
       </div>
+    </div>
+    <a-spin :spinning="showLoading" size="large">
       <div class="user-group-list">
         <div class="user-group-item" v-for="group in groupList" :key="group.id">
           <div class="group-icon-container">
