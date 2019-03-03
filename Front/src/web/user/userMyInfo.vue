@@ -1,30 +1,32 @@
 <template>
-  <div class="userMyWx">
-    <a-alert message="以下资料同步自企业微信。" type="info" :showIcon="true"></a-alert>
-    <a-input-group>
-      <a-input addonBefore="姓名" readonly :value="wxInfo.username" size="large"/>
-      <a-input addonBefore="邮箱" readonly :value="wxInfo.email" size="large"/>
-      <a-input addonBefore="手机" readonly :value="wxInfo.mobile" size="large"/>
-      <a-input addonBefore="加入" readonly :value="renderJoinTime" size="large"/>
-    </a-input-group>
-    <div class="submit-container">
-      <a-button icon="wechat" type="primary" @click="syncWxInfo" :disabled="syncBtnDisabled">同步</a-button>
+  <a-spin :spinning="showLoading" size="large">
+    <div class="userMyWx">
+      <a-alert message="以下资料同步自企业微信。" type="info" :showIcon="true"></a-alert>
+      <a-input-group>
+        <a-input addonBefore="姓名" readonly :value="wxInfo.username" size="large"/>
+        <a-input addonBefore="邮箱" readonly :value="wxInfo.email" size="large"/>
+        <a-input addonBefore="手机" readonly :value="wxInfo.mobile" size="large"/>
+        <a-input addonBefore="加入" readonly :value="renderJoinTime" size="large"/>
+      </a-input-group>
+      <div class="submit-container">
+        <a-button icon="wechat" type="primary" @click="syncWxInfo" :disabled="syncBtnDisabled">同步</a-button>
+      </div>
+      <a-alert message="以下资料可自行更改，仅团队成员可见。" type="success" :showIcon="true"></a-alert>
+      <a-input-group>
+        <a-input addonBefore="昵称" v-model="detailInfo.nickname" size="large"/>
+        <a-input addonBefore="学号" v-model="detailInfo.studentID" size="large"/>
+        <a-input addonBefore="宿舍" v-model="detailInfo.dormitory" size="large"/>
+        <a-input addonBefore=" Q Q " v-model="detailInfo.qq" size="large"/>
+        <a-input addonBefore="微信" v-model="detailInfo.wechat" size="large"/>
+        <a-input addonBefore="专业" v-model="detailInfo.major" size="large"/>
+        <a-input addonBefore="班级" v-model="detailInfo.className" size="large"/>
+        <a-input addonBefore="签名" v-model="detailInfo.signature" size="large"/>
+      </a-input-group>
+      <div class="submit-container">
+        <a-button icon="check" type="primary" @click="updateInfo" :disabled="updateBtnDisabled">提交</a-button>
+      </div>
     </div>
-    <a-alert message="以下资料可自行更改，仅团队成员可见。" type="success" :showIcon="true"></a-alert>
-    <a-input-group>
-      <a-input addonBefore="昵称" v-model="detailInfo.nickname" size="large"/>
-      <a-input addonBefore="学号" v-model="detailInfo.studentID" size="large"/>
-      <a-input addonBefore="宿舍" v-model="detailInfo.dormitory" size="large"/>
-      <a-input addonBefore=" Q Q " v-model="detailInfo.qq" size="large"/>
-      <a-input addonBefore="微信" v-model="detailInfo.wechat" size="large"/>
-      <a-input addonBefore="专业" v-model="detailInfo.major" size="large"/>
-      <a-input addonBefore="班级" v-model="detailInfo.className" size="large"/>
-      <a-input addonBefore="签名" v-model="detailInfo.signature" size="large"/>
-    </a-input-group>
-    <div class="submit-container">
-      <a-button icon="check" type="primary" @click="updateInfo" :disabled="updateBtnDisabled">提交</a-button>
-    </div>
-  </div>
+  </a-spin>
 </template>
 <script>
 export default {
@@ -47,7 +49,8 @@ export default {
                 signature: ""
             },
             updateBtnDisabled: false,
-            syncBtnDisabled: false
+            syncBtnDisabled: false,
+            showLoading: true
         };
     },
     computed: {
@@ -64,6 +67,7 @@ export default {
     methods: {
         async syncWxInfo() {
             this.syncBtnDisabled = true;
+            this.showLoading = true;
             const responseRaw = await this.$ajax.post(this.$urls.syncWxInfo);
             const response = responseRaw.data;
             if (response.code === 1) {
@@ -82,8 +86,10 @@ export default {
                 });
             }
             this.syncBtnDisabled = false;
+            this.showLoading = false;
         },
         async getInfo() {
+            this.showLoading = true;
             const responseRaw = await this.$ajax.get(this.$urls.myInfo);
             if (responseRaw.data.code !== 1) {
                 return this.$store.dispatch("checkLoginStatus");
@@ -98,9 +104,11 @@ export default {
             this.keys2.forEach(item => {
                 this.detailInfo[item] = response[item];
             });
+            this.showLoading = false;
         },
         async updateInfo() {
             this.updateBtnDisabled = true;
+            this.showLoading = true;
             const responseRaw = await this.$ajax.post(
                 this.$urls.updateMyInfo,
                 this.detailInfo
@@ -120,6 +128,7 @@ export default {
                 });
             }
             this.updateBtnDisabled = false;
+            this.showLoading = false;
         }
     },
     mounted() {

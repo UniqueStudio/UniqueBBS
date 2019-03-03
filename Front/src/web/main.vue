@@ -79,20 +79,22 @@
         </router-link>
       </div>
     </div>
-    <div class="body">
-      <keep-alive>
-        <router-view v-if="$route.meta.keepAlive"></router-view>
-      </keep-alive>
-      <router-view v-if="!$route.meta.keepAlive"></router-view>
-    </div>
+    <a-spin :spinning="showLoading" size="large">
+      <div class="body">
+        <keep-alive>
+          <router-view v-if="$route.meta.keepAlive"></router-view>
+        </keep-alive>
+        <router-view v-if="!$route.meta.keepAlive"></router-view>
+      </div>
+    </a-spin>
     <footer>
       <p class="footer-left">
-        <b>Unique BBS</b> v1.09
+        <b>Unique BBS</b> v1.10
         <br>Code By
         <a href="https://github.com/ttzztztz" target="_blank">Rabbit</a> @ 811
       </p>
       <p class="footer-right">Unique Studio
-        <br>March 2 2019
+        <br>March 3 2019
       </p>
     </footer>
   </div>
@@ -100,6 +102,11 @@
 <script>
 import "./css.css";
 export default {
+    data() {
+        return {
+            showLoading: false
+        };
+    },
     methods: {
         handleLoginClick() {
             this.$router.push({ path: "/forum" });
@@ -132,6 +139,7 @@ export default {
             }
         },
         async loginStatusJump() {
+            this.showLoading = true;
             const responseRaw = await this.$ajax.get(this.$urls.myInfo);
             const response = responseRaw.data;
             const isLogin = response.code === 1;
@@ -151,6 +159,7 @@ export default {
                     path: "/user/my/info"
                 });
             }
+            this.showLoading = false;
         }
     },
     mounted() {

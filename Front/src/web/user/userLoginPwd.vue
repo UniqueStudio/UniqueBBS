@@ -1,34 +1,36 @@
 <template>
   <div class="userLoginPwd">
-    <div class="title-info" style="background:#673ab7;">
-      <div class="title-icon">
-        <a-icon type="key" class="title-item-icon"></a-icon>&nbsp;使用账号密码登录
+    <a-spin :spinning="showLoading" size="large">
+      <div class="title-info" style="background:#673ab7;">
+        <div class="title-icon">
+          <a-icon type="key" class="title-item-icon"></a-icon>&nbsp;使用账号密码登录
+        </div>
       </div>
-    </div>
-    <div class="team-logo-container">
-      <img src="./unique.jpg" class="team-logo" alt="team-logo">
-    </div>
-    <h1>登录</h1>
-    <div class="login-container">
-      <a-input-group>
-        <a-input addonBefore="昵称" v-model.trim="nickname"/>
-        <a-input addonBefore="密码" v-model.trim="pwd" type="password" @keyup.enter="login"/>
-      </a-input-group>
-    </div>
-    <div class="login-btn-container">
-      <a-button
-        icon="login"
-        type="primary"
-        @click="login"
-        id="login"
-        :disabled="loginBtnDisabled"
-      >登录</a-button>
-    </div>
-    <div>
-      <router-link to="/user/login/wx">
-        <a-button icon="wechat" type="primary">使用企业微信登录</a-button>
-      </router-link>
-    </div>
+      <div class="team-logo-container">
+        <img src="./unique.jpg" class="team-logo" alt="team-logo">
+      </div>
+      <h1>登录</h1>
+      <div class="login-container">
+        <a-input-group>
+          <a-input addonBefore="昵称" v-model.trim="nickname"/>
+          <a-input addonBefore="密码" v-model.trim="pwd" type="password" @keyup.enter="login"/>
+        </a-input-group>
+      </div>
+      <div class="login-btn-container">
+        <a-button
+          icon="login"
+          type="primary"
+          @click="login"
+          id="login"
+          :disabled="loginBtnDisabled"
+        >登录</a-button>
+      </div>
+      <div>
+        <router-link to="/user/login/wx">
+          <a-button icon="wechat" type="primary">使用企业微信登录</a-button>
+        </router-link>
+      </div>
+    </a-spin>
   </div>
 </template>
 <script>
@@ -38,7 +40,8 @@ export default {
         return {
             nickname: "",
             pwd: "",
-            loginBtnDisabled: false
+            loginBtnDisabled: false,
+            showLoading: false
         };
     },
     computed: {
@@ -49,9 +52,9 @@ export default {
     },
     methods: {
         async login(e) {
-            console.log(e);
             if (!(e instanceof KeyboardEvent) && !(e instanceof MouseEvent))
                 return;
+            this.showLoading = true;
             this.loginBtnDisabled = true;
             document.getElementById("login").focus();
             const nickname = this.nickname;
@@ -84,6 +87,7 @@ export default {
                 this.$router.push({ path: "/user/my/info" });
             }
             this.loginBtnDisabled = false;
+            this.showLoading = false;
         }
     }
 };

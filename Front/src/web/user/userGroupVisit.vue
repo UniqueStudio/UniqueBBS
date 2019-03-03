@@ -8,22 +8,28 @@
         </div>
       </div>
     </router-link>
-    <div class="user-group-collections">
-      <div v-for="user in groupUserList" :key="user.id" class="group-user-container">
-        <div class="group-user-avatar">
-          <router-link :to="'/user/visit/'+user.id">
-            <a-avatar shape="circle" :src="user.avatar" class="avatar-img"></a-avatar>
-          </router-link>
-        </div>
-        <div class="group-user-info">
-          <router-link :to="'/user/visit/'+user.id">
-            <span :style="{color: user.isAdmin? 'orange' : 'black'}">{{user.username}}</span>
-          </router-link>
-          <rabbit-tag class="group-user-mobile" background="#CACAE5" color="#42427A">{{user.mobile}}</rabbit-tag>
-          <p>{{user.signature}}</p>
+    <a-spin :spinning="showLoading" size="large">
+      <div class="user-group-collections">
+        <div v-for="user in groupUserList" :key="user.id" class="group-user-container">
+          <div class="group-user-avatar">
+            <router-link :to="'/user/visit/'+user.id">
+              <a-avatar shape="circle" :src="user.avatar" class="avatar-img"></a-avatar>
+            </router-link>
+          </div>
+          <div class="group-user-info">
+            <router-link :to="'/user/visit/'+user.id">
+              <span :style="{color: user.isAdmin? 'orange' : 'black'}">{{user.username}}</span>
+            </router-link>
+            <rabbit-tag
+              class="group-user-mobile"
+              background="#CACAE5"
+              color="#42427A"
+            >{{user.mobile}}</rabbit-tag>
+            <p>{{user.signature}}</p>
+          </div>
         </div>
       </div>
-    </div>
+    </a-spin>
   </div>
 </template>
 <script>
@@ -35,23 +41,27 @@ export default {
             groupUserList: [],
             groupName: "",
             gid: "",
-            groupColor: ""
+            groupColor: "",
+            showLoading: true
         };
     },
     methods: {
         async getGroupUserList() {
             const { gid } = this.$route.params;
+            this.showLoading = true;
             this.gid = gid;
             const responseGroupInfoRaw = await this.$ajax.get(
                 this.$urls.groupUsers(gid)
             );
             const responseGroupInfo = responseGroupInfoRaw.data;
             if (responseGroupInfo.code !== 1) {
+                this.showLoading = false;
                 return this.$store.dispatch("checkLoginStatus");
             }
             this.groupUserList = responseGroupInfo.msg.list;
             this.groupName = responseGroupInfo.msg.info.name;
             this.groupColor = responseGroupInfo.msg.info.color;
+            this.showLoading = false;
         }
     },
     mounted() {

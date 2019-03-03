@@ -1,59 +1,65 @@
 <template>
   <div class="user-my-notice">
-    <div class="user-my-notice-control">
-      <h3>消息列表</h3>
-      <div class="user-my-notice-btn-container" v-if="messageList.length > 0">
-        <a-button type="primary" @click="handleReadAllMessages" :disabled="isReadDisabled">全部已读</a-button>
-        <a-button type="primary" @click="handleDeleteAllMessages" :disabled="deleteAllDisabled">全部删除</a-button>
+    <a-spin :spinning="showLoading" size="large">
+      <div class="user-my-notice-control">
+        <h3>消息列表</h3>
+        <div class="user-my-notice-btn-container" v-if="messageList.length > 0">
+          <a-button type="primary" @click="handleReadAllMessages" :disabled="isReadDisabled">全部已读</a-button>
+          <a-button
+            type="primary"
+            @click="handleDeleteAllMessages"
+            :disabled="deleteAllDisabled"
+          >全部删除</a-button>
+        </div>
       </div>
-    </div>
-    <a-comment
-      v-for="message in messageList"
-      :key="message.messageItem.id"
-      :data-url="message.url"
-      class="message-item"
-    >
-      <div slot="author" class="message-sender">
-        <a-tag
-          :color="message.fromUser.isAdmin?'orange':'cyan'"
-          @click="jumpToUser(message.fromUser.id)"
-        >
-          <a-icon :type="message.fromUser.isAdmin?'crown': 'user'"/>
-          {{message.fromUser.username}}
-        </a-tag>
-        <div class="right-message">
-          <a-tag color="red" @click="deleteMessage(message.messageItem.id)">
-            <a-icon type="scissor"/>&nbsp;删除
+      <a-comment
+        v-for="message in messageList"
+        :key="message.messageItem.id"
+        :data-url="message.url"
+        class="message-item"
+      >
+        <div slot="author" class="message-sender">
+          <a-tag
+            :color="message.fromUser.isAdmin?'orange':'cyan'"
+            @click="jumpToUser(message.fromUser.id)"
+          >
+            <a-icon :type="message.fromUser.isAdmin?'crown': 'user'"/>
+            {{message.fromUser.username}}
           </a-tag>
+          <div class="right-message">
+            <a-tag color="red" @click="deleteMessage(message.messageItem.id)">
+              <a-icon type="scissor"/>&nbsp;删除
+            </a-tag>
+          </div>
         </div>
-      </div>
-      <a-avatar
-        :src="message.fromUser.avatar"
-        slot="avatar"
-        @click="jumpToUser(message.fromUser.id)"
-      />
-      <div
-        slot="content"
-        @click="handleClickMessage(message.messageItem.id,message.messageItem.url)"
-        :class="{'bold-message': !message.messageItem.isRead}"
-      >{{message.messageItem.message}}</div>
-      <div class="message-status">
-        <div class="message-time">{{getMessageHumandate(message.messageItem.createDate)}}</div>
-        <div class="messasge-read-status">
-          <a-icon type="smile"/>
-          &nbsp;{{message.messageItem.isRead ? '已读':'未读'}}
+        <a-avatar
+          :src="message.fromUser.avatar"
+          slot="avatar"
+          @click="jumpToUser(message.fromUser.id)"
+        />
+        <div
+          slot="content"
+          @click="handleClickMessage(message.messageItem.id,message.messageItem.url)"
+          :class="{'bold-message': !message.messageItem.isRead}"
+        >{{message.messageItem.message}}</div>
+        <div class="message-status">
+          <div class="message-time">{{getMessageHumandate(message.messageItem.createDate)}}</div>
+          <div class="messasge-read-status">
+            <a-icon type="smile"/>
+            &nbsp;{{message.messageItem.isRead ? '已读':'未读'}}
+          </div>
         </div>
+        <a-divider class="notice-divider"></a-divider>
+      </a-comment>
+      <div class="pagination" v-if="totalMessages > defaultPageSize">
+        <a-pagination
+          :current="page"
+          :defaultPageSize="defaultPageSize"
+          :total="totalMessages"
+          @change="handlePageOnChange"
+        ></a-pagination>
       </div>
-      <a-divider class="notice-divider"></a-divider>
-    </a-comment>
-    <div class="pagination" v-if="totalMessages > defaultPageSize">
-      <a-pagination
-        :current="page"
-        :defaultPageSize="defaultPageSize"
-        :total="totalMessages"
-        @change="handlePageOnChange"
-      ></a-pagination>
-    </div>
+    </a-spin>
   </div>
 </template>
 <script>
@@ -65,7 +71,8 @@ export default {
             deleteAllDisabled: false,
             defaultPageSize: 20,
             totalMessages: 0,
-            page: 1
+            page: 1,
+            showLoading: true
         };
     },
     methods: {
@@ -101,12 +108,14 @@ export default {
             return this.$humanDate(new Date(str));
         },
         async getMessageList() {
+            this.showLoading = true;
             this.$store.dispatch("updateUnreadMessage");
             const messageCountResponseRaw = await this.$ajax.get(
                 this.$urls.messageCount
             );
 
             if (messageCountResponseRaw.data.code !== 1) {
+                this.showLoading = false;
                 return this.$store.dispatch("checkLoginStatus");
             }
             this.totalMessages = Number.parseInt(
@@ -118,11 +127,14 @@ export default {
             );
 
             if (messageListResponseRaw.data.code !== 1) {
+                this.showLoading = false;
                 return this.$store.dispatch("checkLoginStatus");
             }
             this.messageList = messageListResponseRaw.data.msg;
+            this.showLoading = false;
         },
         async deleteMessage(mid) {
+            this.showLoading = true;
             const responseRaw = await this.$ajax.post(
                 this.$urls.messageDelete(mid)
             );
@@ -141,6 +153,7 @@ export default {
                 this.getMessageList();
             }
             this.$store.dispatch("updateUnreadMessage");
+            this.showLoading = false;
         },
         async readMessage(mid) {
             await this.$ajax.post(this.$urls.messageRead(mid));
@@ -148,6 +161,7 @@ export default {
             this.$store.dispatch("updateUnreadMessage");
         },
         async readAllMessages(e) {
+            this.showLoading = true;
             this.isReadDisabled = true;
             const responseRaw = await this.$ajax.post(
                 this.$urls.messageReadAll
@@ -168,8 +182,10 @@ export default {
             }
             this.$store.dispatch("updateUnreadMessage");
             this.isReadDisabled = false;
+            this.showLoading = false;
         },
         async deleteAllMessages(e) {
+            this.showLoading = true;
             this.deleteAllDisabled = true;
             const responseRaw = await this.$ajax.post(
                 this.$urls.messageDeleteAll
@@ -190,6 +206,7 @@ export default {
             }
             this.$store.dispatch("updateUnreadMessage");
             this.deleteAllDisabled = false;
+            this.showLoading = false;
         }
     },
     mounted() {

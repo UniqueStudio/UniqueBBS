@@ -6,61 +6,63 @@
         &nbsp;{{mode==0?"发表Report": "编辑Report"}}
       </div>
     </div>
-    <div class="report-form">
-      <div class="form-left">
-        <label>报告类型</label>
+    <a-spin :spinning="showLoading" size="large">
+      <div class="report-form">
+        <div class="form-left">
+          <label>报告类型</label>
+        </div>
+        <div class="form-right">
+          <a-select style="width: 100%;" v-model="isWeekReport">
+            <a-select-option value="0" v-if="can.daily">Daily Report</a-select-option>
+            <a-select-option value="1" v-if="can.weekly">Weekly Report</a-select-option>
+          </a-select>
+        </div>
+        <div class="form-left">
+          <label>学习时间</label>
+        </div>
+        <div class="form-right">
+          <a-input placeholder="学习时间" v-model="time"/>
+        </div>
+        <div class="form-left">
+          <label>学习内容</label>
+        </div>
+        <div class="form-right">
+          <a-textarea placeholder="学习内容" v-model="content"/>
+        </div>
+        <div class="form-left">
+          <label>学习计划</label>
+        </div>
+        <div class="form-right">
+          <a-textarea placeholder="学习计划" v-model="plan"/>
+        </div>
+        <div class="form-left">
+          <label>解决问题</label>
+        </div>
+        <div class="form-right">
+          <a-textarea placeholder="解决问题" v-model="solution"/>
+        </div>
+        <div class="form-left">
+          <label>学习总结</label>
+        </div>
+        <div class="form-right">
+          <a-textarea placeholder="学习总结" v-model="conclusion"/>
+        </div>
+        <div class="form-left">
+          <label>附加内容</label>
+        </div>
+        <div class="form-right">
+          <a-textarea placeholder="附加信息" v-model="extra"/>
+        </div>
+        <div class="form-left"></div>
+        <div class="form-right">
+          <a-button
+            type="primary"
+            icon="calendar"
+            @click="handleButtonClick"
+          >{{mode==0?"发表Report": "编辑Report"}}</a-button>
+        </div>
       </div>
-      <div class="form-right">
-        <a-select style="width: 100%;" v-model="isWeekReport">
-          <a-select-option value="0" v-if="can.daily">Daily Report</a-select-option>
-          <a-select-option value="1" v-if="can.weekly">Weekly Report</a-select-option>
-        </a-select>
-      </div>
-      <div class="form-left">
-        <label>学习时间</label>
-      </div>
-      <div class="form-right">
-        <a-input placeholder="学习时间" v-model="time"/>
-      </div>
-      <div class="form-left">
-        <label>学习内容</label>
-      </div>
-      <div class="form-right">
-        <a-textarea placeholder="学习内容" v-model="content"/>
-      </div>
-      <div class="form-left">
-        <label>学习计划</label>
-      </div>
-      <div class="form-right">
-        <a-textarea placeholder="学习计划" v-model="plan"/>
-      </div>
-      <div class="form-left">
-        <label>解决问题</label>
-      </div>
-      <div class="form-right">
-        <a-textarea placeholder="解决问题" v-model="solution"/>
-      </div>
-      <div class="form-left">
-        <label>学习总结</label>
-      </div>
-      <div class="form-right">
-        <a-textarea placeholder="学习总结" v-model="conclusion"/>
-      </div>
-      <div class="form-left">
-        <label>附加内容</label>
-      </div>
-      <div class="form-right">
-        <a-textarea placeholder="附加信息" v-model="extra"/>
-      </div>
-      <div class="form-left"></div>
-      <div class="form-right">
-        <a-button
-          type="primary"
-          icon="calendar"
-          @click="handleButtonClick"
-        >{{mode==0?"发表Report": "编辑Report"}}</a-button>
-      </div>
-    </div>
+    </a-spin>
   </div>
 </template>
 <script>
@@ -79,7 +81,8 @@ export default {
             can: {
                 daily: true,
                 weekly: true
-            }
+            },
+            showLoading: true
         };
     },
     methods: {
@@ -187,14 +190,15 @@ export default {
             }
         }
     },
-    mounted() {
+    async mounted() {
         this.mode = this.$route.meta.mode;
         if (this.mode === 1) {
             this.rid = this.$route.params.rid;
-            this.getReportInfo();
+            await this.getReportInfo();
         } else {
-            this.getCanStatus();
+            await this.getCanStatus();
         }
+        this.showLoading = false;
     }
 };
 </script>

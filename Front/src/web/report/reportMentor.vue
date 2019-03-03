@@ -5,68 +5,70 @@
         <a-icon type="trophy" class="title-item-icon"></a-icon>&nbsp;Mentor
       </div>
     </div>
-    <div class="avatar-container">
-      <div class="user-info-container">
-        <div class="user-avatar-container">
-          <img :src="myAvatar" alt="myAvatar" class="user-avatar">
-        </div>
-        <div class="user-name-container">
-          <a-tag color="cyan">
-            <a-icon type="user"/>
-            &nbsp;{{myUserName}}
-          </a-tag>
-        </div>
-      </div>
-      <div class="user-info-container" v-if="mentor.have">
-        <div class="user-avatar-container">
-          <router-link :to="'/user/visit/'+mentor.id">
-            <img :src="mentor.avatar" alt="myMentorAvatar" class="user-avatar">
-          </router-link>
-        </div>
-        <div class="user-name-container">
-          <router-link :to="'/user/visit/'+mentor.id">
-            <a-tag color="purple">
-              <a-icon type="fork"/>
-              &nbsp;{{mentor.username}}
+    <a-spin :spinning="showLoading" size="large">
+      <div class="avatar-container">
+        <div class="user-info-container">
+          <div class="user-avatar-container">
+            <img :src="myAvatar" alt="myAvatar" class="user-avatar">
+          </div>
+          <div class="user-name-container">
+            <a-tag color="cyan">
+              <a-icon type="user"/>
+              &nbsp;{{myUserName}}
             </a-tag>
-          </router-link>
+          </div>
         </div>
-      </div>
-    </div>
-    <div class="mentor-set">
-      <h3>设置Mentor</h3>
-      <div class="mentor-set-container">
-        <a-input-group>
-          <a-input addonBefore="Mentor姓名" v-model="setMentorName" size="large"/>
-        </a-input-group>
-      </div>
-      <div class="mentor-set-btn-container">
-        <a-button icon="tool" type="primary" @click="setMentor">设定</a-button>
-      </div>
-    </div>
-    <h3>我的Mentee</h3>
-    <div class="mentor-my-students">
-      <div class="mentor-my-students-item" v-for="student in students" :key="student.id">
-        <div class="student-item-avatar">
-          <div class="student-item-avatar-container">
-            <router-link :to="'/user/visit/'+student.id">
-              <img :src="student.avatar" alt="userAvatar" class="user-avatar-small">
+        <div class="user-info-container" v-if="mentor.have">
+          <div class="user-avatar-container">
+            <router-link :to="'/user/visit/'+mentor.id">
+              <img :src="mentor.avatar" alt="myMentorAvatar" class="user-avatar">
             </router-link>
           </div>
-          <div class="student-item-name-container">
-            <router-link :to="'/user/visit/'+student.id">
-              <a-tag color="cyan">
-                <a-icon type="user"/>
-                &nbsp;{{student.username}}
+          <div class="user-name-container">
+            <router-link :to="'/user/visit/'+mentor.id">
+              <a-tag color="purple">
+                <a-icon type="fork"/>
+                &nbsp;{{mentor.username}}
               </a-tag>
             </router-link>
           </div>
         </div>
-        <div class="student-item-graph">
-          <report-graph :uid="student.id" align="left"></report-graph>
+      </div>
+      <div class="mentor-set">
+        <h3>设置Mentor</h3>
+        <div class="mentor-set-container">
+          <a-input-group>
+            <a-input addonBefore="Mentor姓名" v-model="setMentorName" size="large"/>
+          </a-input-group>
+        </div>
+        <div class="mentor-set-btn-container">
+          <a-button icon="tool" type="primary" @click="setMentor">设定</a-button>
         </div>
       </div>
-    </div>
+      <h3>我的Mentee</h3>
+      <div class="mentor-my-students">
+        <div class="mentor-my-students-item" v-for="student in students" :key="student.id">
+          <div class="student-item-avatar">
+            <div class="student-item-avatar-container">
+              <router-link :to="'/user/visit/'+student.id">
+                <img :src="student.avatar" alt="userAvatar" class="user-avatar-small">
+              </router-link>
+            </div>
+            <div class="student-item-name-container">
+              <router-link :to="'/user/visit/'+student.id">
+                <a-tag color="cyan">
+                  <a-icon type="user"/>
+                  &nbsp;{{student.username}}
+                </a-tag>
+              </router-link>
+            </div>
+          </div>
+          <div class="student-item-graph">
+            <report-graph :uid="student.id" align="left"></report-graph>
+          </div>
+        </div>
+      </div>
+    </a-spin>
   </div>
 </template>
 <script>
@@ -85,7 +87,8 @@ export default {
             },
             students: [],
             myUserName: "",
-            setMentorName: ""
+            setMentorName: "",
+            showLoading: true
         };
     },
     computed: {
@@ -95,6 +98,7 @@ export default {
     },
     methods: {
         async getInfo() {
+            this.showLoading = true;
             const mentorResponseRaw = await this.$ajax.get(
                 this.$urls.mentorMyStudents
             );
@@ -119,8 +123,10 @@ export default {
                     content: mentorResponseRaw.data.msg
                 });
             }
+            this.showLoading = false;
         },
         async setMentor() {
+            this.showLoading = true;
             const setResult = await this.$ajax.post(this.$urls.mentorSet, {
                 mentorName: this.setMentorName
             });
@@ -138,6 +144,7 @@ export default {
                     content: setResult.data.msg
                 });
             }
+            this.showLoading = false;
         }
     },
     mounted() {

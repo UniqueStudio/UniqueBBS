@@ -1,56 +1,61 @@
 <template>
   <div class="user-group-list-container">
-    <div class="title-info" style="background:#3F47C5;">
-      <div class="title-icon">
-        <a-icon type="team" class="title-item-icon"></a-icon>&nbsp;组列表
-      </div>
-    </div>
-    <div class="user-group-list">
-      <div class="user-group-item" v-for="group in groupList" :key="group.id">
-        <div class="group-icon-container">
-          <router-link :to="'/user/group/'+group.group.id">
-            <div class="group-icon-bg" :style="{backgroundColor:group.group.color}">
-              <a-icon type="team" class="group-icon"></a-icon>
-            </div>
-          </router-link>
+    <a-spin :spinning="showLoading" size="large">
+      <div class="title-info" style="background:#3F47C5;">
+        <div class="title-icon">
+          <a-icon type="team" class="title-item-icon"></a-icon>&nbsp;组列表
         </div>
-        <div class="group-name">
-          <div>
+      </div>
+      <div class="user-group-list">
+        <div class="user-group-item" v-for="group in groupList" :key="group.id">
+          <div class="group-icon-container">
             <router-link :to="'/user/group/'+group.group.id">
-              <span class="group-name-title">{{group.group.name}}</span>
+              <div class="group-icon-bg" :style="{backgroundColor:group.group.color}">
+                <a-icon type="team" class="group-icon"></a-icon>
+              </div>
             </router-link>
           </div>
-          <div class="group-info">
-            <router-link :to="'/user/visit/'+group.master.id">
-              <a-tag color="orange">
-                <a-icon type="crown"/>
-                {{group.master.username}}
+          <div class="group-name">
+            <div>
+              <router-link :to="'/user/group/'+group.group.id">
+                <span class="group-name-title">{{group.group.name}}</span>
+              </router-link>
+            </div>
+            <div class="group-info">
+              <router-link :to="'/user/visit/'+group.master.id">
+                <a-tag color="orange">
+                  <a-icon type="crown"/>
+                  {{group.master.username}}
+                </a-tag>
+              </router-link>
+              <a-tag color="cyan" class="group-number">
+                <a-icon type="team"/>
+                {{group.count}}人
               </a-tag>
-            </router-link>
-            <a-tag color="cyan" class="group-number">
-              <a-icon type="team"/>
-              {{group.count}}人
-            </a-tag>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </a-spin>
   </div>
 </template>
 <script>
 export default {
     data() {
         return {
-            groupList: []
+            groupList: [],
+            showLoading: true
         };
     },
     methods: {
         async getGroupList() {
+            this.showLoading = true;
             const responseRaw = await this.$ajax.get(this.$urls.groupList);
             if (responseRaw.data.code !== 1) {
                 return this.$store.dispatch("checkLoginStatus");
             }
             this.groupList = responseRaw.data.msg;
+            this.showLoading = false;
         }
     },
     mounted() {

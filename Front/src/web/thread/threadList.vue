@@ -10,73 +10,75 @@
         {{forum.threads}}
       </div>
     </div>
-    <div class="thread-controls">
-      <router-link :to="'/thread/create/'+forum.id">
-        <a-button type="primary" icon="form">发帖</a-button>
-      </router-link>
-    </div>
-    <div class="thread-list-items">
-      <div class="thread-item" v-for="thread in threadList" :key="thread.id">
-        <div :class="{'thread-item-author':true,'no-active-filter':!thread.thread.active}">
-          <router-link :to="'/user/visit/'+thread.user.id">
-            <a-avatar shape="circle" :src="thread.user.avatar" class="avatar-img"></a-avatar>
-          </router-link>
-        </div>
-        <div :class="{'thread-item-info':true,'no-active-filter':!thread.thread.active}">
-          <p class="thread-item-info-subject">
-            <span v-if="thread.thread.top" :title="thread.thread.top===1 ? '本版置顶':'全局置顶'">
-              <a-icon type="arrow-up" :style="{color: thread.thread.top===1 ? 'orange' : 'red'}"/>
-            </span>
-            <router-link :to="'/thread/info/'+thread.thread.id+'/1'">{{thread.thread.subject}}</router-link>
-          </p>
-          <p>
-            <a-tag color="cyan" v-if="thread.thread.diamond">
-              <a-icon type="star"/>
-              <span class="diamond-text">&nbsp;精华</span>
-            </a-tag>
-            <a-tag color="red" v-if="thread.thread.closed">
-              <a-icon type="lock"/>
-              <span class="diamond-text">&nbsp;锁定</span>
-            </a-tag>
+    <a-spin :spinning="showLoading" size="large">
+      <div class="thread-controls">
+        <router-link :to="'/thread/create/'+forum.id">
+          <a-button type="primary" icon="form">发帖</a-button>
+        </router-link>
+      </div>
+      <div class="thread-list-items">
+        <div class="thread-item" v-for="thread in threadList" :key="thread.id">
+          <div :class="{'thread-item-author':true,'no-active-filter':!thread.thread.active}">
             <router-link :to="'/user/visit/'+thread.user.id">
-              <a-tag :color="thread.user.isAdmin? 'orange':'cyan'">
-                <a-icon :type="thread.user.isAdmin? 'crown' : 'user'"/>
-                {{thread.user.username}}
-              </a-tag>
+              <a-avatar shape="circle" :src="thread.user.avatar" class="avatar-img"></a-avatar>
             </router-link>
-            <a-tag color="green">
-              <a-icon type="clock-circle"/>
-              {{humanDate(new Date(thread.thread.createDate))}}
-            </a-tag>
-            <a-tag color="purple" class="thread-item-post-count">
-              <a-icon type="message"/>
-              {{thread.thread.postCount}}
-            </a-tag>
-          </p>
+          </div>
+          <div :class="{'thread-item-info':true,'no-active-filter':!thread.thread.active}">
+            <p class="thread-item-info-subject">
+              <span v-if="thread.thread.top" :title="thread.thread.top===1 ? '本版置顶':'全局置顶'">
+                <a-icon type="arrow-up" :style="{color: thread.thread.top===1 ? 'orange' : 'red'}"/>
+              </span>
+              <router-link :to="'/thread/info/'+thread.thread.id+'/1'">{{thread.thread.subject}}</router-link>
+            </p>
+            <p>
+              <a-tag color="cyan" v-if="thread.thread.diamond">
+                <a-icon type="star"/>
+                <span class="diamond-text">&nbsp;精华</span>
+              </a-tag>
+              <a-tag color="red" v-if="thread.thread.closed">
+                <a-icon type="lock"/>
+                <span class="diamond-text">&nbsp;锁定</span>
+              </a-tag>
+              <router-link :to="'/user/visit/'+thread.user.id">
+                <a-tag :color="thread.user.isAdmin? 'orange':'cyan'">
+                  <a-icon :type="thread.user.isAdmin? 'crown' : 'user'"/>
+                  {{thread.user.username}}
+                </a-tag>
+              </router-link>
+              <a-tag color="green">
+                <a-icon type="clock-circle"/>
+                {{humanDate(new Date(thread.thread.createDate))}}
+              </a-tag>
+              <a-tag color="purple" class="thread-item-post-count">
+                <a-icon type="message"/>
+                {{thread.thread.postCount}}
+              </a-tag>
+            </p>
+          </div>
+          <div class="thread-item-last-reply" v-if="thread.lastReply[0]">
+            <div class="thread-item-info-reply-message">
+              <router-link
+                :to="'/thread/info/'+thread.thread.id+'/1'"
+              >{{thread.lastReply[0].message.length > 10? (thread.lastReply[0].message.substr(0,10)+'...') : thread.lastReply[0].message}}</router-link>
+            </div>
+            <div class="thread-item-info-author">
+              <a-tag color="green">
+                <a-icon type="clock-circle"/>
+                {{humanDate(new Date(thread.thread.lastDate))}}
+              </a-tag>
+            </div>
+          </div>
         </div>
-        <div class="thread-item-last-reply" v-if="thread.lastReply[0]">
-          <div class="thread-item-info-reply-message">
-            <router-link
-              :to="'/thread/info/'+thread.thread.id+'/1'"
-            >{{thread.lastReply[0].message.length > 10? (thread.lastReply[0].message.substr(0,10)+'...') : thread.lastReply[0].message}}</router-link>
-          </div>
-          <div class="thread-item-info-author">
-            <a-tag color="green">
-              <a-icon type="clock-circle"/>
-              {{humanDate(new Date(thread.thread.lastDate))}}
-            </a-tag>
-          </div>
+        <div class="pagination" v-if="forum.threads > defaultPageSize">
+          <a-pagination
+            :current="page"
+            :defaultPageSize="defaultPageSize"
+            :total="forum.threads"
+            @change="handlePageOnchange"
+          ></a-pagination>
         </div>
       </div>
-      <div class="pagination" v-if="forum.threads > defaultPageSize">
-        <a-pagination
-          :current="page"
-          :defaultPageSize="defaultPageSize"
-          :total="forum.threads"
-          @change="handlePageOnchange"
-        ></a-pagination>
-      </div>
-    </div>
+    </a-spin>
   </div>
 </template>
 <script>
@@ -94,7 +96,8 @@ export default {
             },
             fid: "0",
             page: 0,
-            defaultPageSize: 20
+            defaultPageSize: 20,
+            showLoading: true
         };
     },
     methods: {
@@ -102,6 +105,7 @@ export default {
             return this.$humanDate(date);
         },
         async getData() {
+            this.showLoading = true;
             this.fid = this.$route.params.fid;
             this.page = Number.parseInt(this.$route.params.page);
             const threadListResponseRaw = await this.$ajax.get(
@@ -123,12 +127,13 @@ export default {
             } else {
                 this.$store.dispatch("checkLoginStatus");
             }
+            this.showLoading = false;
         },
         handlePageOnchange(page) {
-          this.$router.push({
-            path: `/thread/list/${this.fid}/${page}`
-          });
-          this.getData();
+            this.$router.push({
+                path: `/thread/list/${this.fid}/${page}`
+            });
+            this.getData();
         }
     },
     activated() {
