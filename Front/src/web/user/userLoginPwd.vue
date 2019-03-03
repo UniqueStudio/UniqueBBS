@@ -32,7 +32,7 @@
   </div>
 </template>
 <script>
-import * as crypto from "crypto";
+import crypto from "crypto";
 export default {
     data() {
         return {
@@ -49,8 +49,9 @@ export default {
     },
     methods: {
         async login(e) {
-            if (!(e instanceof KeyboardEvent)) return;
-            this.pwd = this.pwd.trim();
+            console.log(e);
+            if (!(e instanceof KeyboardEvent) && !(e instanceof MouseEvent))
+                return;
             this.loginBtnDisabled = true;
             document.getElementById("login").focus();
             const nickname = this.nickname;
