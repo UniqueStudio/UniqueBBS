@@ -6,80 +6,57 @@
 
 <script>
 export default {
-  name: "App",
-  mounted() {
-    this.loginStatusJump();
-    this.$router.beforeEach((to, from, next) => {
-      const loginStatus = this.$store.state.loginStatus;
-      if (to.matched.some(item => item.meta.requireLogin) && !loginStatus) {
-        next({
-          path: "/user/login/pwd"
+    name: "App",
+    mounted() {
+        this.$router.beforeEach((to, from, next) => {
+            const loginStatus = this.$store.state.loginStatus;
+            if (
+                to.matched.some(item => item.meta.requireLogin) &&
+                !loginStatus
+            ) {
+                next({
+                    path: "/user/login/pwd"
+                });
+            } else if (
+                to.matched.some(item => item.meta.requireUnLogin) &&
+                loginStatus
+            ) {
+                next({
+                    path: "/user/my/info"
+                });
+            } else {
+                next();
+            }
         });
-      } else if (
-        to.matched.some(item => item.meta.requireUnLogin) &&
-        loginStatus
-      ) {
-        next({
-          path: "/user/my/info"
+        this.$notification.config({
+            top: "86px",
+            placement: "topRight",
+            duration: 5
         });
-      } else {
-        next();
-      }
-    });
-    this.$notification.config({
-      top: "86px",
-      placement: "topRight",
-      duration: 5
-    });
-  },
-  computed: {
-    noticeContent() {
-      return this.$store.state.noticeContent;
     },
-    loginStatus() {
-      return this.$store.state.loginStatus;
-    }
-  },
-  watch: {
-    noticeContent(newContent, oldContent) {
-      if (newContent !== "") {
-        this.$notification.open({
-          message: "消息通知",
-          description: newContent,
-          icon: <a-icon type="mail" style="color: #108ee9" />
-        });
-      }
+    computed: {
+        noticeContent() {
+            return this.$store.state.noticeContent;
+        }
     },
-    loginStatus(newVal, oldVal) {
-      this.loginStatusJump();
+    watch: {
+        noticeContent(newContent, oldContent) {
+            if (newContent !== "") {
+                this.$notification.open({
+                    message: "消息通知",
+                    description: newContent,
+                    icon: <a-icon type="mail" style="color: #108ee9" />
+                });
+            }
+        }
     }
-  },
-  methods: {
-    loginStatusJump() {
-      if (
-        this.$route.matched.some(item => item.meta.requireLogin) &&
-        !this.loginStatus
-      ) {
-        this.$router.push({
-          path: "/user/login/pwd"
-        });
-      } else if (
-        this.$route.matched.some(item => item.meta.requireUnLogin) &&
-        this.loginStatus
-      ) {
-        this.$router.push({
-          path: "/user/my/info"
-        });
-      }
-    }
-  }
 };
 </script>
 
 <style>
 #app {
-  font-family: "Microsoft Yahei", sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+    font-family: "Microsoft Yahei", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 </style>

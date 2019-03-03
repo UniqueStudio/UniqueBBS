@@ -154,7 +154,7 @@ const upload = multer({
     fileFilter: fileFilter
 }); //20MB
 
-app.use((_req, res, next) => {
+root.use((_req, res, next) => {
     res.header("Access-Control-Allow-Origin", "*");
     res.header("Access-Control-Allow-Methods", "POST, GET");
     res.header(
