@@ -132,7 +132,7 @@ export default {
             }
         },
         async loginStatusJump() {
-            const responseRaw = await ajax.get(urls.myInfo);
+            const responseRaw = await this.$ajax.get(this.$urls.myInfo);
             const response = responseRaw.data;
             const isLogin = response.code === 1;
 
