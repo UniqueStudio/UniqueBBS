@@ -87,12 +87,12 @@
     </div>
     <footer>
       <p class="footer-left">
-        <b>Unique BBS</b> v1.08
+        <b>Unique BBS</b> v1.09
         <br>Code By
         <a href="https://github.com/ttzztztz" target="_blank">Rabbit</a> @ 811
       </p>
       <p class="footer-right">Unique Studio
-        <br>February 23 2019
+        <br>March 2 2019
       </p>
     </footer>
   </div>
@@ -126,19 +126,44 @@ export default {
                         localStorage.removeItem("token");
                         localStorage.removeItem("uid");
                         this.$store.commit("setLoginStatus", false);
-                        this.$store.dispatch("checkLoginStatus");
                         this.$router.push({ path: "/user/login/pwd" });
                     }
                     break;
+            }
+        },
+        loginStatusJump() {
+            if (
+                this.$route.matched.some(item => item.meta.requireLogin) &&
+                !this.loginStatus
+            ) {
+                this.$router.push({
+                    path: "/user/login/pwd"
+                });
+            } else if (
+                this.$route.matched.some(item => item.meta.requireUnLogin) &&
+                this.loginStatus
+            ) {
+                this.$router.push({
+                    path: "/user/my/info"
+                });
             }
         }
     },
     mounted() {
         this.$store.dispatch("checkLoginStatus");
+        this.loginStatusJump();
     },
     computed: {
         navActive() {
             return this.$store.state.navActive;
+        },
+        loginStatus() {
+            return this.$store.state.loginStatus;
+        }
+    },
+    watch: {
+        loginStatus(newVal, oldVal) {
+            this.loginStatusJump();
         }
     }
 };
