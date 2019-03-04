@@ -1,11 +1,11 @@
 <template>
   <div class="userLoginPwd">
-    <a-spin :spinning="showLoading" size="large">
-      <div class="title-info" style="background:#673ab7;">
-        <div class="title-icon">
-          <a-icon type="key" class="title-item-icon"></a-icon>&nbsp;使用账号密码登录
-        </div>
+    <div class="title-info" style="background:#673ab7;">
+      <div class="title-icon">
+        <a-icon type="key" class="title-item-icon"></a-icon>&nbsp;使用账号密码登录
       </div>
+    </div>
+    <a-spin :spinning="showLoading" size="large">
       <div class="team-logo-container">
         <img src="./unique.jpg" class="team-logo" alt="team-logo">
       </div>
