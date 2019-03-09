@@ -107,7 +107,7 @@ export default {
         async getData() {
             this.showLoading = true;
             this.fid = this.$route.params.fid;
-            this.page = Number.parseInt(this.$route.params.page);
+            this.page = +this.$route.params.page;
             const threadListResponseRaw = await this.$ajax.get(
                 this.$urls.threadList(this.fid, this.page)
             );

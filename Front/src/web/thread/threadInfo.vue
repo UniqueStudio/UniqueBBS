@@ -420,7 +420,7 @@ export default {
         async getThreadInfo() {
             this.showLoading = true;
             this.tid = this.$route.params.tid;
-            this.page = Number.parseInt(this.$route.params.page);
+            this.page = +this.$route.params.page;
             const threadInfoResponseRaw = await this.$ajax.get(
                 this.$urls.threadInfo(this.tid, this.page)
             );

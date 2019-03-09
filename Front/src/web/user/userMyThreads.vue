@@ -75,7 +75,7 @@ export default {
         async getMyThreadList() {
             this.showLoading = true;
             const uid = localStorage.getItem("uid");
-            this.page = Number.parseInt(this.$route.params.page);
+            this.page = +this.$route.params.page;
             const myThreadListRaw = await this.$ajax.get(
                 this.$urls.userPosts(uid, this.page.toString())
             );

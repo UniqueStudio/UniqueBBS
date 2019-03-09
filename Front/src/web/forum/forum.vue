@@ -1,47 +1,52 @@
 <template>
   <div class="forum-container">
     <a-spin :spinning="showLoading" size="large">
-      <div class="forum-item" v-for="forum in this.forumList" :key="forum.id">
-        <div class="forum-item-icon-container">
-          <router-link :to="'/thread/list/'+forum.id+'/1'">
-            <div class="forum-item-icon-bg" :style="{backgroundColor:forum.backgroundColor}">
-              <a-icon :type="forum.icon" class="forum-item-icon"></a-icon>
-            </div>
-          </router-link>
+      <div>
+        <div class="search-box">
+          <a-input-search placeholder="请输入要搜索的内容" @search="handleSearch" v-model="seachBoxInput"/>
         </div>
-        <div class="forum-item-info">
-          <router-link :to="'/thread/list/'+forum.id+'/1'">
-            <p class="forum-item-title">{{forum.name}}</p>
-          </router-link>
-          <p v-if="forum.description !== null" class="forum-item-description">
-            <a-tag color="purple">
-              <a-icon type="message"/>
-              {{forum.threads}}
-            </a-tag>
-            {{forum.description}}
-          </p>
-        </div>
-        <div class="forum-item-last">
-          <div v-if="forum.lastPost!==null">
-            <p class="forum-last-post">
-              <router-link :to="'/user/visit/'+forum.lastPostInfo.user.id">
-                <a-avatar
-                  shape="circle"
-                  :src="forum.lastPostInfo.user.avatar"
-                  class="avatar-img"
-                  size="small"
-                ></a-avatar>
-              </router-link>
-              <router-link
-                :to="'/thread/info/'+forum.lastPostInfo.thread.id+'/1'"
-              >{{forum.lastPost.message.length>10 ? (forum.lastPost.message.substr(0,10)+"..."):forum.lastPost.message}}</router-link>
-            </p>
-            <a-tag color="green">
-              <a-icon type="clock-circle"/>
-              {{getHumanDate(forum.lastPost.createDate)}}
-            </a-tag>
+        <div class="forum-item" v-for="forum in this.forumList" :key="forum.id">
+          <div class="forum-item-icon-container">
+            <router-link :to="'/thread/list/'+forum.id+'/1'">
+              <div class="forum-item-icon-bg" :style="{backgroundColor:forum.backgroundColor}">
+                <a-icon :type="forum.icon" class="forum-item-icon"></a-icon>
+              </div>
+            </router-link>
           </div>
-          <div v-else>暂无回帖</div>
+          <div class="forum-item-info">
+            <router-link :to="'/thread/list/'+forum.id+'/1'">
+              <p class="forum-item-title">{{forum.name}}</p>
+            </router-link>
+            <p v-if="forum.description !== null" class="forum-item-description">
+              <a-tag color="purple">
+                <a-icon type="message"/>
+                {{forum.threads}}
+              </a-tag>
+              {{forum.description}}
+            </p>
+          </div>
+          <div class="forum-item-last">
+            <div v-if="forum.lastPost!==null">
+              <p class="forum-last-post">
+                <router-link :to="'/user/visit/'+forum.lastPostInfo.user.id">
+                  <a-avatar
+                    shape="circle"
+                    :src="forum.lastPostInfo.user.avatar"
+                    class="avatar-img"
+                    size="small"
+                  ></a-avatar>
+                </router-link>
+                <router-link
+                  :to="'/thread/info/'+forum.lastPostInfo.thread.id+'/1'"
+                >{{forum.lastPost.message.length>10 ? (forum.lastPost.message.substr(0,10)+"..."):forum.lastPost.message}}</router-link>
+              </p>
+              <a-tag color="green">
+                <a-icon type="clock-circle"/>
+                {{getHumanDate(forum.lastPost.createDate)}}
+              </a-tag>
+            </div>
+            <div v-else>暂无回帖</div>
+          </div>
         </div>
       </div>
     </a-spin>
@@ -52,7 +57,8 @@ export default {
     data() {
         return {
             forumList: [],
-            showLoading: true
+            showLoading: true,
+            seachBoxInput: ""
         };
     },
     methods: {
@@ -76,9 +82,15 @@ export default {
                 this.$store.dispatch("checkLoginStatus");
             }
             this.showLoading = false;
+        },
+        handleSearch() {
+            this.$router.push({
+                path: `/search/${this.seachBoxInput}/1`
+            });
         }
     },
     activated() {
+        this.seachBoxInput = "";
         this.$store.commit("setActiveNav", 1);
         this.getForumList();
     }
@@ -93,6 +105,9 @@ export default {
     .forum-item {
         grid-template-columns: 20% 50% 30%;
     }
+    .search-box {
+        width: 60%;
+    }
 }
 @media screen and (max-width: 800px) {
     .forum-container {
@@ -105,6 +120,12 @@ export default {
     .forum-item-last {
         display: none;
     }
+    .search-box {
+        width: 90%;
+    }
+}
+.search-box {
+    margin: 12px auto;
 }
 .forum-item {
     display: grid;

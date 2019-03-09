@@ -82,7 +82,7 @@ export default {
             });
         },
         handlePageOnChange(page) {
-            this.page = Number.parseInt(page);
+            this.page = +page;
             this.$router.push({
                 path: `/user/my/notice/${page}`
             });
@@ -118,9 +118,7 @@ export default {
                 this.showLoading = false;
                 return this.$store.dispatch("checkLoginStatus");
             }
-            this.totalMessages = Number.parseInt(
-                messageCountResponseRaw.data.msg.total
-            );
+            this.totalMessages = +messageCountResponseRaw.data.msg.total;
 
             const messageListResponseRaw = await this.$ajax.get(
                 this.$urls.messageList(this.page)
@@ -210,7 +208,7 @@ export default {
         }
     },
     mounted() {
-        this.page = Number.parseInt(this.$route.params.page);
+        this.page = +this.$route.params.page;
         this.getMessageList();
     }
 };

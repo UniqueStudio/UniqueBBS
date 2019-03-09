@@ -209,7 +209,7 @@ app.post("/thread/recovery/:tid", threadRecovery);
 app.get("/post/info/:pid", postInfo);
 app.post("/post/delete/:pid", postDelete);
 app.post("/post/update/:pid", postUpdate);
-app.post("/post/search", postSearch);
+app.post("/post/search/:page", postSearch);
 app.post("/post/deleteHard/:pid", postDeleteHard);
 app.post("/post/recovery/:pid", postRecovery);
 

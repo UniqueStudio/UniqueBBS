@@ -111,7 +111,7 @@ export default {
             if (this.mode === "visit") {
                 this.canPostReport = false;
             }
-            this.page = Number.parseInt(this.$route.params.page);
+            this.page = +this.$route.params.page;
             this.getData();
         },
         getDate(dateStr) {
@@ -190,7 +190,7 @@ export default {
                 this.$urls.reportList(this.user.uid, this.page)
             );
             this.reportList = reportListRaw.data.msg.list;
-            this.reportCount = Number.parseInt(reportListRaw.data.msg.count);
+            this.reportCount = +reportListRaw.data.msg.count;
             const reportCanRaw = await this.$ajax.get(this.$urls.reportCan);
             this.canPostReport =
                 reportCanRaw.data.msg.weekly || reportCanRaw.data.msg.daily;
