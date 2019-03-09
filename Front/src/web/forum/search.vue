@@ -88,6 +88,7 @@ export default {
             this.$router.push({
                 path: `/search/${this.seachBoxInput}/${page}`
             });
+            this.doSearch();
         },
         getHumanDate(str) {
             const date = new Date(str);
