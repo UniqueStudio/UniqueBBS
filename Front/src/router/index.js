@@ -24,6 +24,7 @@ const report = () => import("@/web/report/report.vue");
 const reportMy = () => import("@/web/report/reportMy.vue");
 const reportCreate = () => import("@/web/report/reportCreate.vue");
 const reportMentor = () => import("@/web/report/reportMentor.vue");
+const search = () => import("@/web/forum/search.vue");
 
 Vue.use(Router);
 
@@ -271,6 +272,14 @@ const router = new Router({
                             }
                         }
                     ]
+                },
+                {
+                    path: "search/:keyword/:page",
+                    name: "search",
+                    component: search,
+                    meta: {
+                        requireLogin: true
+                    }
                 }
             ]
         }

@@ -1,6 +1,7 @@
-import { verifyJWT } from "./check";
+import { verifyJWT, filterUserInfo } from "./check";
 import { Request, Response } from "express";
 import { prisma } from "../generated/prisma-client";
+import { pagesize } from "./consts";
 
 export const postDeleteHard = async function(req: Request, res: Response) {
     try {
@@ -156,12 +157,69 @@ export const postSearch = async function(req: Request, res: Response) {
     try {
         verifyJWT(req.header("Authorization"));
         const { keyword } = req.body;
-        const result = await prisma.posts({
-            where: {
-                message_contains: keyword
+        const { page } = req.params;
+
+        const keywords = (keyword as string).split(" ");
+
+        const keywordArr1 = keywords.map(item => ({ message_contains: item }));
+        const keywordArr2 = keywords.map(item => ({
+            thread: {
+                subject_contains: item
             }
+        }));
+
+        const postResult = await prisma.posts({
+            where: {
+                OR: [{ AND: keywordArr1 }, { AND: keywordArr2 }]
+            },
+            orderBy: "createDate_DESC",
+            skip: pagesize * (+page - 1),
+            first: pagesize
         });
-        res.json({ code: 1, msg: result });
+
+        const result = await Promise.all(
+            postResult.map(async item => {
+                const thread = await prisma
+                    .post({
+                        id: item.id
+                    })
+                    .thread();
+
+                const user = await prisma
+                    .post({
+                        id: item.id
+                    })
+                    .user();
+
+                const postCount = await prisma
+                    .thread({
+                        id: thread.id
+                    })
+                    .postCount();
+
+                return {
+                    id: thread.id,
+                    key: item.id,
+                    subject: thread.subject,
+                    user: filterUserInfo(user),
+                    message: item.message,
+                    postCount: postCount,
+                    createDate: item.createDate,
+                    threadCreateDate: thread.createDate
+                };
+            })
+        );
+
+        const count = await prisma
+            .postsConnection({
+                where: {
+                    OR: [{ AND: keywordArr1 }, { AND: keywordArr2 }]
+                }
+            })
+            .aggregate()
+            .count();
+
+        res.json({ code: 1, msg: { result, count } });
     } catch (e) {
         res.json({ code: -1, msg: e.message });
     }

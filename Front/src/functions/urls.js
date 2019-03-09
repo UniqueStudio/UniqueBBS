@@ -61,6 +61,7 @@ const urls = {
     mentorMyStudents: `${domain}user/mentor/students`,
     mentorSet: `${domain}user/mentor/set`,
     atResult: `${domain}at`,
+    search: page => `${domain}post/search/${page}`,
     socket: socket
 };
 export default urls;
