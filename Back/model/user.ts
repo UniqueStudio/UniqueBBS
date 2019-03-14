@@ -182,7 +182,7 @@ export const userLoginByPwd = async function(req: Request, res: Response) {
         }
 
         const token = signJWT(userInfo.id, userInfo.isAdmin, userInfo.username);
-        await prisma.updateUser({
+        prisma.updateUser({
             where: {
                 id: userInfo.id
             },
@@ -449,7 +449,7 @@ export const userScan = async function(req: Request, res: Response) {
                         _user.isAdmin,
                         _user.username
                     );
-                    await prisma.updateUser({
+                    prisma.updateUser({
                         where: {
                             id: _user.id
                         },
