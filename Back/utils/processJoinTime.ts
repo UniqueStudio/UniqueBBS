@@ -11,10 +11,17 @@ export default function processJoinTime(user: any): number {
             const testResult = /加入时间/g.test(item.name);
             if (testResult) {
                 let year = Number.parseInt(item.value.substr(0, 4));
-                let period = joinPeriod.get(item.value.substr(4, 1));
-                if (!period) {
-                    period = "0";
+
+                let period = "0";
+
+                if (/春/.test(item.value)) {
+                    period = "1";
+                } else if (/夏/.test(item.value)) {
+                    period = "2";
+                } else if (/秋/.test(item.value)) {
+                    period = "3";
                 }
+
                 if (!Object.is(year, NaN) && period) {
                     result = year + period;
                 }
