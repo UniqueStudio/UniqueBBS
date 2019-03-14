@@ -73,7 +73,6 @@ export const getUser = async function() {
                 avatar: `unique://${user.userid}`,
                 userid: user.userid,
                 email: user.email,
-                lastLogin: new Date(),
                 joinTime: processJoinTime(user),
                 group: {
                     connect: userGroup
@@ -93,7 +92,10 @@ export const getUser = async function() {
                 userID = update.id;
             } else {
                 console.log(`Creating user ${user.name}`);
-                const create = await prisma.createUser(dataObj);
+                const create = await prisma.createUser({
+                    ...dataObj,
+                    lastLogin: new Date()
+                });
                 userID = create.id;
             }
 
