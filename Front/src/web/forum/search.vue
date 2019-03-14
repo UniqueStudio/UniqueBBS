@@ -88,7 +88,6 @@ export default {
             this.$router.push({
                 path: `/search/${this.seachBoxInput}/${page}`
             });
-            this.page = +page;
             this.doSearch();
         },
         getHumanDate(str) {
@@ -121,7 +120,11 @@ export default {
         width: 60%;
     }
     .search-container {
-        width: 60%;
+        width: 90%;
+        margin: 36px auto;
+    }
+    .result-container {
+        width: 75%;
         margin: 36px auto;
     }
 }
