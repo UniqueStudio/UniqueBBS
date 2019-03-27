@@ -361,13 +361,20 @@ export const userInfoUpdateFromWx = async function(
             }
 
             const userGroupArr = user.department;
+            const isOld = (userGroupArr as any[]).some(item => +item >= 14); //老成员只放在一个组内
             let userGroup: Array<{ id: string }> = [];
-            for (let userGroupKey of userGroupArr) {
-                const id = groupList.get(userGroupKey);
-                if (id) {
-                    userGroup.push({
-                        id: id
-                    });
+            if (isOld) {
+                userGroup.push({
+                    id: groupList.get(14)
+                });
+            } else {
+                for (let userGroupKey of userGroupArr) {
+                    const id = groupList.get(userGroupKey);
+                    if (id && +userGroupKey < 14) {
+                        userGroup.push({
+                            id: id
+                        });
+                    }
                 }
             }
 

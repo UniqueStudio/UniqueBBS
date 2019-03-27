@@ -87,7 +87,7 @@ import {
 import { socketLogin, socketDisconnect } from "./model/socket";
 import { atResult } from "./model/at";
 
-const SERVER_VERSION = "1.05";
+const SERVER_VERSION = "1.06";
 
 export const MODE = process.env.NODE_ENV;
 
