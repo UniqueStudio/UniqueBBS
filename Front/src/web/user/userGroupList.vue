@@ -22,7 +22,7 @@
               </router-link>
             </div>
             <div class="group-info">
-              <router-link :to="'/user/visit/'+group.master.id">
+              <router-link :to="'/user/visit/'+group.master.id" v-if="group.master">
                 <a-tag color="orange">
                   <a-icon type="crown"/>
                   {{group.master.username}}

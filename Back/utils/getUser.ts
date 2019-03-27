@@ -48,13 +48,21 @@ export const getUser = async function() {
             setID.set(user.userid, 1);
 
             const userGroupArr = user.department;
+            const isOld = (userGroupArr as any[]).some(item => +item >= 14); //老成员只放在一个组内
             let userGroup: Array<{ id: string }> = [];
-            for (let userGroupKey of userGroupArr) {
-                const groupID = groupList.get(userGroupKey);
-                if (groupID) {
-                    userGroup.push({
-                        id: groupID
-                    });
+
+            if (isOld) {
+                userGroup.push({
+                    id: groupList.get(14)
+                });
+            } else {
+                for (let userGroupKey of userGroupArr) {
+                    const groupID = groupList.get(userGroupKey);
+                    if (groupID && +userGroupKey < 14) {
+                        userGroup.push({
+                            id: groupID
+                        });
+                    }
                 }
             }
 
@@ -87,13 +95,14 @@ export const getUser = async function() {
                     where: {
                         userid: user.userid
                     },
-                    data: dataObj
+                    data: { ...dataObj, active: true }
                 });
                 userID = update.id;
             } else {
                 console.log(`Creating user ${user.name}`);
                 const create = await prisma.createUser({
                     ...dataObj,
+                    active: true,
                     lastLogin: new Date()
                 });
                 userID = create.id;

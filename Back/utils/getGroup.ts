@@ -60,7 +60,7 @@ export const updateGroup = async function() {
             }
         }
 
-        if (!findResult) {
+        if (!findResult && department.id <= 14) {
             await prisma.createGroup({
                 name: department.name,
                 key: department.id
