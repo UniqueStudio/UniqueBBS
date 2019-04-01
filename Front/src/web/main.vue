@@ -48,6 +48,13 @@
       <div class="nav-avatar">
         <a-dropdown placement="bottomRight" v-if="this.$store.state.loginStatus">
           <a-menu slot="overlay" @click="handleMenuClick" class="nav-menu">
+            <a-menu-item key="8" v-if="isAdmin">
+              <a-icon type="sound"/>群发通知
+            </a-menu-item>
+            <a-menu-item key="9">
+              <a-icon type="form"/>发帖
+            </a-menu-item>
+            <a-menu-divider key="10"></a-menu-divider>
             <a-menu-item key="1">
               <a-icon type="contacts"/>资料
             </a-menu-item>
@@ -87,13 +94,13 @@
     </div>
     <footer>
       <p class="footer-left">
-        <b>Unique BBS</b> v1.15
+        <b>Unique BBS</b> v1.16
         <br>Code By
         <a href="https://github.com/ttzztztz" target="_blank">Rabbit</a> @ 811
       </p>
       <p class="footer-right">
         Unique Studio
-        <br>March 27 2019
+        <br>April 1 2019
       </p>
     </footer>
   </div>
@@ -130,6 +137,12 @@ export default {
                         this.$router.push({ path: "/user/login/pwd" });
                     }
                     break;
+                case "8":
+                    this.$router.push({ path: "/admin/push" });
+                    break;
+                case "9":
+                    this.$router.push({ path: "/thread/create" });
+                    break;
             }
         },
         async loginStatusJump() {
@@ -164,6 +177,9 @@ export default {
         },
         loginStatus() {
             return this.$store.state.loginStatus;
+        },
+        isAdmin() {
+            return this.$store.state.isAdmin;
         }
     },
     watch: {

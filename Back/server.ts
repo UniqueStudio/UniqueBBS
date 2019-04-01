@@ -79,6 +79,7 @@ import { groupList, groupUserList, groupUser } from "./model/group";
 import {
     messageIsRead,
     messageList,
+    messageSuperPush,
     messageDelete,
     messageReadAll,
     messageDeleteAll,
@@ -87,7 +88,7 @@ import {
 import { socketLogin, socketDisconnect } from "./model/socket";
 import { atResult } from "./model/at";
 
-const SERVER_VERSION = "1.06";
+const SERVER_VERSION = "1.07";
 
 export const MODE = process.env.NODE_ENV;
 
@@ -221,6 +222,7 @@ app.get("/group/user/:uid", groupUser);
 //Message
 app.get("/message/list/:page", messageList);
 app.get("/message/count", messageCount);
+app.post("/message/push", messageSuperPush);
 app.post("/message/read/:id", messageIsRead);
 app.post("/message/delete/:id", messageDelete);
 app.post("/message/all/read", messageReadAll);
