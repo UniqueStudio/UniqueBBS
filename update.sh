@@ -1,2 +1,2 @@
-cd ~/BBS_Front/ && sudo docker cp ./ 6ddd8a5a2d24:/var/www && sudo docker restart 6ddd8a5a2d24
-cd ~/BBS_Back/ && sudo docker cp ./ 32271e5163d2:/usr/src/app/output && sudo docker restart 32271e5163d2
+cd ~/BBS_Front/ && sudo docker cp ./ ee8c88579608:/var/www && sudo docker restart ee8c88579608
+cd ~/BBS_Back/ && sudo docker cp ./ be01cbce9410:/usr/src/app/output && sudo docker restart be01cbce9410

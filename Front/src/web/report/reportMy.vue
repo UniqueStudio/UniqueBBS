@@ -269,7 +269,7 @@ export default {
     margin: 36px auto;
 }
 .user-report-list {
-    margin: 36px 0;
+    margin: 48px 0;
 }
 .report-header {
     display: grid;
