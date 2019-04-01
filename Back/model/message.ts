@@ -1,7 +1,7 @@
 import { prisma, Message } from "../generated/prisma-client";
 import { Request, Response } from "express";
-import { verifyJWT, filterUserInfo } from "./check";
-import { pagesize } from "./consts";
+import { verifyJWT, filterUserInfo, getAccessToken } from "./check";
+import { pagesize, wxMsgPushURL } from "./consts";
 import { socketPushMessage } from "./socket";
 
 export const MESSAGE_REPLY = (username: string, subject: string) =>
@@ -18,6 +18,12 @@ export const MESSAGE_AT = (
     isReply: Boolean
 ) =>
     `${fromUsername}在帖子《${subject}》${isReply ? "的回复" : ""}中提到了您。`;
+
+export type WxPushMsgToObj =
+    | {
+          touser: string;
+      }
+    | { toparty: string };
 
 export const MESSAGE_THREAD_URL = (tid: string) => `/thread/info/${tid}/1`;
 export const MESSAGE_REPORT_URL = `/report/mentor`;
@@ -258,5 +264,138 @@ export const messageCount = async function(req: Request, res: Response) {
         res.json({ code: 1, msg: { total, unread, last } });
     } catch (err) {
         res.json({ code: -1, msg: err.message });
+    }
+};
+
+export const messageSuperPush = async function(req: Request, res: Response) {
+    try {
+        const { isAdmin } = verifyJWT(req.header("Authorization"));
+        if (!isAdmin) {
+            res.json({ code: -1, msg: "您无权向团队成员推送消息！" });
+            return;
+        }
+        const { groupLists, content, url } = req.body;
+
+        if (!content) {
+            res.json({ code: -1, msg: "请输入要推送的通知内容！" });
+            return;
+        }
+
+        messageWxPushGroup(groupLists, content, undefined, "团队公告");
+
+        (async () => {
+            const [adminAccount] = await prisma.users({
+                where: {
+                    username: "杨子越"
+                }
+            });
+
+            const willPushUids: string[] = [];
+
+            for (const gid of groupLists as string[]) {
+                const users = await prisma.users({
+                    where: {
+                        group_some: {
+                            id: gid
+                        }
+                    }
+                });
+                willPushUids.push(...users.map(item => item.id));
+            }
+
+            const uniquePushUids = [...new Set(willPushUids)];
+            for (const uid of uniquePushUids) {
+                await pushMessage(adminAccount.id, uid, content, url);
+            }
+        })();
+
+        res.json({ code: 1 });
+    } catch (err) {
+        res.json({ code: -1, msg: err.message });
+    }
+};
+
+export const messageWxPushUser = async function(
+    uids: string[],
+    content: string,
+    url?: string,
+    title?: string
+) {
+    try {
+        const userIdLists = await Promise.all(
+            uids.map(async item => {
+                const userInfo = await prisma.user({
+                    id: item
+                });
+                return userInfo.userid;
+            })
+        );
+
+        const userIdsString = userIdLists.filter(item => !!item).join("|");
+
+        const toObj = {
+            touser: userIdsString
+        } as WxPushMsgToObj;
+
+        await messageWxPush(toObj, content, url, title);
+    } catch (e) {
+        console.log(e.message);
+    }
+};
+
+export const messageWxPushGroup = async function(
+    gids: string[],
+    content: string,
+    url?: string,
+    title?: string
+) {
+    try {
+        const groupKeyLists = await Promise.all(
+            gids.map(async item => {
+                const groupInfo = await prisma.group({
+                    id: item
+                });
+                return groupInfo.key;
+            })
+        );
+
+        const groupKeyString = groupKeyLists.filter(item => !!item).join("|");
+
+        const toObj = {
+            toparty: groupKeyString
+        } as WxPushMsgToObj;
+
+        await messageWxPush(toObj, content, url, title);
+    } catch (e) {
+        console.log(e.message);
+    }
+};
+
+export const messageWxPush = async function(
+    toSomeObj: WxPushMsgToObj,
+    content: string,
+    url?: string,
+    title?: string
+) {
+    try {
+        const reqBody = {
+            ...toSomeObj,
+            msgtype: "textcard",
+            agentid: process.env.AGENTID,
+            textcard: {
+                title: title ? title : "论坛消息提醒",
+                description: content,
+                url: url ? url : "https://bbs.hustunique.com/user/my/notice/1",
+                btntxt: "消息中心"
+            }
+        };
+
+        const accessToken = await getAccessToken();
+        await fetch(wxMsgPushURL(accessToken), {
+            method: "post",
+            body: JSON.stringify(reqBody)
+        });
+    } catch (e) {
+        console.log(e.message);
     }
 };

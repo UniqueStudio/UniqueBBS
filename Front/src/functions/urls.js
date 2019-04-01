@@ -1,7 +1,7 @@
 const url = new URL(window.location.href);
 
-const domain = url.origin + "/api/";
-// const domain = "http://localhost:7010/api/";
+// const domain = url.origin + "/api/";
+const domain = "http://localhost:7010/api/";
 
 const socket = domain.replace(/^http/i, "ws");
 const urls = {
@@ -61,6 +61,7 @@ const urls = {
     mentorMyStudents: `${domain}user/mentor/students`,
     mentorSet: `${domain}user/mentor/set`,
     atResult: `${domain}at`,
+    messagePush: `${domain}message/push`,
     search: page => `${domain}post/search/${page}`,
     socket: socket
 };

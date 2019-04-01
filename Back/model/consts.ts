@@ -21,6 +21,8 @@ export const userIDURL = (accessToken: string, code: string) =>
     `https://qyapi.weixin.qq.com/cgi-bin/user/getuserinfo?access_token=${accessToken}&code=${code}`;
 export const userInfoURL = (accessToken: string, userid: string) =>
     `https://qyapi.weixin.qq.com/cgi-bin/user/get?access_token=${accessToken}&userid=${userid}`;
+export const wxMsgPushURL = (accessToken: string) =>
+    `https://qyapi.weixin.qq.com/cgi-bin/message/send?access_token=${accessToken}`;
 
 export const regPreviewURL = `${process.env.BACKEND_URL}attach/preview/`;
 // export const regPreviewURL = `http://localhost:7010/attach/preview/`;

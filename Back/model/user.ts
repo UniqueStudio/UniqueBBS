@@ -17,7 +17,12 @@ import {
     filterUserInfo,
     filterUsersInfo
 } from "./check";
-import { pushMessage, MESSAGE_SET_MENTOR, MESSAGE_REPORT_URL } from "./message";
+import {
+    pushMessage,
+    MESSAGE_SET_MENTOR,
+    MESSAGE_REPORT_URL,
+    messageWxPushUser
+} from "./message";
 import { setLockExpireIncr } from "./lock";
 import { filterUserAvatar } from "./check";
 import fs from "fs";
@@ -652,10 +657,12 @@ export const mentorSet = async function(req: Request, res: Response) {
             }
         });
 
-        await pushMessage(
-            uid,
-            mentorInfo.id,
-            MESSAGE_SET_MENTOR(username),
+        const sendSetMentorMsg = MESSAGE_SET_MENTOR(username);
+
+        pushMessage(uid, mentorInfo.id, sendSetMentorMsg, MESSAGE_REPORT_URL);
+        messageWxPushUser(
+            [mentorInfo.id],
+            sendSetMentorMsg,
             MESSAGE_REPORT_URL
         );
 

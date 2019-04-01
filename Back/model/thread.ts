@@ -19,7 +19,8 @@ import {
     MESSAGE_QUOTE,
     MESSAGE_DIAMOND,
     MESSAGE_THREAD_URL,
-    MESSAGE_AT
+    MESSAGE_AT,
+    messageWxPushUser
 } from "./message";
 import { redLock } from "../server";
 import { fileProcess } from "./attach";
@@ -518,12 +519,10 @@ export const threadReply = async function(req: Request, res: Response) {
             forumLastPostUpdate(forumInfo.id, resultThread[0].id);
             let havePushMessage = 0;
             if (uid !== authorInfo.id) {
-                pushMessage(
-                    uid,
-                    authorInfo.id,
-                    MESSAGE_REPLY(username, threadInfo.subject),
-                    MESSAGE_THREAD_URL(threadInfo.id)
-                );
+                const sendMsg = MESSAGE_REPLY(username, threadInfo.subject);
+                const sendUrl = MESSAGE_THREAD_URL(threadInfo.id);
+                pushMessage(uid, authorInfo.id, sendMsg, sendUrl);
+                messageWxPushUser([authorInfo.id], sendMsg, sendUrl);
                 havePushMessage = 1;
             }
             if (quote !== -1 && !havePushMessage) {
@@ -537,11 +536,21 @@ export const threadReply = async function(req: Request, res: Response) {
                     })
                     .user();
                 if (quotePost && quotePostAuthor.id !== uid) {
+                    const sendQuoteMsg = MESSAGE_QUOTE(
+                        username,
+                        threadInfo.subject
+                    );
+                    const sendQuoteUrl = MESSAGE_THREAD_URL(threadInfo.id);
                     pushMessage(
                         uid,
                         quotePostAuthor.id,
-                        MESSAGE_QUOTE(username, threadInfo.subject),
-                        MESSAGE_THREAD_URL(threadInfo.id)
+                        sendQuoteMsg,
+                        sendQuoteUrl
+                    );
+                    messageWxPushUser(
+                        [quotePostAuthor.id],
+                        sendQuoteMsg,
+                        sendQuoteUrl
                     );
                 }
             }
@@ -659,11 +668,18 @@ export const threadDiamond = async function(req: Request, res: Response) {
                 .user();
 
             if (setDiamond === "1") {
+                const sendDiamondMsg = MESSAGE_DIAMOND(threadInfo.subject);
+                const sendDiamondUrl = MESSAGE_THREAD_URL(tid);
                 pushMessage(
                     authObj.uid,
                     threadAuthor.id,
-                    MESSAGE_DIAMOND(threadInfo.subject),
-                    MESSAGE_THREAD_URL(tid)
+                    sendDiamondMsg,
+                    sendDiamondUrl
+                );
+                messageWxPushUser(
+                    [threadAuthor.id],
+                    sendDiamondMsg,
+                    sendDiamondUrl
                 );
             }
             res.json({ code: 1 });

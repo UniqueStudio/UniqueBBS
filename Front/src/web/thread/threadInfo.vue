@@ -471,11 +471,13 @@ export default {
             if (userGroupListResponse.code !== 1) {
                 return this.$store.dispatch("checkLoginStatus");
             }
-            this.groupList = userGroupListResponse.msg.map(item => ({
-                name: item.name,
-                color: item.color,
-                id: item.id
-            }));
+            this.groupList = userGroupListResponse.msg
+                .map(item => ({
+                    name: item.name,
+                    color: item.color,
+                    id: item.id
+                }))
+                .filter(item => item.name !== "团队老人");
 
             const atList = new Set();
             const atReg = /@(.+?)(?=\s)/gi;
@@ -512,6 +514,9 @@ export default {
                         post.post.message = post.post.message.replace(
                             item.at,
                             replaceStr
+                        );
+                        post.group = post.group.filter(
+                            item => item.name !== "团队老人"
                         );
                     });
                 });

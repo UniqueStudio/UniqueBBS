@@ -1,7 +1,13 @@
 import { verifyJWT } from "./check";
 import { Request, Response } from "express";
 import { prisma } from "../generated/prisma-client";
-import { pushMessageGroup, pushMessage, MESSAGE_THREAD_URL } from "./message";
+import {
+    pushMessageGroup,
+    pushMessage,
+    messageWxPushUser,
+    MESSAGE_THREAD_URL,
+    messageWxPushGroup
+} from "./message";
 
 export interface atInfo {
     at: string;
@@ -68,10 +74,20 @@ export const atProcess = async function(
                 sendMessage,
                 MESSAGE_THREAD_URL(tid)
             );
+            messageWxPushUser(
+                [atResult.id],
+                sendMessage,
+                MESSAGE_THREAD_URL(tid)
+            );
         } else if (atResult.type === "group" && isAdmin) {
             pushMessageGroup(
                 fromUid,
                 atResult.id,
+                sendMessage,
+                MESSAGE_THREAD_URL(tid)
+            );
+            messageWxPushGroup(
+                [atResult.id],
                 sendMessage,
                 MESSAGE_THREAD_URL(tid)
             );

@@ -25,6 +25,8 @@ const reportMy = () => import("@/web/report/reportMy.vue");
 const reportCreate = () => import("@/web/report/reportCreate.vue");
 const reportMentor = () => import("@/web/report/reportMentor.vue");
 const search = () => import("@/web/forum/search.vue");
+const admin = () => import("@/web/admin/admin.vue");
+const adminPush = () => import("@/web/admin/adminPush.vue");
 
 Vue.use(Router);
 
@@ -98,6 +100,21 @@ const router = new Router({
                         requireLogin: true,
                         keepAlive: true
                     }
+                },
+                {
+                    path: "admin",
+                    name: "admin",
+                    component: admin,
+                    children: [
+                        {
+                            path: "push",
+                            name: "adminPush",
+                            component: adminPush,
+                            meta: {
+                                requireLogin: true
+                            }
+                        }
+                    ]
                 },
                 {
                     path: "user",
@@ -265,7 +282,7 @@ const router = new Router({
                     children: [
                         {
                             path: "update/:pid",
-                            name: "threadUpdate",
+                            name: "postUpdate",
                             component: threadCreate,
                             meta: {
                                 mode: 2
