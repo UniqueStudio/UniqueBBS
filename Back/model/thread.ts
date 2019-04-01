@@ -379,7 +379,7 @@ export const threadCreate = async function(req: Request, res: Response) {
             forumThreadsAdd(fid, 1, newPostPid);
             userThreadsAdd(uid, 1);
             atProcess(
-                message,
+                newMessage,
                 uid,
                 MESSAGE_AT(username, subject, false),
                 resultThread.id,
