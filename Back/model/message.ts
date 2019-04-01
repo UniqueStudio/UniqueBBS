@@ -378,6 +378,10 @@ export const messageWxPush = async function(
     title?: string
 ) {
     try {
+        if (url && url.substr(0, 1) === "/") {
+            url = "https://bbs.hustunique.com" + url;
+        }
+
         const reqBody = {
             ...toSomeObj,
             msgtype: "textcard",
