@@ -76,6 +76,7 @@ export const filterUserInfo = function(user: User): OtherUser {
         for (let key of filterUserKeys) {
             delete (user as any)[key];
         }
+
         user.avatar = filterUserAvatar(user.avatar);
     }
     return user;
@@ -109,6 +110,9 @@ export const convertString = function(str: string): string {
 };
 
 export const filterUserAvatar = function(avatar: string) {
+    if (avatar === "__default__") {
+        avatar = `unique://null`;
+    }
     const UNIQUE_PREFIX = "unique://";
     const prefix = avatar.substr(0, UNIQUE_PREFIX.length);
     return prefix === UNIQUE_PREFIX

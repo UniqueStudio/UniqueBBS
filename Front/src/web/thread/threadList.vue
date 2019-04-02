@@ -20,7 +20,7 @@
         <div class="thread-item" v-for="thread in threadList" :key="thread.id">
           <div :class="{'thread-item-author':true,'no-active-filter':!thread.thread.active}">
             <router-link :to="'/user/visit/'+thread.user.id">
-              <img :src="thread.user.avatar" alt="Avatar" class="avatar-img">
+              <img :src="thread.user.avatar" class="avatar-img">
             </router-link>
           </div>
           <div :class="{'thread-item-info':true,'no-active-filter':!thread.thread.active}">
