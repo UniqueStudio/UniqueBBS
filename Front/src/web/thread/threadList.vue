@@ -20,7 +20,7 @@
         <div class="thread-item" v-for="thread in threadList" :key="thread.id">
           <div :class="{'thread-item-author':true,'no-active-filter':!thread.thread.active}">
             <router-link :to="'/user/visit/'+thread.user.id">
-              <a-avatar shape="circle" :src="thread.user.avatar" class="avatar-img"></a-avatar>
+              <img :src="thread.user.avatar" alt="Avatar" class="avatar-img">
             </router-link>
           </div>
           <div :class="{'thread-item-info':true,'no-active-filter':!thread.thread.active}">
@@ -102,7 +102,7 @@ export default {
     },
     methods: {
         humanDate(date) {
-            return this.$humanDate(date);
+            return this.$humanDateLite(date);
         },
         async getData() {
             this.showLoading = true;
@@ -217,6 +217,7 @@ export default {
 .avatar-img {
     height: 48px;
     width: 48px;
+    border-radius: 24px;
 }
 .thread-item-author {
     text-align: right;
