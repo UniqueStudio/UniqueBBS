@@ -266,7 +266,7 @@ export default {
     text-align: center;
 }
 .user-report-create {
-    margin: 36px auto;
+    margin: 48px auto;
 }
 .user-report-list {
     margin: 48px 0;

@@ -5,6 +5,7 @@ import "ant-design-vue/dist/antd.css";
 import Vuex from "vuex";
 import urls from "./functions/urls";
 import getHumanDate from "./functions/humanDate";
+import getHumanDateLite from "./functions/humanDateLite";
 import joinTime from "./functions/joinTime";
 import marked from "marked";
 import Antd from "ant-design-vue";
@@ -28,6 +29,7 @@ Vue.prototype.$ajax = ajax;
 Vue.prototype.$humanDate = getHumanDate;
 Vue.prototype.$marked = marked;
 Vue.prototype.$joinTime = joinTime;
+Vue.prototype.$humanDateLite = getHumanDateLite;
 
 Vue.config.productionTip = false;
 
