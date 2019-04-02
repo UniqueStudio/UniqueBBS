@@ -752,6 +752,6 @@ export const userAvatar = async function(req: Request, res: Response) {
             res.download(`./utils/defaultAvatar.png`);
         }
     } catch (e) {
-        res.json({ code: -1, msg: e.message });
+        res.download(`./utils/defaultAvatar.png`);
     }
 };
