@@ -101,7 +101,14 @@ export default {
         handleClickMessage(id, url) {
             this.readMessage(id);
             if (url !== null) {
-                this.$router.push({ path: url });
+                if (
+                    url.substr(0, 8) === "https://" ||
+                    url.substr(0, 7) === "http://"
+                ) {
+                    window.open(url);
+                } else {
+                    this.$router.push({ path: url });
+                }
             }
         },
         getMessageHumandate(str) {
