@@ -281,7 +281,7 @@ export const messageSuperPush = async function(req: Request, res: Response) {
             return;
         }
 
-        messageWxPushGroup(groupLists, content, undefined, "团队公告");
+        messageWxPushGroup(groupLists, content, url, "团队公告");
 
         (async () => {
             const [adminAccount] = await prisma.users({
