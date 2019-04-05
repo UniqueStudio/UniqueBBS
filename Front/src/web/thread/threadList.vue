@@ -106,6 +106,12 @@ export default {
         },
         async getData() {
             this.showLoading = true;
+            this.forum.name = "加载中";
+            this.forum.description = "加载中";
+            this.forum.backgroundColor = "gray";
+            this.forum.icon = "loading";
+            this.forum.threads = 0;
+
             this.fid = this.$route.params.fid;
             this.page = +this.$route.params.page;
             const threadListResponseRaw = await this.$ajax.get(
