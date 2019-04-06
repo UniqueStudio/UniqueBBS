@@ -326,6 +326,8 @@ export default {
     },
     async mounted() {
         this.mode = this.$route.meta.mode;
+        await this.getForumList();
+
         if (this.mode === 1) {
             this.tid = this.$route.params.tid;
             await this.getThreadInfo(this.tid);
@@ -333,10 +335,11 @@ export default {
             this.pid = this.$route.params.pid;
             await this.getReplyInfo(this.pid);
         }
+
         if (this.mode === 0) {
             await this.getAttachList();
         }
-        await this.getForumList();
+
         this.showLoading = false;
     }
 };

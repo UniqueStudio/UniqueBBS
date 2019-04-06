@@ -70,7 +70,7 @@ export default {
                     });
                 }
             }
-            this.resetBtnDisabled = true;
+            this.resetBtnDisabled = false;
             this.showLoading = false;
         }
     },
