@@ -2,6 +2,7 @@ import jwt from "jsonwebtoken";
 import { secret, accessTokenURL, filterUserKeys, filterMyKeys } from "./consts";
 import crypto from "crypto";
 import { User } from "../generated/prisma-client";
+import { redisClientGetAsync, redisClientSetAsync } from "../server";
 
 export const BACKEND_URL = process.env.BACKEND_URL;
 
@@ -65,10 +66,24 @@ export const addSaltPasswordOnce = function(pwd_MD5: string) {
 };
 
 export const getAccessToken = async function() {
-    const accessTokenResponse = await fetch(accessTokenURL);
-    const accessTokenResult = await accessTokenResponse.json();
-    const accessToken = accessTokenResult.access_token;
-    return accessToken as string;
+    const checkTokenResult = await redisClientGetAsync("ACCESS_TOKEN");
+    if (checkTokenResult) {
+        return checkTokenResult;
+    } else {
+        const accessTokenResponse = await fetch(accessTokenURL);
+        const accessTokenResult = await accessTokenResponse.json();
+        const accessToken: string = accessTokenResult.access_token;
+        const expireSeconds: string = accessTokenResult.expires_in;
+
+        await redisClientSetAsync(
+            "ACCESS_TOKEN",
+            accessToken,
+            "EX",
+            expireSeconds
+        );
+
+        return accessToken;
+    }
 };
 
 export const filterUserInfo = function(user: User): OtherUser {

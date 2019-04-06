@@ -1,12 +1,6 @@
 import { prisma, User } from "../generated/prisma-client";
 import fetch from "node-fetch";
-import {
-    scanningURL,
-    userIDURL,
-    userInfoURL,
-    getQRCodeURL,
-    pagesize
-} from "./consts";
+import { scanningURL, userIDURL, getQRCodeURL, pagesize } from "./consts";
 import { Request, Response } from "express";
 import {
     addSaltPasswordOnce,
@@ -23,12 +17,11 @@ import {
     MESSAGE_REPORT_URL,
     messageWxPushUser
 } from "./message";
+import { syncUpdateUser } from "./sync";
 import { setLockExpireIncr } from "./lock";
 import { filterUserAvatar } from "./check";
 import fs from "fs";
 import { MODE } from "../server";
-import downloadImg from "../utils/downloadImg";
-import processJoinTime from "../utils/processJoinTime";
 
 export const userInfo = async function(req: Request, res: Response) {
     try {
@@ -342,77 +335,7 @@ export const userInfoUpdateFromWx = async function(
             return;
         }
 
-        (async function() {
-            const userInfo = await prisma.user({
-                id: authObj.uid
-            });
-
-            const accessToken = await getAccessToken();
-            const userInfoResponse = await fetch(
-                userInfoURL(accessToken, userInfo.userid)
-            );
-            const user = await userInfoResponse.json();
-            if (user.errcode !== 0) {
-                res.json({ code: -1, msg: user.errcode });
-                return;
-            }
-
-            const groups = await prisma.groups();
-            let groupList = new Map<number, string>();
-            let groupKeyList: Array<[number, string]> = [];
-            for (let group of groups) {
-                groupList.set(group.key, group.id);
-                groupKeyList.push([group.key, group.name]);
-            }
-
-            const userGroupArr = user.department;
-            const isOld = (userGroupArr as any[]).some(item => +item >= 14); //老成员只放在一个组内
-            let userGroup: Array<{ id: string }> = [];
-            if (isOld) {
-                userGroup.push({
-                    id: groupList.get(14)
-                });
-            } else {
-                for (let userGroupKey of userGroupArr) {
-                    const id = groupList.get(userGroupKey);
-                    if (id && +userGroupKey < 14) {
-                        userGroup.push({
-                            id: id
-                        });
-                    }
-                }
-            }
-
-            const avatarPath =
-                process.env.NODE_ENV === "DEV"
-                    ? `./upload/avatar`
-                    : `/var/bbs/upload/avatar`;
-            await downloadImg(
-                user.avatar,
-                `${avatarPath}/${user.userid}.avatar`
-            );
-
-            const dataObj = {
-                username: user.name,
-                mobile: user.mobile,
-                avatar: `unique://${user.userid}`,
-                userid: user.userid,
-                email: user.email,
-                lastLogin: new Date(),
-                joinTime: processJoinTime(user),
-                group: {
-                    connect: userGroup
-                },
-                isAdmin: user.isleader === 1 || user.name === "杨子越"
-            };
-
-            await prisma.updateUser({
-                where: {
-                    userid: user.userid
-                },
-                data: dataObj
-            });
-        })();
+        syncUpdateUser(authObj.uid, "UID");
 
         res.json({ code: 1 });
     } catch (e) {
