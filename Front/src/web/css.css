@@ -42,3 +42,10 @@
 .show-markdown {
     word-break: break-all;
 }
+.thread-content code {
+    background-color: #ddf3ff;
+    border-radius: 2px;
+    padding: 2px 4px;
+    margin: 0 2px;
+    font-size: 0.9em;
+}

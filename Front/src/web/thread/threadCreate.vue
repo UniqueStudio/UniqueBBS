@@ -26,7 +26,7 @@
           <div class="code-mirror-input-container">
             <codemirror v-model="message" :options="cmOptions"></codemirror>
           </div>
-          <div class="create-preview-container">
+          <div class="create-preview-container thread-content">
             <a-divider type="vertical" class="divider"></a-divider>
             <div class="create-preview show-markdown" v-html="previewText"></div>
           </div>
@@ -69,6 +69,9 @@ import "codemirror/lib/codemirror.css";
 import "codemirror/mode/markdown/markdown.js";
 import "codemirror/theme/idea.css";
 import "./editor.css";
+
+let autoSaveTimer;
+
 export default {
     components: { codemirror },
     data() {
@@ -92,7 +95,8 @@ export default {
             attachList: [],
             showAttachList: false,
             btnDisabled: false,
-            showLoading: true
+            showLoading: true,
+            actionFinished: false
         };
     },
     computed: {
@@ -231,6 +235,7 @@ export default {
             const THREAD_CREATE = 0,
                 THREAD_UPDATE = 1,
                 POST_UPDATE = 2;
+
             switch (mode) {
                 case THREAD_CREATE:
                     this.createThread();
@@ -254,6 +259,7 @@ export default {
                 }
             );
             if (responseRaw.data.code === 1) {
+                this.actionFinished = true;
                 this.$router.push({
                     path: `/thread/info/${this.tid}/1`
                 });
@@ -279,6 +285,7 @@ export default {
                 fileListArr: this.attachList.map(item => item.response.msg)
             });
             if (responseRaw.data.code === 1) {
+                this.actionFinished = true;
                 const tid = responseRaw.data.msg;
                 this.$router.push({
                     path: `/thread/info/${tid}/1`
@@ -305,6 +312,7 @@ export default {
                 }
             );
             if (updatePostInfoRaw.data.code === 1) {
+                this.actionFinished = true;
                 const tid = updatePostInfoRaw.data.msg;
                 this.$router.push({
                     path: `/thread/info/${tid}/1`
@@ -326,9 +334,26 @@ export default {
     },
     async mounted() {
         this.mode = this.$route.meta.mode;
+        this.actionFinished = false;
+
+        autoSaveTimer = setInterval(() => {
+            localStorage.setItem("autoSave_subject", this.subject);
+            localStorage.setItem("autoSave_message", this.message);
+        }, 10 * 1000);
+
         await this.getForumList();
 
-        if (this.mode === 1) {
+        if (this.mode == 0) {
+            const savedSubject = localStorage.getItem("autoSave_subject");
+            const savedMessage = localStorage.getItem("autoSave_message");
+
+            if (savedMessage || savedSubject) {
+                this.subject = savedSubject;
+                this.message = savedMessage;
+            }
+
+            await this.getAttachList();
+        } else if (this.mode === 1) {
             this.tid = this.$route.params.tid;
             await this.getThreadInfo(this.tid);
         } else if (this.mode === 2) {
@@ -336,11 +361,17 @@ export default {
             await this.getReplyInfo(this.pid);
         }
 
-        if (this.mode === 0) {
-            await this.getAttachList();
-        }
-
         this.showLoading = false;
+    },
+    beforeDestroy() {
+        if (this.actionFinished) {
+            localStorage.removeItem("autoSave_subject");
+            localStorage.removeItem("autoSave_message");
+        } else {
+            localStorage.setItem("autoSave_subject", this.subject);
+            localStorage.setItem("autoSave_message", this.message);
+        }
+        clearInterval(autoSaveTimer);
     }
 };
 </script>
