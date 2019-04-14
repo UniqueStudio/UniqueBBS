@@ -180,14 +180,15 @@ export const userLoginByPwd = async function(req: Request, res: Response) {
         }
 
         const token = signJWT(userInfo.id, userInfo.isAdmin, userInfo.username);
-        prisma.updateUser({
-            where: {
-                id: userInfo.id
-            },
-            data: {
-                lastLogin: new Date()
-            }
-        });
+        (async () =>
+            await prisma.updateUser({
+                where: {
+                    id: userInfo.id
+                },
+                data: {
+                    lastLogin: new Date()
+                }
+            }))();
         res.json({
             code: 1,
             msg: {
@@ -201,7 +202,6 @@ export const userLoginByPwd = async function(req: Request, res: Response) {
         });
     } else {
         res.json({ code: -1, msg: "密码错误！" });
-        return;
     }
 };
 
@@ -384,14 +384,15 @@ export const userScan = async function(req: Request, res: Response) {
                         _user.isAdmin,
                         _user.username
                     );
-                    prisma.updateUser({
-                        where: {
-                            id: _user.id
-                        },
-                        data: {
-                            lastLogin: new Date()
-                        }
-                    });
+                    (async () =>
+                        await prisma.updateUser({
+                            where: {
+                                id: _user.id
+                            },
+                            data: {
+                                lastLogin: new Date()
+                            }
+                        }))();
                     res.json({
                         code: 1,
                         msg: {
