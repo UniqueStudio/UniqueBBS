@@ -179,7 +179,8 @@ export const threadInfo = async function(req: Request, res: Response) {
                 if (!item.active && !isAdmin) {
                     return {
                         post: {
-                            active: false
+                            active: false,
+                            message: ""
                         },
                         user: null,
                         group: null,

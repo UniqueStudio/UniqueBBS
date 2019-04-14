@@ -171,7 +171,7 @@
           class="thread-post-list-item"
           v-for="(post,index) in postList"
           :key="post.id"
-          :class="{'no-active-filter':!post.post.active}"
+          :class="{'no-active-filter':!post.post.active , 'remove-margin': !post.post.active && !isAdmin}"
         >
           <div class="thread-post-list-item-avatar-container" v-if="isAdmin || post.post.active">
             <router-link :to="'/user/visit/'+post.user.id">
@@ -447,11 +447,13 @@ export default {
                 rawPostContent = data.postArr.map(item => item.post.message);
 
                 data.postArr = data.postArr.map(item => {
-                    item.post.message = this.getMessage(item.post.message);
-                    if (item.quote) {
-                        item.quote.message = this.getMessage(
-                            item.quote.message
-                        );
+                    if (item.post.active) {
+                        item.post.message = this.getMessage(item.post.message);
+                        if (item.quote) {
+                            item.quote.message = this.getMessage(
+                                item.quote.message
+                            );
+                        }
                     }
 
                     return item;
@@ -489,11 +491,13 @@ export default {
                     atList.add(item.substr(1, item.length - 1))
                 );
             for (const post of rawPostContent) {
-                const postMatchArr = post.match(atReg);
-                postMatchArr &&
-                    postMatchArr.forEach(item =>
-                        atList.add(item.substr(1, item.length - 1))
-                    );
+                if (post) {
+                    const postMatchArr = post.match(atReg);
+                    postMatchArr &&
+                        postMatchArr.forEach(item =>
+                            atList.add(item.substr(1, item.length - 1))
+                        );
+                }
             }
             const atResponseRaw = await this.$ajax.post(this.$urls.atResult, {
                 keywords: [...atList]
@@ -781,5 +785,8 @@ export default {
 }
 .attach-item {
     display: inline-block;
+}
+.remove-margin {
+    margin: 0 !important;
 }
 </style>
