@@ -112,18 +112,6 @@ export const filterUsersInfo = function(users: Array<User>): Array<OtherUser> {
     return returnUser;
 };
 
-export const convertString = function(str: string): string {
-    let result = "";
-    const strLen = str.length;
-    for (let i = 0; i < strLen; i++) {
-        if (str[i] === "/" || str[i] === ":") {
-            result += "\\";
-        }
-        result += str[i];
-    }
-    return result;
-};
-
 export const filterUserAvatar = function(avatar: string) {
     if (avatar === "__default__") {
         avatar = `unique://null`;
