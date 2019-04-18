@@ -2,11 +2,16 @@ require("dotenv").config();
 
 import { prisma } from "../generated/prisma-client";
 import fetch from "node-fetch";
-import { getUserListURL } from "../model/consts";
-import { getAccessToken } from "../model/check";
+import { getUserListURL, accessTokenURL } from "../model/consts";
 import downloadImg from "../utils/downloadImg";
 import processJoinTime from "../utils/processJoinTime";
 import fs from "fs";
+
+export const getAccessToken = async function() {
+    const accessTokenResponse = await fetch(accessTokenURL);
+    const accessTokenResult = await accessTokenResponse.json();
+    return accessTokenResult.access_token;
+};
 
 export const getUser = async function() {
     const avatarPath =
