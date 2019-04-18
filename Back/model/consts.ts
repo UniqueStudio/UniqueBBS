@@ -1,6 +1,18 @@
-import { convertString } from "./check";
 import dotenv from "dotenv";
 dotenv.config();
+
+export const convertString = function(str: string): string {
+    let result = "";
+    const strLen = str.length;
+    for (let i = 0; i < strLen; i++) {
+        if (str[i] === "/" || str[i] === ":") {
+            result += "\\";
+        }
+        result += str[i];
+    }
+    return result;
+};
+
 export const secret = process.env.SECRET as string;
 
 export const wxMsgToken = process.env.WXMSGTOKEN as string;
