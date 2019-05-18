@@ -65,23 +65,30 @@ export const addSaltPasswordOnce = function(pwd_MD5: string) {
         .digest("hex");
 };
 
-export const getAccessToken = async function() {
-    const checkTokenResult = await redisClientGetAsync("ACCESS_TOKEN");
-    if (checkTokenResult) {
-        return checkTokenResult;
+export const getAccessToken = async function(useCache: Boolean = true) {
+    if (useCache) {
+        const checkTokenResult = await redisClientGetAsync("ACCESS_TOKEN");
+        if (checkTokenResult) {
+            return checkTokenResult;
+        } else {
+            const accessTokenResponse = await fetch(accessTokenURL);
+            const accessTokenResult = await accessTokenResponse.json();
+            const accessToken: string = accessTokenResult.access_token;
+            const expireSeconds: string = accessTokenResult.expires_in;
+
+            await redisClientSetAsync(
+                "ACCESS_TOKEN",
+                accessToken,
+                "EX",
+                expireSeconds
+            );
+
+            return accessToken;
+        }
     } else {
         const accessTokenResponse = await fetch(accessTokenURL);
         const accessTokenResult = await accessTokenResponse.json();
         const accessToken: string = accessTokenResult.access_token;
-        const expireSeconds: string = accessTokenResult.expires_in;
-
-        await redisClientSetAsync(
-            "ACCESS_TOKEN",
-            accessToken,
-            "EX",
-            expireSeconds
-        );
-
         return accessToken;
     }
 };

@@ -519,9 +519,11 @@ export default {
                             item.at,
                             replaceStr
                         );
-                        post.group = post.group.filter(
-                            item => item.name !== "团队老人"
-                        );
+                        if (post.group) {
+                            post.group = post.group.filter(
+                                item => item.name !== "团队老人"
+                            );
+                        }
                     });
                 });
             }
