@@ -356,7 +356,7 @@ export const userScan = async function(req: Request, res: Response) {
             const loginObj = JSON.parse(loginResult.match(/{.+}/)![0]);
             if (loginObj.status === "QRCODE_SCAN_SUCC") {
                 const auth_code = loginObj.auth_code;
-                const accessToken = await getAccessToken();
+                const accessToken = await getAccessToken(false);
                 const userIDResponse = await fetch(
                     userIDURL(accessToken, auth_code)
                 );
