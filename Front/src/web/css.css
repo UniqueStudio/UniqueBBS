@@ -61,3 +61,6 @@
 .ant-drawer-content {
     opacity: 0.8;
 }
+.ant-modal {
+    opacity: 0.85;
+}
