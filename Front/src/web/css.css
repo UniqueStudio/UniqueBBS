@@ -49,3 +49,9 @@
     margin: 0 2px;
     font-size: 0.9em;
 }
+.ant-modal-content {
+    opacity: 0.9;
+}
+.ant-modal-wrap {
+    backdrop-filter: blur(20px);
+}
