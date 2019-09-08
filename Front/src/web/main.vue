@@ -1,109 +1,113 @@
 <template>
-  <div id="root">
-    <div class="nav">
-      <div class="nav-logo">
-        <img src="./logo.png" alt="Unique Studio Logo" @click="handleLoginClick">
-      </div>
-      <div class="nav-item">
-        <div class="nav-item-content">
-          <div></div>
-          <router-link to="/report">
-            <a-tooltip :mouseLeaveDelay="0" placement="bottom">
-              <template slot="title">报告</template>
-              <div class="nav-item-icon-container">
-                <a-icon
-                  type="calendar"
-                  style="font-size:24px;"
-                  :theme="navActive===0?'filled':'outlined'"
-                />
-              </div>
-            </a-tooltip>
-          </router-link>
-          <router-link to="/forum">
-            <a-tooltip :mouseLeaveDelay="0" placement="bottom">
-              <template slot="title">论坛</template>
-              <div class="nav-item-icon-container">
-                <a-icon
-                  type="pushpin"
-                  style="font-size:24px;"
-                  :theme="navActive===1?'filled':'outlined'"
-                />
-              </div>
-            </a-tooltip>
-          </router-link>
-          <router-link to="/user">
-            <a-tooltip :mouseLeaveDelay="0" placement="bottom">
-              <template slot="title">个人</template>
-              <div class="nav-item-icon-container">
-                <a-icon
-                  type="star"
-                  style="font-size:24px;"
-                  :theme="navActive===2?'filled':'outlined'"
-                />
-              </div>
-            </a-tooltip>
-          </router-link>
+    <div id="root">
+        <div class="nav">
+            <div class="nav-logo">
+                <img src="./logo.png" alt="Unique Studio Logo" @click="handleLoginClick" />
+            </div>
+            <div class="nav-item">
+                <div class="nav-item-content">
+                    <div></div>
+                    <router-link to="/report">
+                        <a-tooltip :mouseLeaveDelay="0" placement="bottom">
+                            <template slot="title">报告</template>
+                            <div class="nav-item-icon-container">
+                                <a-icon
+                                    type="calendar"
+                                    style="font-size:24px;"
+                                    :theme="navActive===0?'filled':'outlined'"
+                                />
+                            </div>
+                        </a-tooltip>
+                    </router-link>
+                    <router-link to="/forum">
+                        <a-tooltip :mouseLeaveDelay="0" placement="bottom">
+                            <template slot="title">论坛</template>
+                            <div class="nav-item-icon-container">
+                                <a-icon
+                                    type="pushpin"
+                                    style="font-size:24px;"
+                                    :theme="navActive===1?'filled':'outlined'"
+                                />
+                            </div>
+                        </a-tooltip>
+                    </router-link>
+                    <router-link to="/user">
+                        <a-tooltip :mouseLeaveDelay="0" placement="bottom">
+                            <template slot="title">个人</template>
+                            <div class="nav-item-icon-container">
+                                <a-icon
+                                    type="star"
+                                    style="font-size:24px;"
+                                    :theme="navActive===2?'filled':'outlined'"
+                                />
+                            </div>
+                        </a-tooltip>
+                    </router-link>
+                </div>
+            </div>
+            <div class="nav-avatar">
+                <a-dropdown placement="bottomRight" v-if="this.$store.state.loginStatus">
+                    <a-menu slot="overlay" @click="handleMenuClick" class="nav-menu">
+                        <a-menu-item key="8" v-if="isAdmin">
+                            <a-icon type="sound" />群发通知
+                        </a-menu-item>
+                        <a-menu-item key="9">
+                            <a-icon type="form" />发帖
+                        </a-menu-item>
+                        <a-menu-divider key="10"></a-menu-divider>
+                        <a-menu-item key="1">
+                            <a-icon type="contacts" />资料
+                        </a-menu-item>
+                        <a-menu-item key="2">
+                            <a-icon type="key" />密码
+                        </a-menu-item>
+                        <a-menu-item key="3">
+                            <a-icon type="sound" />消息
+                            <a-badge :count="$store.state.unreadCount" class="user-menu-badage"></a-badge>
+                        </a-menu-item>
+                        <a-menu-item key="4">
+                            <a-icon type="team" />组别
+                        </a-menu-item>
+                        <a-menu-item key="5">
+                            <a-icon type="copy" />帖子
+                        </a-menu-item>
+                        <a-menu-divider key="6"></a-menu-divider>
+                        <a-menu-item key="7">
+                            <a-icon type="logout" />注销
+                        </a-menu-item>
+                    </a-menu>
+                    <div class="user-avatar-box">
+                        <a-badge :count="$store.state.unreadCount" class="user-badage"></a-badge>
+                        <a-avatar
+                            shape="circle"
+                            :src="this.$store.state.avatarSrc"
+                            class="avatar-img"
+                        ></a-avatar>
+                    </div>
+                </a-dropdown>
+                <router-link to="/user/login/pwd" v-else>
+                    <a-avatar shape="circle" icon="cloud" class="avatar-img avatar-nologin"></a-avatar>
+                </router-link>
+            </div>
         </div>
-      </div>
-      <div class="nav-avatar">
-        <a-dropdown placement="bottomRight" v-if="this.$store.state.loginStatus">
-          <a-menu slot="overlay" @click="handleMenuClick" class="nav-menu">
-            <a-menu-item key="8" v-if="isAdmin">
-              <a-icon type="sound"/>群发通知
-            </a-menu-item>
-            <a-menu-item key="9">
-              <a-icon type="form"/>发帖
-            </a-menu-item>
-            <a-menu-divider key="10"></a-menu-divider>
-            <a-menu-item key="1">
-              <a-icon type="contacts"/>资料
-            </a-menu-item>
-            <a-menu-item key="2">
-              <a-icon type="key"/>密码
-            </a-menu-item>
-            <a-menu-item key="3">
-              <a-icon type="sound"/>消息
-              <a-badge :count="$store.state.unreadCount" class="user-menu-badage"></a-badge>
-            </a-menu-item>
-            <a-menu-item key="4">
-              <a-icon type="team"/>组别
-            </a-menu-item>
-            <a-menu-item key="5">
-              <a-icon type="copy"/>帖子
-            </a-menu-item>
-            <a-menu-divider key="6"></a-menu-divider>
-            <a-menu-item key="7">
-              <a-icon type="logout"/>注销
-            </a-menu-item>
-          </a-menu>
-          <div class="user-avatar-box">
-            <a-badge :count="$store.state.unreadCount" class="user-badage"></a-badge>
-            <a-avatar shape="circle" :src="this.$store.state.avatarSrc" class="avatar-img"></a-avatar>
-          </div>
-        </a-dropdown>
-        <router-link to="/user/login/pwd" v-else>
-          <a-avatar shape="circle" icon="cloud" class="avatar-img avatar-nologin"></a-avatar>
-        </router-link>
-      </div>
+        <div class="body">
+            <keep-alive>
+                <router-view v-if="$route.meta.keepAlive"></router-view>
+            </keep-alive>
+            <router-view v-if="!$route.meta.keepAlive"></router-view>
+        </div>
+        <footer>
+            <p class="footer-left">
+                <b>Unique BBS</b> v1.22
+                <br />Code By
+                <a href="https://github.com/ttzztztz" target="_blank">Rabbit</a> @ 811
+            </p>
+            <p class="footer-right">
+                Unique Studio
+                <br />September 8 2019
+            </p>
+        </footer>
     </div>
-    <div class="body">
-      <keep-alive>
-        <router-view v-if="$route.meta.keepAlive"></router-view>
-      </keep-alive>
-      <router-view v-if="!$route.meta.keepAlive"></router-view>
-    </div>
-    <footer>
-      <p class="footer-left">
-        <b>Unique BBS</b> v1.22
-        <br>Code By
-        <a href="https://github.com/ttzztztz" target="_blank">Rabbit</a> @ 811
-      </p>
-      <p class="footer-right">
-        Unique Studio
-        <br>May 18 2019
-      </p>
-    </footer>
-  </div>
 </template>
 <script>
 import "./css.css";
@@ -247,6 +251,7 @@ footer {
     padding: 6px;
     transition: all 0.9s cubic-bezier(0.33, 0.63, 0.65, 0.99);
     user-select: none;
+    backdrop-filter: blur(10px);
 }
 .nav:hover {
     background: rgb(45, 45, 45);
