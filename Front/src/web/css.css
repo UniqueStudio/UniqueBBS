@@ -55,3 +55,9 @@
 .ant-modal-wrap {
     backdrop-filter: blur(20px);
 }
+.ant-drawer-open {
+    backdrop-filter: blur(20px);
+}
+.ant-drawer-content {
+    opacity: 0.8;
+}
