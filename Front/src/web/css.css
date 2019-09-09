@@ -49,18 +49,20 @@
     margin: 0 2px;
     font-size: 0.9em;
 }
-.ant-modal-content {
-    opacity: 0.9;
-}
-.ant-modal-wrap {
-    backdrop-filter: blur(20px);
-}
+.ant-modal-wrap,
+.ant-notification-notice,
 .ant-drawer-open {
     backdrop-filter: blur(20px);
+}
+.ant-modal-content {
+    opacity: 0.9;
 }
 .ant-drawer-content {
     opacity: 0.8;
 }
 .ant-modal {
+    opacity: 0.85;
+}
+.ant-notification-notice {
     opacity: 0.85;
 }
