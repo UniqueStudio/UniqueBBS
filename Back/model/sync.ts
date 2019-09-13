@@ -73,7 +73,10 @@ export const syncPrepare = async function(id: string, MODE: "UID" | "USERID") {
         group: {
             connect: userGroup
         },
-        isAdmin: user.isleader === 1 || user.name === "杨子越"
+        isAdmin:
+            user.isleader === 1 ||
+            user.name === "杨子越" ||
+            user.name === "洪志远"
     };
     return { dataObj, userid: user.userid };
 };

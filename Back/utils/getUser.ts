@@ -90,7 +90,10 @@ export const getUser = async function() {
                 group: {
                     connect: userGroup
                 },
-                isAdmin: user.isleader === 1 || user.name === "杨子越"
+                isAdmin:
+                    user.isleader === 1 ||
+                    user.name === "杨子越" ||
+                    user.name === "洪志远"
             };
             let userID;
 
