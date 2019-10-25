@@ -98,13 +98,13 @@
         </div>
         <footer>
             <p class="footer-left">
-                <b>Unique BBS</b> v1.26
+                <b>Unique BBS</b> v1.27
                 <br />Code By
                 <a href="https://github.com/ttzztztz" target="_blank">Rabbit</a> @ 811
             </p>
             <p class="footer-right">
                 Unique Studio
-                <br />September 9 2019
+                <br />October 25 2019
             </p>
         </footer>
     </div>

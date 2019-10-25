@@ -1,23 +1,29 @@
 <template>
-  <div class="report-create">
-    <div class="title-info" style="background:#009688;">
-      <div class="title-icon">
-        <a-icon type="calendar" class="title-item-icon"></a-icon>
-        &nbsp;{{mode==0?"发表Report": "编辑Report"}}
-      </div>
-    </div>
-    <a-spin :spinning="showLoading" size="large">
-      <div class="report-form">
-        <div class="form-left">
-          <label>报告类型</label>
+    <div class="report-create">
+        <div class="title-info" style="background:#009688;">
+            <div class="title-icon">
+                <a-icon type="calendar" class="title-item-icon"></a-icon>
+                &nbsp;{{mode==0?"发表Report": "编辑Report"}}
+            </div>
         </div>
-        <div class="form-right">
-          <a-select style="width: 100%;" v-model="isWeekReport">
-            <a-select-option value="0" v-if="can.daily">Daily Report</a-select-option>
-            <a-select-option value="1" v-if="can.weekly">Weekly Report</a-select-option>
-          </a-select>
-        </div>
-        <div class="form-left">
+        <a-spin :spinning="showLoading" size="large">
+            <div class="report-form">
+                <div class="form-left">
+                    <label>报告类型</label>
+                </div>
+                <div class="form-right">
+                    <a-select style="width: 100%;" v-model="isWeekReport">
+                        <a-select-option value="0" v-if="can.daily">Daily Report</a-select-option>
+                        <a-select-option value="1" v-if="can.weekly">Weekly Report</a-select-option>
+                    </a-select>
+                </div>
+                <div class="form-left">
+                    <label>Report内容</label>
+                </div>
+                <div class="form-right">
+                    <a-input class="message-container" placeholder="学习时间" v-model="message" />
+                </div>
+                <!-- <div class="form-left">
           <label>学习时间</label>
         </div>
         <div class="form-right">
@@ -52,31 +58,32 @@
         </div>
         <div class="form-right">
           <a-textarea placeholder="附加信息" v-model="extra"/>
-        </div>
-        <div class="form-left"></div>
-        <div class="form-right">
-          <a-button
-            type="primary"
-            icon="calendar"
-            @click="handleButtonClick"
-          >{{mode==0?"发表Report": "编辑Report"}}</a-button>
-        </div>
-      </div>
-    </a-spin>
-  </div>
+                </div>-->
+                <div class="form-left"></div>
+                <div class="form-right">
+                    <a-button
+                        type="primary"
+                        icon="calendar"
+                        @click="handleButtonClick"
+                    >{{mode==0?"发表Report": "编辑Report"}}</a-button>
+                </div>
+            </div>
+        </a-spin>
+    </div>
 </template>
 <script>
 export default {
     data() {
         return {
             rid: "",
-            time: "",
-            content: "",
-            plan: "",
-            solution: "",
-            conclusion: "",
+            // time: "",
+            // content: "",
+            // plan: "",
+            // solution: "",
+            // conclusion: "",
             isWeekReport: "0",
-            extra: "",
+            // extra: "",
+            message: "",
             mode: 0,
             can: {
                 daily: true,
@@ -102,13 +109,14 @@ export default {
             const createReportRaw = await this.$ajax.post(
                 this.$urls.reportCreate,
                 {
-                    time: this.time,
-                    content: this.content,
-                    plan: this.plan,
-                    solution: this.solution,
-                    conclusion: this.conclusion,
+                    // time: this.time,
+                    // content: this.content,
+                    // plan: this.plan,
+                    // solution: this.solution,
+                    // conclusion: this.conclusion,
                     isWeekReport: this.isWeekReport,
-                    extra: this.extra
+                    message: this.message
+                    // extra: this.extra
                 }
             );
 
@@ -118,6 +126,7 @@ export default {
                     description: "Report发布成功！",
                     icon: <a-icon type="calendar" style="color: #108ee9" />
                 });
+
                 this.$router.push({
                     path: "/report/my/1"
                 });
@@ -142,16 +151,17 @@ export default {
                 this.$urls.reportInfo(this.rid)
             );
             if (reportInfoRaw.data.code === 1) {
-                [
-                    "time",
-                    "content",
-                    "plan",
-                    "solution",
-                    "conclusion",
-                    "extra"
-                ].forEach(item => {
-                    this[item] = reportInfoRaw.data.msg[item];
-                });
+                // [
+                //     "time",
+                //     "content",
+                //     "plan",
+                //     "solution",
+                //     "conclusion",
+                //     "extra"
+                // ].forEach(item => {
+                //     this[item] = reportInfoRaw.data.msg[item];
+                // });
+                this.message = reportInfoRaw.data.msg;
             } else {
                 const modal = this.$error();
                 modal.update({
@@ -164,12 +174,13 @@ export default {
             const updateReportRaw = await this.$ajax.post(
                 this.$urls.reportUpdate(this.rid),
                 {
-                    time: this.time,
-                    content: this.content,
-                    plan: this.plan,
-                    solution: this.solution,
-                    conclusion: this.conclusion,
-                    extra: this.extra
+                    // time: this.time,
+                    // content: this.content,
+                    // plan: this.plan,
+                    // solution: this.solution,
+                    // conclusion: this.conclusion,
+                    // extra: this.extra
+                    message: this.message
                 }
             );
             if (updateReportRaw.data.code === 1) {
@@ -225,5 +236,8 @@ export default {
 .form-left,
 .form-right {
     margin: 8px 0;
+}
+.message-container {
+    height: 196px;
 }
 </style>
