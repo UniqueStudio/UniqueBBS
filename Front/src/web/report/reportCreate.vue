@@ -21,7 +21,7 @@
                     <label>Report内容</label>
                 </div>
                 <div class="form-right">
-                    <a-input class="message-container" placeholder="学习时间" v-model="message" />
+                    <a-textarea class="message-container" placeholder="学习时间" v-model="message" />
                 </div>
                 <!-- <div class="form-left">
           <label>学习时间</label>

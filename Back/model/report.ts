@@ -4,7 +4,7 @@ import { verifyJWT } from "./check";
 import { pagesize } from "./consts";
 import { getTodayFirstTimestamp, getTodayLastTimestamp } from "./time";
 import { setLockExpire, getLockStatus } from "./lock";
-import { redisClientGetAsync } from "../server";
+// import { redisClientGetAsync } from "../server";
 
 // export const REPORT_TEMPLATE = (
 //     time: string,
@@ -287,12 +287,12 @@ export const reportUpdate = async function(req: Request, res: Response) {
             //  plan, solution, conclusion, extra
         } = req.body;
 
-        const reportCache = await redisClientGetAsync(`report:${rid}`);
+        // const reportCache = await redisClientGetAsync(`report:${rid}`);
 
-        if (reportCache === null) {
-            res.json({ code: -1, msg: "该Report无法编辑！" });
-            return;
-        }
+        // if (reportCache === null) {
+        //     res.json({ code: -1, msg: "该Report无法编辑！" });
+        //     return;
+        // }
 
         const reportInfo = await prisma.report({
             id: rid
