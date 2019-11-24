@@ -1,5 +1,5 @@
 import { prisma, Group, User } from "../generated/prisma-client";
-import { verifyJWT, filterUsersInfo } from "./check";
+import { verifyJWT, filterUsersInfo, filterUserInfo } from "./check";
 import { Request, Response } from "express";
 
 export const groupUser = async function(req: Request, res: Response) {
@@ -24,7 +24,9 @@ export const groupList = async function(req: Request, res: Response) {
         const groupList = await Promise.all(
             groupListRaw.map(async item => ({
                 group: item,
-                master: await prisma.group({ id: item.id }).master(),
+                master: filterUserInfo(
+                    await prisma.group({ id: item.id }).master()
+                ),
                 count: await prisma
                     .usersConnection({
                         where: {
