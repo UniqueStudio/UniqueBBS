@@ -253,7 +253,7 @@ export const fileProcess = async function(
 
             if (
                 !isAdmin &&
-                (attachAuthor.id !== uid || attachThread.id !== tid)
+                (attachAuthor.id !== uid || (attachThread.id && attachThread.id !== tid))
             ) {
                 return undefined;
             }
