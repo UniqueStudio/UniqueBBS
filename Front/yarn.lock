@@ -3083,6 +3083,11 @@ he@1.2.x, he@^1.1.0:
   resolved "https://registry.yarnpkg.com/he/-/he-1.2.0.tgz#84ae65fa7eafb165fddb61566ae14baf05664f0f"
   integrity sha512-F/1DnUGPopORZi0ni+CvrCgHQ5FyEAHRLSApuYWMmrbSwoN2Mn/7k+Gl38gJnR7yyDZk6WLXwiGod1JOWNDKGw==
 
+highlight.js@^10.0.3:
+  version "10.0.3"
+  resolved "https://registry.npm.taobao.org/highlight.js/download/highlight.js-10.0.3.tgz#5effcc58420f113f279a0badb8ac50c4be06e63b"
+  integrity sha1-Xv/MWEIPET8nmgutuKxQxL4G5js=
+
 hmac-drbg@^1.0.0:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/hmac-drbg/-/hmac-drbg-1.0.1.tgz#d2745701025a6c775a6c545793ed502fc0c649a1"

@@ -8,19 +8,22 @@ import getHumanDate from "./functions/humanDate";
 import getHumanDateLite from "./functions/humanDateLite";
 import joinTime from "./functions/joinTime";
 import marked from "marked";
+import { getLanguage, highlight } from "highlight.js";
 import Antd from "ant-design-vue";
 import io from "socket.io-client";
 import ajax from "./functions/ajax";
 
 marked.setOptions({
     renderer: new marked.Renderer(),
+    highlight: (code, lang) =>
+        highlight(getLanguage(lang) ? lang : "plaintext", code).value,
     gfm: true,
     tables: true,
     breaks: true,
     pedantic: false,
     sanitize: false,
     smartLists: true,
-    smartypants: false
+    smartypants: false,
 });
 
 Vue.prototype.$urls = urls;
@@ -46,7 +49,7 @@ const store = new Vuex.Store({
         uid: "",
         socket: undefined,
         noticeContent: "",
-        wxGoPageTime: new Date().getTime()
+        wxGoPageTime: new Date().getTime(),
     },
     mutations: {
         setAvatarSrc(state, url) {
@@ -75,7 +78,7 @@ const store = new Vuex.Store({
         },
         setLoginTime(state, val) {
             state.wxGoPageTime = val;
-        }
+        },
     },
     actions: {
         async checkLoginStatus(context) {
@@ -112,8 +115,8 @@ const store = new Vuex.Store({
                     Number.parseInt(messageCountResponse.msg.unread)
                 );
             }
-        }
-    }
+        },
+    },
 });
 
 /* eslint-disable no-new */
@@ -122,5 +125,5 @@ new Vue({
     router,
     store,
     components: { App },
-    template: "<App/>"
+    template: "<App/>",
 });
