@@ -50,6 +50,11 @@
     margin: 0 2px;
     font-size: 0.9em;
 }
+.thread-content pre code {
+    display: block;
+    margin: 0 auto;
+    padding: 12px;
+}
 .ant-modal-wrap,
 .ant-notification-notice,
 .ant-drawer-open {
