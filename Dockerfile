@@ -1,4 +1,4 @@
-FROM node:alpine AS build
+FROM node:12-alpine AS build
 
 ADD ./Back/package.json /tmp/package.json
 ADD ./Back/yarn.lock /tmp/yarn.lock
