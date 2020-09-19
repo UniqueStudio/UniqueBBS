@@ -251,9 +251,9 @@ app.post("/at", atResult);
 root.use("/api", app);
 root.use("/wxapi", wxServer);
 // only for docker-compose
-if (typeof process.env.DOCKER_COMPOSE === "string") {
-    root.use("*", proxy("/", { target: "http://bbs_front/" }));
-}
+// if (typeof process.env.DOCKER_COMPOSE === "string") {
+//     root.use("*", proxy("/", { target: "http://bbs_front/" }));
+// }
 
 server.listen(7010, () => {
     console.log(
