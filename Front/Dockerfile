@@ -1,4 +1,4 @@
-FROM node:alpine AS build
+FROM node:12-alpine AS build
 
 # ARG domain=https://api.bbs.hzytql.top/
 
