@@ -1,7 +1,7 @@
 require("dotenv").config();
 
 import express, { Router } from "express";
-import proxy from "http-proxy-middleware";
+// import proxy from "http-proxy-middleware";
 import bodyParser from "body-parser";
 import Redis from "redis";
 import Redlock from "redlock";
