@@ -190,7 +190,7 @@ export default {
             const regImgStr = /\!\[uniqueImg\]\(unique\:\/\/(.*?)\)/g;
             this.message = threadInfoRaw.data.msg.firstPost.message.replace(
                 regImgStr,
-                `![uniqueImg](/api/attach/preview/$1)`
+                `![uniqueImg](https://hustunique.com:7010/api/attach/preview/$1)`
             );
 
             this.attachList = threadInfoRaw.data.msg.attachArr.map(item => ({
