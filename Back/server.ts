@@ -10,6 +10,7 @@ import multer from "multer";
 import socket from "socket.io";
 import http from "http";
 import wxServer from "./wxserver";
+import task from "./task";
 
 import {
     userMyInfo,
@@ -254,6 +255,8 @@ root.use("/wxapi", wxServer);
 // if (typeof process.env.DOCKER_COMPOSE === "string") {
 //     root.use("*", proxy("/", { target: "http://bbs_front/" }));
 // }
+
+task().then(() => console.log('task started'));
 
 server.listen(7010, () => {
     console.log(
