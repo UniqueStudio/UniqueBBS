@@ -1,4 +1,4 @@
-import { prisma, User } from "../generated/prisma-client";
+import { prisma, User, UserCreateInput } from "../generated/prisma-client";
 import fetch from "node-fetch";
 import { scanningURL, userIDURL, getQRCodeURL, pagesize } from "./consts";
 import { Request, Response } from "express";
@@ -9,7 +9,10 @@ import {
     verifyJWT,
     filterMyInfo,
     filterUserInfo,
-    filterUsersInfo
+    filterUsersInfo,
+    verifyLongJWT,
+    signLongJWT,
+    longExpireTime
 } from "./check";
 import {
     pushMessage,
@@ -21,7 +24,7 @@ import { syncUpdateUser } from "./sync";
 import { setLockExpireIncr } from "./lock";
 import { filterUserAvatar } from "./check";
 import fs from "fs";
-import { MODE } from "../server";
+import { MODE, redisClientSetAsync } from "../server";
 
 export const userInfo = async function(req: Request, res: Response) {
     try {
@@ -180,6 +183,8 @@ export const userLoginByPwd = async function(req: Request, res: Response) {
         }
 
         const token = signJWT(userInfo.id, userInfo.isAdmin, userInfo.username);
+        const longToken = signLongJWT(userInfo.id, userInfo.isAdmin, userInfo.username);
+
         (async () =>
             await prisma.updateUser({
                 where: {
@@ -189,6 +194,9 @@ export const userLoginByPwd = async function(req: Request, res: Response) {
                     lastLogin: new Date()
                 }
             }))();
+        (async () => {
+            await redisClientSetAsync(token, longToken, "EX", longExpireTime);
+        })();
         res.json({
             code: 1,
             msg: {
@@ -384,6 +392,11 @@ export const userScan = async function(req: Request, res: Response) {
                         _user.isAdmin,
                         _user.username
                     );
+                    const longToken = signLongJWT(
+                        _user.id,
+                        _user.isAdmin, 
+                        _user.username
+                    );
                     (async () =>
                         await prisma.updateUser({
                             where: {
@@ -393,6 +406,9 @@ export const userScan = async function(req: Request, res: Response) {
                                 lastLogin: new Date()
                             }
                         }))();
+                    (async () => {
+                        await redisClientSetAsync(token, longToken, "EX", longExpireTime);
+                        })();
                     res.json({
                         code: 1,
                         msg: {
@@ -679,3 +695,23 @@ export const userAvatar = async function(req: Request, res: Response) {
         res.download(`./utils/defaultAvatar.png`);
     }
 };
+
+// when jwt expires send a post response to this api.
+//
+export const userUpdateJWT = async function(req: Request, res: Response) {
+    try {
+        const newToken = await verifyLongJWT(req.header("Authorization"));
+        res.json({code: 1, msg: newToken});
+    } catch (e) {
+        res.json({code: -1, msg: e.message})
+    }
+}
+
+export const registTest = async function (req: Request, res: Response) {
+    let {username, pwd, userid, nickname} = req.body;
+    pwd = addSaltPasswordOnce(pwd);
+    // console.log(req.body);
+    let userInput: UserCreateInput = {nickname: nickname , username: username, password: pwd, userid: userid, lastLogin: new Date()};
+    await prisma.createUser(userInput);
+    res.json({code: 1, msg: userInput});
+}

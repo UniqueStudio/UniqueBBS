@@ -29,7 +29,8 @@ import {
     userSearch,
     userRuntime,
     mentorMyMentees,
-    userAvatar
+    userAvatar,
+    userUpdateJWT
 } from "./model/user";
 import {
     threadDeleteHard,
@@ -55,7 +56,7 @@ import {
     postSearch,
     postInfo
 } from "./model/post";
-import { forumList, forumListSimple, forumRuntime } from "./model/forum";
+import { forumList, forumListSimple, forumRuntime, forumListTop } from "./model/forum";
 import {
     reportCreate,
     reportInfo,
@@ -185,11 +186,13 @@ app.post("/user/update/pwd", userPwdReset);
 app.post("/user/update/wx", userInfoUpdateFromWx);
 app.post("/user/mentor/set", mentorSet);
 app.post("/user/search", userSearch);
+app.post("/user/update/jwt", userUpdateJWT);
 
 //Forum
 app.get("/forum/list", forumList);
 app.get("/forum/runtime", forumRuntime);
 app.get("/forum/listSimple", forumListSimple);
+app.get("/forum/listTop", forumListTop);
 
 //Thread
 app.get("/thread/list/:fid/:page", threadList);
@@ -263,3 +266,4 @@ server.listen(7010, () => {
         `Rabbit WebServer / ${SERVER_VERSION} is running on port 7010.\nRedis:6379 , MySQL:3306 , graphQL:4466`
     );
 });
+

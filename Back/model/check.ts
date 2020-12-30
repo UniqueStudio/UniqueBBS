@@ -2,7 +2,9 @@ import jwt from "jsonwebtoken";
 import { secret, accessTokenURL, filterUserKeys, filterMyKeys } from "./consts";
 import crypto from "crypto";
 import { User } from "../generated/prisma-client";
-import { redisClientGetAsync, redisClientSetAsync } from "../server";
+import { redisClientDelAsync, redisClientGetAsync, redisClientSetAsync } from "../server";
+
+export const longExpireTime = 1296000;// half of a month
 
 export const BACKEND_URL = process.env.BACKEND_URL;
 
@@ -37,6 +39,26 @@ export const signJWT = function(
     );
 };
 
+// 
+export const signLongJWT = function(
+    uid: string,
+    isAdmin: boolean,
+    username: string
+) {
+    let sign = jwt.sign(
+        {
+            uid: uid,
+            isAdmin: isAdmin,
+            username: username
+        },
+        secret,
+        {
+            expiresIn: longExpireTime  
+        }
+    );
+
+    return sign;
+};
 export const verifyJWT = function(token?: string) {
     if (!token) {
         throw new Error("No token provided");
@@ -129,3 +151,24 @@ export const filterUserAvatar = function(avatar: string) {
         ? avatar.replace(/^unique\:\/\//g, `${BACKEND_URL}user/avatar/`)
         : avatar.replace(/^http\:\/\//g, "https://");
 };
+
+
+export const verifyLongJWT = async function(shortJWT: string) {
+    if (!shortJWT) {
+        throw new Error("No short token provided")
+    }
+    let longJWT = await redisClientGetAsync(shortJWT);
+    if (longJWT) {
+        const authObj = verifyJWT(longJWT);
+        const uid = authObj.uid;
+        const isAdmin = authObj.isAdmin;
+        const username = authObj.username;
+        const newToken = signJWT(uid, isAdmin, username);
+        const newLongToken = signLongJWT(uid, isAdmin, username);
+        await redisClientDelAsync(shortJWT);
+        await redisClientSetAsync(newToken, newLongToken, "EX", longExpireTime);
+        return newToken;
+    } else {
+        throw new Error("No valid long token");
+    }
+}

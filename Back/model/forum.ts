@@ -97,3 +97,9 @@ export const forumRuntime = async function(req: Request, res: Response) {
         res.json({ code: -1, msg: e.message });
     }
 };
+
+
+export const forumListTop = async function(req: Request, res: Response) {
+    req.header('Content-Type');
+    res.json({ code: 1, msg: 'unfinished'});
+}
