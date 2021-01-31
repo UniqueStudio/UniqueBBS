@@ -33,6 +33,7 @@ import {
     userUpdateJWT
 } from "./model/user";
 import {
+    threadGetTop3,
     threadDeleteHard,
     threadList,
     threadInfo,
@@ -56,7 +57,7 @@ import {
     postSearch,
     postInfo
 } from "./model/post";
-import { forumList, forumListSimple, forumRuntime, forumListTop } from "./model/forum";
+import { forumList, forumListSimple, forumRuntime } from "./model/forum";
 import {
     reportCreate,
     reportInfo,
@@ -192,9 +193,9 @@ app.post("/user/update/jwt", userUpdateJWT);
 app.get("/forum/list", forumList);
 app.get("/forum/runtime", forumRuntime);
 app.get("/forum/listSimple", forumListSimple);
-app.get("/forum/listTop", forumListTop);
 
 //Thread
+app.get("/thread/top3/:fid", threadGetTop3);
 app.get("/thread/list/:fid/:page", threadList);
 app.get("/thread/info/:tid/:page", threadInfo);
 app.get("/thread/runtime", threadRuntime);

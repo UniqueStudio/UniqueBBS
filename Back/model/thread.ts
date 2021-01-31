@@ -241,6 +241,94 @@ export const threadInfo = async function(req: Request, res: Response) {
     }
 };
 
+/*
+return msg: {
+    list: [
+        {
+            threadInfo,
+            threadAuthor,
+        },
+        {
+            threadInfo,
+            threadAuthor,
+        },
+        {
+            threadInfo,
+            threadAuthor,
+        },
+    ]
+}
+ */
+export const threadGetTop3 = async function (req:Request, res: Response) {
+    try {
+        verifyJWT(req.header("Authorization"));
+
+        let { fid } = req.params;
+        let topArr: Array<Thread> = [];
+        let threadTop1 = await prisma.threads({
+            where: {
+                top: 1,
+                forum: {
+                    id: fid
+                }
+            },
+            orderBy: "lastDate_DESC"
+        })
+        if (threadTop1.length > 0) {
+            topArr.push(threadTop1[0]);
+        } else {
+            topArr.push(null);
+        }
+        let threadMostPost = await prisma.threads({
+            where: {
+                top: 0,
+                forum: {
+                    id: fid
+                },
+                active: true
+            },
+            orderBy: "postCount_DESC"
+        })
+        if (threadMostPost.length > 0) {
+            topArr.push(threadMostPost[0]);
+        } else {
+            topArr.push(null);
+        }
+        let threadNewUpdate = await prisma.threads({
+            where: {
+                top: 0,
+                forum: {
+                    id: fid
+                },
+                active: true,
+            },
+            orderBy: "updatedAt_DESC"
+        })
+        if (threadNewUpdate.length > 1) {
+            if (topArr[1] !== null && threadNewUpdate[0].id === topArr[1].id) {
+                topArr.push(threadNewUpdate[1]);
+            } else {
+                topArr.push(threadNewUpdate[0]);
+            }
+        } else {
+            topArr.push(null);
+        }
+        
+        const resultArr = await Promise.all(
+            topArr.map(async item => {
+                return item? {
+                    thread: item,
+                    user: filterUserInfo(
+                        await prisma.thread({ id: item.id }).user()
+                    )
+                }: null;
+            })
+        );
+        res.json({ code: 1, msg: {list: resultArr}});
+    } catch (e) {
+        res.json({ code: -1 , msg: e.message});
+    }
+}
 export const threadCreate = async function(req: Request, res: Response) {
     try {
         const {
@@ -712,6 +800,7 @@ export const threadTop = async function(req: Request, res: Response) {
         res.json({ code: -1, msg: e.message });
     }
 };
+
 
 export const threadClose = async function(req: Request, res: Response) {
     try {
