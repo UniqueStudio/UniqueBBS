@@ -32,6 +32,20 @@ import {
 } from "./filter";
 import { atProcess } from "./at";
 
+var lastModifies :{[key:string]:Date} = {};
+
+export const initlastModifies = async function() {
+    try {
+        (await prisma.forums()).forEach(async item => {
+            let fid = item.id;
+            lastModifies[fid] = new Date();
+        });
+        
+    } catch (e) {
+        console.log(e);
+    }
+}
+
 export const threadList = async function(req: Request, res: Response) {
     try {
         const authObj = verifyJWT(req.header("Authorization"));
@@ -605,6 +619,8 @@ export const threadReply = async function(req: Request, res: Response) {
                     last: 1
                 });
 
+            lastModifies[forumInfo.id] = new Date();
+
             forumLastPostUpdate(forumInfo.id, resultThread[0].id);
             let havePushMessage = 0;
             if (uid !== authorInfo.id) {
@@ -673,7 +689,11 @@ export const threadDelete = async function(req: Request, res: Response) {
                 id: tid
             })
             .user();
-
+        const forumInfo = await prisma
+            .thread({
+                id: tid
+            })
+            .forum();
         if (threadAuthInfo.id !== uid && !authObj.isAdmin) {
             res.json({ code: -1, msg: "您无权操作此帖子！" });
             return;
@@ -686,7 +706,7 @@ export const threadDelete = async function(req: Request, res: Response) {
                     active: false
                 }
             });
-
+            lastModifies[forumInfo.id] = new Date();
             res.json({ code: 1 });
         }
     } catch (e) {
@@ -749,7 +769,12 @@ export const threadDiamond = async function(req: Request, res: Response) {
                     diamond: setDiamond === "1"
                 }
             });
-
+            const forumInfo = await prisma
+            .thread({
+                id: tid
+            })
+            .forum();
+            lastModifies[forumInfo.id] = new Date();
             const threadAuthor = await prisma
                 .thread({
                     id: tid
@@ -794,6 +819,12 @@ export const threadTop = async function(req: Request, res: Response) {
                     top: Number.parseInt(setTop)
                 }
             });
+            const forumInfo = await prisma
+            .thread({
+                id: tid
+            })
+            .forum();
+            lastModifies[forumInfo.id] = new Date();
             res.json({ code: 1 });
         }
     } catch (e) {
@@ -818,6 +849,12 @@ export const threadClose = async function(req: Request, res: Response) {
                     closed: setClose === "1"
                 }
             });
+            const forumInfo = await prisma
+            .thread({
+                id: tid
+            })
+            .forum();
+            lastModifies[forumInfo.id] = new Date();
             res.json({ code: 1 });
         }
     } catch (e) {
@@ -841,7 +878,12 @@ export const threadRecovery = async function(req: Request, res: Response) {
                     active: true
                 }
             });
-
+            const forumInfo = await prisma
+            .thread({
+                id: tid
+            })
+            .forum();
+            lastModifies[forumInfo.id] = new Date();
             await prisma.updateManyPosts({
                 where: {
                     thread: {
@@ -996,6 +1038,69 @@ export const threadUpdate = async function(req: Request, res: Response) {
     }
 };
 
+export const threadGetNew = async function(req: Request, res: Response) {
+    try {
+        let { fid } = req.params;
+        const authObj = verifyJWT(req.header("Authorization"));
+        const { timestamp } = req.body;
+        if (parseInt(timestamp) < lastModifies[fid].getTime()) {
+            res.json({code: 1, msg: {haveModified: true}});
+            return;
+        }
+        
+
+        const whereArr = {
+            forum: {
+                id: fid
+            },
+            active: authObj.isAdmin ? undefined : true,
+            top: 0
+        };
+
+
+        let page = 1;
+        let okFlag = false;
+        let resultArr = [];
+        for (;okFlag === false;) {
+            const resultArrRaw: Array<Thread> = await prisma.threads({
+                where: whereArr,
+                skip: (page-1)*pagesize,
+                first: pagesize,
+                orderBy: "lastDate_DESC"
+            });
+            
+            let i = 0;
+            for (; i < resultArrRaw.length; i++) {
+                let item = resultArrRaw[i];
+                if ((new Date(item.lastDate)) < (new Date(timestamp))) {
+                    okFlag = true;
+                    break;
+                }
+                resultArr.push({
+                    thread: item,
+                    user: filterUserInfo(
+                        await prisma.thread({ id: item.id }).user()
+                    ),
+                    lastReply: await prisma.posts({
+                        where: {
+                            thread: {
+                                id: item.id,
+                                active: authObj.isAdmin ? undefined : true
+                            }
+                        },
+                        orderBy: "createDate_DESC",
+                        first: 1
+                    })
+                })
+            }
+            if (okFlag === true || i === resultArrRaw.length) break;
+        }
+        res.json({ code: 1, msg: { list: resultArr } });
+    } catch (e) {
+        res.json({ code: -1 });
+    }
+}
+
 export const threadMove = async function(req: Request, res: Response) {
     try {
         const { uid, isAdmin } = verifyJWT(req.header("Authorization"));
@@ -1058,6 +1163,8 @@ export const threadMove = async function(req: Request, res: Response) {
                     }
                 }
             });
+            lastModifies[previousForum.id] = new Date();
+            lastModifies[newForum.id] = new Date();
             res.json({ code: 1 });
         } catch (e) {
             res.json({ code: -1, msg: e.message });

@@ -47,7 +47,9 @@ import {
     threadUpdate,
     threadMove,
     threadSearch,
-    threadRuntime
+    threadRuntime,
+    threadGetNew,
+    initlastModifies,
 } from "./model/thread";
 import {
     postDeleteHard,
@@ -195,6 +197,7 @@ app.get("/forum/runtime", forumRuntime);
 app.get("/forum/listSimple", forumListSimple);
 
 //Thread
+
 app.get("/thread/top3/:fid", threadGetTop3);
 app.get("/thread/list/:fid/:page", threadList);
 app.get("/thread/info/:tid/:page", threadInfo);
@@ -210,6 +213,7 @@ app.post("/thread/search", threadSearch);
 app.post("/thread/delete/:tid", threadDelete);
 app.post("/thread/deleteHard/:tid", threadDeleteHard);
 app.post("/thread/recovery/:tid", threadRecovery);
+app.post("/thread/getNew/:fid", threadGetNew);
 
 //Post
 app.get("/post/info/:pid", postInfo);
@@ -266,5 +270,6 @@ server.listen(7010, () => {
     console.log(
         `Rabbit WebServer / ${SERVER_VERSION} is running on port 7010.\nRedis:6379 , MySQL:3306 , graphQL:4466`
     );
+    setTimeout(initlastModifies, 2000);
 });
 
