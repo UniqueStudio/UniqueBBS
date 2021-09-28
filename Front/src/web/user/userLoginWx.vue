@@ -53,9 +53,9 @@ export default {
                     return;
                 }
                 while (statusRaw.data.code === -1) {
-                    statusRaw = await this.getStatusRaw();
                     // like Sleep(500ms)
                     await new Promise(resolve => setTimeout(resolve, 500));
+                    statusRaw = await this.getStatusRaw();
                 }
                 if (statusRaw.data.code === 1) {
                     const response = statusRaw.data;
