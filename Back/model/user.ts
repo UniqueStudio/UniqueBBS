@@ -423,6 +423,9 @@ export const userScan = async function(req: Request, res: Response) {
             } else {
                 res.json({ code: -1, msg: "登录失败！" });
             }
+        } else if (status === "QRCODE_SCAN_NEVER") {
+            // Havn't scanned the qrcode
+            res.json({ code: -1, msg: "尚未扫码" });
         } else {
             res.json({ code: -2, msg: "登录超时，请重新登录！" });
         }
@@ -434,8 +437,9 @@ export const userScan = async function(req: Request, res: Response) {
 export const userQRLogin = async function(_req: Request, res: Response) {
     try {
         const response = await fetch(getQRCodeURL);
-        const html = await response.text();
-        const key = html.match(/key ?: ?"\w+/)![0].replace(/key ?: ?"/, "");
+        const data = JSON.parse(await response.text());
+        const qrcodeSrc: string = data.serviceResponse.authenticationSuccess.qrcodeSrc;
+        const key = qrcodeSrc.match(/key=(\w+)/)![0].replace(/key=/, "");
         res.json({ code: 1, msg: key });
     } catch (err) {
         res.json({ code: -1, msg: err.message });

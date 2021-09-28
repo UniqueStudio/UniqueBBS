@@ -21,6 +21,7 @@ export const wxAppID = process.env.APPID as string;
 export const wxSECRET = process.env.WXSECRET as string;
 export const agentID = process.env.AGENTID as string;
 
+export const ssoQRCodeURL = `https://sso.hustunique.com/qrcode/code`;
 export const getQRCodeURL = `https://open.work.weixin.qq.com/wwopen/sso/qrConnect?appid=${wxAppID}&agentid=${agentID}&redirect_uri=https%3A%2F%2Fopen.hustunique.com%2Fauth&state=api`;
 export const scanningURL =
     "https://open.work.weixin.qq.com/wwopen/sso/l/qrConnect?key=";
