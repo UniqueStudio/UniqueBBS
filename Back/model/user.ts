@@ -1,6 +1,6 @@
 import { prisma, User, UserCreateInput } from "../generated/prisma-client";
 import fetch from "node-fetch";
-import { scanningURL, userIDURL, getQRCodeURL, pagesize } from "./consts";
+import { scanningURL, userIDURL, ssoQRCodeURL, pagesize } from "./consts";
 import { Request, Response } from "express";
 import {
     addSaltPasswordOnce,
@@ -436,7 +436,7 @@ export const userScan = async function(req: Request, res: Response) {
 
 export const userQRLogin = async function(_req: Request, res: Response) {
     try {
-        const response = await fetch(getQRCodeURL);
+        const response = await fetch(ssoQRCodeURL);
         const data = JSON.parse(await response.text());
         const qrcodeSrc: string = data.serviceResponse.authenticationSuccess.qrcodeSrc;
         const key = qrcodeSrc.match(/key=(\w+)/)![0].replace(/key=/, "");

@@ -30,6 +30,11 @@ export default {
         };
     },
     methods: {
+        async getStatusRaw() {
+            return await this.$ajax.get(
+                this.$urls.wxLoginGetStatus(this.key)
+            );
+        },
         async getKey() {
             const pageIntoTime = this.$store.state.wxGoPageTime;
 
@@ -92,13 +97,6 @@ export default {
     beforeDestroy() {
         this.onPage = false;
     },
-    methods: {
-        async getStatusRaw() {
-            return await this.$ajax.get(
-                this.$urls.wxLoginGetStatus(this.key)
-            );
-        }
-    }
 };
 </script>
 <style scoped>
