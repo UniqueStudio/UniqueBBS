@@ -30,6 +30,11 @@ export default {
         };
     },
     methods: {
+        async getStatusRaw() {
+            return await this.$ajax.get(
+                this.$urls.wxLoginGetStatus(this.key)
+            );
+        },
         async getKey() {
             const pageIntoTime = this.$store.state.wxGoPageTime;
 
@@ -48,13 +53,15 @@ export default {
                 this.key = key;
                 this.keySrc = `https://open.work.weixin.qq.com/wwopen/sso/qrImg?key=${key}`;
                 this.showLoading = false;
-                const statusRaw = await this.$ajax.get(
-                    this.$urls.wxLoginGetStatus(this.key)
-                );
+                let statusRaw = await this.getStatusRaw();
                 if (this.$store.state.wxGoPageTime !== pageIntoTime) {
                     return;
                 }
-
+                while (statusRaw.data.code === -1) {
+                    // like Sleep(500ms)
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                    statusRaw = await this.getStatusRaw();
+                }
                 if (statusRaw.data.code === 1) {
                     const response = statusRaw.data;
                     const token = response.msg.token;
@@ -89,7 +96,7 @@ export default {
     },
     beforeDestroy() {
         this.onPage = false;
-    }
+    },
 };
 </script>
 <style scoped>
