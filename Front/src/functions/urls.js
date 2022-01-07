@@ -1,6 +1,6 @@
 const url = new URL(window.location.href);
 
-const domain = "https://hustunique.com:7010/api/";
+const domain = "https://back.bbs.hustunique.com/api/";
 // const domain = "http://localhost:7010/api/";
 
 const socket = domain.replace(/^http/i, "ws");
