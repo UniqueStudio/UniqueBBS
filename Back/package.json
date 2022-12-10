@@ -9,7 +9,7 @@
         "body-parser": "^1.18.3",
         "cron": "^1.8.2",
         "dotenv": "^6.2.0",
-        "express": "^4.16.4",
+        "express": "^4.17.3",
         "express-generator": "^4.16.0",
         "fast-xml-parser": "^3.12.12",
         "graphql": "14.0.2",
