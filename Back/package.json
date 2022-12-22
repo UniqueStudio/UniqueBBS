@@ -14,7 +14,7 @@
         "fast-xml-parser": "^3.12.12",
         "graphql": "14.0.2",
         "http-proxy-middleware": "^0.19.1",
-        "jsonwebtoken": "^8.4.0",
+        "jsonwebtoken": "^9.0.0",
         "multer": "^1.4.1",
         "node-fetch": "^2.6.1",
         "prisma-client-lib": "1.23.4",
